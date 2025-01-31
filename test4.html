@@ -1,0 +1,34 @@
+// Add this to your existing JavaScript
+function validateForm(type) {
+    // ... existing validation code ...
+
+    if (isValid) {
+        const formData = new FormData();
+        formData.append('username', document.getElementById(prefix + (type === 'buyer' ? 'username' : 'business')).value);
+        formData.append('email', document.getElementById(prefix + 'email').value);
+        formData.append('password', document.getElementById(prefix + 'password').value);
+        formData.append('phone', document.getElementById(prefix + 'phone').value);
+        formData.append('user_type', type);
+
+        fetch('handlers/signup_handler.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            console.log('Raw response:', response);
+            return response.json();
+        })
+        .then(data => {
+            if (data.status === 'success') {
+                alert('Registration successful!');
+                window.location.href = type === 'buyer' ? 'home.html' : 'seller_home.html';
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred during registration');
+        });
+    }
+} 

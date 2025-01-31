@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Cloth</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        .admin-container {
+            max-width: 1000px;
+            margin: 50px auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            gap: 20px;
+        }
+        .left-column, .right-column {
+            flex: 1;
+            margin-top: auto;
+            margin-bottom: auto;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .upload-area {
+            border: 2px dashed #ccc;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            cursor: pointer;
+            height: 200px; /* Increased height for the upload area */
+        }
+        .image-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .image-preview img {
+            max-width: 100px;
+            border-radius: 5px;
+        }
+        .button-container {
+            display: flex;
+            justify-content: center; /* Centering the button horizontally */
+            margin-top: 20px; /* Add some space above the button */
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <div class="left-column">
+            <div class="form-group upload-area" id="uploadArea">
+                <p>Drag & Drop to Upload Images </p>
+                <button type="button" onclick="document.getElementById('images').click()">Browse</button>
+                <input type="file" id="images" multiple accept="image/*" style="display:none;" onchange="previewImages()" />
+                <div class="image-preview" id="imagePreview"></div>
+            </div>
+        </div>
+        <div class="right-column">
+            <h1>Add New Cloth</h1>
+            <form id="clothForm">
+                <div class="form-group">
+                    <label for="title">Cloth Title</label>
+                    <input type="text" id="title" required />
+                </div>
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea id="description" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="size">Size</label>
+                    <input type="text" id="size" required />
+                </div>
+                <div class="form-group">
+                    <label for="color">Color</label>
+                    <input type="text" id="color" required />
+                </div>
+                <div class="form-group">
+                    <label for="price">Rental Price (₹/day)</label>
+                    <input type="number" id="price" required />
+                </div>
+                <div class="form-group">
+                    <label for="contact">Contact No</label>
+                    <input type="text" id="contact" required />
+                </div>
+                <div class="form-group">
+                    <label for="whatsapp">WhatsApp No</label>
+                    <input type="text" id="whatsapp" required />
+                </div>
+                <div class="form-group">
+                    <label for="shopName">Shop Name</label>
+                    <input type="text" id="shopName" required />
+                </div>
+                <div class="form-group">
+                    <label for="address">Shop Address</label>
+                    <input type="text" id="address" placeholder="Shop Address" required />
+                </div>
+                <div class="form-group">
+                    <label for="terms">Terms and Conditions</label>
+                    <textarea id="terms" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="location">Location</label>
+                    <input type="text" id="location" placeholder="Location (latitude, longitude)" required />
+                    <button type="button" onclick="getCurrentLocation()">Get Current Location</button>
+                </div>
+                <div class="button-container">
+                    <button type="submit">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Image upload preview
+        function previewImages() {
+            const files = document.getElementById('images').files;
+            const preview = document.getElementById('imagePreview');
+            preview.innerHTML = '';
+            for (let i = 0; i < files.length && i < 5; i++) { // Limit to 5 images
+                const img = document.createElement('img');
+                img.src = URL.createObjectURL(files[i]);
+                preview.appendChild(img);
+            }
+        }
+
+        // Geolocation and reverse geocoding
+        function getCurrentLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const latitude = position.coords.latitude;
+                        const longitude = position.coords.longitude;
+                        document.getElementById('location').value = `${latitude}, ${longitude}`;
+                        reverseGeocode(latitude, longitude);
+                    },
+                    (error) => {
+                        alert("Unable to retrieve your location. Please try again.");
+                        console.error("Geolocation error:", error);
+                    }
+                );
+            } else {
+                alert("Geolocation is not supported by your browser.");
+            }
+        }
+
+        async function reverseGeocode(latitude, longitude) {
+            const apiKey = 'YOUR_GOOGLE_MAPS_API_KEY'; // Replace with your API key
+            const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`;
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data.status === "OK" && data.results.length > 0) {
+                    const address = data.results[0].formatted_address;
+                    if (confirm(`Do you want to update the address to: ${address}?`)) {
+                        document.getElementById('address').value = address;
+                    }
+                } else {
+                    alert("Unable to find a human-readable address for the given location.");
+                }
+            } catch (error) {
+                console.error("Error while fetching address:", error);
+                alert("There was an error retrieving the address. Please try again.");
+            }
+        }
+    </script>
+</body>
+</html>
