@@ -17,10 +17,10 @@ $allowed_page = ($_SESSION['user_type'] === 'buyer' && $current_page === 'Buyer_
 if (!$allowed_page) {
     if ($_SESSION['user_type'] === 'buyer') {
         header('Location: Buyer_Dashboard.html');
-    } 
-    if ($_SESSION['user_type'] === 'seller') {
+    } else if ($_SESSION['user_type'] === 'seller') {
         header('Location: seller_home.html');
     }
     exit();
 }
+
 ?> 
