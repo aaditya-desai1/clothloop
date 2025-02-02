@@ -28,13 +28,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 VALUES ('$username', '$email', '$password', '$phone', '$user_type')";
 
         if ($conn->query($sql) === TRUE) {
-            $redirect = $user_type === 'buyer' ? 'home.html' : 'seller_home.html';
-            echo "<script>alert('Registration successful!'); window.location.href='" . $redirect . "';</script>";
+            // Redirect to login page after successful registration
+            echo "<script>
+                alert('Registration successful! Please login.');
+                window.location.href='login.html';
+            </script>";
         } else {
             throw new Exception("Database Error: " . $conn->error);
         }
     } catch (Exception $e) {
-        echo "<script>alert('Error: " . $e->getMessage() . "'); window.location.href='signup.html';</script>";
+        echo "<script>
+            alert('Error: " . $e->getMessage() . "');
+            window.location.href='signup.html';
+        </script>";
     }
+
+       // Insert user directly open seller home page or buyer home page
+
+        //     $sql = "INSERT INTO users (username, email, password, phone, user_type) 
+        //     VALUES ('$username', '$email', '$password', '$phone', '$user_type')";
+
+        // if ($conn->query($sql) === TRUE) {
+        // $redirect = $user_type === 'buyer' ? 'Buyer_Dashboard.html' : 'seller_home.html';
+        // echo "<script>alert('Registration successful!'); window.location.href='" . $redirect . "';</script>";
+        // } else {
+        // throw new Exception("Database Error: " . $conn->error);
+        // }
+        // } catch (Exception $e) {
+        // echo "<script>alert('Error: " . $e->getMessage() . "'); window.location.href='signup.html';</script>";
+
 }
 ?> 

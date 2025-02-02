@@ -2,6 +2,11 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-require_once __DIR__ . '/config/db_connect.php';
-echo "If you see this, PHP is working and database is connected!";
+require_once 'config/db_connect.php';
+
+if(isset($conn)) {
+    echo "Database connection successful!";
+} else {
+    echo "Database connection failed!";
+}
 ?> 

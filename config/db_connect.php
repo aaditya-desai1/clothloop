@@ -1,7 +1,7 @@
 <?php
 $servername = "localhost";
-$username = "root";
-$password = "";
+$username = "root";  // default XAMPP username
+$password = "";      // default XAMPP password
 $dbname = "clothloop";
 
 try {

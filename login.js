@@ -19,7 +19,12 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
         const data = await response.json();
         
         if (data.success) {
-            window.location.href = '/clothloop/Buyer_Dashboard.html';
+            // Redirect based on user type
+            if (data.user_type === 'seller') {
+                window.location.href = 'seller_home.html';
+            } else if (data.user_type === 'buyer') {
+                window.location.href = 'Buyer_Dashboard.html';
+            }
         } else {
             alert(data.message || 'Login failed. Please check your credentials.');
         }
