@@ -24,7 +24,6 @@ document.getElementById('login-form').addEventListener('submit', function(e) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-<<<<<<< HEAD
             // Redirect based on user type and destination
             if (data.user_type === 'seller') {
                 window.location.href = 'Seller_Dashboard.html';
@@ -34,13 +33,6 @@ document.getElementById('login-form').addEventListener('submit', function(e) {
                 } else {
                     window.location.href = 'Buyer_Dashboard.html';
                 }
-=======
-            // Redirect based on user type
-            if (data.user_type === 'seller') {
-                window.location.href = 'seller_home.html';
-            } else if (data.user_type === 'buyer') {
-                window.location.href = 'Buyer_Dashboard.html';
->>>>>>> f9410016c5415c75d7d77c4dcce1af52df2bdb12
             }
         } else {
             alert(data.error || 'Login failed. Please try again.');
