@@ -15,13 +15,92 @@ function showForm(type) {
     }
 }
 
-// Form validation
+// Add password validation function
+function validatePassword(password) {
+    // Password validation rules
+    const minLength = 8;
+    const maxLength = 12;
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasNumbers = /\d/.test(password);
+    const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(password);
+    
+    const errors = [];
+    
+    if (password.length < minLength || password.length > maxLength) {
+        errors.push(`Password must be between ${minLength}-${maxLength} characters`);
+    }
+    if (!hasUpperCase) errors.push('Include at least one uppercase letter');
+    if (!hasLowerCase) errors.push('Include at least one lowercase letter');
+    if (!hasNumbers) errors.push('Include at least one number');
+    if (!hasSpecialChar) errors.push('Include at least one special character');
+    
+    return {
+        isValid: errors.length === 0,
+        errors: errors
+    };
+}
+
+// Update password strength indicator
+function updatePasswordStrength(password, strengthElement) {
+    let strength = 0;
+    
+    if (password.length >= 8) strength++;
+    if (/[A-Z]/.test(password)) strength++;
+    if (/[a-z]/.test(password)) strength++;
+    if (/[0-9]/.test(password)) strength++;
+    if (/[^A-Za-z0-9]/.test(password)) strength++;
+
+    const strengthText = ['Very Weak', 'Weak', 'Medium', 'Strong', 'Very Strong'];
+    const strengthColor = ['#ff4444', '#ffbb33', '#ffeb3b', '#00C851', '#007E33'];
+    
+    strengthElement.style.width = `${(strength / 5) * 100}%`;
+    strengthElement.style.backgroundColor = strengthColor[strength - 1];
+    strengthElement.textContent = strengthText[strength - 1];
+}
+
+// Add event listeners for password fields
+document.addEventListener('DOMContentLoaded', function() {
+    const passwordFields = document.querySelectorAll('input[type="password"][name="password"]');
+    
+    passwordFields.forEach(passwordField => {
+        // Create password strength indicator
+        const strengthDiv = document.createElement('div');
+        strengthDiv.className = 'password-strength-bar';
+        passwordField.parentElement.appendChild(strengthDiv);
+        
+        // Create error message container
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'password-error';
+        passwordField.parentElement.appendChild(errorDiv);
+        
+        // Add input event listener
+        passwordField.addEventListener('input', function() {
+            const result = validatePassword(this.value);
+            updatePasswordStrength(this.value, strengthDiv);
+            
+            // Show/hide error messages
+            errorDiv.innerHTML = result.errors.map(error => `<div class="error-message">${error}</div>`).join('');
+            
+            // Update input validity
+            this.setCustomValidity(result.isValid ? '' : 'Please fix password errors');
+        });
+    });
+});
+
+// Update form validation
 document.querySelectorAll('form').forEach(form => {
     form.addEventListener('submit', function(e) {
         e.preventDefault();
         
         const password = this.querySelector('input[name="password"]').value;
         const confirmPassword = this.querySelector('input[name="confirm_password"]').value;
+        const passwordValidation = validatePassword(password);
+
+        if (!passwordValidation.isValid) {
+            alert('Please fix password errors:\n' + passwordValidation.errors.join('\n'));
+            return;
+        }
 
         if (password !== confirmPassword) {
             alert('Passwords do not match!');
