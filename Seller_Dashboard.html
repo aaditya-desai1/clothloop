@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Seller Dashboard</title>
+  
+  <!-- CSS Links -->
+  <link rel="stylesheet" href="Seller_Dashboard.css"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+  
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="main-header">
+      <div class="header-left">
+        <div class="logo">
+          <img src="LOGO.webp" alt="APPLICATION logo" />
+          <div class="brand-name">
+
+          </div>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="account-info">
+          <div class="notifications">
+            <i class="fas fa-bell"></i>
+            <span class="notification-badge">3</span>
+          </div>
+          <div class="user-profile">
+            <img src="Shop_logo.png" alt="User Shop logo" />
+            <div class="user-details">
+              <h4>John Doe</h4>
+              <p>Seller Account</p>
+            </div>
+            <i class="fas fa-chevron-down"></i>
+            <div class="dropdown-menu">
+              <a href="#"><i class="fas fa-user"></i> Profile</a>
+              <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
+              <a href="login.html"><i class="fas fa-sign-out-alt"></i> Log Out</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <nav>
+        <ul>
+          <li>
+            <a href="#" class="nav-link active" data-section="home">
+              <i class="fas fa-tachometer-alt"></i> Dashboard
+            </a>
+          </li>
+          <br>
+          <li>
+            <a href="#" class="nav-link" data-section="analysis">
+              <i class="fas fa-chart-line"></i> Analysis
+            </a>
+          </li>
+          <br>
+          <li>
+            <a href="#" class="nav-link" data-section="comments">
+              <i class="fas fa-comments"></i> Comments
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+    
+    <!-- Home -->
+    <div id="home-section" class="main-content section active">
+      
+      <!-- Overview Section -->
+      <div class="overview">
+        <div class="stat">
+          <h3>Total Likes</h3>
+          <p>120</p>
+        </div>
+        <div class="stat">
+          <h3>Total Product</h3>
+          <p>4</p>
+        </div>
+        <div class="upload-button">
+          <button type="button" onclick="window.location.href='cloth_upload.html'">
+            <i class="fas fa-plus"></i> Upload Product
+          </button>
+        </div>
+      </div>
+      
+      <!-- Listed Products -->
+      <div class="listed-products">
+        <h2>Listed Products</h2>
+        <div class="product-grid">
+          <div class="product">
+            <img src="p2.jpg" alt="Product 1" />
+            <h3>Product 1</h3>
+            <p>Description of product 1</p>
+          </div>
+          <div class="product">
+            <img src="p4.jpg" alt="Product 2" />
+            <h3>Product 2</h3>
+            <p>Description of product 2</p>
+          </div>
+          <div class="product">
+            <img src="p3.jpg" alt="Product 3" />
+            <h3>Product 3</h3>
+            <p>Description of product 3</p>
+          </div>
+          <div class="product">
+            <img src="p4.jpg" alt="Product 2" />
+            <h3>Product 2</h3>
+            <p>Description of product 2</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Analysis Section -->
+    <div id="analysis-section" class="main-content section hidden">
+      
+      <!-- Analysis Section -->
+      <div class="analysis">
+        <h2>Analysis</h2>
+        <div class="chart-grid">
+          <div class="chart">
+            <h3>Product Likes</h3>
+            <canvas id="product-sales-chart"></canvas>
+          </div>
+          <div class="chart">
+            <h3>Views</h3>
+            <canvas id="revenue-chart"></canvas>
+          </div>
+          <div class="chart">
+            <h3>Customer Engagement</h3>
+            <canvas id="customer-engagement-chart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Comments Section -->
+    <div id="comments-section" class="main-content section hidden">
+      <div class="comments">
+        <h2>Comments</h2>
+        <div class="comment-grid">
+          <!-- Product 1 Comments -->
+          <div class="comment-product">
+            <h3>Product 1</h3>
+            <div class="comment-list">
+              <div class="comment">
+                <img src="https://storage.googleapis.com/a1aa/image/vyoteAaMVxUdfUT8mcADqui86QHEAIXpi3dNEZoqHHpo3UlTA.jpg" alt="User 1" />
+                <div class="comment-content">
+                  <h4>User 1</h4>
+                  <p>This is a sample comment for Product 1.</p>
+                  <button class="reply-button" onclick="toggleReplyForm(this)">
+                    <i class="fas fa-reply"></i> Reply
+                  </button>
+                  <div class="reply-form">
+                    <textarea placeholder="Write your reply..."></textarea>
+                    <button onclick="submitReply(this)">Submit</button>
+                  </div>
+                  <div class="replies-container">
+                    <!-- Replies will be added here dynamically -->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Product 2 Comments -->
+          <div class="comment-product">
+            <h3>Product 2</h3>
+            <div class="comment-list">
+              <div class="comment">
+                <img src="https://storage.googleapis.com/a1aa/image/KJizTK3abTLIAtud3mmXdFjneitoeHGh06PGxeNaCePe8mqcC.jpg" alt="User 2" />
+                <div class="comment-content">
+                  <h4>User 2</h4>
+                  <p>Great product! Love the quality and design.</p>
+                  <button class="reply-button" onclick="toggleReplyForm(this)">
+                    <i class="fas fa-reply"></i> Reply
+                  </button>
+                  <div class="reply-form">
+                    <textarea placeholder="Write your reply..."></textarea>
+                    <button onclick="submitReply(this)">Submit</button>
+                  </div>
+                  <div class="replies-container">
+                    <!-- Replies will be added here dynamically -->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Product 3 Comments -->
+          <div class="comment-product">
+            <h3>Product 3</h3>
+            <div class="comment-list">
+              <div class="comment">
+                <img src="https://storage.googleapis.com/a1aa/image/p4ZEJIKfJCSvFCvZ9wnCQdDqUJDzYHCTwG62blqgepYm3UlTA.jpg" alt="User 3" />
+                <div class="comment-content">
+                  <h4>User 3</h4>
+                  <p>Perfect fit and amazing material!</p>
+                  <button class="reply-button" onclick="toggleReplyForm(this)">
+                    <i class="fas fa-reply"></i> Reply
+                  </button>
+                  <div class="reply-form">
+                    <textarea placeholder="Write your reply..."></textarea>
+                    <button onclick="submitReply(this)">Submit</button>
+                  </div>
+                  <div class="replies-container">
+                    <!-- Replies will be added here dynamically -->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings Section -->
+    <div id="settings-section" class="main-content section hidden">
+      <h1>
+       Settings
+      </h1>
+      <div class="form-group">
+       <label for="email">
+        Email:
+       </label>
+       <input id="email" type="text" value="user@example.com"/>
+      </div>
+      <div class="form-group">
+       <label for="phone">
+        Phone Number:
+       </label>
+       <input id="phone" type="text" value="+1 123 456 7890"/>
+      </div>
+      <div class="form-group">
+       <label for="password">
+        Password:
+       </label>
+       <input id="password" type="password" value="********"/>
+      </div>
+      <div class="form-group">
+       <label for="confirm-password">
+        Confirm Password:
+       </label>
+       <input id="confirm-password" type="password" value="********"/>
+      </div>
+      <div class="form-group">
+       <label for="profile-picture">
+        Profile Picture:
+       </label>
+       <input id="profile-picture" type="file"/>
+      </div>
+      <div class="form-group">
+       <label for="bio">
+        Bio:
+       </label>
+       <textarea id="bio">Tell us about yourself...</textarea>
+      </div>
+      <div class="form-group">
+       <button type="button">
+        Save Changes
+       </button>
+      </div>
+     </div>
+     
+  </div>
+
+  <!-- Add JavaScript at the end of body -->
+  <script src="Seller_Dashboard.js"></script>
+</body>
+</html>

@@ -9,55 +9,40 @@
 
 </head>
 <body>
-  <div class="container">
-    <!-- Sidebar -->
-    <div class="sidebar">
+  <!-- Header -->
+  <header class="main-header">
+    <div class="header-left">
       <div class="logo">
-        <img src="shop_logo.png" alt="Channel logo" />
-        <div class="channel-info">
-          <h1>CF</h1>
-          <p>clothify</p>
+        <img src="LOGO.webp" alt="APPLICATION logo" />
+        <div class="brand-name">
         </div>
       </div>
-      <br>
-      <br>
-      <nav>
-        <ul>
-          <li>
-            <a href="seller_home.html">
-              <i class="fas fa-tachometer-alt"></i> Dashboard
-            </a>
-          </li>
-          <br>
-          <li>
-            <a href="analysis.html">
-              <i class="fas fa-chart-line"></i> Analysis
-            </a>
-          </li>
-          <br>
-          <li>
-            <a href="comments.html">
-              <i class="fas fa-comments"></i> Comments
-            </a>
-          </li>
-          <br>
-          <li>
-            <a href="settings.html" class="active">
-              <i class="fas fa-cog"></i> Settings
-            </a>
-          </li>
-          <br>
-        </ul>
-      </nav>
     </div>
-    
-   
-      
-      <!-- Settings Section -->
-      <div class="main-content">
-        <h1>
-         Settings
-        </h1>
+    <div class="header-right">
+      <div class="account-info">
+        <div class="notifications">
+          <i class="fas fa-bell"></i>
+          <span class="notification-badge">3</span>
+        </div>
+        <div class="user-profile">
+          <img src="Shop_logo.png" alt="User Shop logo" />
+          <div class="user-details">
+            <h4>John Doe</h4>
+            <p>Seller Account</p>
+          </div>
+          <i class="fas fa-chevron-down"></i>
+          <div class="dropdown-menu">
+            <a href="#"><i class="fas fa-user"></i> Profile</a>
+            <a href="#" data-section="settings"><i class="fas fa-cog"></i> Settings</a>
+            <a href="login.html"><i class="fas fa-sign-out-alt"></i> Log Out</a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Settings Section -->
+    <div class="main-content">
+      <h1>Settings</h1>
         <div class="form-group">
          <label for="email">
           Email:
@@ -94,13 +79,17 @@
          </label>
          <textarea id="bio">Tell us about yourself...</textarea>
         </div>
-        <div class="form-group">
-         <button type="button">
-          Save Changes
-         </button>
+        <div class="form-group button-group">
+          <button type="button" class="save-btn">
+            Save Changes
+          </button>
+          <button type="button" class="back-btn" onclick="window.location.href='Seller_Dashboard.html'">
+            <i class="fas fa-arrow-left"></i> Back
+          </button>
         </div>
        </div>
     </div>
   
+  <script src="settings.js"></script>
 </body>
 </html>

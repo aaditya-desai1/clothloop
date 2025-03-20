@@ -10,7 +10,7 @@
     },
     {
         imgSrc: "p2.jpg",
-        title: "Couple in Traditional Cloths"
+        title: "Couple in Traditional Clothes"
     }
 ];
 

@@ -12,8 +12,28 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
 
     <style>
-
-</style>
+        .logo {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .header-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        .header-buttons button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #333;
+            color: white;
+        }
+        .header-buttons button:hover {
+            background-color: #555;
+        }
+    </style>
 
 </head>
 <body>
@@ -21,10 +41,11 @@
     <header class="header">
         <div class="container">
             <a href="index.html">
-                <img src="https://storage.googleapis.com/a1aa/image/dOnanAuM8nJzKxeCekMXncY6WhdBLZZOZwAg4e58qmOBVOKnA.jpg" alt="ClothLoop Logo" class="logo">
+                <img src="logo.webp" alt="ClothLoop Logo" class="logo">
             </a>
             <div class="header-buttons">
                 <button onclick="window.location.href='Buyer_Dashboard.html'">Back to home page</button>
+                <button onclick="window.location.href='login.html'">Logout</button>
             </div>
         </div>
     </header>

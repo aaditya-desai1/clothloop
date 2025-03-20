@@ -1,4 +1,3 @@
-
         // Get the sorting button and dropdown
         const sortBtn = document.getElementById('sortBtn');
         const sortDropdown = document.getElementById('sortDropdown');
@@ -165,6 +164,8 @@
         });
 
         function handleLogout() {
-            // Add any logout logic here (e.g., clearing session, cookies, etc.)
+            // Clear any stored user data
+            localStorage.clear();
+            // Redirect to login page
             window.location.href = 'login.html';
         }

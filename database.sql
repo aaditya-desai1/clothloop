@@ -1,5 +1,5 @@
-CREATE DATABASE cloths_rental;
-USE cloths_rental;
+CREATE DATABASE clothloop;
+USE clothloop;
 
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,

@@ -4,7 +4,7 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 // Include database configuration
-require_once 'db_config.php';
+require_once 'config/db_connect.php';
 
 try {
     // Get POST data
@@ -16,28 +16,25 @@ try {
     error_log("Login attempt - Username: " . $username);
     
     // Prepare SQL statement
-    $stmt = $pdo->prepare("SELECT * FROM users WHERE username = :username");
-    $stmt->execute(['username' => $username]);
-    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    $stmt = $conn->prepare("SELECT * FROM users WHERE username = ?");
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $user = $result->fetch_assoc();
     
     if ($user) {
         error_log("User found - Attempting password verification");
         
-        // First try direct comparison (for plain text passwords)
-        if ($password === $user['password']) {
-            session_start();
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['username'] = $user['username'];
-            echo json_encode(['success' => true]);
-            exit;
-        }
-        
-        // Then try hashed password
         if (password_verify($password, $user['password'])) {
             session_start();
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['username'] = $user['username'];
-            echo json_encode(['success' => true]);
+            $_SESSION['user_type'] = $user['user_type'];
+            
+            echo json_encode([
+                'success' => true,
+                'user_type' => $user['user_type']
+            ]);
         } else {
             echo json_encode([
                 'success' => false,
@@ -51,7 +48,7 @@ try {
         ]);
     }
     
-} catch(PDOException $e) {
+} catch(Exception $e) {
     error_log("Database error: " . $e->getMessage());
     echo json_encode([
         'success' => false,
