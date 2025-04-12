@@ -24,28 +24,28 @@
         <form id="buyerForm" class="hidden" action="../backend/signup_process.php" method="POST">
             <h3>Buyer Signup</h3>
             <div class="form-group">
-                <label>Username:</label>
-                <input type="text" name="username" required>
+                <label for="buyer-username">Username:</label>
+                <input type="text" id="buyer-username" name="username" title="Enter your username" placeholder="Enter username" required>
                 <span class="error"></span>
             </div>
             <div class="form-group">
-                <label>Phone Number:</label>
-                <input type="tel" name="phone" pattern="[0-9]{10}" required>
+                <label for="buyer-phone">Phone Number:</label>
+                <input type="tel" id="buyer-phone" name="phone" pattern="[0-9]{10}" title="Enter 10-digit phone number" placeholder="10-digit phone number" required>
                 <span class="error"></span>
             </div>
             <div class="form-group">
-                <label>Email:</label>
-                <input type="email" name="email" required>
+                <label for="buyer-email">Email:</label>
+                <input type="email" id="buyer-email" name="email" title="Enter your email address" placeholder="Email address" required>
                 <span class="error"></span>
             </div>
             <div class="form-group">
-                <label>Password:</label>
-                <input type="password" name="password" required>
+                <label for="buyer-password">Password:</label>
+                <input type="password" id="buyer-password" name="password" title="Enter your password" placeholder="Password" required>
                 <span class="error"></span>
             </div>
             <div class="form-group">
-                <label>Confirm Password:</label>
-                <input type="password" name="confirm_password" required>
+                <label for="buyer-confirm-password">Confirm Password:</label>
+                <input type="password" id="buyer-confirm-password" name="confirm_password" title="Confirm your password" placeholder="Confirm password" required>
                 <span class="error"></span>
             </div>
             <div class="separator">
@@ -66,28 +66,28 @@
         <form id="sellerForm" class="hidden" action="../backend/signup_process.php" method="POST">
             <h3>Seller Signup</h3>
             <div class="form-group">
-                <label>User Name:</label>
-                <input type="text" name="username" required>
+                <label for="seller-username">User Name:</label>
+                <input type="text" id="seller-username" name="username" title="Enter your username" placeholder="Enter username" required>
                 <span class="error"></span>
             </div>
             <div class="form-group">
-                <label>Phone Number:</label>
-                <input type="tel" name="phone" pattern="[0-9]{10}" required>
+                <label for="seller-phone">Phone Number:</label>
+                <input type="tel" id="seller-phone" name="phone" pattern="[0-9]{10}" title="Enter 10-digit phone number" placeholder="10-digit phone number" required>
                 <span class="error"></span>
             </div>
             <div class="form-group">
-                <label>Email:</label>
-                <input type="email" name="email" required>
+                <label for="seller-email">Email:</label>
+                <input type="email" id="seller-email" name="email" title="Enter your email address" placeholder="Email address" required>
                 <span class="error"></span>
             </div>
             <div class="form-group">
-                <label>Password:</label>
-                <input type="password" name="password" required>
+                <label for="seller-password">Password:</label>
+                <input type="password" id="seller-password" name="password" title="Enter your password" placeholder="Password" required>
                 <span class="error"></span>
             </div>
             <div class="form-group">
-                <label>Confirm Password:</label>
-                <input type="password" name="confirm_password" required>
+                <label for="seller-confirm-password">Confirm Password:</label>
+                <input type="password" id="seller-confirm-password" name="confirm_password" title="Confirm your password" placeholder="Confirm password" required>
                 <span class="error"></span>
             </div>
             <div class="separator">
@@ -108,8 +108,8 @@
         <form id="sellerGoogleVerification" class="hidden" action="../backend/signup_process.php" method="POST">
             <h3>Additional Information Required</h3>
             <div class="form-group">
-                <label>Phone Number:</label>
-                <input type="tel" name="phone" pattern="[0-9]{10}" required>
+                <label for="google-verify-phone">Phone Number:</label>
+                <input type="tel" id="google-verify-phone" name="phone" pattern="[0-9]{10}" title="Enter 10-digit phone number" placeholder="10-digit phone number" required>
                 <span class="error"></span>
             </div>
             <input type="hidden" name="google_token" id="sellerGoogleVerificationToken">
