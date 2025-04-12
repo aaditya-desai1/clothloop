@@ -15,7 +15,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['user_type'] = $user['user_type'];
             
-            $redirect = $user['user_type'] == 'buyer' ? 'home.html' : 'seller_home.html';
+            $redirect = $user['user_type'] == 'buyer' ? '../frontend/Buyer/Buyer_Dashboard.html' : '../frontend/Seller/seller_home.html';
             echo json_encode(["status" => "success", "redirect" => $redirect]);
         } else {
             echo json_encode(["status" => "error", "message" => "Invalid password"]);
