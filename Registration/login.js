@@ -10,7 +10,7 @@ document.getElementById('login-form').addEventListener('submit', function(e) {
     const destination = urlParams.get('destination');
     
     // Make API call to login.php
-    fetch('login.php', {
+    fetch('../backend/login.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -26,12 +26,12 @@ document.getElementById('login-form').addEventListener('submit', function(e) {
         if (data.success) {
             // Redirect based on user type and destination
             if (data.user_type === 'seller') {
-                window.location.href = 'Seller_Dashboard.html';
+                window.location.href = '../frontend/Seller/seller_home.html';
             } else if (data.user_type === 'buyer') {
                 if (destination === 'wishlist') {
-                    window.location.href = 'wish.html';
+                    window.location.href = '../frontend/Buyer/wish.html';
                 } else {
-                    window.location.href = 'Buyer_Dashboard.html';
+                    window.location.href = '../frontend/Buyer/Buyer_Dashboard.html';
                 }
             }
         } else {

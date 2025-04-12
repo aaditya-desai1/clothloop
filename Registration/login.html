@@ -6,17 +6,17 @@
     <link rel="signup" href="signup.html">
     <!-- <link rel="login-form" href="login.js"> -->
     <link rel="stylesheet" href="login.css">
-    <title>Document</title>
+    <title>Login - ClothLoop</title>
 </head>
 <body>
 
     <div class="container">
         <h1>Login</h1>
-        <form id="login-form" action="../backend/login.php" method="POST">
+        <form id="login-form">
           <label for="username">Username:</label>
-          <input type="text" id="username" name="username"><br><br>
+          <input type="text" id="username" name="username" required><br><br>
           <label for="password">Password:</label>
-          <input type="password" id="password" name="password"><br><br>
+          <input type="password" id="password" name="password" required><br><br>
           <div class="button-container">
               <input type="submit" value="Login">
           </div>
