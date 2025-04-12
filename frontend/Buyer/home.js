@@ -162,3 +162,11 @@
             window.addEventListener('scroll', handleScrollAnimation);
             handleScrollAnimation();
         });
+
+        // Check if there's a handleLogout function and update it
+        function handleLogout() {
+            // Clear any stored user data
+            localStorage.clear();
+            // Redirect to login page
+            window.location.href = '../../Registration/login.html';
+        }

@@ -7,9 +7,30 @@
   
   <link rel="stylesheet" href="seller_home.css"/>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
-
+  <style>
+    .logout-button {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      padding: 8px 15px;
+      background-color: #e74c3c;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.3s;
+    }
+    
+    .logout-button:hover {
+      background-color: #c0392b;
+    }
+  </style>
 </head>
 <body>
+  <button class="logout-button" onclick="window.location.href='../../Registration/login.html'">
+    <i class="fas fa-sign-out-alt"></i> Logout
+  </button>
   <div class="container">
     <!-- Sidebar -->
     <div class="sidebar">
