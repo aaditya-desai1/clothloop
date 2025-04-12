@@ -27,7 +27,7 @@
         });
 
           // List of image sources
-    const images = ["1.jpg", "2.jpg", "3.jpg", "4.jpg", "5.jpg"];
+    const images = ["../Image/1.jpg", "../Image/2.jpg", "../Image/3.jpg", "../Image/4.jpg", "../Image/5.jpg"];
     let currentImageIndex = 0;
     let interval;
 
@@ -167,5 +167,5 @@
             // Clear any stored user data
             localStorage.clear();
             // Redirect to login page
-            window.location.href = 'login.html';
+            window.location.href = '../../Registration/login.html';
         }

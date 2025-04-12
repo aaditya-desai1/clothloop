@@ -1,15 +1,15 @@
  // Sample Wishlist Data with exactly 3 items
  const wishlistItems = [
     {
-        imgSrc: "p3.jpg",
+        imgSrc: "../Image/p3.jpg",
         title: "Traditional Woman Attire"
     },
     {
-        imgSrc: "p1.jpg",
+        imgSrc: "../Image/p1.jpg",
         title: "Traditional Man Attire"
     },
     {
-        imgSrc: "p2.jpg",
+        imgSrc: "../Image/p2.jpg",
         title: "Couple in Traditional Clothes"
     }
 ];

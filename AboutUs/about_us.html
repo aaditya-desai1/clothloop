@@ -25,6 +25,44 @@
             background-color: var(--light-bg);
         }
 
+        nav {
+            background-color: var(--primary-color);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        nav .logo {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        nav ul li {
+            margin-left: 1.5rem;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        nav ul li a:hover {
+            background-color: var(--secondary-color);
+        }
+
         .header {
             background-image: linear-gradient(rgba(44, 62, 80, 0.7), rgba(44, 62, 80, 0.7)), 
                             url('https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
@@ -136,6 +174,7 @@
         .mission-vision .about-card {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             color: white;
         }
 
@@ -177,6 +216,16 @@
     </style>
 </head>
 <body>
+    <nav>
+        <a href="../frontend/Buyer/home.html" class="logo">ClothLoop</a>
+        <ul>
+            <li><a href="../frontend/Buyer/home.html">Home</a></li>
+            <li><a href="../Registration/login.html">Login</a></li>
+            <li><a href="../Registration/signup.html">Register</a></li>
+            <li><a href="javascript:history.back()">Back</a></li>
+        </ul>
+    </nav>
+
     <div class="header">
         <h1>About ClothLoop</h1>
         <p>Connecting Fashion with Sustainability</p>
