@@ -24,8 +24,8 @@
         <h1>Login</h1>
         <!-- Error message container will be added here by JS -->
         <form id="login-form">
-          <label for="username">Username:</label>
-          <input type="text" id="username" name="username" required><br><br>
+          <label for="email">Email:</label>
+          <input type="email" id="email" name="email" required><br><br>
           <label for="password">Password:</label>
           <input type="password" id="password" name="password" required><br><br>
           <div class="button-container">
@@ -54,7 +54,7 @@
         e.preventDefault(); // Prevent default form submission
         
         // Get form values
-        const username = document.getElementById('username').value;
+        const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
         
         // Get destination from URL parameters
@@ -82,12 +82,14 @@
             form.prepend(errorDiv);
         }
         
-        console.log('Attempting login for:', username);
+        console.log('Attempting login for:', email);
         
         // API paths to try (in order)
         const paths = [
             '/ClothLoop/backend/login.php',
             '../backend/login.php',
+            '../backend/direct_login.php',
+            '../backend/simple_login.php',
             '../../backend/login.php',
             './backend/login.php'
         ];
@@ -105,7 +107,7 @@
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    username: username,
+                    email: email,
                     password: password,
                     destination: destination
                 })

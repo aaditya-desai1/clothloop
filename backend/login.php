@@ -47,15 +47,15 @@ try {
     }
     
     // Check if required fields are present
-    if (!isset($data['username']) || !isset($data['password'])) {
-        throw new Exception("Username and password are required");
+    if (!isset($data['email']) || !isset($data['password'])) {
+        throw new Exception("Email and password are required");
     }
     
-    $username = $data['username'];
+    $email = $data['email'];
     $password = $data['password'];
     
     // Log login attempt (for debugging)
-    error_log("Login attempt for username: " . $username);
+    error_log("Login attempt for email: " . $email);
     
     // Check database connection
     if (!isset($conn) || $conn->connect_error) {
@@ -64,36 +64,18 @@ try {
     }
     
     // Prepare SQL statement with parameterized query
-    // Try to find user by username first
-    $stmt = $conn->prepare("SELECT * FROM users WHERE username = ?");
+    // Try to find user by email
+    $stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
     if (!$stmt) {
         throw new Exception("Database query preparation failed: " . $conn->error);
     }
     
-    $stmt->bind_param("s", $username);
+    $stmt->bind_param("s", $email);
     if (!$stmt->execute()) {
         throw new Exception("Query execution failed: " . $stmt->error);
     }
     
     $result = $stmt->get_result();
-    
-    // If username not found, try with email 
-    if ($result->num_rows == 0) {
-        $stmt->close();
-        
-        // Try email as username
-        $stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
-        if (!$stmt) {
-            throw new Exception("Database query preparation failed: " . $conn->error);
-        }
-        
-        $stmt->bind_param("s", $username);
-        if (!$stmt->execute()) {
-            throw new Exception("Query execution failed: " . $stmt->error);
-        }
-        
-        $result = $stmt->get_result();
-    }
     
     if ($result->num_rows > 0) {
         $user = $result->fetch_assoc();
@@ -105,12 +87,13 @@ try {
         if (!$password_correct && $password === $user['password']) {
             $password_correct = true;
             // Log that password is stored in plain text (security issue)
-            error_log("WARNING: User {$username} has plain text password stored!");
+            error_log("WARNING: User {$email} has plain text password stored!");
         }
         
         if ($password_correct) {
             // Set session variables
             $_SESSION['user_id'] = $user['id'];
+            $_SESSION['email'] = $user['email'];
             $_SESSION['username'] = $user['username'];
             $_SESSION['user_type'] = $user['user_type'];
             
@@ -121,12 +104,12 @@ try {
                 'message' => 'Login successful'
             ]);
         } else {
-            error_log("Password verification failed for user: {$username}");
+            error_log("Password verification failed for user: {$email}");
             throw new Exception("Invalid password. Please try again.");
         }
     } else {
-        error_log("User not found: {$username}");
-        throw new Exception("User not found. Please check your username or register a new account.");
+        error_log("User not found: {$email}");
+        throw new Exception("User not found. Please check your email or register a new account.");
     }
     
     // Close resources
