@@ -5,119 +5,61 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up - ClothLoop</title>
     <link rel="stylesheet" href="signup.css">
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
-    <script src="https://unpkg.com/jwt-decode/build/jwt-decode.js"></script>
-    <meta name="google-signin-client_id" content="YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com">
 </head>
 <body>
     <div class="container">
-        <!-- <h2>Sign Up</h2> -->
+        <h2>Sign Up</h2>
         
-        <!-- Role Selection Buttons -->
-        <div id="roleButtons">
-            <!-- <h2>Sign Up</h2> -->
-            <button class="btn" onclick="showForm('buyer')">Sign up as Buyer</button>
-            <button class="btn" onclick="showForm('seller')">Sign up as Seller</button>
+        <div id="success-message" class="success-message"></div>
+        
+        <form id="signup-form" action="../backend/signup_process.php" method="POST">
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" title="Enter your username" placeholder="Enter username" required>
+                <span class="error" id="username-error"></span>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" title="Enter your email address" placeholder="Email address" required>
+                <span class="error" id="email-error"></span>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" title="Enter your password" placeholder="Password" required>
+                <div class="password-strength-bar" id="password-strength"></div>
+                <div class="password-error" id="password-error"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="confirm_password">Confirm Password:</label>
+                <input type="password" id="confirm_password" name="confirm_password" title="Confirm your password" placeholder="Confirm password" required>
+                <span class="error" id="confirm-password-error"></span>
+            </div>
+            
+            <div class="form-group">
+                <label for="phone">Phone Number:</label>
+                <input type="tel" id="phone" name="phone" pattern="[0-9]{10}" title="Enter 10-digit phone number" placeholder="10-digit phone number" required>
+                <span class="error" id="phone-error"></span>
+            </div>
+            
+            <div class="form-group">
+                <label for="user_type">User Type:</label>
+                <select id="user_type" name="user_type" required>
+                    <option value="buyer">Buyer</option>
+                    <option value="seller">Seller</option>
+                </select>
+            </div>
+            
+            <div class="button-container">
+                <button type="submit" id="submit-btn" class="btn">Create Account</button>
+            </div>
+        </form>
+        
+        <div class="login-link">
+            <p>Already have an account? <a href="login.html">Login</a></p>
         </div>
-
-        <!-- Buyer Signup Form -->
-        <form id="buyerForm" class="hidden" action="../backend/signup_process.php" method="POST">
-            <h3>Buyer Signup</h3>
-            <div class="form-group">
-                <label for="buyer-username">Username:</label>
-                <input type="text" id="buyer-username" name="username" title="Enter your username" placeholder="Enter username" required>
-                <span class="error"></span>
-            </div>
-            <div class="form-group">
-                <label for="buyer-phone">Phone Number:</label>
-                <input type="tel" id="buyer-phone" name="phone" pattern="[0-9]{10}" title="Enter 10-digit phone number" placeholder="10-digit phone number" required>
-                <span class="error"></span>
-            </div>
-            <div class="form-group">
-                <label for="buyer-email">Email:</label>
-                <input type="email" id="buyer-email" name="email" title="Enter your email address" placeholder="Email address" required>
-                <span class="error"></span>
-            </div>
-            <div class="form-group">
-                <label for="buyer-password">Password:</label>
-                <input type="password" id="buyer-password" name="password" title="Enter your password" placeholder="Password" required>
-                <span class="error"></span>
-            </div>
-            <div class="form-group">
-                <label for="buyer-confirm-password">Confirm Password:</label>
-                <input type="password" id="buyer-confirm-password" name="confirm_password" title="Confirm your password" placeholder="Confirm password" required>
-                <span class="error"></span>
-            </div>
-            <div class="separator">
-                <div class="line"></div>
-                <p>or</p>
-                <div class="line"></div>
-            </div>
-            <div id="buyerGoogleButton" style="display: flex; justify-content: center;"></div>
-            <input type="hidden" name="google_token" id="buyerGoogleToken">
-            <input type="hidden" name="user_type" value="buyer">
-            <div class="button-container">
-                <button type="submit" class="btn">Sign Up as Buyer</button>
-                <button type="button" class="btn" onclick="showForm('seller')">Switch to Seller</button>
-            </div>
-        </form>
-
-        <!-- Seller Signup Form -->
-        <form id="sellerForm" class="hidden" action="../backend/signup_process.php" method="POST">
-            <h3>Seller Signup</h3>
-            <div class="form-group">
-                <label for="seller-username">User Name:</label>
-                <input type="text" id="seller-username" name="username" title="Enter your username" placeholder="Enter username" required>
-                <span class="error"></span>
-            </div>
-            <div class="form-group">
-                <label for="seller-phone">Phone Number:</label>
-                <input type="tel" id="seller-phone" name="phone" pattern="[0-9]{10}" title="Enter 10-digit phone number" placeholder="10-digit phone number" required>
-                <span class="error"></span>
-            </div>
-            <div class="form-group">
-                <label for="seller-email">Email:</label>
-                <input type="email" id="seller-email" name="email" title="Enter your email address" placeholder="Email address" required>
-                <span class="error"></span>
-            </div>
-            <div class="form-group">
-                <label for="seller-password">Password:</label>
-                <input type="password" id="seller-password" name="password" title="Enter your password" placeholder="Password" required>
-                <span class="error"></span>
-            </div>
-            <div class="form-group">
-                <label for="seller-confirm-password">Confirm Password:</label>
-                <input type="password" id="seller-confirm-password" name="confirm_password" title="Confirm your password" placeholder="Confirm password" required>
-                <span class="error"></span>
-            </div>
-            <div class="separator">
-                <div class="line"></div>
-                <p>or</p>
-                <div class="line"></div>
-            </div>
-            <div id="sellerGoogleButton" style="display: flex; justify-content: center;"></div>
-            <input type="hidden" name="google_token" id="sellerGoogleToken">
-            <input type="hidden" name="user_type" value="seller">
-            <div class="button-container">
-                <button type="submit" class="btn">Sign Up as Seller</button>
-                <button type="button" class="btn" onclick="showForm('buyer')">Switch to Buyer</button>
-            </div>
-        </form>
-
-        <!-- Add this form for Google Seller verification -->
-        <form id="sellerGoogleVerification" class="hidden" action="../backend/signup_process.php" method="POST">
-            <h3>Additional Information Required</h3>
-            <div class="form-group">
-                <label for="google-verify-phone">Phone Number:</label>
-                <input type="tel" id="google-verify-phone" name="phone" pattern="[0-9]{10}" title="Enter 10-digit phone number" placeholder="10-digit phone number" required>
-                <span class="error"></span>
-            </div>
-            <input type="hidden" name="google_token" id="sellerGoogleVerificationToken">
-            <input type="hidden" name="user_type" value="seller">
-            <div class="button-container">
-                <button type="submit" class="btn">Complete Signup</button>
-            </div>
-        </form>
     </div>
 
     <script src="signup.js"></script>

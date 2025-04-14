@@ -15,11 +15,10 @@ function showForm(type) {
     }
 }
 
-// Add password validation function
+// Password validation function
 function validatePassword(password) {
     // Password validation rules
     const minLength = 8;
-    const maxLength = 12;
     const hasUpperCase = /[A-Z]/.test(password);
     const hasLowerCase = /[a-z]/.test(password);
     const hasNumbers = /\d/.test(password);
@@ -27,8 +26,8 @@ function validatePassword(password) {
     
     const errors = [];
     
-    if (password.length < minLength || password.length > maxLength) {
-        errors.push(`Password must be between ${minLength}-${maxLength} characters`);
+    if (password.length < minLength) {
+        errors.push(`Password must be at least ${minLength} characters`);
     }
     if (!hasUpperCase) errors.push('Include at least one uppercase letter');
     if (!hasLowerCase) errors.push('Include at least one lowercase letter');
@@ -42,8 +41,10 @@ function validatePassword(password) {
 }
 
 // Update password strength indicator
-function updatePasswordStrength(password, strengthElement) {
+function updatePasswordStrength(password) {
     let strength = 0;
+    const strengthElement = document.getElementById('password-strength');
+    const errorElement = document.getElementById('password-error');
     
     if (password.length >= 8) strength++;
     if (/[A-Z]/.test(password)) strength++;
@@ -54,62 +55,120 @@ function updatePasswordStrength(password, strengthElement) {
     const strengthText = ['Very Weak', 'Weak', 'Medium', 'Strong', 'Very Strong'];
     const strengthColor = ['#ff4444', '#ffbb33', '#ffeb3b', '#00C851', '#007E33'];
     
-    strengthElement.style.width = `${(strength / 5) * 100}%`;
-    strengthElement.style.backgroundColor = strengthColor[strength - 1];
-    strengthElement.textContent = strengthText[strength - 1];
+    if (strength > 0) {
+        strengthElement.style.width = `${(strength / 5) * 100}%`;
+        strengthElement.style.backgroundColor = strengthColor[strength - 1];
+        strengthElement.textContent = strengthText[strength - 1];
+    } else {
+        strengthElement.style.width = '0';
+        strengthElement.textContent = '';
+    }
+    
+    // Validate password and show errors
+    const result = validatePassword(password);
+    errorElement.innerHTML = result.errors.map(error => 
+        `<div class="error-message">${error}</div>`
+    ).join('');
+    
+    return result.isValid;
 }
 
-// Add event listeners for password fields
+// Document ready event
 document.addEventListener('DOMContentLoaded', function() {
-    const passwordFields = document.querySelectorAll('input[type="password"][name="password"]');
-    
-    passwordFields.forEach(passwordField => {
-        // Create password strength indicator
-        const strengthDiv = document.createElement('div');
-        strengthDiv.className = 'password-strength-bar';
-        passwordField.parentElement.appendChild(strengthDiv);
-        
-        // Create error message container
-        const errorDiv = document.createElement('div');
-        errorDiv.className = 'password-error';
-        passwordField.parentElement.appendChild(errorDiv);
-        
-        // Add input event listener
-        passwordField.addEventListener('input', function() {
-            const result = validatePassword(this.value);
-            updatePasswordStrength(this.value, strengthDiv);
-            
-            // Show/hide error messages
-            errorDiv.innerHTML = result.errors.map(error => `<div class="error-message">${error}</div>`).join('');
-            
-            // Update input validity
-            this.setCustomValidity(result.isValid ? '' : 'Please fix password errors');
+    // Add password input event listener
+    const passwordInput = document.getElementById('password');
+    if (passwordInput) {
+        passwordInput.addEventListener('input', function() {
+            updatePasswordStrength(this.value);
         });
-    });
-});
-
-// Update form validation
-document.querySelectorAll('form').forEach(form => {
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const password = this.querySelector('input[name="password"]').value;
-        const confirmPassword = this.querySelector('input[name="confirm_password"]').value;
-        const passwordValidation = validatePassword(password);
-
-        if (!passwordValidation.isValid) {
-            alert('Please fix password errors:\n' + passwordValidation.errors.join('\n'));
-            return;
-        }
-
-        if (password !== confirmPassword) {
-            alert('Passwords do not match!');
-            return;
-        }
-
-        // If validation passes, submit the form
-        this.submit();
-    });
+    }
+    
+    // Form submission handler
+    const signupForm = document.getElementById('signup-form');
+    if (signupForm) {
+        signupForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form values
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm_password').value;
+            const phone = document.getElementById('phone').value;
+            const userType = document.getElementById('user_type').value;
+            
+            // Validate phone number
+            if (!/^\d{10}$/.test(phone)) {
+                document.getElementById('phone-error').textContent = 'Please enter a valid 10-digit phone number';
+                return;
+            } else {
+                document.getElementById('phone-error').textContent = '';
+            }
+            
+            // Validate password
+            if (!updatePasswordStrength(password)) {
+                return;
+            }
+            
+            // Validate confirm password
+            if (password !== confirmPassword) {
+                document.getElementById('confirm-password-error').textContent = 'Passwords do not match';
+                return;
+            } else {
+                document.getElementById('confirm-password-error').textContent = '';
+            }
+            
+            // Disable submit button and show loading state
+            const submitBtn = document.getElementById('submit-btn');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Creating Account...';
+            submitBtn.disabled = true;
+            
+            // Create form data
+            const formData = new FormData(this);
+            
+            // Send data to the server
+            fetch('../backend/signup_process.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.text();
+            })
+            .then(data => {
+                // Check if response contains success message
+                if (data.includes('Registration successful')) {
+                    // Show success message
+                    const successMessage = document.getElementById('success-message');
+                    successMessage.style.display = 'block';
+                    successMessage.innerHTML = `
+                        <h3>User Created Successfully!</h3>
+                        <p><strong>Username:</strong> ${username}</p>
+                        <p><strong>User Type:</strong> ${userType}</p>
+                        <p><a href="login.html">Go to login page</a></p>
+                    `;
+                    
+                    // Hide the form
+                    signupForm.style.display = 'none';
+                } else {
+                    // Show error if registration failed
+                    document.getElementById('username-error').textContent = 'Registration failed. Please try again.';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('username-error').textContent = 'An error occurred. Please try again.';
+            })
+            .finally(() => {
+                // Reset button state
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            });
+        });
+    }
 });
 
 function handleGoogleCredential(response, userType) {
