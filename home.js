@@ -27,7 +27,7 @@
         });
 
           // List of image sources
-    const images = ["../Image/1.jpg", "../Image/2.jpg", "../Image/3.jpg", "../Image/4.jpg", "../Image/5.jpg"];
+    const images = ["frontend/Image/1.jpg", "frontend/Image/2.jpg", "frontend/Image/3.jpg", "frontend/Image/4.jpg", "frontend/Image/5.jpg"];
     let currentImageIndex = 0;
     let interval;
 
