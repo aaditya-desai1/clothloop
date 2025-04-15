@@ -86,12 +86,7 @@
         
         // API paths to try (in order)
         const paths = [
-            '/ClothLoop/backend/login.php',
-            '../backend/login.php',
-            '../backend/direct_login.php',
-            '../backend/simple_login.php',
-            '../../backend/login.php',
-            './backend/login.php'
+            '../backend/login.php'
         ];
         
         // Try the first path
@@ -127,12 +122,12 @@
                 if (data.success) {
                     // Redirect based on user type and destination
                     if (data.user_type === 'seller') {
-                        window.location.href = '/ClothLoop/frontend/Seller/Seller_Dashboard.html';
+                        window.location.href = '../frontend/Seller/Seller_Dashboard.html';
                     } else if (data.user_type === 'buyer') {
                         if (destination === 'wishlist') {
-                            window.location.href = '/ClothLoop/frontend/Buyer/wish.html';
+                            window.location.href = '../frontend/Buyer/wish.html';
                         } else {
-                            window.location.href = '/ClothLoop/frontend/Buyer/Buyer_Dashboard.html';
+                            window.location.href = '../frontend/Buyer/Buyer_Dashboard.html';
                         }
                     }
                 } else {
@@ -145,16 +140,9 @@
             .catch(error => {
                 console.error('Login request error:', error);
                 
-                // Try the next path if available
-                if (pathIndex < paths.length - 1) {
-                    console.log(`Path ${path} failed, trying next path...`);
-                    tryLogin(paths[pathIndex + 1], pathIndex + 1);
-                } else {
-                    // All paths failed, show error
-                    showError('Error connecting to server. Please try again.<br><small>Details: ' + error.message + '</small>');
-                }
-            })
-            .finally(() => {
+                // Show a clear error message
+                showError('Error connecting to server. Please check your internet connection and try again.<br><small>Details: ' + error.message + '</small>');
+                
                 // Reset button state
                 submitButton.value = originalButtonText;
                 submitButton.disabled = false;

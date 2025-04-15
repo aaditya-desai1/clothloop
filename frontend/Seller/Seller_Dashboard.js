@@ -222,7 +222,7 @@ function initializeNavigation() {
 }
 
 function handleLogout() {
-    window.location.href = 'login.html';
+    window.location.href = '../../Registration/login.html';
 }
 
   

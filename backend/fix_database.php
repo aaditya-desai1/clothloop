@@ -7,6 +7,7 @@ header('Content-Type: text/html');
 echo "<h1>Database Structure Check & Fix</h1>";
 
 try {
+    // Load database configuration
     $servername = "localhost";
     $username = "root";  // default XAMPP username
     $password = "";      // default XAMPP password
@@ -198,7 +199,5 @@ try {
 <hr>
 <h2>Next Steps</h2>
 <ul>
-    <li><a href="debug_login.php">Use the login debugger</a> to test login with detailed diagnostics</li>
-    <li><a href="create_user.php">Create a new user</a> with a properly hashed password</li>
-    <li><a href="../Registration/login.html">Go to the normal login page</a> to try logging in</li>
+    <li><a href="../Registration/login.html">Go to the login page</a> to try logging in</li>
 </ul> 
