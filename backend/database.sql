@@ -52,7 +52,8 @@ CREATE TABLE cloth_details (
 CREATE TABLE cloth_images (
     id INT AUTO_INCREMENT PRIMARY KEY,
     cloth_id INT NOT NULL,
-    image_path VARCHAR(255) NOT NULL,
+    image_data MEDIUMBLOB NOT NULL,
+    image_type VARCHAR(30) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (cloth_id) REFERENCES cloth_details(id) ON DELETE CASCADE
 );

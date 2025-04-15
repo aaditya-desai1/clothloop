@@ -1,0 +1,9 @@
+Connecting to database...
+Connected successfully.
+Found 1 records to migrate.
+Migrating record 3 with path: ../Image/cloth_images/cloth_3_67fe88e0070c7.jpeg
+  Error: File not found at path: ../Image/cloth_images/cloth_3_67fe88e0070c7.jpeg
+Migration complete. Successfully migrated: 0, Errors: 1
+Changes committed to database.
+Done.
+Check C:\xampp\htdocs\ClothLoop\backend/migrate_data.log for complete output.

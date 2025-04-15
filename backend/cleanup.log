@@ -1,0 +1,15 @@
+Connecting to database...
+Connected successfully.
+Successfully dropped image_path_old column.
+Changes committed to database.
+Final table structure for cloth_images:
+-------------------------------------
+Field          Type                     Null   Key    Default   Extra
+--------------------------------------------------------------------------------
+id             int(11)                  NO     PRI    NULL      auto_increment
+cloth_id       int(11)                  NO     MUL    NULL      
+image_data     mediumblob               NO            NULL      
+image_type     varchar(30)              NO            NULL      
+created_at     timestamp                NO            current_timestamp()
+Done.
+Check C:\xampp\htdocs\ClothLoop\backend/cleanup.log for complete output.

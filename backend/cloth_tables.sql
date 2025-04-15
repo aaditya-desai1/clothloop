@@ -19,7 +19,8 @@ CREATE TABLE IF NOT EXISTS `cloth_details` (
 CREATE TABLE IF NOT EXISTS `cloth_images` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `cloth_id` int(11) NOT NULL,
-  `image_path` varchar(255) NOT NULL,
+  `image_data` MEDIUMBLOB NOT NULL,
+  `image_type` varchar(30) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `cloth_id` (`cloth_id`)

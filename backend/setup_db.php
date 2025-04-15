@@ -15,8 +15,8 @@ if ($conn->connect_error) {
 
 echo "Connected successfully.<br>";
 
-// Read the SQL file
-$sql = file_get_contents('cloth_tables.sql');
+// Read the SQL file with the correct path
+$sql = file_get_contents(__DIR__ . '/cloth_tables.sql');
 
 // Execute multi-query SQL commands
 if ($conn->multi_query($sql)) {
@@ -30,18 +30,6 @@ if ($conn->multi_query($sql)) {
     } while ($conn->more_results() && $conn->next_result());
 } else {
     echo "Error creating tables: " . $conn->error . "<br>";
-}
-
-// Create image upload directory if it doesn't exist
-$upload_dir = '../Image/cloth_images/';
-if (!file_exists($upload_dir)) {
-    if (mkdir($upload_dir, 0777, true)) {
-        echo "Image upload directory created successfully.<br>";
-    } else {
-        echo "Failed to create image upload directory.<br>";
-    }
-} else {
-    echo "Image upload directory already exists.<br>";
 }
 
 $conn->close();

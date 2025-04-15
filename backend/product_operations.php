@@ -63,17 +63,20 @@ function fetchProducts() {
     $products = [];
     while ($row = $result->fetch_assoc()) {
         // Get the image
-        $image_path = "../Image/placeholder.jpg"; // Default image path
+        $image_data = null;
         
         // Check if we have an image record
-        $img_sql = "SELECT image_path FROM cloth_images WHERE cloth_id = ? LIMIT 1";
+        $img_sql = "SELECT image_data, image_type FROM cloth_images WHERE cloth_id = ? LIMIT 1";
         $img_stmt = $conn->prepare($img_sql);
         $img_stmt->bind_param("i", $row['id']);
         $img_stmt->execute();
         $img_result = $img_stmt->get_result();
         
         if ($img_row = $img_result->fetch_assoc()) {
-            $image_path = $img_row['image_path'];
+            // Convert the BLOB data to a base64 string for display in HTML
+            $image_data = 'data:image/' . $img_row['image_type'] . ';base64,' . base64_encode($img_row['image_data']);
+        } else {
+            $image_data = '../Image/placeholder.jpg';
         }
         
         // Format the product data
@@ -88,7 +91,7 @@ function fetchProducts() {
             'whatsappNo' => $row['whatsapp_number'],
             'terms' => $row['terms_and_conditions'],
             'created_at' => $row['created_at'],
-            'image' => $image_path
+            'image' => $image_data
         ];
         
         $img_stmt->close();
@@ -144,24 +147,10 @@ function addProduct() {
             $image_type = $image_type_aux[1];
             $image_base64 = base64_decode($image_parts[1]);
             
-            // Generate a unique filename
-            $filename = 'cloth_' . $cloth_id . '_' . uniqid() . '.' . $image_type;
-            $upload_dir = '../Image/cloth_images/';
-            
-            // Create directory if it doesn't exist
-            if (!file_exists($upload_dir)) {
-                mkdir($upload_dir, 0777, true);
-            }
-            
-            $file_path = $upload_dir . $filename;
-            
-            // Save the image file
-            file_put_contents($file_path, $image_base64);
-            
-            // Insert image record in cloth_images table
-            $img_sql = "INSERT INTO cloth_images (cloth_id, image_path) VALUES (?, ?)";
+            // Insert image directly into database
+            $img_sql = "INSERT INTO cloth_images (cloth_id, image_data, image_type) VALUES (?, ?, ?)";
             $img_stmt = $conn->prepare($img_sql);
-            $img_stmt->bind_param("is", $cloth_id, $file_path);
+            $img_stmt->bind_param("iss", $cloth_id, $image_base64, $image_type);
             $img_stmt->execute();
             $img_stmt->close();
         }
@@ -220,20 +209,6 @@ function updateProduct() {
             $image_type = $image_type_aux[1];
             $image_base64 = base64_decode($image_parts[1]);
             
-            // Generate a unique filename
-            $filename = 'cloth_' . $data['id'] . '_' . uniqid() . '.' . $image_type;
-            $upload_dir = '../Image/cloth_images/';
-            
-            // Create directory if it doesn't exist
-            if (!file_exists($upload_dir)) {
-                mkdir($upload_dir, 0777, true);
-            }
-            
-            $file_path = $upload_dir . $filename;
-            
-            // Save the image file
-            file_put_contents($file_path, $image_base64);
-            
             // Check if there's already an image record for this cloth
             $check_sql = "SELECT id FROM cloth_images WHERE cloth_id = ? LIMIT 1";
             $check_stmt = $conn->prepare($check_sql);
@@ -243,14 +218,14 @@ function updateProduct() {
             
             if ($check_result->num_rows > 0) {
                 // Update existing image record
-                $img_sql = "UPDATE cloth_images SET image_path = ? WHERE cloth_id = ?";
+                $img_sql = "UPDATE cloth_images SET image_data = ?, image_type = ? WHERE cloth_id = ?";
                 $img_stmt = $conn->prepare($img_sql);
-                $img_stmt->bind_param("si", $file_path, $data['id']);
+                $img_stmt->bind_param("ssi", $image_base64, $image_type, $data['id']);
             } else {
                 // Insert new image record
-                $img_sql = "INSERT INTO cloth_images (cloth_id, image_path) VALUES (?, ?)";
+                $img_sql = "INSERT INTO cloth_images (cloth_id, image_data, image_type) VALUES (?, ?, ?)";
                 $img_stmt = $conn->prepare($img_sql);
-                $img_stmt->bind_param("is", $data['id'], $file_path);
+                $img_stmt->bind_param("iss", $data['id'], $image_base64, $image_type);
             }
             
             $img_stmt->execute();
