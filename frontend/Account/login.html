@@ -81,6 +81,43 @@
             transform: translateY(2px);
         }
         
+        /* Password input container for eye icon */
+        .password-container {
+            position: relative;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        
+        .password-container input {
+            width: 100%;
+            height: 45px;
+            padding: 12px 40px 12px 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+            margin-bottom: 0;
+        }
+        
+        .password-container input:focus {
+            border-color: #4CAF50;
+            outline: none;
+        }
+        
+        .password-toggle {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #666;
+            font-size: 16px;
+        }
+        
+        .password-toggle:hover {
+            color: #333;
+        }
+        
         .separator {
             display: flex;
             align-items: center;
@@ -162,7 +199,10 @@
           <label for="email">Email:</label>
           <input type="email" id="email" name="email" required><br><br>
           <label for="password">Password:</label>
-          <input type="password" id="password" name="password" required><br><br>
+          <div class="password-container">
+              <input type="password" id="password" name="password" required>
+              <span class="password-toggle" onclick="togglePasswordVisibility('password')">&#128065;</span>
+          </div>
           <div class="button-container">
               <input type="submit" value="Login">
           </div>
@@ -185,6 +225,20 @@
     </div>
       
     <script>
+    // Toggle password visibility
+    function togglePasswordVisibility(inputId) {
+        const passwordInput = document.getElementById(inputId);
+        const toggleIcon = document.querySelector('.password-toggle');
+        
+        if (passwordInput.type === "password") {
+            passwordInput.type = "text";
+            toggleIcon.innerHTML = "&#128064;"; // Eyes looking away icon
+        } else {
+            passwordInput.type = "password";
+            toggleIcon.innerHTML = "&#128065;"; // Eye icon
+        }
+    }
+    
     document.getElementById('login-form').addEventListener('submit', function(e) {
         e.preventDefault(); // Prevent default form submission
         
