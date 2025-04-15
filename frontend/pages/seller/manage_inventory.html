@@ -1,0 +1,92 @@
+function fetchSellerProducts() {
+    const sellerId = localStorage.getItem('userId');
+    
+    if (!sellerId) {
+        document.getElementById('productsContainer').innerHTML = '<p>Please log in to view your inventory.</p>';
+        return;
+    }
+    
+    document.getElementById('productsContainer').innerHTML = '<p>Loading your inventory...</p>';
+    
+    fetch(`../../backend/products_fix.php?operation=fetch&seller_id=${sellerId}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.status === 'success') {
+                displayProducts(data.products);
+            } else {
+                document.getElementById('productsContainer').innerHTML = `<p>Error: ${data.message}</p>`;
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching products:', error);
+            document.getElementById('productsContainer').innerHTML = `<p>Error loading products: ${error.message}</p>`;
+        });
+}
+
+function updateProduct(productId, event) {
+    event.preventDefault();
+    const form = document.getElementById(`editForm-${productId}`);
+    const formData = new FormData(form);
+    formData.append('product_id', productId);
+    
+    // Disable the submit button
+    const submitBtn = form.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = 'Updating...';
+    
+    fetch('../../backend/products_fix.php?operation=update', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            showNotification('Product updated successfully!', 'success');
+            closeModal(`editModal-${productId}`);
+            fetchSellerProducts(); // Refresh the product list
+        } else {
+            showNotification(`Error: ${data.message}`, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification(`Error: ${error.message}`, 'error');
+    })
+    .finally(() => {
+        // Re-enable the submit button
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = 'Update Product';
+    });
+}
+
+function deleteProduct(productId) {
+    if (!confirm('Are you sure you want to delete this product?')) {
+        return;
+    }
+    
+    const formData = new FormData();
+    formData.append('product_id', productId);
+    
+    fetch('../../backend/products_fix.php?operation=delete', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            showNotification('Product deleted successfully!', 'success');
+            fetchSellerProducts(); // Refresh the product list
+        } else {
+            showNotification(`Error: ${data.message}`, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification(`Error: ${error.message}`, 'error');
+    });
+} 

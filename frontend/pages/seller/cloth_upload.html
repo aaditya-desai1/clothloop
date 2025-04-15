@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Cloth</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        .admin-container {
+            max-width: 1000px;
+            margin: 50px auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            gap: 20px;
+        }
+        .left-column, .right-column {
+            flex: 1;
+            margin-top: auto;
+            margin-bottom: auto;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .upload-area {
+            border: 2px dashed #ccc;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            cursor: pointer;
+            height: 200px; /* Increased height for the upload area */
+        }
+        .image-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .image-preview img {
+            max-width: 100px;
+            border-radius: 5px;
+        }
+        .button-container {
+            display: flex;
+            justify-content: center; /* Centering the button horizontally */
+            margin-top: 20px; /* Add some space above the button */
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .top-navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background-color: #f5f5f5;
+            margin-bottom: 20px;
+        }
+        .back-button, .logout-button {
+            padding: 8px 15px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+        }
+        .back-button:hover {
+            background-color: #2980b9;
+        }
+        .logout-button {
+            background-color: #e74c3c;
+        }
+        .logout-button:hover {
+            background-color: #c0392b;
+        }
+        .back-button i, .logout-button i {
+            margin-right: 5px;
+        }
+        
+        /* Alert styles */
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            display: none;
+        }
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-navigation">
+        <a href="seller_dashboard.html" class="back-button">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+        <a href="../account/login.html" class="logout-button" onclick="handleLogout()">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+    </div>
+
+    <!-- Alert messages -->
+    <div id="successAlert" class="alert alert-success">
+        <strong>Success!</strong> Your cloth has been added successfully.
+    </div>
+    <div id="errorAlert" class="alert alert-danger">
+        <strong>Error!</strong> <span id="errorMessage">There was a problem adding your cloth.</span>
+    </div>
+
+    <div class="admin-container">
+        <div class="left-column">
+            <div class="form-group upload-area" id="uploadArea">
+                <p>Drag & Drop to Upload Images </p>
+                <button type="button" onclick="document.getElementById('images').click()">Browse</button>
+                <input type="file" id="images" multiple accept="image/*" style="display:none;" onchange="previewImages()" />
+                <div class="image-preview" id="imagePreview"></div>
+            </div>
+        </div>
+        <div class="right-column">
+            <h1>Add New Cloth</h1>
+            <form id="clothForm">
+                <div class="form-group">
+                    <label for="title">Cloth Title</label>
+                    <input type="text" id="title" required />
+                </div>
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea id="description" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="category">Category</label>
+                    <select id="category" required>
+                        <option value="">Select Category</option>
+                        <option value="Formal">Formal</option>
+                        <option value="Casual">Casual</option>
+                        <option value="Wedding">Wedding</option>
+                        <option value="Traditional">Traditional</option>
+                        <option value="Ethnic">Ethnic</option>
+                        <option value="Western">Western</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="size">Size</label>
+                    <input type="text" id="size" required />
+                </div>
+                <div class="form-group">
+                    <label for="rental_price">Rental Price (₹/day)</label>
+                    <input type="number" id="rental_price" required />
+                </div>
+                <div class="form-group">
+                    <label for="contact_number">Contact No</label>
+                    <input type="text" id="contact_number" required />
+                </div>
+                <div class="form-group">
+                    <label for="whatsapp_number">WhatsApp No</label>
+                    <input type="text" id="whatsapp_number" required />
+                </div>
+                <div class="form-group">
+                    <label for="terms">Terms and Conditions</label>
+                    <textarea id="terms" required></textarea>
+                </div>
+                <div class="button-container">
+                    <button type="submit" id="submitBtn">Add Item</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Check if user is logged in
+        document.addEventListener('DOMContentLoaded', function() {
+            const userId = localStorage.getItem('userId');
+            const userType = localStorage.getItem('userType');
+            
+            if (!userId || userType !== 'seller') {
+                alert('You must be logged in as a seller to access this page');
+                window.location.href = '../account/login.html';
+            }
+        });
+        
+        // Image upload preview
+        function previewImages() {
+            const files = document.getElementById('images').files;
+            const preview = document.getElementById('imagePreview');
+            preview.innerHTML = '';
+            for (let i = 0; i < files.length && i < 5; i++) { // Limit to 5 images
+                const img = document.createElement('img');
+                img.src = URL.createObjectURL(files[i]);
+                preview.appendChild(img);
+            }
+        }
+        
+        // Handle form submission
+        document.getElementById('clothForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form data
+            const title = document.getElementById('title').value;
+            const description = document.getElementById('description').value;
+            const category = document.getElementById('category').value;
+            const size = document.getElementById('size').value;
+            const rental_price = document.getElementById('rental_price').value;
+            const contact_number = document.getElementById('contact_number').value;
+            const whatsapp_number = document.getElementById('whatsapp_number').value;
+            const terms = document.getElementById('terms').value;
+            
+            // Get seller info from localStorage
+            const seller_id = localStorage.getItem('userId');
+            
+            // Validate form
+            if (!title || !description || !category || !size || !rental_price || !contact_number || !whatsapp_number || !terms) {
+                showError('Please fill in all required fields');
+                return;
+            }
+            
+            // Validate image
+            const images = document.getElementById('images').files;
+            if (images.length === 0) {
+                showError('Please select at least one image');
+                return;
+            }
+            
+            // Disable submit button while processing
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Adding...';
+            
+            // Create FormData object
+            const formData = new FormData();
+            formData.append('title', title);
+            formData.append('description', description);
+            formData.append('category', category);
+            formData.append('size', size);
+            formData.append('rental_price', rental_price);
+            formData.append('contact_number', contact_number);
+            formData.append('whatsapp_number', whatsapp_number);
+            formData.append('terms_and_conditions', terms);
+            formData.append('seller_id', seller_id);
+            
+            // Add image file
+            formData.append('image', images[0]);
+            
+            // Log FormData contents for debugging
+            console.log('FormData contains:');
+            for(let pair of formData.entries()) {
+                console.log(pair[0] + ': ' + (pair[0] === 'image' ? '[File]' : pair[1]));
+            }
+            
+            // Send data to server - USE NEW BACKEND FILE
+            fetch('../../backend/products_fix.php?operation=add', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok: ' + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Success:', data);
+                if (data.status === 'success') {
+                    showSuccess();
+                    // Reset form
+                    document.getElementById('clothForm').reset();
+                    document.getElementById('imagePreview').innerHTML = '';
+                } else {
+                    showError(data.message || 'Error adding cloth');
+                    console.error('API Error:', data);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showError('An error occurred while adding the cloth: ' + error.message);
+            })
+            .finally(() => {
+                // Re-enable submit button
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Add Item';
+            });
+        });
+        
+        // Show success message
+        function showSuccess() {
+            const alert = document.getElementById('successAlert');
+            alert.style.display = 'block';
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 5000);
+        }
+        
+        // Show error message
+        function showError(message) {
+            const alert = document.getElementById('errorAlert');
+            document.getElementById('errorMessage').textContent = message;
+            alert.style.display = 'block';
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 5000);
+        }
+        
+        // Handle logout
+        function handleLogout() {
+            localStorage.removeItem('userId');
+            localStorage.removeItem('userType');
+            localStorage.removeItem('username');
+            // Redirection happens via the href
+        }
+    </script>
+</body>
+</html>

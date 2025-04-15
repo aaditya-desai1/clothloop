@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wishlist - ClothLoop</title>
+    <!-- Font Awesome for Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+
+    <style>
+        /* General Styling */
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        /* Header Section */
+        .header {
+            background-color: white;
+            padding: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex; /* Use flexbox layout */
+            justify-content: space-between; /* Space between items */
+            align-items: center; /* Vertically center items */
+        }
+          
+        .container {
+            max-width: 1200px;
+            margin: 0 auto; /* Center the container */
+            width: 100%; /* Ensure full width */
+            display: flex; /* Make the container a flexbox */
+            justify-content: space-between; /* Space items in the container */
+            align-items: center; /* Vertically center items in the container */
+        }
+          
+        .logo {
+            height: 50px; /* Logo height */
+            width: 50px; /* Logo width */
+            border-radius: 50%;
+            object-fit: cover;
+        }
+          
+        .header-buttons {
+            margin-left: auto; /* Push button to the right */
+            display: flex;
+            gap: 10px;
+        }
+          
+        .header-buttons button {
+            background-color: #333; /* Button background color */
+            color: white; /* Button text color */
+            padding: 10px 20px; /* Button padding */
+            margin-left: 10px; /* Space between buttons if needed */
+            border: none; /* Remove border */
+            border-radius: 5px; /* Rounded corners */
+            cursor: pointer; /* Pointer on hover */
+            transition: all 0.3s ease;
+        }
+          
+        .header-buttons button:hover {
+            background-color: #555; /* Darken button on hover */
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .header-buttons button:active {
+            transform: translateY(0);
+        }
+        
+        /* Wishlist Main Section */
+        main {
+            padding: 20px;
+            text-align: center;
+        }
+        
+        h2 {
+            font-size: 2rem;
+            animation: fadeIn 0.8s ease-out;
+            position: relative;
+        }
+        
+        .wishlist-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .wishlist-item {
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+            animation: fadeIn 0.5s ease-out;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 96%;
+        }
+        
+        .wishlist-img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .wishlist-item h3 {
+            font-size: 1.2rem;
+        }
+        
+        /* Animation Keyframes */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes scaleIn {
+            from {
+                transform: scale(0.95);
+            }
+            to {
+                transform: scale(1);
+            }
+        }
+        
+        /* Header Animation */
+        .header {
+            animation: slideDown 0.5s ease-out;
+        }
+        
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100%);
+            }
+            to {
+                transform: translateY(0);
+            }
+        }
+        
+        .wishlist-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .wishlist-item:hover .wishlist-img {
+            transform: scale(1.05);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .wishlist-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .wishlist-img {
+                height: 250px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .wishlist-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+
+</head>
+<body>
+    <!-- Header Section -->
+    <header class="header">
+        <div class="container">
+            <a href="buyer_dashboard.html">
+                <img src="../../assets/images/logo.webp" alt="ClothLoop Logo" class="logo">
+            </a>
+            <div class="header-buttons">
+                <button onclick="window.location.href='buyer_dashboard.html'">Back to home page</button>
+                <button onclick="window.location.href='../account/login.html'">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Wishlist Main Content -->
+    <h2 style="text-align: center; margin: 20px 0;">Your Wishlist</h2>
+
+    <main class="container">
+
+        <div class="wishlist-grid" id="wishlist">
+            <!-- Wishlist items will be dynamically loaded here -->
+        </div>
+    </main>
+
+    <script>
+        // Sample Wishlist Data with exactly 3 items
+        const wishlistItems = [
+            {
+                imgSrc: "../../assets/images/p3.jpg",
+                title: "Traditional Woman Attire"
+            },
+            {
+                imgSrc: "../../assets/images/p1.jpg",
+                title: "Traditional Man Attire"
+            },
+            {
+                imgSrc: "../../assets/images/p2.jpg",
+                title: "Couple in Traditional Clothes"
+            }
+        ];
+
+        const wishlistContainer = document.getElementById("wishlist");
+
+        // Dynamically load exactly 3 wishlist items
+        wishlistItems.forEach(item => {
+            const wishlistItem = document.createElement("div");
+            wishlistItem.classList.add("wishlist-item");
+
+            wishlistItem.innerHTML = `
+                <img src="${item.imgSrc}" alt="${item.title}" class="wishlist-img">
+                <h3>${item.title}</h3>
+            `;
+
+            wishlistContainer.appendChild(wishlistItem);
+        });
+
+        // Existing script remains, adding new animation logic
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add staggered animation to wishlist items
+            const items = document.querySelectorAll('.wishlist-item');
+            items.forEach((item, index) => {
+                item.style.animationDelay = `${index * 0.2}s`;
+            });
+
+            // Add click animation for remove button
+            items.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    if (e.target === this.querySelector('::before')) {
+                        this.style.animation = 'fadeOut 0.3s ease-out forwards';
+                        setTimeout(() => {
+                            this.remove();
+                        }, 300);
+                    }
+                });
+            });
+
+            // Mark current page in dashboard
+            const currentPage = document.querySelector('.dashboard-item.wishlist');
+            if (currentPage) {
+                currentPage.classList.add('selected-dashboard');
+            }
+
+            // Create remove buttons for each item
+            items.forEach(item => {
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'remove-btn';
+                removeBtn.innerHTML = '×';
+                removeBtn.style.position = 'absolute';
+                removeBtn.style.top = '10px';
+                removeBtn.style.right = '10px';
+                removeBtn.style.background = 'rgba(255, 0, 0, 0.7)';
+                removeBtn.style.color = 'white';
+                removeBtn.style.border = 'none';
+                removeBtn.style.borderRadius = '50%';
+                removeBtn.style.width = '30px';
+                removeBtn.style.height = '30px';
+                removeBtn.style.cursor = 'pointer';
+                removeBtn.style.opacity = '0';
+                removeBtn.style.transition = 'opacity 0.3s';
+                
+                removeBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    item.style.animation = 'slideUp 0.3s reverse forwards';
+                    setTimeout(() => item.remove(), 300);
+                });
+
+                item.appendChild(removeBtn);
+                
+                // Show remove button on hover
+                item.addEventListener('mouseenter', function() {
+                    removeBtn.style.opacity = '1';
+                });
+                
+                item.addEventListener('mouseleave', function() {
+                    removeBtn.style.opacity = '0';
+                });
+            });
+        });
+
+        // Define the slideUp animation
+        document.head.insertAdjacentHTML('beforeend', `
+            <style>
+                @keyframes slideUp {
+                    from { 
+                        opacity: 0;
+                        transform: translateY(20px);
+                    }
+                    to { 
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+                
+                @keyframes fadeOut {
+                    to { 
+                        opacity: 0;
+                        transform: scale(0.9);
+                    }
+                }
+            </style>
+        `);
+    </script>
+</body>
+</html>

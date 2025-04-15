@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloth Details</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+    <style>
+        /* General Styles */
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            background-color: #f5f5f5;
+        }
+
+        .details-container {
+            max-width: 1000px;
+            margin: 50px auto;
+            background-color: white;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: row;
+        }
+
+        .image-section, .info-section {
+            flex: 1;
+            padding: 20px;
+        }
+
+        .info-section {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .info-section h1 {
+            margin-top: 0;
+            font-size: 24px;
+        }
+
+        .info-section p {
+            margin: 10px 0;
+            font-size: 16px;
+        }
+
+        /* Like, Comment, Share, Save Section */
+        .interaction-section {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            border-top: 1px solid #ccc;
+            padding-top: 20px;
+            position: relative;
+        }
+
+        .interaction-section button {
+            background: none;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            color: #555;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .interaction-section button i {
+            margin-bottom: 5px;
+        }
+
+        /* Count Text Styling */
+        .count-text {
+            font-size: 14px;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        /* Comment Section */
+        .comments-container {
+            margin-top: 20px;
+        }
+
+        .comments-container textarea {
+            width: 100%;
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .comments-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .comments-list li {
+            background-color: #f5f5f5;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+
+        /* Responsive Styling */
+        @media (max-width: 768px) {
+            .details-container {
+                flex-direction: column;
+            }
+        }
+    </style>
+    
+</head>
+<body>
+    <div class="details-container">
+        <div class="image-section">
+            <img src="" alt="Cloth Image" id="clothImage" style="width: 100%; border-radius: 5px;">
+        </div>
+        <div class="info-section">
+            <h1 id="clothTitle">Cloth Title</h1>
+            <p id="clothDescription">Description of the cloth will appear here.</p>
+            <p><strong>Size:</strong> <span id="clothSize"></span></p>
+            <p><strong>Color:</strong> <span id="clothColor"></span></p>
+            <p><strong>Rental Price:</strong> ₹<span id="clothPrice"></span>/day</p>
+            <p><strong>Contact No:</strong> <span id="contactNumber"></span></p>
+            <p><strong>Whatsapp No:</strong> <span id="whatsappNumber"></span></p>
+            <p><strong>Shop Name:</strong> <span id="shopName"></span></p>
+            <p><strong>Shop Address:</strong> <span id="shopAddress"></span></p>
+            <p><strong>Terms and Conditions:</strong> <span id="termsConditions"></span></p>
+            <p><strong></strong> <button onclick="openMap()"><i class="fas fa-map-marker-alt"></i><span>Location</span></button></p>
+            <!-- Like, Comment, Share, Save Section -->
+            <div class="interaction-section">
+                <button onclick="toggleLike()">
+                    <i class="far fa-thumbs-up" id="likeIcon"></i><span>Like</span>
+                    <div class="count-text" id="likeCount">0</div>
+                </button>
+                <button onclick="showCommentBox()">
+                    <i class="far fa-comment"></i><span>Comment</span>
+                    <div class="count-text" id="commentCount">0</div>
+                </button>
+                <button onclick="shareItem()">
+                    <i class="far fa-share-square"></i><span>Share</span>
+                    <div class="count-text" id="shareCount">0</div>
+                </button>
+                <button onclick="toggleSave()">
+                    <i class="far fa-bookmark" id="saveIcon"></i><span>Save</span>
+                    <div class="count-text" id="saveCount">0</div>
+                </button>
+            </div>
+
+            <!-- Comment Section -->
+            <div class="comments-container" id="commentBox" style="display:none;">
+                <textarea id="commentInput" placeholder="Add a comment..."></textarea>
+                <button onclick="addComment()">Post Comment</button>
+                <ul class="comments-list" id="commentsList"></ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Function to parse URL parameters
+        function getQueryParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                image: params.get('image'),
+                title: params.get('title'),
+                description: params.get('description'),
+                size: params.get('size'),
+                color: params.get('color'),
+                price: params.get('price'),
+                contact: params.get('contact'),
+                whatsapp: params.get('whatsapp'),
+                location: params.get('location'),
+                shop: params.get('shop'),
+                address: params.get('address'),
+                terms: params.get('terms')
+            };
+        }
+
+        // Populate the details section based on URL parameters
+        const params = getQueryParams();
+        
+        // Set image source
+        const imageEl = document.getElementById('clothImage');
+        imageEl.src = params.image;
+        // Add error handling for image loading
+        imageEl.onerror = function() {
+            console.error('Failed to load image:', params.image);
+            // Fallback to placeholder
+            this.src = '../../assets/images/shop_logo.png';
+        };
+        
+        document.getElementById('clothTitle').textContent = params.title;
+        document.getElementById('clothDescription').textContent = params.description;
+        document.getElementById('clothSize').textContent = params.size;
+        document.getElementById('clothColor').textContent = params.color;
+        document.getElementById('clothPrice').textContent = params.price;
+        document.getElementById('contactNumber').textContent = params.contact;
+        document.getElementById('whatsappNumber').textContent = params.whatsapp;
+        document.getElementById('shopName').textContent = params.shop;
+        document.getElementById('shopAddress').textContent = params.address;
+        document.getElementById('termsConditions').textContent = params.terms;
+
+        // Initialize counts
+        let likeCount = 0;
+        let commentCount = 0;
+        let shareCount = 0;
+        let saveCount = 0;
+
+        // Like functionality
+        let liked = false;
+        function toggleLike() {
+            liked = !liked;
+            document.getElementById('likeIcon').className = liked ? 'fas fa-thumbs-up' : 'far fa-thumbs-up';
+            likeCount += liked ? 1 : -1;
+            document.getElementById('likeCount').textContent = likeCount;
+        }
+
+        // Save functionality
+        let saved = false;
+        function toggleSave() {
+            saved = !saved;
+            document.getElementById('saveIcon').className = saved ? 'fas fa-bookmark' : 'far fa-bookmark';
+            saveCount += saved ? 1 : -1;
+            document.getElementById('saveCount').textContent = saveCount;
+        }
+
+        // Share functionality
+        function shareItem() {
+            shareCount++;
+            document.getElementById('shareCount').textContent = shareCount;
+            alert("Item shared successfully!");
+        }
+
+        // Comment functionality
+        function showCommentBox() {
+            document.getElementById('commentBox').style.display = 'block';
+        }
+
+        function addComment() {
+            const commentInput = document.getElementById('commentInput');
+            const commentText = commentInput.value;
+            if (commentText) {
+                commentCount++;
+                document.getElementById('commentCount').textContent = commentCount;
+                const commentItem = document.createElement('li');
+                commentItem.textContent = commentText;
+                document.getElementById('commentsList').appendChild(commentItem);
+                commentInput.value = ''; // Clear the input
+            }
+        }
+
+        // Open Google Maps for the location
+        function openMap() {
+            const location = params.location; // Get the location from the URL parameters
+            const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`;
+            window.open(googleMapsUrl, '_blank');
+        }
+    </script>
+</body>
+</html>

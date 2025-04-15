@@ -241,27 +241,27 @@
 </head>
 <body>
     <div class="container">
-        <h2>Sign Up</h2>
+        <h2>Create Your Account</h2>
         
         <div id="success-message" class="success-message"></div>
         
-        <form id="signup-form" action="../../backend/api/users/signup_process.php" method="POST">
+        <form id="signup-form" action="../../../backend/api/users/signup_process.php" method="POST">
             <div class="form-group">
                 <label for="username">Username:</label>
-                <input type="text" id="username" name="username" title="Enter your username" placeholder="Enter username" required>
-                <span class="error" id="username-error"></span>
+                <input type="text" id="username" name="username" required>
+                <div id="username-error" class="error-message"></div>
             </div>
             
             <div class="form-group">
                 <label for="email">Email:</label>
-                <input type="email" id="email" name="email" title="Enter your email address" placeholder="Email address" required>
-                <span class="error" id="email-error"></span>
+                <input type="email" id="email" name="email" required>
+                <div id="email-error" class="error-message"></div>
             </div>
             
             <div class="form-group">
                 <label for="password">Password:</label>
                 <div class="password-container">
-                    <input type="password" id="password" name="password" title="Enter your password" placeholder="Password" required>
+                    <input type="password" id="password" name="password" required>
                     <span class="password-toggle" onclick="togglePasswordVisibility('password')">&#128065;</span>
                 </div>
                 <div class="password-strength-bar" id="password-strength"></div>
@@ -271,88 +271,84 @@
             <div class="form-group">
                 <label for="confirm_password">Confirm Password:</label>
                 <div class="password-container">
-                    <input type="password" id="confirm_password" name="confirm_password" title="Confirm your password" placeholder="Confirm password" required>
+                    <input type="password" id="confirm_password" name="confirm_password" required>
                     <span class="password-toggle" onclick="togglePasswordVisibility('confirm_password')">&#128065;</span>
                 </div>
-                <span class="error" id="confirm-password-error"></span>
+                <div id="confirm-password-error" class="error-message"></div>
             </div>
             
             <div class="form-group">
                 <label for="phone">Phone Number:</label>
-                <input type="tel" id="phone" name="phone" pattern="[0-9]{10}" title="Enter 10-digit phone number" placeholder="10-digit phone number" required>
-                <span class="error" id="phone-error"></span>
+                <input type="tel" id="phone" name="phone" required>
+                <div id="phone-error" class="error-message"></div>
             </div>
             
             <div class="form-group">
                 <label>User Type:</label>
                 <div class="radio-group">
-                    <label class="radio-option" style="font-weight: normal;">
-                        <input type="radio" id="buyer_type" name="user_type" value="buyer" checked> Buyer
+                    <label class="radio-option">
+                        <input type="radio" name="user_type" value="buyer" checked> Buyer
                     </label>
-                    <label class="radio-option" style="font-weight: normal;">
-                        <input type="radio" id="seller_type" name="user_type" value="seller"> Seller
+                    <label class="radio-option">
+                        <input type="radio" name="user_type" value="seller" id="seller-radio"> Seller
                     </label>
                 </div>
             </div>
 
             <!-- Seller specific fields (hidden by default) -->
-            <div id="seller_fields" style="display: none;">
+            <div id="seller-fields" style="display: none;">
                 <h3 style="font-size: 18px; margin-bottom: 15px;">Shop Information</h3>
                 
                 <div class="form-group">
                     <label for="shop_name">Shop Name:</label>
-                    <input type="text" id="shop_name" name="shop_name" placeholder="Enter shop name">
-                    <span class="error" id="shop-name-error"></span>
+                    <input type="text" id="shop_name" name="shop_name">
+                    <div id="shop-name-error" class="error-message"></div>
                 </div>
                 
                 <div class="form-group">
                     <label for="shop_address">Shop Address:</label>
-                    <textarea id="shop_address" name="shop_address" style="height: 80px;" placeholder="Enter complete shop address"></textarea>
-                    <span class="error" id="shop-address-error"></span>
+                    <textarea id="shop_address" name="shop_address"></textarea>
+                    <div id="shop-address-error" class="error-message"></div>
                 </div>
                 
                 <div class="form-group">
-                    <label for="shop_location">Shop Location:</label>
-                    <!-- Hidden fields for latitude and longitude -->
-                    <input type="hidden" id="shop_latitude" name="shop_latitude">
-                    <input type="hidden" id="shop_longitude" name="shop_longitude">
-                    <div id="location_status" class="location-status">
-                        Location not set
-                    </div>
-                    <button type="button" id="get_location" class="btn" style="width: 100%; padding: 10px; font-size: 14px; background-color: #666768;">
-                        <i class="fas fa-map-marker-alt" style="margin-right: 5px;"></i> Get Current Location
+                    <label>Shop Location:</label>
+                    <div class="location-status" id="location_status">Location not set yet</div>
+                    <button type="button" id="get_location" class="btn" style="width: 100%; margin-bottom: 10px;">
+                        <i class="fas fa-map-marker-alt"></i> Get Current Location
                     </button>
-                    <div id="manual_location_toggle" style="text-align: center; margin-top: 10px; cursor: pointer; color: #4CAF50;">
-                        <small>or enter location manually</small>
-                    </div>
-                    <div id="manual_location_fields" style="display: none; margin-top: 10px;">
-                        <div class="form-group" style="margin-bottom: 10px;">
-                            <label for="manual_latitude" style="font-size: 14px;">Latitude:</label>
-                            <input type="text" id="manual_latitude" placeholder="Enter latitude (e.g. 40.7128)" style="margin-bottom: 10px;">
+                    
+                    <p id="manual_location_toggle" style="cursor: pointer; color: #4CAF50; text-decoration: underline; text-align: center; margin-top: 10px;">
+                        Enter location manually
+                    </p>
+                    
+                    <div id="manual_location_fields" style="display: none; margin-top: 15px;">
+                        <div class="form-group">
+                            <label for="manual_latitude">Latitude:</label>
+                            <input type="text" id="manual_latitude" placeholder="e.g. 40.7128">
                         </div>
-                        <div class="form-group" style="margin-bottom: 10px;">
-                            <label for="manual_longitude" style="font-size: 14px;">Longitude:</label>
-                            <input type="text" id="manual_longitude" placeholder="Enter longitude (e.g. -74.0060)">
+                        <div class="form-group">
+                            <label for="manual_longitude">Longitude:</label>
+                            <input type="text" id="manual_longitude" placeholder="e.g. -74.0060">
                         </div>
-                        <button type="button" id="set_manual_location" class="btn" style="width: 100%; padding: 8px; font-size: 14px; background-color: #666768;">
-                            Set Manual Location
+                        <button type="button" id="set_manual_location" class="btn" style="width: 100%;">
+                            <i class="fas fa-check"></i> Set Manual Location
                         </button>
                     </div>
-                    <span class="error" id="location-error"></span>
+                    
+                    <input type="hidden" id="shop_latitude" name="shop_latitude">
+                    <input type="hidden" id="shop_longitude" name="shop_longitude">
+                    <div id="location-error" class="error-message"></div>
                 </div>
             </div>
             
             <div class="button-container">
-                <button type="submit" id="submit-btn" class="btn">Create Account</button>
+                <button type="submit" id="submit-btn" class="btn">Sign Up</button>
             </div>
         </form>
         
         <div class="login-link">
             Already have an account? <a href="login.html">Login</a>
-        </div>
-        
-        <div class="login-link" style="margin-top: 10px; font-size: 12px;">
-            <a href="../../backend/fix_database.php">Database setup</a>
         </div>
     </div>
 
@@ -443,9 +439,9 @@
             }
             
             // Toggle seller fields based on user type selection
-            const buyerRadio = document.getElementById('buyer_type');
-            const sellerRadio = document.getElementById('seller_type');
-            const sellerFields = document.getElementById('seller_fields');
+            const buyerRadio = document.querySelector('input[name="user_type"][value="buyer"]');
+            const sellerRadio = document.querySelector('input[name="user_type"][value="seller"]');
+            const sellerFields = document.getElementById('seller-fields');
             
             function toggleSellerFields() {
                 sellerFields.style.display = sellerRadio.checked ? 'block' : 'none';
@@ -667,7 +663,7 @@
                     const formData = new FormData(this);
                     
                     // Send data to the server
-                    fetch('../../backend/api/users/signup_process.php', {
+                    fetch('../../../backend/api/users/signup_process.php', {
                         method: 'POST',
                         body: formData
                     })

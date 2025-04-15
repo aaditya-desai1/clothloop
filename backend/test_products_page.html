@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClothLoop Product Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #f5f5f5;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        .product-card {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+            transition: transform 0.3s;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .product-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-bottom: 1px solid #eee;
+        }
+        .product-info {
+            padding: 15px;
+        }
+        .product-title {
+            font-size: 18px;
+            margin: 0 0 10px 0;
+        }
+        .product-price {
+            font-size: 16px;
+            color: #ff3e6c;
+            font-weight: bold;
+        }
+        .product-seller {
+            font-size: 14px;
+            color: #777;
+            margin-top: 5px;
+        }
+        #status-message {
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+        }
+        .error {
+            color: #721c24;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+        }
+        .success {
+            color: #155724;
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+        }
+        .loading {
+            color: #0c5460;
+            background-color: #d1ecf1;
+            border: 1px solid #bee5eb;
+        }
+        .controls {
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>ClothLoop Product Test</h1>
+        <p>This page tests the backend product API and displays the results.</p>
+    </div>
+    
+    <div class="controls">
+        <button id="fetch-utils">Test Utils Endpoint</button>
+        <button id="fetch-api">Test API Endpoint</button>
+        <button id="clear-results">Clear Results</button>
+    </div>
+    
+    <div id="status-message" class="loading">Loading...</div>
+    
+    <div id="product-grid" class="product-grid"></div>
+    
+    <script>
+        // DOM elements
+        const statusMessage = document.getElementById('status-message');
+        const productGrid = document.getElementById('product-grid');
+        const fetchUtilsBtn = document.getElementById('fetch-utils');
+        const fetchApiBtn = document.getElementById('fetch-api');
+        const clearResultsBtn = document.getElementById('clear-results');
+        
+        // Hide status message by default
+        statusMessage.style.display = 'none';
+        
+        // Fetch from utils endpoint
+        fetchUtilsBtn.addEventListener('click', () => {
+            fetchProducts('../utils/product_operations.php?operation=fetch_all');
+        });
+        
+        // Fetch from API endpoint
+        fetchApiBtn.addEventListener('click', () => {
+            fetchProducts('../api/products/get_products.php');
+        });
+        
+        // Clear results
+        clearResultsBtn.addEventListener('click', () => {
+            productGrid.innerHTML = '';
+            statusMessage.style.display = 'none';
+        });
+        
+        // Function to fetch products
+        function fetchProducts(endpoint) {
+            // Clear previous results
+            productGrid.innerHTML = '';
+            
+            // Show loading message
+            statusMessage.className = 'loading';
+            statusMessage.textContent = 'Loading products...';
+            statusMessage.style.display = 'block';
+            
+            // Fetch products
+            fetch(endpoint)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Network response was not ok: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('API response:', data);
+                    
+                    if (data.status === 'success') {
+                        const products = data.products;
+                        
+                        if (products.length === 0) {
+                            statusMessage.className = 'success';
+                            statusMessage.textContent = 'No products found.';
+                        } else {
+                            statusMessage.className = 'success';
+                            statusMessage.textContent = `Found ${products.length} products.`;
+                            
+                            // Render products
+                            products.forEach(product => {
+                                const card = document.createElement('div');
+                                card.className = 'product-card';
+                                
+                                card.innerHTML = `
+                                    <img 
+                                        src="${product.image}" 
+                                        alt="${product.title}" 
+                                        class="product-image"
+                                        onerror="this.src='../../assets/images/placeholder.png';"
+                                    >
+                                    <div class="product-info">
+                                        <h3 class="product-title">${product.title}</h3>
+                                        <p class="product-price">₹${product.rental_price} / day</p>
+                                        <p class="product-seller">${product.shop_name || 'ClothLoop Seller'}</p>
+                                    </div>
+                                `;
+                                
+                                productGrid.appendChild(card);
+                            });
+                        }
+                    } else {
+                        statusMessage.className = 'error';
+                        statusMessage.textContent = `Error: ${data.message || 'Unknown error'}`;
+                        
+                        if (data.debug) {
+                            console.error('Debug:', data.debug);
+                        }
+                    }
+                })
+                .catch(error => {
+                    statusMessage.className = 'error';
+                    statusMessage.textContent = `Error: ${error.message}`;
+                    console.error('Error:', error);
+                });
+        }
+    </script>
+</body>
+</html> 

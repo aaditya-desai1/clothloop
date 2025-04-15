@@ -427,7 +427,7 @@
     <header class="main-header">
       <div class="header-left">
         <div class="logo">
-          <img src="../Image/logo.webp" alt="ClothLoop logo" />
+          <img src="../../assets/images/logo.webp" alt="ClothLoop logo" />
           <div class="brand-name">
             <h1>ClothLoop</h1>
             <p>Seller Dashboard</p>
@@ -437,7 +437,7 @@
       <div class="header-right">
         <div class="account-info">
           <div class="user-profile">
-            <img id="navProfileImage" src="../Image/shop_logo.png" alt="User Shop logo" />
+            <img id="navProfileImage" src="../../assets/images/shop_logo.png" alt="User Shop logo" />
             <div class="user-details">
               <h4 id="navSellerName">Loading...</h4>
               <p>Seller Account</p>
@@ -446,7 +446,7 @@
             <div class="dropdown-menu">
               <a href="seller_profile.html" class="active"><i class="fas fa-user"></i> Profile</a>
               <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
-              <a href="../Account/login.html"><i class="fas fa-sign-out-alt"></i> Log Out</a>
+              <a href="../account/login.html"><i class="fas fa-sign-out-alt"></i> Log Out</a>
             </div>
           </div>
         </div>
@@ -474,7 +474,7 @@
       <form id="profileForm">
         <div class="form-group">
           <div class="image-upload-container">
-            <img id="profileImagePreview" class="profile-image-preview" src="../Image/shop_logo.png" alt="Profile Picture">
+            <img id="profileImagePreview" class="profile-image-preview" src="../../assets/images/shop_logo.png" alt="Profile Picture">
             <div class="upload-btn-wrapper">
               <button type="button" class="upload-btn">Upload New Picture</button>
               <input type="file" id="profilePicture" accept="image/*" onchange="previewImage(event)">
@@ -550,6 +550,13 @@
         document.querySelector('.user-profile').classList.remove('active');
       });
       
+      // Handle logout
+      document.querySelector('.dropdown-menu a[href="../account/login.html"]').addEventListener('click', function() {
+        // Clear user data
+        localStorage.removeItem('user_id');
+        sessionStorage.clear();
+      });
+      
       // Form submission
       profileForm.addEventListener('submit', function(e) {
         e.preventDefault();
@@ -591,7 +598,7 @@
       
       // Function to fetch seller profile from database
       function fetchSellerProfile() {
-        fetch('../../backend/api/sellers/get_seller_profile.php')
+        fetch('../../../backend/api/sellers/get_seller_profile.php')
           .then(response => {
             if (!response.ok) {
               throw new Error('Server returned status: ' + response.status);
@@ -657,7 +664,7 @@
           formData.append('profile_image', profilePic);
         }
 
-        fetch('../../backend/api/sellers/update_seller_profile.php', {
+        fetch('../../../backend/api/sellers/update_seller_profile.php', {
           method: 'POST',
           body: formData
         })
