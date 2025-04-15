@@ -115,24 +115,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $conn->commit();
             
             // Registration successful
-            echo "<script>
-                alert('Registration successful! Please login.');
-                window.location.href='../Account/login.html';
-            </script>";
+            echo "Registration successful";
         } catch (Exception $e) {
             // Rollback transaction if something failed
             $conn->rollback();
-            echo "<script>
-                alert('Registration failed: " . $e->getMessage() . "');
-                window.location.href='../Account/register.html';
-            </script>";
+            echo "Registration failed: " . $e->getMessage();
         }
     } else {
         // Display errors
-        echo "<script>
-            alert('Registration failed: " . implode(', ', $errors) . "');
-            window.location.href='../Account/register.html';
-        </script>";
+        echo "Registration failed: " . implode(', ', $errors);
     }
 } else {
     // If not a POST request, redirect to registration page

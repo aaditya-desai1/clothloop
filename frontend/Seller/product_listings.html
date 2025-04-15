@@ -1,0 +1,1450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Product Listings</title>
+  
+  <!-- Font Awesome CDN -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+  
+  <!-- Inline CSS -->
+  <style>
+    /* Global Variables */
+    :root {
+      --primary-color: #666768;
+      --secondary-color: #f7f7f7;
+      --text-primary: #212121;
+      --text-secondary: #383737;
+      --white: #fff;
+      --hover-color: #444;
+      --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+      --shadow-md: 0 5px 15px rgba(0, 0, 0, 0.1);
+      --transition: all 0.3s ease;
+      --border-radius: 10px;
+      --accent-color: #4CAF50;
+      --danger-color: #e74c3c;
+    }
+
+    /* Global Styles */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: sans-serif;
+      background-color: var(--white);
+      color: var(--text-primary);
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+    }
+
+    h2, h3 {
+      margin-bottom: 20px;
+      color: var(--text-primary);
+    }
+
+    .container {
+      display: flex;
+      width: 100%;
+      min-height: 100vh;
+      background-color: var(--white);
+    }
+
+    /* Header */
+    .main-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      background-color: var(--secondary-color);
+      position: fixed;    
+      width: 100%;
+      height: 70px;
+      top: 0;            
+      left: 0;           
+      right: 0;
+      z-index: 1000;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+    }
+    
+    .header-left .logo {
+      display: flex;
+      align-items: center;
+      margin-right: 20px;
+      height: 40px;
+      line-height: 1;
+    }
+    
+    .header-left .logo img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      margin-right: 10px;
+      vertical-align: middle;
+      display: inline-block;
+    }
+
+    .brand-name {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.2;
+    }
+
+    .brand-name h1 {
+      font-size: 18px;
+      font-weight: bold;
+      margin: 0;
+      padding: 0;
+      line-height: 1.2;
+      color: var(--text-primary);
+    }
+
+    .brand-name p {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin: 0;
+      padding: 0;
+      line-height: 1.2;
+    }
+    
+    .header-right {
+      display: flex;
+      align-items: center;
+      margin-right: 20px;
+    }
+    
+    .account-info {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    
+    .notifications {
+      position: relative;
+      cursor: pointer;
+    }
+    
+    .notifications i {
+      font-size: 20px;
+      color: var(--text-primary);
+    }
+    
+    .notification-badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background-color: #ff6b6b;
+      color: white;
+      width: 20px;
+      height: 20px;
+      font-size: 12px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
+    
+    .user-profile {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      gap: 10px;
+      position: relative;
+      background-color: var(--white);
+      border-radius: 10px;
+      padding: 5px 10px;
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+    }
+    
+    .user-profile:hover {
+      box-shadow: var(--shadow-md);
+    }
+    
+    .user-profile img {
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-right: 10px;
+    }
+    
+    .user-details {
+      margin-right: 10px;
+    }
+    
+    .user-details h4 {
+      font-size: 14px;
+      font-weight: bold;
+      margin: 0;
+    }
+    
+    .user-details p {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin: 0;
+    }
+    
+    .user-profile i {
+      font-size: 14px;
+      color: var(--text-primary);
+      margin-left: 5px;
+    }
+    
+    .dropdown-menu {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      padding: 10px 0;
+      min-width: 200px;
+      z-index: 1000;
+      display: none;
+    }
+    
+    .dropdown-menu a {
+      display: block;
+      padding: 10px 20px;
+      text-decoration: none;
+      color: var(--text-primary);
+      transition: all 0.3s ease;
+    }
+    
+    .dropdown-menu a i {
+      margin-right: 10px;
+    }
+    
+    .dropdown-menu a:hover {
+      background-color: #f5f5f5;
+    }
+    
+    .user-profile.active .dropdown-menu {
+      display: block;
+    }
+    
+    /* Sidebar */
+    .sidebar {
+      width: 280px;
+      background-color: var(--white);
+      height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 70px;
+      box-shadow: var(--shadow-sm);
+      padding-top: 20px;
+      z-index: 900;
+    }
+    
+    .sidebar-nav {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .sidebar-nav li {
+      margin-bottom: 5px;
+    }
+    
+    .sidebar-nav a {
+      display: flex;
+      align-items: center;
+      padding: 15px 20px;
+      text-decoration: none;
+      color: var(--text-primary);
+      transition: var(--transition);
+      border-radius: 10px;
+      margin: 0 10px;
+    }
+    
+    .sidebar-nav a i {
+      margin-right: 15px;
+      font-size: 18px;
+    }
+    
+    .sidebar-nav a.active,
+    .sidebar-nav a:hover {
+      background-color: var(--primary-color);
+      color: var(--white);
+    }
+    
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      padding: 40px;
+      margin-left: 280px;
+      margin-top: 70px;
+    }
+
+    /* Product Listings */
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 25px;
+      margin-top: 30px;
+    }
+
+    .product-card {
+      background-color: var(--white);
+      border-radius: var(--border-radius);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+    }
+
+    .product-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .product-image {
+      height: 200px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .product-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .product-details {
+      padding: 15px;
+    }
+
+    .product-details h3 {
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+
+    .product-meta {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      font-size: 14px;
+    }
+
+    .product-price {
+      font-weight: bold;
+      color: var(--accent-color);
+    }
+
+    .product-category {
+      color: var(--text-secondary);
+      background-color: var(--secondary-color);
+      padding: 3px 8px;
+      border-radius: 15px;
+      font-size: 12px;
+    }
+
+    .product-description {
+      margin-bottom: 15px;
+      color: var(--text-secondary);
+      font-size: 14px;
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .product-actions {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .product-actions button {
+      flex: 1;
+      padding: 8px 5px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: var(--transition);
+    }
+
+    .view-btn {
+      background-color: var(--secondary-color);
+      color: var(--text-primary);
+    }
+
+    .view-btn:hover {
+      background-color: #e6e6e6;
+    }
+
+    .edit-btn {
+      background-color: #3498db;
+      color: white;
+    }
+
+    .edit-btn:hover {
+      background-color: #2980b9;
+    }
+
+    .delete-btn {
+      background-color: var(--secondary-color);
+      color: var(--danger-color);
+    }
+
+    .delete-btn:hover {
+      background-color: var(--danger-color);
+      color: white;
+    }
+
+    .no-products {
+      text-align: center;
+      padding: 50px;
+      background-color: var(--secondary-color);
+      border-radius: var(--border-radius);
+      margin-top: 30px;
+    }
+
+    .no-products i {
+      font-size: 48px;
+      color: var(--text-secondary);
+      margin-bottom: 20px;
+    }
+
+    .no-products h3 {
+      margin-bottom: 10px;
+    }
+
+    .no-products p {
+      color: var(--text-secondary);
+      margin-bottom: 20px;
+    }
+
+    /* Add Cloth Button */
+    .add-cloth-btn {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 60px;
+      height: 60px;
+      background-color: var(--accent-color);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow-md);
+      cursor: pointer;
+      z-index: 1000;
+      transition: var(--transition);
+    }
+
+    .add-cloth-btn i {
+      font-size: 24px;
+    }
+
+    .add-cloth-btn:hover {
+      transform: scale(1.1);
+    }
+
+    /* Upload Cloth Popup */
+    .popup-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .popup-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .popup-container {
+      background-color: white;
+      width: 100%;
+      max-width: 800px;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow-md);
+      display: flex;
+      overflow: hidden;
+      max-height: 90vh;
+    }
+
+    .popup-image-upload {
+      width: 40%;
+      padding: 20px;
+      background-color: var(--secondary-color);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .image-upload-area {
+      flex: 1;
+      border: 2px dashed var(--primary-color);
+      border-radius: var(--border-radius);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .image-upload-area i {
+      font-size: 48px;
+      color: var(--primary-color);
+      margin-bottom: 15px;
+    }
+
+    .image-upload-area p {
+      text-align: center;
+      color: var(--text-secondary);
+      margin-bottom: 10px;
+    }
+
+    .image-upload-area input[type="file"] {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .preview-image {
+      max-width: 100%;
+      max-height: 200px;
+      display: none;
+      margin-top: 10px;
+      border-radius: 5px;
+    }
+
+    .popup-form {
+      width: 60%;
+      padding: 30px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .popup-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .popup-header h2 {
+      margin: 0;
+    }
+
+    .close-popup {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: var(--text-primary);
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+      color: var(--text-primary);
+    }
+
+    .form-group input[type="text"],
+    .form-group input[type="number"],
+    .form-group input[type="tel"],
+    .form-group textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      transition: border-color 0.3s;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      border-color: var(--accent-color);
+      outline: none;
+    }
+
+    .form-group textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .radio-group {
+      display: flex;
+      gap: 20px;
+    }
+
+    .radio-option {
+      display: flex;
+      align-items: center;
+    }
+
+    .radio-option input[type="radio"] {
+      margin-right: 8px;
+    }
+
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: var(--transition);
+    }
+
+    .btn-primary {
+      background-color: var(--accent-color);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background-color: #3e8e41;
+    }
+
+    .btn-secondary {
+      background-color: #f1f1f1;
+      color: var(--text-primary);
+    }
+
+    .btn-secondary:hover {
+      background-color: #ddd;
+    }
+
+    /* View Product Modal */
+    .view-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .view-modal.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .view-modal-content {
+      background-color: white;
+      width: 100%;
+      max-width: 800px;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .view-modal-header {
+      padding: 20px;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .view-modal-header h2 {
+      margin: 0;
+    }
+
+    .view-modal-body {
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      gap: 30px;
+    }
+
+    .view-product-image {
+      width: 300px;
+      height: 300px;
+      overflow: hidden;
+      border-radius: var(--border-radius);
+    }
+
+    .view-product-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .view-product-details {
+      flex: 1;
+    }
+
+    .view-product-details h3 {
+      margin-top: 0;
+      margin-bottom: 10px;
+      font-size: 24px;
+    }
+
+    .view-product-price {
+      font-size: 20px;
+      color: var(--accent-color);
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+
+    .view-product-meta {
+      margin-bottom: 20px;
+    }
+
+    .view-product-meta p {
+      margin: 8px 0;
+      display: flex;
+      align-items: center;
+    }
+
+    .view-product-meta i {
+      width: 25px;
+      color: var(--primary-color);
+      margin-right: 10px;
+    }
+
+    .view-product-description {
+      margin-bottom: 20px;
+    }
+
+    .view-product-description h4 {
+      margin-bottom: 10px;
+    }
+
+    .view-product-description p {
+      line-height: 1.6;
+      color: var(--text-secondary);
+    }
+
+    .view-modal-footer {
+      padding: 15px 20px;
+      border-top: 1px solid #eee;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    /* Delete Confirmation Modal */
+    .delete-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .delete-modal.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .delete-modal-content {
+      background-color: white;
+      width: 100%;
+      max-width: 500px;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
+    }
+
+    .delete-modal-header {
+      padding: 20px;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .delete-modal-header i {
+      font-size: 24px;
+      color: var(--danger-color);
+    }
+
+    .delete-modal-header h3 {
+      margin: 0;
+      color: var(--danger-color);
+    }
+
+    .delete-modal-body {
+      padding: 20px;
+    }
+
+    .delete-modal-body p {
+      margin: 0 0 10px 0;
+      line-height: 1.6;
+    }
+
+    .delete-modal-footer {
+      padding: 15px 20px;
+      border-top: 1px solid #eee;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .btn-danger {
+      background-color: var(--danger-color);
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background-color: #c0392b;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="main-header">
+      <div class="header-left">
+        <div class="logo">
+          <img src="../Image/logo.webp" alt="APPLICATION logo" />
+          <div class="brand-name">
+            <h1>ClothLoop</h1>
+            <p>Seller Dashboard</p>
+          </div>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="account-info">
+          <div class="notifications">
+            <i class="fas fa-bell"></i>
+            <span class="notification-badge">3</span>
+          </div>
+          <div class="user-profile">
+            <img src="../Image/shop_logo.png" alt="User Shop logo" />
+            <div class="user-details">
+              <h4>John Doe</h4>
+              <p>Seller Account</p>
+            </div>
+            <i class="fas fa-chevron-down"></i>
+            <div class="dropdown-menu">
+              <a href="seller_profile.html"><i class="fas fa-user"></i> Profile</a>
+              <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
+              <a href="../Account/login.html"><i class="fas fa-sign-out-alt"></i> Log Out</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <ul class="sidebar-nav">
+        <li><a href="seller_dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+        <li><a href="product_listings.html" class="active"><i class="fas fa-list"></i> Product Listings</a></li>
+        <li><a href="seller_dashboard.html#analysis"><i class="fas fa-chart-line"></i> Analysis</a></li>
+        <li><a href="seller_dashboard.html#comments"><i class="fas fa-comments"></i> Comments</a></li>
+      </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <h2>Product Listings</h2>
+      <p>Manage your products: view, edit, and delete listings.</p>
+      
+      <!-- Empty state when no products -->
+      <div id="emptyProductState" class="no-products">
+        <i class="fas fa-box-open"></i>
+        <h3>No Products Yet</h3>
+        <p>You haven't added any products for rent. Click the + button to add your first product.</p>
+      </div>
+      
+      <!-- Product Grid -->
+      <div id="productGrid" class="product-grid" style="display: none;">
+        <!-- Products will be dynamically added here -->
+      </div>
+      
+    </main>
+  </div>
+
+  <!-- Add Cloth Button -->
+  <div class="add-cloth-btn" id="addClothBtn">
+    <i class="fas fa-plus"></i>
+  </div>
+
+  <!-- Upload Cloth Popup -->
+  <div class="popup-overlay" id="uploadPopup">
+    <div class="popup-container">
+      <div class="popup-image-upload">
+        <div class="image-upload-area" id="dropArea">
+          <i class="fas fa-cloud-upload-alt"></i>
+          <p>Drag & drop an image here</p>
+          <p>or</p>
+          <p><strong>Click to browse</strong></p>
+          <input type="file" id="clothImage" accept="image/*">
+          <img id="previewImage" class="preview-image" src="" alt="Preview">
+        </div>
+      </div>
+      <div class="popup-form">
+        <div class="popup-header">
+          <h2>Upload New Cloth</h2>
+          <button class="close-popup" id="closePopup">&times;</button>
+        </div>
+        <form id="uploadClothForm">
+          <div class="form-group">
+            <label for="clothTitle">Cloth Title</label>
+            <input type="text" id="clothTitle" required>
+          </div>
+          <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" required></textarea>
+          </div>
+          <div class="form-group">
+            <label for="size">Size</label>
+            <input type="text" id="size" required>
+          </div>
+          <div class="form-group">
+            <label>Category</label>
+            <div class="radio-group">
+              <div class="radio-option">
+                <input type="radio" id="men" name="category" value="Men" required>
+                <label for="men">Men</label>
+              </div>
+              <div class="radio-option">
+                <input type="radio" id="women" name="category" value="Women">
+                <label for="women">Women</label>
+              </div>
+              <div class="radio-option">
+                <input type="radio" id="kids" name="category" value="Kids">
+                <label for="kids">Kids</label>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="rentalPrice">Rental Price (₹/day)</label>
+            <input type="number" id="rentalPrice" min="0" step="1" required>
+          </div>
+          <div class="form-group">
+            <label for="contactNo">Contact No.</label>
+            <input type="tel" id="contactNo" required>
+          </div>
+          <div class="form-group">
+            <label for="whatsappNo">WhatsApp No.</label>
+            <input type="tel" id="whatsappNo" required>
+          </div>
+          <div class="form-group">
+            <label for="terms">Terms and Conditions</label>
+            <textarea id="terms" required></textarea>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" id="cancelUpload">Cancel</button>
+            <button type="submit" class="btn btn-primary">Upload Cloth</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- View Product Modal -->
+  <div class="view-modal" id="viewModal">
+    <div class="view-modal-content">
+      <div class="view-modal-header">
+        <h2>Product Details</h2>
+        <button class="close-popup" id="closeViewModal">&times;</button>
+      </div>
+      <div class="view-modal-body">
+        <div class="view-product-image">
+          <img id="viewProductImage" src="" alt="Product Image">
+        </div>
+        <div class="view-product-details">
+          <h3 id="viewProductTitle"></h3>
+          <div class="view-product-price" id="viewProductPrice"></div>
+          <div class="view-product-meta">
+            <p><i class="fas fa-tshirt"></i> <span id="viewProductSize"></span></p>
+            <p><i class="fas fa-tag"></i> <span id="viewProductCategory"></span></p>
+            <p><i class="fas fa-phone"></i> <span id="viewProductContact"></span></p>
+            <p><i class="fab fa-whatsapp"></i> <span id="viewProductWhatsapp"></span></p>
+          </div>
+          <div class="view-product-description">
+            <h4>Description</h4>
+            <p id="viewProductDescription"></p>
+          </div>
+          <div class="view-product-description">
+            <h4>Terms & Conditions</h4>
+            <p id="viewProductTerms"></p>
+          </div>
+        </div>
+      </div>
+      <div class="view-modal-footer">
+        <button class="btn btn-secondary" id="closeViewBtn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div class="delete-modal" id="deleteModal">
+    <div class="delete-modal-content">
+      <div class="delete-modal-header">
+        <i class="fas fa-exclamation-triangle"></i>
+        <h3>Confirm Deletion</h3>
+      </div>
+      <div class="delete-modal-body">
+        <p>Are you sure you want to delete this product?</p>
+        <p>This action cannot be undone.</p>
+      </div>
+      <div class="delete-modal-footer">
+        <button class="btn btn-secondary" id="cancelDeleteBtn">Cancel</button>
+        <button class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // DOM Elements
+      const addClothBtn = document.getElementById('addClothBtn');
+      const uploadPopup = document.getElementById('uploadPopup');
+      const closePopup = document.getElementById('closePopup');
+      const cancelUpload = document.getElementById('cancelUpload');
+      const clothImage = document.getElementById('clothImage');
+      const previewImage = document.getElementById('previewImage');
+      const dropArea = document.getElementById('dropArea');
+      const uploadForm = document.getElementById('uploadClothForm');
+      const productGrid = document.getElementById('productGrid');
+      const emptyProductState = document.getElementById('emptyProductState');
+      const viewModal = document.getElementById('viewModal');
+      const closeViewModal = document.getElementById('closeViewModal');
+      const closeViewBtn = document.getElementById('closeViewBtn');
+      const deleteModal = document.getElementById('deleteModal');
+      const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+      const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+      
+      // Current product being edited or deleted
+      let currentProductId = null;
+
+      // Products data
+      let products = [];
+
+      // Fetch products from database
+      fetchProducts();
+
+      // Upload popup functions
+      addClothBtn.addEventListener('click', function() {
+        uploadPopup.classList.add('active');
+        resetForm();
+      });
+
+      function closeUploadPopup() {
+        uploadPopup.classList.remove('active');
+        resetForm();
+      }
+
+      function resetForm() {
+        uploadForm.reset();
+        previewImage.style.display = 'none';
+        previewImage.src = '';
+        currentProductId = null;
+      }
+
+      closePopup.addEventListener('click', closeUploadPopup);
+      cancelUpload.addEventListener('click', closeUploadPopup);
+
+      // Close when clicking outside the popup
+      uploadPopup.addEventListener('click', function(e) {
+        if (e.target === uploadPopup) {
+          closeUploadPopup();
+        }
+      });
+
+      // Image preview functionality
+      clothImage.addEventListener('change', function(e) {
+        handleImageSelect(e.target.files[0]);
+      });
+
+      // Drag and drop functionality
+      dropArea.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        dropArea.style.borderColor = 'var(--accent-color)';
+        dropArea.style.backgroundColor = 'rgba(76, 175, 80, 0.1)';
+      });
+
+      dropArea.addEventListener('dragleave', function() {
+        dropArea.style.borderColor = 'var(--primary-color)';
+        dropArea.style.backgroundColor = 'transparent';
+      });
+
+      dropArea.addEventListener('drop', function(e) {
+        e.preventDefault();
+        dropArea.style.borderColor = 'var(--primary-color)';
+        dropArea.style.backgroundColor = 'transparent';
+        
+        const file = e.dataTransfer.files[0];
+        if (file && file.type.match('image.*')) {
+          clothImage.files = e.dataTransfer.files;
+          handleImageSelect(file);
+        }
+      });
+
+      function handleImageSelect(file) {
+        if (file && file.type.match('image.*')) {
+          const reader = new FileReader();
+          
+          reader.onload = function(e) {
+            previewImage.src = e.target.result;
+            previewImage.style.display = 'block';
+          };
+          
+          reader.readAsDataURL(file);
+        }
+      }
+
+      // User profile dropdown
+      document.querySelector('.user-profile').addEventListener('click', function(e) {
+        this.classList.toggle('active');
+        e.stopPropagation();
+      });
+      
+      // Close dropdown when clicking outside
+      document.addEventListener('click', function() {
+        document.querySelector('.user-profile').classList.remove('active');
+      });
+
+      // Form submission
+      uploadForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Get form values
+        const productData = {
+          id: currentProductId || null,
+          title: document.getElementById('clothTitle').value,
+          description: document.getElementById('description').value,
+          size: document.getElementById('size').value,
+          category: document.querySelector('input[name="category"]:checked').value,
+          rentalPrice: document.getElementById('rentalPrice').value,
+          contactNo: document.getElementById('contactNo').value,
+          whatsappNo: document.getElementById('whatsappNo').value,
+          terms: document.getElementById('terms').value,
+          image: previewImage.src || '../Image/placeholder.jpg'
+        };
+        
+        // Save to database
+        if (currentProductId) {
+          // Update existing product
+          updateProduct(productData);
+        } else {
+          // Add new product
+          addProduct(productData);
+        }
+        
+        // Close the popup
+        closeUploadPopup();
+      });
+
+      // Fetch products from database
+      function fetchProducts() {
+        // Show loading indicator or similar
+        
+        fetch('../../backend/product_operations.php?operation=fetch')
+          .then(response => response.json())
+          .then(data => {
+            if (data.status === 'success') {
+              products = data.products;
+              renderProducts();
+            } else {
+              console.error('Error fetching products:', data.message);
+              // Show error message to user
+              alert('Failed to load products. Please try again later.');
+            }
+          })
+          .catch(error => {
+            console.error('Error fetching products:', error);
+            // Show error message to user
+            alert('Failed to load products. Please try again later.');
+          });
+      }
+
+      // Add product to database
+      function addProduct(productData) {
+        // Show loading indicator or similar
+        
+        fetch('../../backend/product_operations.php?operation=add', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(productData)
+        })
+          .then(response => response.json())
+          .then(data => {
+            if (data.status === 'success') {
+              // Refresh products list
+              fetchProducts();
+              // Show success message
+              alert('Product added successfully!');
+            } else {
+              console.error('Error adding product:', data.message);
+              // Show error message to user
+              alert('Failed to add product. Please try again later.');
+            }
+          })
+          .catch(error => {
+            console.error('Error adding product:', error);
+            // Show error message to user
+            alert('Failed to add product. Please try again later.');
+          });
+      }
+
+      // Update product in database
+      function updateProduct(productData) {
+        // Show loading indicator or similar
+        
+        fetch('../../backend/product_operations.php?operation=update', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(productData)
+        })
+          .then(response => response.json())
+          .then(data => {
+            if (data.status === 'success') {
+              // Refresh products list
+              fetchProducts();
+              // Show success message
+              alert('Product updated successfully!');
+            } else {
+              console.error('Error updating product:', data.message);
+              // Show error message to user
+              alert('Failed to update product. Please try again later.');
+            }
+          })
+          .catch(error => {
+            console.error('Error updating product:', error);
+            // Show error message to user
+            alert('Failed to update product. Please try again later.');
+          });
+      }
+
+      // Delete product from database
+      function deleteProduct(productId) {
+        // Show loading indicator or similar
+        
+        fetch('../../backend/product_operations.php?operation=delete', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ id: productId })
+        })
+          .then(response => response.json())
+          .then(data => {
+            if (data.status === 'success') {
+              // Refresh products list
+              fetchProducts();
+              // Show success message
+              alert('Product deleted successfully!');
+            } else {
+              console.error('Error deleting product:', data.message);
+              // Show error message to user
+              alert('Failed to delete product. Please try again later.');
+            }
+          })
+          .catch(error => {
+            console.error('Error deleting product:', error);
+            // Show error message to user
+            alert('Failed to delete product. Please try again later.');
+          });
+      }
+
+      // Render products in the grid
+      function renderProducts() {
+        if (products.length === 0) {
+          emptyProductState.style.display = 'block';
+          productGrid.style.display = 'none';
+          return;
+        }
+
+        emptyProductState.style.display = 'none';
+        productGrid.style.display = 'grid';
+        
+        productGrid.innerHTML = '';
+        
+        products.forEach(product => {
+          const productCard = document.createElement('div');
+          productCard.className = 'product-card';
+          productCard.setAttribute('data-id', product.id);
+          
+          productCard.innerHTML = `
+            <div class="product-image">
+              <img src="${product.image}" alt="${product.title}" />
+            </div>
+            <div class="product-details">
+              <h3>${product.title}</h3>
+              <div class="product-meta">
+                <span class="product-price">₹${product.rentalPrice}/day</span>
+                <span class="product-category">${product.category}</span>
+              </div>
+              <div class="product-description">${product.description}</div>
+              <div class="product-actions">
+                <button class="view-btn" data-id="${product.id}">View</button>
+                <button class="edit-btn" data-id="${product.id}">Edit</button>
+                <button class="delete-btn" data-id="${product.id}">Delete</button>
+              </div>
+            </div>
+          `;
+          
+          productGrid.appendChild(productCard);
+        });
+
+        // Add event listeners to buttons
+        document.querySelectorAll('.view-btn').forEach(btn => {
+          btn.addEventListener('click', function() {
+            viewProduct(this.getAttribute('data-id'));
+          });
+        });
+
+        document.querySelectorAll('.edit-btn').forEach(btn => {
+          btn.addEventListener('click', function() {
+            editProduct(this.getAttribute('data-id'));
+          });
+        });
+
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+          btn.addEventListener('click', function() {
+            showDeleteConfirmation(this.getAttribute('data-id'));
+          });
+        });
+      }
+
+      // View product details
+      function viewProduct(productId) {
+        const product = products.find(p => p.id == productId);
+        if (!product) return;
+        
+        document.getElementById('viewProductImage').src = product.image;
+        document.getElementById('viewProductTitle').textContent = product.title;
+        document.getElementById('viewProductPrice').textContent = `₹${product.rentalPrice}/day`;
+        document.getElementById('viewProductSize').textContent = product.size;
+        document.getElementById('viewProductCategory').textContent = product.category;
+        document.getElementById('viewProductContact').textContent = product.contactNo;
+        document.getElementById('viewProductWhatsapp').textContent = product.whatsappNo;
+        document.getElementById('viewProductDescription').textContent = product.description;
+        document.getElementById('viewProductTerms').textContent = product.terms;
+        
+        viewModal.classList.add('active');
+      }
+
+      // Edit product
+      function editProduct(productId) {
+        const product = products.find(p => p.id == productId);
+        if (!product) return;
+        
+        // Fill the form with product data
+        document.getElementById('clothTitle').value = product.title;
+        document.getElementById('description').value = product.description;
+        document.getElementById('size').value = product.size;
+        document.querySelector(`input[name="category"][value="${product.category}"]`).checked = true;
+        document.getElementById('rentalPrice').value = product.rentalPrice;
+        document.getElementById('contactNo').value = product.contactNo;
+        document.getElementById('whatsappNo').value = product.whatsappNo;
+        document.getElementById('terms').value = product.terms;
+        
+        // Show the image preview
+        previewImage.src = product.image;
+        previewImage.style.display = 'block';
+        
+        // Set the current product ID
+        currentProductId = productId;
+        
+        // Show the popup
+        uploadPopup.classList.add('active');
+      }
+
+      // Show delete confirmation modal
+      function showDeleteConfirmation(productId) {
+        currentProductId = productId;
+        deleteModal.classList.add('active');
+      }
+
+      // Cancel delete
+      cancelDeleteBtn.addEventListener('click', function() {
+        deleteModal.classList.remove('active');
+        currentProductId = null;
+      });
+
+      // Confirm delete
+      confirmDeleteBtn.addEventListener('click', function() {
+        if (currentProductId) {
+          deleteProduct(currentProductId);
+          deleteModal.classList.remove('active');
+          currentProductId = null;
+        }
+      });
+
+      // Close delete modal when clicking outside
+      deleteModal.addEventListener('click', function(e) {
+        if (e.target === deleteModal) {
+          deleteModal.classList.remove('active');
+          currentProductId = null;
+        }
+      });
+
+      // Close view modal
+      closeViewModal.addEventListener('click', function() {
+        viewModal.classList.remove('active');
+      });
+
+      closeViewBtn.addEventListener('click', function() {
+        viewModal.classList.remove('active');
+      });
+
+      // Close view modal when clicking outside
+      viewModal.addEventListener('click', function(e) {
+        if (e.target === viewModal) {
+          viewModal.classList.remove('active');
+        }
+      });
+    });
+  </script>
+</body>
+</html> 

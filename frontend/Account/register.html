@@ -675,18 +675,8 @@
                     .then(data => {
                         // Check if response contains success message
                         if (data.includes('Registration successful')) {
-                            // Show success message
-                            const successMessage = document.getElementById('success-message');
-                            successMessage.style.display = 'block';
-                            successMessage.innerHTML = `
-                                <h3>User Created Successfully!</h3>
-                                <p><strong>Username:</strong> ${username}</p>
-                                <p><strong>User Type:</strong> ${userType}</p>
-                                <p><a href="login.html">Go to login page</a></p>
-                            `;
-                            
-                            // Hide the form
-                            signupForm.style.display = 'none';
+                            // Redirect directly to login page
+                            window.location.href = "login.html";
                         } else {
                             // Show error if registration failed
                             alert('Registration failed: ' + data);
