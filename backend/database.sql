@@ -16,7 +16,7 @@ CREATE TABLE cloth_details (
     cloth_title VARCHAR(100) NOT NULL,
     description TEXT,
     size VARCHAR(20) NOT NULL,
-    color VARCHAR(30) NOT NULL,
+    category VARCHAR(30) NOT NULL,
     rental_price DECIMAL(10,2) NOT NULL,
     contact_number VARCHAR(15) NOT NULL,
     whatsapp_number VARCHAR(15),

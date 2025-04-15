@@ -25,6 +25,7 @@
       --shadow-md: 0 5px 15px rgba(0, 0, 0, 0.1);
       --transition: all 0.3s ease;
       --border-radius: 10px;
+      --accent-color: #4CAF50;
     }
 
     /* Global Styles */
@@ -578,6 +579,225 @@
       background-color: #e74c3c;
       color: white;
     }
+
+    /* Add Cloth Button */
+    .add-cloth-btn {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 60px;
+      height: 60px;
+      background-color: var(--accent-color);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow-md);
+      cursor: pointer;
+      z-index: 1000;
+      transition: var(--transition);
+    }
+
+    .add-cloth-btn i {
+      font-size: 24px;
+    }
+
+    .add-cloth-btn:hover {
+      transform: scale(1.1);
+    }
+
+    /* Upload Cloth Popup */
+    .popup-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .popup-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .popup-container {
+      background-color: white;
+      width: 100%;
+      max-width: 800px;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow-md);
+      display: flex;
+      overflow: hidden;
+      max-height: 90vh;
+    }
+
+    .popup-image-upload {
+      width: 40%;
+      padding: 20px;
+      background-color: var(--secondary-color);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .image-upload-area {
+      flex: 1;
+      border: 2px dashed var(--primary-color);
+      border-radius: var(--border-radius);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .image-upload-area i {
+      font-size: 48px;
+      color: var(--primary-color);
+      margin-bottom: 15px;
+    }
+
+    .image-upload-area p {
+      text-align: center;
+      color: var(--text-secondary);
+      margin-bottom: 10px;
+    }
+
+    .image-upload-area input[type="file"] {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .preview-image {
+      max-width: 100%;
+      max-height: 200px;
+      display: none;
+      margin-top: 10px;
+      border-radius: 5px;
+    }
+
+    .popup-form {
+      width: 60%;
+      padding: 30px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .popup-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .popup-header h2 {
+      margin: 0;
+    }
+
+    .close-popup {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: var(--text-primary);
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+      color: var(--text-primary);
+    }
+
+    .form-group input[type="text"],
+    .form-group input[type="number"],
+    .form-group input[type="tel"],
+    .form-group textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      transition: border-color 0.3s;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      border-color: var(--accent-color);
+      outline: none;
+    }
+
+    .form-group textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .radio-group {
+      display: flex;
+      gap: 20px;
+    }
+
+    .radio-option {
+      display: flex;
+      align-items: center;
+    }
+
+    .radio-option input[type="radio"] {
+      margin-right: 8px;
+    }
+
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: var(--transition);
+    }
+
+    .btn-primary {
+      background-color: var(--accent-color);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background-color: #3e8e41;
+    }
+
+    .btn-secondary {
+      background-color: #f1f1f1;
+      color: var(--text-primary);
+    }
+
+    .btn-secondary:hover {
+      background-color: #ddd;
+    }
   </style>
 </head>
 <body>
@@ -622,8 +842,7 @@
         <li><a href="#dashboard" class="active" data-section="dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
         <li><a href="#analysis" data-section="analysis"><i class="fas fa-chart-line"></i> Analysis</a></li>
         <li><a href="#comments" data-section="comments"><i class="fas fa-comments"></i> Comments</a></li>
-        <li><a href="settings.html"><i class="fas fa-cog"></i> Settings</a></li>
-        </ul>
+      </ul>
     </aside>
 
     <!-- Main Content -->
@@ -633,92 +852,27 @@
         <div class="welcome-message">
           <h2>Welcome to Seller Dashboard</h2>
           <p>Manage your products, track sales, and analyze your performance.</p>
-    </div>
-    
+        </div>
+        
         <div class="stats-grid">
           <div class="stat-card">
-            <h3>Total Sales</h3>
-            <div class="stat-value">$12,345</div>
-            <div class="stat-change">+15% from last month</div>
-        </div>
-          <div class="stat-card">
-            <h3>Orders</h3>
-            <div class="stat-value">145</div>
-            <div class="stat-change">+10% from last month</div>
-        </div>
-          <div class="stat-card">
             <h3>Products</h3>
-            <div class="stat-value">43</div>
-            <div class="stat-change">+5 new products</div>
+            <div class="stat-value">0</div>
+            <div class="stat-change">Add your first product</div>
           </div>
           <div class="stat-card">
             <h3>Customer Reviews</h3>
             <div class="stat-value">4.8</div>
             <div class="stat-change">+0.2 from last month</div>
+          </div>
         </div>
-      </div>
-      
+        
         <div class="recent-products">
           <h2>Recent Products</h2>
-        <div class="product-grid">
-            <div class="product-card">
-              <div class="product-image">
-                <img src="../Image/white sweater.jpg" alt="White Sweater" />
-          </div>
-              <div class="product-details">
-                <h3>White Sweater</h3>
-                <div class="price">$49.99</div>
-                <div class="stock">In Stock: 25</div>
-                <div class="product-actions">
-                  <button>Edit</button>
-                  <button>View</button>
-          </div>
-          </div>
-          </div>
-            <div class="product-card">
-              <div class="product-image">
-                <img src="../Image/Black-jeans.jpeg" alt="Black Jeans" />
-        </div>
-              <div class="product-details">
-                <h3>Black Jeans</h3>
-                <div class="price">$39.99</div>
-                <div class="stock">In Stock: 18</div>
-                <div class="product-actions">
-                  <button>Edit</button>
-                  <button>View</button>
-      </div>
-    </div>
-          </div>
-            <div class="product-card">
-              <div class="product-image">
-                <img src="../Image/black shirt.jpeg" alt="Black T-Shirt" />
-          </div>
-              <div class="product-details">
-                <h3>Black T-Shirt</h3>
-                <div class="price">$24.99</div>
-                <div class="stock">In Stock: 32</div>
-                <div class="product-actions">
-                  <button>Edit</button>
-                  <button>View</button>
+          <div class="product-grid">
+            <!-- Products will be added here dynamically -->
           </div>
         </div>
-      </div>
-            <div class="product-card">
-              <div class="product-image">
-                <img src="../Image/bomber jacket.jpeg" alt="Bomber Jacket" />
-    </div>
-              <div class="product-details">
-                <h3>Bomber Jacket</h3>
-                <div class="price">$89.99</div>
-                <div class="stock">In Stock: 10</div>
-                <div class="product-actions">
-                  <button>Edit</button>
-                  <button>View</button>
-                  </div>
-                  </div>
-                </div>
-              </div>
-            </div>
       </section>
 
       <!-- Analysis Section -->
@@ -729,14 +883,14 @@
             <h3>Product Sales</h3>
             <div class="chart-wrapper">
               <canvas id="barChart"></canvas>
-                  </div>
-                  </div>
+            </div>
+          </div>
           <div class="chart-card">
             <h3>Revenue Views</h3>
             <div class="chart-wrapper">
               <canvas id="lineChart"></canvas>
-                </div>
-              </div>
+            </div>
+          </div>
           <div class="chart-card">
             <h3>Customer Engagement</h3>
             <div class="chart-wrapper">
@@ -755,8 +909,8 @@
             <div class="user-info">
               <h4>Sarah Johnson</h4>
               <p>Posted 2 days ago</p>
-                  </div>
-                  </div>
+            </div>
+          </div>
           <div class="comment-body">
             <p>I absolutely love this shirt! The quality is amazing and it fits perfectly. Would definitely buy from this seller again.</p>
             <div class="comment-product">
@@ -764,9 +918,9 @@
               <div class="comment-product-info">
                 <h5>Black T-Shirt</h5>
                 <p>$24.99</p>
-                </div>
               </div>
             </div>
+          </div>
           <div class="comment-actions">
             <button class="reply-btn">Reply</button>
             <button class="delete-btn">Delete</button>
@@ -778,8 +932,8 @@
             <div class="user-info">
               <h4>Mike Peters</h4>
               <p>Posted 5 days ago</p>
-      </div>
-    </div>
+            </div>
+          </div>
           <div class="comment-body">
             <p>The Bomber Jacket I received was slightly different from the one in the picture. The zipper seems a bit flimsy too. Can I get more details on the materials used?</p>
             <div class="comment-product">
@@ -787,16 +941,94 @@
               <div class="comment-product-info">
                 <h5>Bomber Jacket</h5>
                 <p>$89.99</p>
-      </div>
-      </div>
-      </div>
+              </div>
+            </div>
+          </div>
           <div class="comment-actions">
             <button class="reply-btn">Reply</button>
             <button class="delete-btn">Delete</button>
-      </div>
-      </div>
+          </div>
+        </div>
       </section>
     </main>
+  </div>
+
+  <!-- Add Cloth Button -->
+  <div class="add-cloth-btn" id="addClothBtn">
+    <i class="fas fa-plus"></i>
+  </div>
+
+  <!-- Upload Cloth Popup -->
+  <div class="popup-overlay" id="uploadPopup">
+    <div class="popup-container">
+      <div class="popup-image-upload">
+        <div class="image-upload-area" id="dropArea">
+          <i class="fas fa-cloud-upload-alt"></i>
+          <p>Drag & drop an image here</p>
+          <p>or</p>
+          <p><strong>Click to browse</strong></p>
+          <input type="file" id="clothImage" accept="image/*">
+          <img id="previewImage" class="preview-image" src="" alt="Preview">
+        </div>
+      </div>
+      <div class="popup-form">
+        <div class="popup-header">
+          <h2>Upload New Cloth</h2>
+          <button class="close-popup" id="closePopup">&times;</button>
+        </div>
+        <form id="uploadClothForm">
+          <div class="form-group">
+            <label for="clothTitle">Cloth Title</label>
+            <input type="text" id="clothTitle" required>
+          </div>
+          <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" required></textarea>
+          </div>
+          <div class="form-group">
+            <label for="size">Size</label>
+            <input type="text" id="size" required>
+          </div>
+          <div class="form-group">
+            <label>Category</label>
+            <div class="radio-group">
+              <div class="radio-option">
+                <input type="radio" id="men" name="category" value="Men" required>
+                <label for="men">Men</label>
+              </div>
+              <div class="radio-option">
+                <input type="radio" id="women" name="category" value="Women">
+                <label for="women">Women</label>
+              </div>
+              <div class="radio-option">
+                <input type="radio" id="kids" name="category" value="Kids">
+                <label for="kids">Kids</label>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="rentalPrice">Rental Price (₹/day)</label>
+            <input type="number" id="rentalPrice" min="0" step="1" required>
+          </div>
+          <div class="form-group">
+            <label for="contactNo">Contact No.</label>
+            <input type="tel" id="contactNo" required>
+          </div>
+          <div class="form-group">
+            <label for="whatsappNo">WhatsApp No.</label>
+            <input type="tel" id="whatsappNo" required>
+          </div>
+          <div class="form-group">
+            <label for="terms">Terms and Conditions</label>
+            <textarea id="terms" required></textarea>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" id="cancelUpload">Cancel</button>
+            <button type="submit" class="btn btn-primary">Upload Cloth</button>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -927,6 +1159,127 @@
         });
     }
     }
+
+    // Upload Cloth Popup Functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const addClothBtn = document.getElementById('addClothBtn');
+      const uploadPopup = document.getElementById('uploadPopup');
+      const closePopup = document.getElementById('closePopup');
+      const cancelUpload = document.getElementById('cancelUpload');
+      const clothImage = document.getElementById('clothImage');
+      const previewImage = document.getElementById('previewImage');
+      const dropArea = document.getElementById('dropArea');
+      const uploadForm = document.getElementById('uploadClothForm');
+
+      // Open popup
+      addClothBtn.addEventListener('click', function() {
+        uploadPopup.classList.add('active');
+      });
+
+      // Close popup functions
+      function closeUploadPopup() {
+        uploadPopup.classList.remove('active');
+        uploadForm.reset();
+        previewImage.style.display = 'none';
+        previewImage.src = '';
+      }
+
+      closePopup.addEventListener('click', closeUploadPopup);
+      cancelUpload.addEventListener('click', closeUploadPopup);
+
+      // Close when clicking outside the popup
+      uploadPopup.addEventListener('click', function(e) {
+        if (e.target === uploadPopup) {
+          closeUploadPopup();
+        }
+      });
+
+      // Image preview functionality
+      clothImage.addEventListener('change', function(e) {
+        handleImageSelect(e.target.files[0]);
+      });
+
+      // Drag and drop functionality
+      dropArea.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        dropArea.style.borderColor = 'var(--accent-color)';
+        dropArea.style.backgroundColor = 'rgba(76, 175, 80, 0.1)';
+      });
+
+      dropArea.addEventListener('dragleave', function() {
+        dropArea.style.borderColor = 'var(--primary-color)';
+        dropArea.style.backgroundColor = 'transparent';
+      });
+
+      dropArea.addEventListener('drop', function(e) {
+        e.preventDefault();
+        dropArea.style.borderColor = 'var(--primary-color)';
+        dropArea.style.backgroundColor = 'transparent';
+        
+        const file = e.dataTransfer.files[0];
+        if (file && file.type.match('image.*')) {
+          clothImage.files = e.dataTransfer.files;
+          handleImageSelect(file);
+        }
+      });
+
+      function handleImageSelect(file) {
+        if (file && file.type.match('image.*')) {
+          const reader = new FileReader();
+          
+          reader.onload = function(e) {
+            previewImage.src = e.target.result;
+            previewImage.style.display = 'block';
+          };
+          
+          reader.readAsDataURL(file);
+        }
+      }
+
+      // Form submission
+      uploadForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Here you would normally send the data to your server
+        // For demonstration, we'll just create a new product card
+
+        // Get form values
+        const clothTitle = document.getElementById('clothTitle').value;
+        const rentalPrice = document.getElementById('rentalPrice').value;
+        
+        // Create a new product card
+        const productCard = document.createElement('div');
+        productCard.className = 'product-card';
+        
+        // Get the image source from the preview
+        const imgSrc = previewImage.src || '../Image/placeholder.jpg';
+        
+        productCard.innerHTML = `
+          <div class="product-image">
+            <img src="${imgSrc}" alt="${clothTitle}" />
+          </div>
+          <div class="product-details">
+            <h3>${clothTitle}</h3>
+            <div class="price">₹${rentalPrice}/day</div>
+            <div class="stock">Available for rent</div>
+            <div class="product-actions">
+              <button>Edit</button>
+              <button>View</button>
+            </div>
+          </div>
+        `;
+        
+        // Add the new product to the grid
+        const productGrid = document.querySelector('.product-grid');
+        productGrid.insertBefore(productCard, productGrid.firstChild);
+        
+        // Close the popup
+        closeUploadPopup();
+        
+        // Show success message
+        alert('Cloth uploaded successfully!');
+      });
+    });
   </script>
 </body>
 </html>
