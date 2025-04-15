@@ -33,7 +33,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             // Redirect to login page after successful registration
             echo "<script>
                 alert('Registration successful! Please login.');
-                window.location.href='../Registration/login.html';
+                window.location.href='../Account/login.html';
             </script>";
         } else {
             throw new Exception("Database Error: " . $conn->error);
@@ -41,7 +41,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } catch (Exception $e) {
         echo "<script>
             alert('Error: " . $e->getMessage() . "');
-            window.location.href='../Registration/signup.html';
+            window.location.href='../Account/register.html';
         </script>";
     }
 

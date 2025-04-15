@@ -267,69 +267,57 @@
             display: block;
         }
 
-        .side-panel {
-            position: fixed;
-            top: 0;
-            right: -300px;
-            width: 300px;
-            height: 100%;
-            background-color: white;
-            z-index: 1001;
-            box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
-            transition: right 0.3s ease;
-        }
-
-        .side-panel.active {
-            right: 0;
-        }
-
-        .side-panel-content {
-            padding: 20px;
-        }
-
-        .side-panel-content a {
-            display: block;
-            padding: 15px 0;
-            color: #333;
-            text-decoration: none;
-            border-bottom: 1px solid #eee;
-        }
-
-        .side-panel-content a:hover {
-            background-color: #f5f5f5;
-        }
-
         /* Sort dropdown */
         .sort-dropdown {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 300px;
-            background-color: white;
+            position: absolute;
+            top: 80px;
+            left: 50px;
+            width: 250px;
+            background-color: #ffffff;
             border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
             z-index: 1001;
-            padding: 20px;
+            padding: 15px;
             display: none;
+            border-left: 4px solid #1A3C68;
         }
 
         .sort-dropdown.show {
             display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .sort-dropdown a {
-            display: block;
+            display: flex;
+            align-items: center;
             padding: 12px 15px;
             color: #333;
             text-decoration: none;
             border-radius: 4px;
-            margin-bottom: 5px;
-            transition: background-color 0.2s;
+            margin-bottom: 8px;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        .sort-dropdown a i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+            color: #1A3C68;
         }
 
         .sort-dropdown a:hover {
-            background-color: #f5f5f6;
+            background-color: #f0f5ff;
+            transform: translateX(5px);
+        }
+
+        .sort-dropdown a:last-child {
+            margin-bottom: 0;
         }
 
         .sort-close {
@@ -338,8 +326,22 @@
             right: 10px;
             background: none;
             border: none;
-            font-size: 24px;
+            font-size: 18px;
             cursor: pointer;
+            color: #888;
+            transition: color 0.2s;
+        }
+
+        .sort-close:hover {
+            color: #333;
+        }
+
+        .sort-title {
+            font-weight: bold;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            color: #1A3C68;
         }
 
         .sort-overlay {
@@ -405,17 +407,18 @@
 
     <div class="sort-dropdown" id="sortDropdown">
         <button class="sort-close" id="sortCloseBtn">&times;</button>
+        <div class="sort-title">Sort Products By</div>
         <a href="#"><i class="fas fa-sort-amount-down"></i> Price: Low to High</a>
         <a href="#"><i class="fas fa-sort-amount-up"></i> Price: High to Low</a>
         <a href="#"><i class="fas fa-clock"></i> Newest Arrivals</a>
         <a href="#"><i class="fas fa-fire"></i> Most Popular</a>
-        <a href="#"><i class="fas fa-map-marker-alt"></i> Near By location</a>
+        <a href="#" class="disabled" style="opacity: 0.6; cursor: not-allowed;"><i class="fas fa-map-marker-alt"></i> Near By location <span style="font-size: 0.8em; color: #666;">(Coming Soon)</span></a>
     </div>
 
     <!-- Header Section -->
     <header class="header">
         <div class="container">
-            <img src="./frontend/Image/logo.webp" alt="ClothLoop Logo" class="logo">
+            <img src="frontend/Image/logo.webp" alt="ClothLoop Logo" class="logo">
             
             <div class="search-bar">
                 <input type="text" placeholder="Search your clothes">
@@ -423,15 +426,14 @@
             </div>
             
             <div class="btn-container">
-                <button class="btn-black" style="background-color: black;" onclick="window.location.href='Registration/login.html'">Login</button>
+                <button class="btn-black" style="background-color: black;" onclick="window.location.href='frontend/Account/login.html'">Login</button>
                 
                 <div class="relative group">
-                    <button class="btn-black" style="background-color: black;" onclick="window.location.href='Registration/signup.html'">Register</button>
+                    <button class="btn-black" style="background-color: black;" onclick="window.location.href='frontend/Account/register.html'">Register</button>
                     
                 </div>
                 
-                <button class="btn-black" style="background-color: black;" onclick="window.location.href='frontend/Buyer/wish.html'">Wish List</button>
-                <button class="btn-black" style="background-color: black;" onclick="window.location.href='AboutUs/about_us.html'">About Us</button>
+                <button class="btn-black" style="background-color: black;" onclick="window.location.href='frontend/AboutUs/about_us.html'">About Us</button>
                
             </div>
         </div>
@@ -439,8 +441,8 @@
             <ul>
                 <div>
                 <li>
-                    <button class="btn-sort" id="sortBtn">
-                        <i class="fas fa-bars"></i>
+                    <button class="btn-sort" id="sortBtn" style="background: none; border: none; color: white; cursor: pointer; display: flex; align-items: center; font-size: 16px;">
+                        <i class="fas fa-bars" style="margin-right: 5px;"></i>
                         Sort By
                     </button>
                 </li>
@@ -516,26 +518,26 @@
                 <div class="mr-4">
                     <h2 class="font-bold mb-2">Get to Know Us</h2>
                     <ul>
-                        <li><a href="AboutUs/about_us.html">About ClothLoop</a></li>
-                        <li><a href="careers.html">Careers</a></li>
-                        <li><a href="press-releases.html">Press Releases</a></li>
-                        <li><a href="clothloop-science.html">Clothloop Science</a></li>
+                        <li><a href="frontend/AboutUs/about_us.html">About ClothLoop</a></li>
+                        <li><a href="frontend/careers.html">Careers</a></li>
+                        <li><a href="frontend/press-releases.html">Press Releases</a></li>
+                        <li><a href="frontend/clothloop-science.html">Clothloop Science</a></li>
                     </ul>
                 </div>
                 <div class="mr-4">
                     <h2 class="font-bold mb-2">Make Money with Us</h2>
                     <ul>
-                        <li><a href="rent-on-clothloop.html">Rent on Clothloop</a></li>
-                        <li><a href="protect-and-build-your-brand.html">Protect and Build Your Brand</a></li>
-                        <li><a href="clothloop-global-renting.html">Clothloop Global Renting</a></li>
-                        <li><a href="advertise-your-products.html">Advertise Your Products</a></li>
+                        <li><a href="frontend/rent-on-clothloop.html">Rent on Clothloop</a></li>
+                        <li><a href="frontend/protect-and-build-your-brand.html">Protect and Build Your Brand</a></li>
+                        <li><a href="frontend/clothloop-global-renting.html">Clothloop Global Renting</a></li>
+                        <li><a href="frontend/advertise-your-products.html">Advertise Your Products</a></li>
                     </ul>
                 </div>
                 <div>
                     <h2 class="font-bold mb-2">Let Us Help You</h2>
                     <ul>
-                        <li><a href="your-account.html">Your Account</a></li>
-                        <li><a href="help.html">Help</a></li>
+                        <li><a href="frontend/your-account.html">Your Account</a></li>
+                        <li><a href="frontend/help.html">Help</a></li>
                     </ul>
                 </div>
             </div>
@@ -544,96 +546,77 @@
                 <img alt="ClothLoop logo" class="logo" src="frontend/Image/logo.webp" />
             </div>
             <div style="display: flex; justify-content: center; gap: 15px;">
-                <a class="mx-2" href="conditions-of-use-sale.html">Conditions of Use &amp; Sale</a>
-                <a class="mx-2" href="privacy-notice.html">Privacy Notice</a>
-                <a class="mx-2" href="interest-based-ads.html">Interest-Based Ads</a>
+                <a class="mx-2" href="frontend/conditions-of-use-sale.html">Conditions of Use &amp; Sale</a>
+                <a class="mx-2" href="frontend/privacy-notice.html">Privacy Notice</a>
+                <a class="mx-2" href="frontend/interest-based-ads.html">Interest-Based Ads</a>
             </div>
             <div style="display: flex; justify-content: center;">
-                © 2024, <a href="home.html">Clothloop.com</a>
+                © 2024, <a href="index.html">Clothloop.com</a>
             </div>
         </div>
     </footer>
 
     <!-- Add this after body tag -->
     <div class="overlay" id="overlay"></div>
-    <div class="side-panel" id="sidePanel">
-        <div class="side-panel-content">
-            <a href="#">Price: Low to High</a>
-            <a href="#">Price: High to Low</a>
-            <a href="#">Newest Arrivals</a>
-            <a href="#">Most Popular</a>
-            <a href="#">Near By location</a>
-        </div>
-    </div>
 
     <!-- JavaScript code directly included in HTML -->
     <script>
         // Get the sorting button and dropdown
-        const sortBtn = document.getElementById('sortBtn');
-        const sortDropdown = document.getElementById('sortDropdown');
-
-        // Toggle the dropdown when clicking the sort button
-        if (sortBtn) {
-            sortBtn.addEventListener('click', function() {
-                sortDropdown.classList.toggle('show');
-            });
-        }
-
-        // Close the dropdown if the user clicks outside of it
-        window.onclick = function(event) {
-            if (!event.target.matches('.btn-sort')) {
-                if (sortDropdown.classList.contains('show')) {
-                    sortDropdown.classList.remove('show');
-                }
-            }
-        };
-
-        // Add event listeners to buttons
         document.addEventListener("DOMContentLoaded", function() {
-            const buttons = document.querySelectorAll("button");
-            buttons.forEach(function(button) {
-                button.addEventListener("click", function() {
-                    console.log("Button clicked!");
+            const sortBtn = document.getElementById('sortBtn');
+            const sortDropdown = document.getElementById('sortDropdown');
+            const sortOverlay = document.getElementById('sortOverlay');
+            const sortCloseBtn = document.getElementById('sortCloseBtn');
+            
+            // Toggle the dropdown when clicking the sort button
+            if (sortBtn) {
+                sortBtn.addEventListener('click', function() {
+                    if (sortDropdown.classList.contains('show')) {
+                        sortDropdown.classList.remove('show');
+                        sortOverlay.style.display = 'none';
+                    } else {
+                        sortDropdown.classList.add('show');
+                        sortOverlay.style.display = 'block';
+                    }
+                });
+            }
+            
+            // Close when clicking the close button
+            if (sortCloseBtn) {
+                sortCloseBtn.addEventListener('click', function() {
+                    sortDropdown.classList.remove('show');
+                    sortOverlay.style.display = 'none';
+                });
+            }
+            
+            // Close when clicking outside the dropdown
+            sortOverlay.addEventListener('click', function() {
+                sortDropdown.classList.remove('show');
+                sortOverlay.style.display = 'none';
+            });
+            
+            // Close on ESC key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && sortDropdown.classList.contains('show')) {
+                    sortDropdown.classList.remove('show');
+                    sortOverlay.style.display = 'none';
+                }
+            });
+
+            // Add click events to sort options
+            const sortOptions = sortDropdown.querySelectorAll('a');
+            sortOptions.forEach(option => {
+                option.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const optionText = this.textContent.trim();
+                    console.log("Sorting by: " + optionText);
+                    sortDropdown.classList.remove('show');
+                    sortOverlay.style.display = 'none';
+                    alert("Sorting by: " + optionText);
                 });
             });
-        });
 
-        // List of image sources
-        const images = ["frontend/Image/1.jpg", "frontend/Image/2.jpg", "frontend/Image/3.jpg", "frontend/Image/4.jpg", "frontend/Image/5.jpg"];
-        let currentImageIndex = 0;
-        let interval;
-
-        // Function to update the displayed image
-        function changeImage(index) {
-            const adImage = document.getElementById("ad-image");
-            adImage.src = images[index];
-        }
-
-        // Function to go to the next image
-        function nextImage() {
-            currentImageIndex = (currentImageIndex + 1) % images.length;
-            changeImage(currentImageIndex);
-        }
-
-        // Function to go to the previous image
-        function prevImage() {
-            currentImageIndex = (currentImageIndex - 1 + images.length) % images.length;
-            changeImage(currentImageIndex);
-        }
-
-        // Start automatic image switching every 5 seconds
-        function startAutoSwitch() {
-            interval = setInterval(nextImage, 5000);
-        }
-
-        // Reset the interval to delay the next automatic switch when a manual switch occurs
-        function resetInterval() {
-            clearInterval(interval);
-            startAutoSwitch();
-        }
-
-        // Event listeners for the next and previous buttons
-        document.addEventListener("DOMContentLoaded", function() {
+            // Initialize the image carousel
             document.getElementById("next-btn").addEventListener("click", () => {
                 nextImage();
                 resetInterval();
@@ -643,49 +626,8 @@
                 prevImage();
                 resetInterval();
             });
-
-            // Initialize the auto-switching functionality
+            
             startAutoSwitch();
-        });
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const sortBtn = document.getElementById('sortBtn');
-            const sidePanel = document.getElementById('sidePanel');
-            const overlay = document.getElementById('overlay');
-
-            // Open panel
-            sortBtn.addEventListener('click', function() {
-                sidePanel.classList.add('active');
-                overlay.classList.add('active');
-                document.body.style.overflow = 'hidden';
-            });
-
-            // Close panel when clicking overlay
-            overlay.addEventListener('click', function() {
-                sidePanel.classList.remove('active');
-                overlay.classList.remove('active');
-                document.body.style.overflow = '';
-            });
-
-            // Close panel when clicking a sort option
-            const sortOptions = sidePanel.querySelectorAll('a');
-            sortOptions.forEach(option => {
-                option.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    sidePanel.classList.remove('active');
-                    overlay.classList.remove('active');
-                    document.body.style.overflow = '';
-                });
-            });
-
-            // Close panel on ESC key
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape' && sidePanel.classList.contains('active')) {
-                    sidePanel.classList.remove('active');
-                    overlay.classList.remove('active');
-                    document.body.style.overflow = '';
-                }
-            });
         });
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -744,7 +686,7 @@
             // Clear any stored user data
             localStorage.clear();
             // Redirect to login page
-            window.location.href = '../../Registration/login.html';
+            window.location.href = 'frontend/Account/login.html';
         }
 
         // Add countdown timer functionality
@@ -798,6 +740,50 @@
                 setInterval(updateCountdown, 1000);
             }
         });
+
+        // Add event listeners to buttons
+        document.addEventListener("DOMContentLoaded", function() {
+            const buttons = document.querySelectorAll("button:not(#sortBtn):not(.sort-close)");
+            buttons.forEach(function(button) {
+                button.addEventListener("click", function() {
+                    console.log("Button clicked!");
+                });
+            });
+        });
+
+        // List of image sources
+        const images = ["frontend/Image/1.jpg", "frontend/Image/2.jpg", "frontend/Image/3.jpg", "frontend/Image/4.jpg", "frontend/Image/5.jpg"];
+        let currentImageIndex = 0;
+        let interval;
+
+        // Function to update the displayed image
+        function changeImage(index) {
+            const adImage = document.getElementById("ad-image");
+            adImage.src = images[index];
+        }
+
+        // Function to go to the next image
+        function nextImage() {
+            currentImageIndex = (currentImageIndex + 1) % images.length;
+            changeImage(currentImageIndex);
+        }
+
+        // Function to go to the previous image
+        function prevImage() {
+            currentImageIndex = (currentImageIndex - 1 + images.length) % images.length;
+            changeImage(currentImageIndex);
+        }
+
+        // Start automatic image switching every 5 seconds
+        function startAutoSwitch() {
+            interval = setInterval(nextImage, 5000);
+        }
+
+        // Reset the interval to delay the next automatic switch when a manual switch occurs
+        function resetInterval() {
+            clearInterval(interval);
+            startAutoSwitch();
+        }
     </script>
 </body>
 </html>

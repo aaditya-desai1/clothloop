@@ -199,5 +199,5 @@ try {
 <hr>
 <h2>Next Steps</h2>
 <ul>
-    <li><a href="../Registration/login.html">Go to the login page</a> to try logging in</li>
+    <li><a href="../Account/login.html">Go to the login page</a> to try logging in</li>
 </ul> 

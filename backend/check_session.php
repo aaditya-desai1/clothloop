@@ -4,7 +4,7 @@ require_once 'config/db_connect.php';
 
 session_start();
 if (!isset($_SESSION['user_id'])) {
-    header('Location: ../Registration/login.html');
+    header('Location: ../Account/login.html');
     exit();
 }
 

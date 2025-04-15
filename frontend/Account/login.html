@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="signup" href="signup.html">
+    <link rel="signup" href="register.html">
     <title>Login - ClothLoop</title>
     <style>
         body {
@@ -180,7 +180,7 @@
             Continue with Google
         </button>
         <div style="text-align: center;">
-            <p>Don't have an account? <a href="signup.html">Sign up</a></p>
+            <p>Don't have an account? <a href="register.html">Sign up</a></p>
         </div>
     </div>
       
@@ -221,7 +221,7 @@
         
         // API paths to try (in order)
         const paths = [
-            '../backend/login.php'
+            '../../backend/login.php'
         ];
         
         // Try the first path
@@ -262,12 +262,12 @@
                     
                     // Redirect based on user type and destination
                     if (data.user_type === 'seller') {
-                        window.location.href = '../frontend/Seller/Seller_Dashboard.html';
+                        window.location.href = '../../frontend/Seller/seller_dashboard.html';
                     } else if (data.user_type === 'buyer') {
                         if (destination === 'wishlist') {
-                            window.location.href = '../frontend/Buyer/wish.html';
+                            window.location.href = '../../frontend/Buyer/wish.html';
                         } else {
-                            window.location.href = '../frontend/Buyer/Buyer_Dashboard.html';
+                            window.location.href = '../../frontend/Buyer/buyer_dashboard.html';
                         }
                     }
                 } else {

@@ -396,7 +396,7 @@
             
             if (!userId) {
                 // Redirect to login if not logged in
-                window.location.href = '../../Registration/login.html';
+                window.location.href = '../../Account/login.html';
                 return;
             }
             
@@ -432,7 +432,7 @@
             const userId = localStorage.getItem('user_id') || sessionStorage.getItem('user_id');
             
             if (!userId) {
-                window.location.href = '../../Registration/login.html';
+                window.location.href = '../../Account/login.html';
                 return;
             }
             
@@ -531,7 +531,7 @@
             localStorage.clear();
             sessionStorage.clear();
             // Redirect to login page
-            window.location.href = '../../Registration/login.html';
+            window.location.href = '../../Account/login.html';
         }
     </script>
 </body>
