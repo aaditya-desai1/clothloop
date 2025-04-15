@@ -3,9 +3,11 @@
         const sortDropdown = document.getElementById('sortDropdown');
 
         // Toggle the dropdown when clicking the sort button
-        sortBtn.addEventListener('click', function() {
-            sortDropdown.classList.toggle('show');
-        });
+        if (sortBtn) {
+            sortBtn.addEventListener('click', function() {
+                sortDropdown.classList.toggle('show');
+            });
+        }
 
         // Close the dropdown if the user clicks outside of it
         window.onclick = function(event) {
@@ -170,3 +172,56 @@
             // Redirect to login page
             window.location.href = '../../Registration/login.html';
         }
+
+        // Add countdown timer functionality
+        function updateCountdown() {
+            // Get current time elements
+            const hoursElement = document.querySelector('.sale-timer .timer-count:nth-child(2)');
+            const minutesElement = document.querySelector('.sale-timer .timer-count:nth-child(4)');
+            const secondsElement = document.querySelector('.sale-timer .timer-count:nth-child(6)');
+            
+            if (!hoursElement || !minutesElement || !secondsElement) return;
+            
+            let hours = parseInt(hoursElement.textContent);
+            let minutes = parseInt(minutesElement.textContent);
+            let seconds = parseInt(secondsElement.textContent);
+            
+            // Decrease seconds
+            seconds--;
+            
+            // Handle time calculations
+            if (seconds < 0) {
+                seconds = 59;
+                minutes--;
+                
+                if (minutes < 0) {
+                    minutes = 59;
+                    hours--;
+                    
+                    if (hours < 0) {
+                        // Sale has ended
+                        hours = 0;
+                        minutes = 0;
+                        seconds = 0;
+                        
+                        // Change the sale text
+                        document.querySelector('.sale-text').textContent = 'Sale is Live!';
+                        return;
+                    }
+                }
+            }
+            
+            // Update the DOM
+            hoursElement.textContent = hours.toString().padStart(2, '0');
+            minutesElement.textContent = minutes.toString().padStart(2, '0');
+            secondsElement.textContent = seconds.toString().padStart(2, '0');
+        }
+
+        // Initialize the countdown
+        document.addEventListener('DOMContentLoaded', function() {
+            // Start the countdown
+            setInterval(updateCountdown, 1000);
+            
+            // Rest of your existing DOMContentLoaded code
+            // ...
+        });

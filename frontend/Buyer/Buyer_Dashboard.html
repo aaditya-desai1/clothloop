@@ -12,11 +12,137 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
 
     <style>
-       
+        /* Myntra-style header CSS */
+        .myntra-header {
+            width: 100%;
+            background-color: #ffffff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            height: 80px;
+        }
+        
+        .myntra-logo {
+            height: 60px;
+            margin-right: 30px;
+        }
+        
+        .myntra-nav {
+            display: flex;
+            align-items: center;
+        }
+        
+        .myntra-nav-items {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .myntra-nav-items li {
+            margin: 0 15px;
+        }
+        
+        .myntra-nav-items li a {
+            text-decoration: none;
+            color: #282c3f;
+            font-weight: 700;
+            font-size: 14px;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+            padding: 30px 0;
+        }
+        
+        .myntra-search-container {
+            flex-grow: 1;
+            max-width: 400px;
+            position: relative;
+            margin: 0 20px;
+        }
+        
+        .myntra-search-input {
+            width: 100%;
+            background-color: #f5f5f6;
+            border-radius: 4px;
+            border: 1px solid #f5f5f6;
+            padding: 10px 15px;
+            padding-left: 40px;
+            font-size: 14px;
+            color: #696e79;
+        }
+        
+        .myntra-search-icon {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #696e79;
+        }
 
+        .myntra-actions {
+            display: flex;
+            align-items: center;
+        }
+        
+        .myntra-action-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 0 15px;
+            cursor: pointer;
+        }
+        
+        .myntra-action-item i {
+            font-size: 20px;
+            margin-bottom: 4px;
+            color: #282c3f;
+        }
+        
+        .myntra-action-item span {
+            font-size: 12px;
+            color: #282c3f;
+        }
     </style>
 </head>
 <body>
+    <!-- Myntra-style Header -->
+    <header class="myntra-header">
+        <div class="myntra-nav">
+            <img src="../Image/logo.webp" alt="ClothLoop Logo" class="myntra-logo">
+            <ul class="myntra-nav-items">
+                <li><a href="#">MEN</a></li>
+                <li><a href="#">WOMEN</a></li>
+                <li><a href="#">KIDS</a></li>
+            </ul>
+        </div>
+        
+        <div class="myntra-search-container">
+            <i class="fas fa-search myntra-search-icon"></i>
+            <input type="text" class="myntra-search-input" placeholder="Search Products">
+        </div>
+        
+        <div class="myntra-actions">
+            <div class="myntra-action-item" onclick="handleLogout()">
+                <i class="far fa-user"></i>
+                <span>Profile</span>
+            </div>
+            <div class="myntra-action-item" onclick="window.location.href='wish.html'">
+                <i class="far fa-heart"></i>
+                <span>Wishlist</span>
+            </div>
+            <div class="myntra-action-item" onclick="window.location.href='../../AboutUs/about_us.html'">
+                <i class="fas fa-info-circle"></i>
+                <span>About Us</span>
+            </div>
+        </div>
+    </header>
+
     <!-- Add overlay and sort panel at the top of body -->
     <div class="sort-overlay" id="sortOverlay"></div>
 
@@ -29,49 +155,9 @@
         <a href="#"><i class="fas fa-map-marker-alt"></i> Near By location</a>
     </div>
 
-    <!-- Header Section -->
-    <header class="header">
-        <div class="container">
-            <img src="../Image/logo.webp" alt="ClothLoop Logo" class="logo">
-            
-            <div class="search-bar">
-                <input type="text" placeholder="Search your clothes">
-                <i class="fas fa-search"></i>
-            </div>
-            
-            <div class="btn-container">
-                <button class="btn-black" style="background-color: black;" onclick="handleLogout()">Logout</button>
-                <button class="btn-black" style="background-color: black;" onclick="window.location.href='wish.html'">Wish List</button>
-                <button class="btn-black" style="background-color: black;" onclick="window.location.href='../../AboutUs/about_us.html'">About Us</button>
-            </div>
-        </div>
-        <nav class="navbar">
-            <ul>
-                <div>
-                <li>
-                    <button class="btn-sort" id="sortBtn">
-                        <i class="fas fa-bars"></i>
-                        Sort By
-                    </button>
-                </li>
-                </div>
-                <div>
-                <li><a href="#">For Women</a></li>
-                <li><a href="#">For Men</a></li>
-                <li><a href="#">For Kids</a></li>
-                </div>
-            </ul>
-        </nav>
-        
-    </header>
-
     <!-- Main Content -->
     <main class="container">
-        <!-- <div class="ad-section">
-            <img src="2.jpg" alt="Ad-section">
-        </div> -->
-        
-        <div class="ad-section" style="background-color: rgb(213, 218, 224) ;">
+        <div class="ad-section" style="background-color: rgb(213, 218, 224);">
           <button id="prev-btn" class="arrow">⬅</button>
           <img id="ad-image" src="../Image/1.jpg" alt="Ad-section">
           <button id="next-btn" class="arrow">➡</button>
@@ -129,7 +215,7 @@
                 <div class="mr-4">
                     <h2 class="font-bold mb-2">Get to Know Us</h2>
                     <ul>
-                        <li><a href="about.html">About ClothLoop</a></li>
+                        <li><a href="../../AboutUs/about_us.html">About ClothLoop</a></li>
                         <li><a href="careers.html">Careers</a></li>
                         <li><a href="press-releases.html">Press Releases</a></li>
                         <li><a href="clothloop-science.html">Clothloop Science</a></li>
@@ -141,7 +227,7 @@
                         <li><a href="rent-on-clothloop.html">Rent on Clothloop</a></li>
                         <li><a href="protect-and-build-your-brand.html">Protect and Build Your Brand</a></li>
                         <li><a href="clothloop-global-renting.html">Clothloop Global Renting</a></li>
-                        <li><a href="login.html">Advertise Your Products</a></li>
+                        <li><a href="../../Registration/login.html">Advertise Your Products</a></li>
                     </ul>
                 </div>
                 <div>
