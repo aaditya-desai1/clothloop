@@ -101,6 +101,7 @@ try {
             echo json_encode([
                 'success' => true,
                 'user_type' => $user['user_type'],
+                'user_id' => $user['id'],
                 'message' => 'Login successful'
             ]);
         } else {

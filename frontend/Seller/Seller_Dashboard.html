@@ -5,12 +5,695 @@
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
   <title>Seller Dashboard</title>
   
-  <!-- CSS Links -->
-  <link rel="stylesheet" href="Seller_Dashboard.css"/>
+  <!-- Font Awesome CDN -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
   
   <!-- Chart.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
+  
+  <!-- Inline CSS (previously in Seller_Dashboard.css) -->
+  <style>
+    /* Global Variables */
+    :root {
+      --primary-color: #666768;
+      --secondary-color: #f7f7f7;
+      --text-primary: #212121;
+      --text-secondary: #383737;
+      --white: #fff;
+      --hover-color: #444;
+      --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+      --shadow-md: 0 5px 15px rgba(0, 0, 0, 0.1);
+      --transition: all 0.3s ease;
+      --border-radius: 10px;
+    }
+
+    /* Reset and Global Styles */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: sans-serif;
+      background-color: var(--white);
+      color: var(--text-primary);
+    }
+
+    /* Layout */
+    .container {
+      display: flex;
+      width: 100%;
+      height: 100vh;
+      background-color: var(--white);
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 250px;
+      background-color: var(--secondary-color);
+      padding: 20px;
+      position: fixed;    
+      height: 100vh;      
+      overflow-y: auto;   
+      top: 0;            
+      left: 0;           
+    }
+
+    /* Logo */
+    .logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 10px;
+    }
+
+    .logo img {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      margin-right: 10px;
+      transition: var(--transition);
+    }
+
+    .channel-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .channel-info h1 {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .channel-info p {
+      font-size: 14px;
+      color: var(--text-primary);
+    }
+
+    /* Navigation */
+    nav ul {
+      list-style: none;
+    }
+
+    nav li {
+      margin-bottom: 15px;
+    }
+
+    .nav-link {
+      text-decoration: none;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      padding: 10px;
+      border-radius: var(--border-radius);
+      transition: var(--transition);
+    }
+
+    .nav-link i {
+      font-size: 18px;
+      margin-right: 10px;
+    }
+
+    .nav-link:hover {
+      background-color: var(--primary-color);
+      color: var(--white);
+      transform: translateX(5px);
+    }
+
+    .nav-link.active {
+      background-color: var(--primary-color);
+      color: var(--white) !important;
+    }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      padding: 40px;
+      margin-left: 250px;
+      background-color: var(--white);
+      animation: fadeIn 0.5s ease;
+    }
+
+    /* Section Visibility */
+    .section {
+      display: none;
+      opacity: 0;
+      transition: opacity 0.3s ease-in-out;
+      background-color: var(--white);
+    }
+
+    .section.active {
+      display: block;
+      opacity: 1;
+    }
+
+    /* Overview Stats */
+    .overview {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-evenly;
+      margin-bottom: 20px;
+    }
+
+    .stat {
+      width: calc(33.33% - 20px);
+      background-color: var(--secondary-color);
+      padding: 20px;
+      border-radius: var(--border-radius);
+      transition: var(--transition);
+    }
+
+    .stat:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .stat h3 {
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+
+    .stat p {
+      font-size: 14px;
+      color: var(--text-primary);
+    }
+
+    /* Upload Button */
+    .upload-button {
+      width: 100%;
+      margin-top: 20px;
+    }
+
+    .upload-button button {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: var(--border-radius);
+      background-color: var(--primary-color);
+      color: var(--white);
+      font-size: 16px;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .upload-button button:hover {
+      background-color: var(--hover-color);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    /* Products Grid */
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .product {
+      background: var(--white);
+      border-radius: var(--border-radius);
+      padding: 20px;
+      transition: var(--transition);
+      box-shadow: var(--shadow-sm);
+      width: 100%;
+    }
+
+    .product:hover {
+      transform: translateY(-10px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .product img {
+      width: 100%;
+      height: 250px;
+      object-fit: cover;
+      border-radius: var(--border-radius);
+      margin-bottom: 10px;
+    }
+
+    /* Charts */
+    .chart-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    .chart {
+      background-color: var(--secondary-color);
+      padding: 20px;
+      border-radius: var(--border-radius);
+      transition: var(--transition);
+    }
+
+    .chart:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-md);
+    }
+
+    /* Comments */
+    .comments {
+      margin-bottom: 20px;
+    }
+
+    .comment-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    
+    .comment-product {
+      background-color: var(--secondary-color);
+      padding: 20px;
+      border-radius: var(--border-radius);
+      transition: var(--transition);
+    }
+    
+    .comment-product:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-md);
+    }
+    
+    .comment-product h3 {
+      font-size: 18px;
+      margin-bottom: 10px;
+      color: var(--text-primary);
+    }
+    
+    .comment-list {
+      margin-top: 10px;
+    }
+    
+    .comment {
+      background-color: var(--white);
+      padding: 15px;
+      border-radius: var(--border-radius);
+      margin-bottom: 10px;
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+    }
+    
+    .comment img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      float: left;
+      margin-right: 10px;
+    }
+    
+    .comment-content {
+      margin-left: 50px;
+    }
+    
+    .comment h4 {
+      font-size: 16px;
+      margin-bottom: 5px;
+      color: var(--text-primary);
+    }
+    
+    .reply-button {
+      background-color: var(--primary-color);
+      color: var(--white);
+      border: none;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+      font-size: 14px;
+      transition: var(--transition);
+    }
+    
+    .reply-button:hover {
+      background-color: var(--hover-color);
+      transform: translateY(-2px);
+    }
+    
+    .replies-container {
+      margin-top: 10px;
+      margin-left: 20px;
+    }
+    
+    .reply {
+      background-color: #f1f1f1;
+      padding: 10px;
+      border-radius: 5px;
+      margin-bottom: 5px;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+    
+    .reply:hover {
+      transform: translateX(5px);
+    }
+    
+    .reply-form {
+      display: none;
+      margin-top: 10px;
+      background-color: #f5f5f5;
+      padding: 10px;
+      border-radius: 5px;
+      transition: all 0.3s ease;
+      animation: slideDown 0.3s ease;
+    }
+    
+    .reply-form.active {
+      display: block;
+    }
+    
+    
+    .reply-form textarea {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      resize: vertical;
+      min-height: 60px;
+      margin-bottom: 10px;
+    }
+    
+    .reply-form button {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    
+    .reply-form button:hover {
+      background-color: var(--hover-color);
+    }
+    
+    .delete-reply {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      font-size: 12px;
+      color: #999;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .delete-reply:hover {
+      color: #f44336;
+    }
+    
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .main-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      background-color: var(--secondary-color);
+      position: fixed;
+      width: calc(100% - 250px);
+      top: 0;
+      right: 0;
+      z-index: 100;
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .header-left {
+      display: flex;
+      align-items: center;
+    }
+    
+    .header-left .logo {
+      display: flex;
+      align-items: center;
+      margin-right: 20px;
+    }
+    
+    .header-left .logo img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      margin-right: 10px;
+    }
+    
+    .brand-name {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .brand-name h1 {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 0;
+    }
+    
+    .brand-name p {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+    
+    .header-right {
+      display: flex;
+      align-items: center;
+    }
+    
+    .account-info {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    
+    .notifications {
+      position: relative;
+      cursor: pointer;
+    }
+    
+    .notifications i {
+      font-size: 20px;
+      color: var(--text-primary);
+    }
+    
+    .notification-badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background-color: #ff6b6b;
+      color: white;
+      width: 20px;
+      height: 20px;
+      font-size: 12px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
+    
+    .user-profile {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      gap: 10px;
+      position: relative;
+    }
+    
+    .dropdown-menu {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      padding: 10px 0;
+      min-width: 200px;
+      z-index: 1000;
+      display: none;
+    }
+    
+    .dropdown-menu a {
+      display: block;
+      padding: 10px 20px;
+      text-decoration: none;
+      color: var(--text-primary);
+      transition: all 0.3s ease;
+    }
+    
+    .dropdown-menu a i {
+      margin-right: 10px;
+    }
+    
+    .dropdown-menu a:hover {
+      background-color: #f5f5f5;
+    }
+    
+    .user-profile.active .dropdown-menu {
+      display: block;
+    }
+    
+    .user-profile {
+      display: flex;
+      align-items: center;
+      background-color: var(--white);
+      border-radius: 10px;
+      padding: 5px 10px;
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+    }
+    
+    .user-profile:hover {
+      box-shadow: var(--shadow-md);
+    }
+    
+    .user-profile img {
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-right: 10px;
+    }
+    
+    .user-details {
+      margin-right: 10px;
+    }
+    
+    .user-details h4 {
+      font-size: 14px;
+      font-weight: bold;
+    }
+    
+    .user-details p {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+    
+    .user-profile i {
+      font-size: 14px;
+      color: var(--text-primary);
+      margin-left: 5px;
+    }
+    
+    @media screen and (max-width: 1024px) {
+      .product-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    @media screen and (max-width: 768px) {
+      .product-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .comment-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    #settings-section {
+      transition: all 0.3s ease;
+      opacity: 0;
+      transform: translateY(20px);
+      display: none;
+      margin-bottom: 30px;
+    }
+    
+    #settings-section:hover {
+      background-color: var(--white);
+    }
+    
+    #settings-section h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+      color: var(--text-primary);
+      text-align: center;
+      font-weight: bold;
+    }
+    
+    .form-group {
+      background-color: var(--secondary-color);
+      padding: 20px;
+      border-radius: var(--border-radius);
+      margin-bottom: 20px;
+      transition: var(--transition);
+    }
+    
+    .form-group:hover {
+      box-shadow: var(--shadow-md);
+    }
+    
+    .form-group label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 10px;
+      font-size: 16px;
+      color: var(--text-primary);
+    }
+    
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+    
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      border-color: var(--primary-color);
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(102, 103, 104, 0.1);
+    }
+    
+    .form-group button {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 10px;
+    }
+    
+    .form-group button:hover {
+      background-color: var(--hover-color);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    
+    input[type="file"] {
+      padding: 10px;
+      border: 1px dashed #ddd;
+      border-radius: 5px;
+      cursor: pointer;
+      background-color: #f9f9f9;
+    }
+    
+    @media (max-width: 768px) {
+      #settings-section {
+        padding: 20px;
+      }
+      
+      .form-group {
+        padding: 15px;
+      }
+      
+      .form-group button {
+        width: 100%;
+      }
+    }
+  </style>
 </head>
 <body>
   <div class="container">
@@ -273,7 +956,230 @@
      
   </div>
 
-  <!-- Add JavaScript at the end of body -->
-  <script src="Seller_Dashboard.js"></script>
+  <script>
+    // Chart Initialization
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeCharts();
+        initializeComments();
+        initializeNavigation();
+    });
+
+    function initializeCharts() {
+        // Only initialize charts if the analysis section is visible
+        if (!document.getElementById('analysis-section').classList.contains('active')) {
+            return;
+        }
+        
+        // Get the context of the canvas element
+        var productSalesChartCtx = document.getElementById('product-sales-chart').getContext('2d');
+        var revenueChartCtx = document.getElementById('revenue-chart').getContext('2d');
+        var customerEngagementChartCtx = document.getElementById('customer-engagement-chart').getContext('2d');
+
+        // Create the charts
+        var productSalesChart = new Chart(productSalesChartCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
+                datasets: [{
+                    label: 'Product Likes',
+                    data: [10, 20, 15, 30, 25],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                }
+            }
+        });
+
+        var revenueChart = new Chart(revenueChartCtx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
+                datasets: [{
+                    label: 'Views',
+                    data: [1000, 2000, 1500, 3000, 2500],
+                    backgroundColor: [
+                        'rgba(255, 99 , 132, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                }
+            }
+        });
+
+        var customerEngagementChart = new Chart(customerEngagementChartCtx, {
+            type: 'pie',
+            data: {
+                labels: ['Facebook', 'Instagram', 'Twitter', 'Email'],
+                datasets: [{
+                    label: 'Customer Engagement',
+                    data: [40, 30, 20, 10],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                }
+            }
+        });
+    }
+
+    // Comment System Functions
+    function initializeComments() {
+        // Add event listeners for comment buttons if needed
+    }
+
+    function toggleReplyForm(button) {
+        // Close all other open forms first
+        const allForms = document.querySelectorAll('.reply-form.active');
+        allForms.forEach(form => {
+          if (form !== button.nextElementSibling) {
+            form.classList.remove('active');
+          }
+        });
+        
+        const form = button.nextElementSibling;
+        form.classList.toggle('active');
+        
+        if (form.classList.contains('active')) {
+          form.querySelector('textarea').focus();
+        }
+    }
+      
+    function submitReply(button) {
+        const form = button.parentElement;
+        const textarea = form.querySelector('textarea');
+        const content = textarea.value.trim();
+        
+        if (!content) {
+          alert('Please enter a reply');
+          return;
+        }
+        
+        const repliesContainer = form.nextElementSibling;
+        const replyElement = document.createElement('div');
+        replyElement.className = 'reply';
+        
+        // Get current user info (you should replace this with actual user data)
+        const currentUser = {
+          name: 'Current User',
+          avatar: 'user_avatar.jpg'
+        };
+        
+        replyElement.innerHTML = `
+          <i class="fas fa-times delete-reply" onclick="deleteReply(this)"></i>
+          <h5>${currentUser.name}</h5>
+          <p>${content}</p>
+        `;
+        
+        repliesContainer.appendChild(replyElement);
+        textarea.value = '';
+        form.classList.remove('active');
+    }
+      
+    function deleteReply(deleteButton) {
+        const reply = deleteButton.parentElement;
+        reply.style.opacity = '0';
+        reply.style.transform = 'translateX(20px)';
+        
+        setTimeout(() => {
+          reply.remove();
+        }, 300);
+    }
+
+    function initializeNavigation() {
+        const navLinks = document.querySelectorAll('.nav-link');
+        
+        navLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Remove active class from all links and sections
+                navLinks.forEach(l => l.classList.remove('active'));
+                document.querySelectorAll('.section').forEach(section => {
+                    section.classList.remove('active');
+                });
+                
+                // Add active class to clicked link
+                this.classList.add('active');
+                
+                // Show corresponding section
+                const sectionId = `${this.dataset.section}-section`;
+                const section = document.getElementById(sectionId);
+                if (section) {
+                    section.classList.add('active');
+                    
+                    // Reinitialize charts if showing analysis section
+                    if (sectionId === 'analysis-section') {
+                        initializeCharts();
+                    }
+                }
+            });
+        });
+        
+        // User profile dropdown
+        document.querySelector('.user-profile').addEventListener('click', function(e) {
+          this.classList.toggle('active');
+          e.stopPropagation();
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function() {
+          document.querySelector('.user-profile').classList.remove('active');
+        });
+    }
+
+    function handleLogout() {
+        window.location.href = '../../Registration/login.html';
+    }
+  </script>
 </body>
 </html>
