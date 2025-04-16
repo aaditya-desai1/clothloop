@@ -60,18 +60,22 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 20px;
+            padding: 0 30px;
             height: 80px;
+            box-sizing: border-box;
         }
         
         .myntra-logo {
-            height: 60px;
+            height: 50px;
             margin-right: 30px;
         }
         
         .myntra-nav {
             display: flex;
             align-items: center;
+            flex: 1;
+            max-width: 500px;
+            min-width: 300px;
         }
         
         .myntra-nav-items {
@@ -85,6 +89,10 @@
             margin: 0 15px;
         }
         
+        .myntra-nav-items li:first-child {
+            margin-left: 0;
+        }
+        
         .myntra-nav-items li a {
             text-decoration: none;
             color: #282c3f;
@@ -93,10 +101,22 @@
             letter-spacing: 0.3px;
             text-transform: uppercase;
             padding: 30px 0;
+            cursor: pointer;
+            display: inline-block;
+        }
+        
+        .myntra-nav-items li a.active {
+            color: #ff3e6c;
+            border-bottom: 2px solid #ff3e6c;
+        }
+
+        .myntra-sort-container {
+            margin-left: 20px;
+            position: relative;
         }
         
         .myntra-search-container {
-            flex-grow: 1;
+            flex: 1;
             max-width: 400px;
             position: relative;
             margin: 0 20px;
@@ -124,6 +144,10 @@
         .myntra-actions {
             display: flex;
             align-items: center;
+            justify-content: flex-end;
+            flex: 1;
+            max-width: 500px;
+            min-width: 300px;
         }
         
         .myntra-action-item {
@@ -134,6 +158,12 @@
             margin: 0 15px;
             cursor: pointer;
             position: relative;
+            padding: 5px;
+            min-width: 60px;
+        }
+        
+        .myntra-action-item:last-child {
+            margin-right: 0;
         }
         
         .myntra-action-item i {
@@ -145,13 +175,15 @@
         .myntra-action-item span {
             font-size: 12px;
             color: #282c3f;
+            text-align: center;
+            white-space: nowrap;
         }
         
         /* Profile dropdown menu styles */
         .profile-dropdown {
             position: absolute;
             top: 100%;
-            right: -30px;
+            right: -20px;
             width: 200px;
             background-color: white;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -162,6 +194,7 @@
             visibility: hidden;
             transform: translateY(10px);
             transition: all 0.3s ease;
+            margin-top: 5px;
         }
         
         .profile-dropdown.active {
@@ -307,16 +340,20 @@
         .sort-button {
             background-color: white;
             border: 1px solid #d4d5d9;
-            padding: 8px 15px;
+            padding: 6px 12px;
             border-radius: 4px;
             cursor: pointer;
             display: flex;
             align-items: center;
-            font-size: 14px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #282c3f;
+            white-space: nowrap;
         }
 
         .sort-button i {
-            margin-right: 8px;
+            margin-right: 6px;
+            color: #ff3e6c;
         }
 
         .sort-button:hover {
@@ -327,11 +364,12 @@
             position: absolute;
             top: 100%;
             left: 0;
-            width: 250px;
+            width: 220px;
             background-color: white;
             border-radius: 4px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
             z-index: 100;
+            margin-top: 5px;
             display: none;
         }
 
@@ -343,6 +381,16 @@
             padding: 12px 15px;
             cursor: pointer;
             transition: background-color 0.2s;
+            font-size: 14px;
+        }
+        
+        .sort-option[data-sort="clear"] {
+            border-bottom: 1px solid #f0f0f0;
+            color: #ff3e6c;
+        }
+        
+        .sort-option[data-sort="clear"] i {
+            color: #ff3e6c;
         }
 
         .sort-option:hover {
@@ -475,20 +523,39 @@
 <body>
     <!-- Myntra-style Header -->
     <header class="myntra-header">
+        <!-- Left section: Logo and navigation -->
         <div class="myntra-nav">
             <img src="../../assets/images/logo.webp" alt="ClothLoop Logo" class="myntra-logo">
             <ul class="myntra-nav-items">
-                <li><a href="#">MEN</a></li>
-                <li><a href="#">WOMEN</a></li>
-                <li><a href="#">KIDS</a></li>
+                <li><a href="javascript:void(0)" id="men-category">MEN</a></li>
+                <li><a href="javascript:void(0)" id="women-category">WOMEN</a></li>
+                <li><a href="javascript:void(0)" id="kids-category">KIDS</a></li>
             </ul>
+            <div class="myntra-sort-container">
+                <button class="sort-button" id="sortButton">
+                    <i class="fas fa-sort"></i> Sort
+                </button>
+                <div class="sort-dropdown" id="sortDropdown">
+                    <div class="sort-option" data-sort="clear">
+                        <i class="fas fa-times"></i> Clear Sort
+                    </div>
+                    <div class="sort-option" data-sort="price-low">
+                        <i class="fas fa-sort-amount-down"></i> Price: Low to High
+                    </div>
+                    <div class="sort-option" data-sort="price-high">
+                        <i class="fas fa-sort-amount-up"></i> Price: High to Low
+                    </div>
+                </div>
+            </div>
         </div>
         
+        <!-- Center section: Search -->
         <div class="myntra-search-container">
             <i class="fas fa-search myntra-search-icon"></i>
             <input type="text" class="myntra-search-input" placeholder="Search Products">
         </div>
         
+        <!-- Right section: User actions -->
         <div class="myntra-actions">
             <div class="myntra-action-item" id="profile-button">
                 <i class="far fa-user"></i>
@@ -513,43 +580,11 @@
 
     <!-- Main Content -->
     <div class="main-container">
-        <!-- Filter and Sort Bar -->
-        <div class="filter-bar">
-            <div class="sort-container" style="position: relative;">
-                <button class="sort-button" id="sortButton">
-                    <i class="fas fa-sort"></i> Sort
-                </button>
-                <div class="sort-dropdown" id="sortDropdown">
-                    <div class="sort-option" data-sort="price-low">
-                        <i class="fas fa-sort-amount-down"></i> Price: Low to High
-                    </div>
-                    <div class="sort-option" data-sort="price-high">
-                        <i class="fas fa-sort-amount-up"></i> Price: High to Low
-                    </div>
-                </div>
-            </div>
-            
-            <div class="category-filters">
-                <div class="category-filter">
-                    <input type="checkbox" id="men-filter" name="category" value="men">
-                    <label for="men-filter">Men</label>
-                </div>
-                <div class="category-filter">
-                    <input type="checkbox" id="women-filter" name="category" value="women">
-                    <label for="women-filter">Women</label>
-                </div>
-                <div class="category-filter">
-                    <input type="checkbox" id="kids-filter" name="category" value="kids">
-                    <label for="kids-filter">Kids</label>
-                </div>
-            </div>
-        </div>
-        
         <!-- Loading indicator -->
         <div id="loading-indicator" class="loading-indicator">
             <div class="spinner"></div>
             <p style="margin-top: 20px; color: #666;">Loading products...</p>
-            </div>
+        </div>
         
         <!-- Error message -->
         <div id="error-message" class="error-message" style="display: none;">
@@ -565,7 +600,7 @@
         <div id="empty-state" class="empty-state" style="display: none;">
             <i class="fas fa-box-open" style="color: #95a5a6;"></i>
             <p>No products found. Check back later for new arrivals!</p>
-            </div>
+        </div>
         
         <!-- Product Grid -->
         <div id="product-grid" class="grid">
@@ -587,7 +622,34 @@
         const loadingIndicator = document.getElementById('loading-indicator');
         const emptyState = document.getElementById('empty-state');
         const errorMessage = document.getElementById('error-message');
-        const categoryFilters = document.querySelectorAll('input[name="category"]');
+        
+        // Category navigation elements
+        const menCategory = document.getElementById('men-category');
+        const womenCategory = document.getElementById('women-category');
+        const kidsCategory = document.getElementById('kids-category');
+        
+        // Load saved preferences on page load
+        function loadSavedPreferences() {
+            // Load sort preference
+            const savedSort = localStorage.getItem('clothloopSortPreference');
+            if (savedSort) {
+                sortProducts(savedSort, false); // Don't save again to avoid circular reference
+            }
+            
+            // Load category preference
+            const savedCategory = localStorage.getItem('clothloopCategoryPreference');
+            if (savedCategory) {
+                const categoryElement = {
+                    'men': menCategory,
+                    'women': womenCategory,
+                    'kids': kidsCategory
+                }[savedCategory];
+                
+                if (categoryElement) {
+                    selectCategory(savedCategory, categoryElement, false); // Don't save again
+                }
+            }
+        }
         
         // Toggle sort dropdown
         sortButton.addEventListener('click', function() {
@@ -596,7 +658,7 @@
         
         // Close dropdown when clicking outside
         document.addEventListener('click', function(event) {
-            if (!event.target.closest('.sort-container')) {
+            if (!event.target.closest('.myntra-sort-container')) {
                 sortDropdown.classList.remove('active');
             }
         });
@@ -605,34 +667,53 @@
         document.querySelectorAll('.sort-option').forEach(option => {
             option.addEventListener('click', function() {
                 const sortType = this.getAttribute('data-sort');
-                sortProducts(sortType);
+                sortProducts(sortType, true);
                 sortDropdown.classList.remove('active');
-                
-                // Update button text to show current sort
-                let sortText = 'Sort';
-                if (sortType === 'price-low') sortText = 'Price: Low to High';
-                if (sortType === 'price-high') sortText = 'Price: High to Low';
-                
-                sortButton.innerHTML = `<i class="fas fa-sort"></i> ${sortText}`;
             });
         });
         
-        // Add event listeners to category filters
-        categoryFilters.forEach(filter => {
-            filter.addEventListener('change', function() {
-                updateSelectedCategories();
-                applyFiltersAndSort();
-            });
+        // Add event listeners to category navigation
+        menCategory.addEventListener('click', function() {
+            selectCategory('men', this, true);
         });
         
-        // Update the selected categories array
-        function updateSelectedCategories() {
-            selectedCategories = [];
-            categoryFilters.forEach(filter => {
-                if (filter.checked) {
-                    selectedCategories.push(filter.value);
+        womenCategory.addEventListener('click', function() {
+            selectCategory('women', this, true);
+        });
+        
+        kidsCategory.addEventListener('click', function() {
+            selectCategory('kids', this, true);
+        });
+        
+        // Select a single category or clear if clicking the same one again
+        function selectCategory(category, element, savePreference = true) {
+            const isAlreadySelected = element.classList.contains('active');
+            
+            // Clear all active categories first
+            [menCategory, womenCategory, kidsCategory].forEach(cat => {
+                cat.classList.remove('active');
+            });
+            
+            // If clicking on already selected category, clear selection
+            if (isAlreadySelected) {
+                selectedCategories = [];
+                
+                // Clear saved preference
+                if (savePreference) {
+                    localStorage.removeItem('clothloopCategoryPreference');
                 }
-            });
+            } else {
+                // Otherwise select just this category
+                element.classList.add('active');
+                selectedCategories = [category];
+                
+                // Save preference
+                if (savePreference) {
+                    localStorage.setItem('clothloopCategoryPreference', category);
+                }
+            }
+            
+            applyFiltersAndSort();
         }
         
         // Filter products by category
@@ -654,8 +735,31 @@
         }
         
         // Sort products
-        function sortProducts(sortType) {
-            currentSort = sortType;
+        function sortProducts(sortType, savePreference = true) {
+            if (sortType === 'clear') {
+                currentSort = '';
+                sortButton.innerHTML = `<i class="fas fa-sort"></i> Sort`;
+                
+                // Clear saved preference
+                if (savePreference) {
+                    localStorage.removeItem('clothloopSortPreference');
+                }
+            } else {
+                currentSort = sortType;
+                
+                // Update button text to show current sort
+                let sortText = 'Sort';
+                if (sortType === 'price-low') sortText = 'Price: Low to High';
+                if (sortType === 'price-high') sortText = 'Price: High to Low';
+                
+                sortButton.innerHTML = `<i class="fas fa-sort"></i> ${sortText}`;
+                
+                // Save preference
+                if (savePreference) {
+                    localStorage.setItem('clothloopSortPreference', sortType);
+                }
+            }
+            
             applyFiltersAndSort();
         }
         
@@ -664,11 +768,15 @@
             // First filter by category
             filteredProducts = filterProductsByCategory(allProducts);
             
-            // Then sort
+            // Then sort if a sort option is active
             if (currentSort === 'price-low') {
                 filteredProducts.sort((a, b) => parseFloat(a.rental_price) - parseFloat(b.rental_price));
             } else if (currentSort === 'price-high') {
                 filteredProducts.sort((a, b) => parseFloat(b.rental_price) - parseFloat(a.rental_price));
+            } else {
+                // When no sorting is applied (or after clearing sort),
+                // restore the original order from when products were loaded
+                filteredProducts.sort((a, b) => a.originalIndex - b.originalIndex);
             }
             
             // Render the filtered and sorted products
@@ -682,6 +790,10 @@
             productGrid.innerHTML = '';
             emptyState.style.display = 'none';
             errorMessage.style.display = 'none';
+            
+            // Reset product arrays to ensure clean state
+            allProducts = [];
+            filteredProducts = [];
             
             // Get user info from localStorage if available
             const userId = localStorage.getItem('userId');
@@ -756,10 +868,13 @@
                                 seller_id: product.seller_id || 0,
                                 shop_name: product.shop_name || 'ClothLoop Seller',
                                 image: imagePath,
-                                size: product.size || ''
+                                size: product.size || '',
+                                // Store the original index to maintain original order if needed
+                                originalIndex: allProducts.length
                             };
                         });
                         
+                        // Keep an unfiltered copy for reference to the original order
                         filteredProducts = [...allProducts];
                         
                         if (allProducts.length === 0) {
@@ -953,6 +1068,7 @@
             allProducts = [];
             filteredProducts = [];
             
+            
             console.log('Attempting to reload products from server...');
             
             // Remove demo mode banner if it exists
@@ -1021,7 +1137,8 @@
                     image: '../../assets/images/p1.jpg',
                     contact_number: '9876543210',
                     whatsapp_number: '9876543210',
-                    terms_and_conditions: 'Security deposit required. Return within 3 days of event.'
+                    terms_and_conditions: 'Security deposit required. Return within 3 days of event.',
+                    originalIndex: 0
                 },
                 {
                     id: '2',
@@ -1034,7 +1151,8 @@
                     image: '../../assets/images/p2.jpg',
                     contact_number: '9876543211',
                     whatsapp_number: '9876543211',
-                    terms_and_conditions: 'Dry cleaning required before return.'
+                    terms_and_conditions: 'Dry cleaning required before return.',
+                    originalIndex: 1
                 },
                 {
                     id: '3',
@@ -1047,7 +1165,8 @@
                     image: '../../assets/images/p3.jpg',
                     contact_number: '9876543212',
                     whatsapp_number: '9876543212',
-                    terms_and_conditions: 'Suitable for ages 4-8 years.'
+                    terms_and_conditions: 'Suitable for ages 4-8 years.',
+                    originalIndex: 2
                 },
                 {
                     id: '4',
@@ -1060,7 +1179,8 @@
                     image: '../../assets/images/p4.jpg',
                     contact_number: '9876543213',
                     whatsapp_number: '9876543213',
-                    terms_and_conditions: 'Available with matching jewelry set for additional charge.'
+                    terms_and_conditions: 'Available with matching jewelry set for additional charge.',
+                    originalIndex: 3
                 },
                 {
                     id: '5',
@@ -1073,7 +1193,8 @@
                     image: '../../assets/images/p5.jpg',
                     contact_number: '9876543213',
                     whatsapp_number: '9876543213',
-                    terms_and_conditions: 'Includes matching stole and turban.'
+                    terms_and_conditions: 'Includes matching stole and turban.',
+                    originalIndex: 4
                 },
                 {
                     id: '6',
@@ -1086,7 +1207,8 @@
                     image: '../../assets/images/p6.jpg',
                     contact_number: '9876543214',
                     whatsapp_number: '9876543214',
-                    terms_and_conditions: 'Available in sizes S, M, L.'
+                    terms_and_conditions: 'Available in sizes S, M, L.',
+                    originalIndex: 5
                 }
             ];
             
@@ -1112,6 +1234,8 @@
         // Load products when the page loads
         document.addEventListener("DOMContentLoaded", function() {
             loadProducts();
+            // Load saved preferences after a short delay to ensure products are loaded
+            setTimeout(loadSavedPreferences, 300);
         });
     </script>
 </body>
