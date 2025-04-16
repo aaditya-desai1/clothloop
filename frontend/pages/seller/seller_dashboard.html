@@ -806,7 +806,7 @@
     <header class="main-header">
       <div class="header-left">
         <div class="logo">
-          <img src="../../assets/images/logo.webp" alt="APPLICATION logo" />
+          <img src="../../assets/images/logo.webp" alt="ClothLoop logo" />
           <div class="brand-name">
             <h1>ClothLoop</h1>
             <p>Seller Dashboard</p>
@@ -820,16 +820,16 @@
             <span class="notification-badge">3</span>
           </div>
           <div class="user-profile">
-            <img id="profile-image" src="../../assets/images/shop_logo.png" alt="User Shop logo" />
+            <img id="navProfileImage" src="../../assets/images/shop_logo.png" alt="Shop Logo" />
             <div class="user-details">
-              <h4 id="seller-name">Loading...</h4>
+              <h4 id="navSellerName">Loading...</h4>
               <p>Seller Account</p>
             </div>
             <i class="fas fa-chevron-down"></i>
             <div class="dropdown-menu">
               <a href="seller_profile.html"><i class="fas fa-user"></i> Profile</a>
               <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
-              <a href="../account/login.html"><i class="fas fa-sign-out-alt"></i> Log Out</a>
+              <a href="#" id="logoutLink"><i class="fas fa-sign-out-alt"></i> Log Out</a>
             </div>
           </div>
         </div>
@@ -1034,25 +1034,155 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      // Elements
-      const addClothBtn = document.getElementById('addClothBtn');
-      const uploadPopup = document.getElementById('uploadPopup');
-      const closePopup = document.getElementById('closePopup');
-      const cancelUpload = document.getElementById('cancelUpload');
-      const uploadForm = document.getElementById('uploadClothForm');
-      const dropArea = document.getElementById('dropArea');
-      const clothImage = document.getElementById('clothImage');
-      const previewImage = document.getElementById('previewImage');
+      // DOM Elements
+      const sideMenu = document.querySelector('aside');
+      const menuBtn = document.getElementById('menu-btn');
+      const closeBtn = document.getElementById('close-btn');
+      const sections = document.querySelectorAll('main > section');
+      const navLinks = document.querySelectorAll('aside .sidebar a');
+      const themeToggler = document.querySelector('.theme-toggler');
+      const userProfile = document.querySelector('.user-profile');
+      const alertMessage = document.getElementById('alertMessage');
+      const navSellerName = document.getElementById('navSellerName');
+      const navProfileImage = document.getElementById('navProfileImage');
       
-      // Navigation
-      const navLinks = document.querySelectorAll('.sidebar-nav a[data-section]');
-      const sections = document.querySelectorAll('.section');
+      // Show/hide sidebar 
+      if (menuBtn) {
+        menuBtn.addEventListener('click', () => {
+          sideMenu.style.display = 'block';
+        });
+      }
       
-      // Fetch seller information
-      fetchSellerInfo();
+      if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+          sideMenu.style.display = 'none';
+        });
+      }
       
-      // Function to fetch seller information
-      function fetchSellerInfo() {
+      // Change theme
+      if (themeToggler) {
+        themeToggler.addEventListener('click', () => {
+          document.body.classList.toggle('dark-theme-variables');
+          
+          themeToggler.querySelector('span:nth-child(1)').classList.toggle('active');
+          themeToggler.querySelector('span:nth-child(2)').classList.toggle('active');
+          
+          // Save theme preference
+          const isDarkMode = document.body.classList.contains('dark-theme-variables');
+          localStorage.setItem('darkMode', isDarkMode);
+        });
+      }
+      
+      // Toggle user profile dropdown
+      if (userProfile) {
+        userProfile.addEventListener('click', function(e) {
+          console.log('Profile clicked');
+          this.classList.toggle('active');
+          e.stopPropagation();
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function() {
+          userProfile.classList.remove('active');
+        });
+      }
+      
+      // Profile fetch and display
+      fetchSellerProfile();
+      
+      // Handle navigation
+      navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          
+          // Remove active class from all links
+          navLinks.forEach(link => link.classList.remove('active'));
+          
+          // Add active class to clicked link
+          this.classList.add('active');
+          
+          // Get target section id
+          const targetId = this.getAttribute('data-section');
+          
+          // Hide all sections
+          sections.forEach(section => section.style.display = 'none');
+          
+          // Show target section
+          const targetSection = document.getElementById(targetId);
+          if (targetSection) {
+            targetSection.style.display = 'block';
+            
+            // If orders section is displayed, fetch orders
+            if (targetId === 'orders') {
+              fetchOrders();
+            }
+            // If products section is displayed, fetch products
+            else if (targetId === 'products') {
+              fetchProducts();
+            }
+          }
+        });
+      });
+      
+      // Set active section on page load
+      function setActiveSectionFromHash() {
+        const hash = window.location.hash || '#dashboard';
+        const targetLink = document.querySelector(`aside .sidebar a[href="${hash}"]`);
+        
+        if (targetLink) {
+          // Set active class
+          navLinks.forEach(link => link.classList.remove('active'));
+          targetLink.classList.add('active');
+          
+          // Show target section
+          const targetId = hash.substring(1);
+          sections.forEach(section => section.style.display = 'none');
+          
+          const targetSection = document.getElementById(targetId);
+          if (targetSection) {
+            targetSection.style.display = 'block';
+            
+            // If orders section is displayed, fetch orders
+            if (targetId === 'orders') {
+              fetchOrders();
+            }
+            // If products section is displayed, fetch products
+            else if (targetId === 'products') {
+              fetchProducts();
+            }
+          }
+        }
+      }
+      
+      // Set active section on page load and when hash changes
+      setActiveSectionFromHash();
+      window.addEventListener('hashchange', setActiveSectionFromHash);
+      
+      // Init theme preference
+      const savedDarkMode = localStorage.getItem('darkMode') === 'true';
+      if (savedDarkMode) {
+        document.body.classList.add('dark-theme-variables');
+        
+        if (themeToggler) {
+          themeToggler.querySelector('span:nth-child(1)').classList.remove('active');
+          themeToggler.querySelector('span:nth-child(2)').classList.add('active');
+        }
+      }
+      
+      // Function to fetch seller profile from database
+      function fetchSellerProfile() {
+        // Get data from session storage if available
+        const cachedData = sessionStorage.getItem('sellerData');
+        if (cachedData) {
+          try {
+            const sellerData = JSON.parse(cachedData);
+            updateNavProfileElements(sellerData);
+          } catch (e) {
+            console.error('Error parsing cached data:', e);
+          }
+        }
+        
+        // Then fetch fresh data from server
         fetch('../../../backend/api/sellers/get_seller_profile.php')
           .then(response => {
             if (!response.ok) {
@@ -1061,279 +1191,59 @@
             return response.json();
           })
           .then(data => {
+            console.log('Profile data received:', data);
             if (data.status === 'success') {
-              // Update the seller name in the header
-              const sellerName = document.getElementById('seller-name');
-              sellerName.textContent = data.seller.username || 'Seller';
+              // Update sessionStorage with fresh data
+              sessionStorage.setItem('sellerData', JSON.stringify(data.seller));
               
-              // Update profile image if available
-              if (data.seller.profile_image) {
-                const profileImage = document.getElementById('profile-image');
-                profileImage.src = data.seller.profile_image;
-              }
+              // Update navigation profile elements
+              updateNavProfileElements(data.seller);
             } else {
-              console.error('Error fetching seller profile:', data.message);
+              console.error('Error from server:', data);
+              
+              // If unauthorized, redirect to login
+              if (data.message && (data.message.includes('Unauthorized') || data.message.includes('login'))) {
+                window.location.href = '../account/login.html';
+              }
             }
           })
           .catch(error => {
-            console.error('Error fetching seller profile:', error);
+            console.error('Error fetching profile:', error);
           });
       }
       
-      // Navigation
-      document.querySelectorAll('.sidebar-nav a').forEach(link => {
-        link.addEventListener('click', function(e) {
-          // Don't handle clicks to external pages
-          if (this.getAttribute('href').startsWith('#')) {
-            e.preventDefault();
-            const targetSection = this.getAttribute('data-section');
-            
-            // Toggle active class on nav links
-            document.querySelectorAll('.sidebar-nav a').forEach(el => 
-              el.classList.remove('active'));
-            this.classList.add('active');
-            
-            // Toggle active class on sections
-            document.querySelectorAll('.section').forEach(el => 
-              el.classList.remove('active'));
-            document.getElementById(targetSection).classList.add('active');
-            
-            // Initialize charts if analysis section is active
-            if (targetSection === 'analysis') {
-              // Allow time for the section to become visible
-              setTimeout(initializeCharts, 100);
-            }
-          }
-        });
-      });
-      
-      // User profile dropdown
-      document.querySelector('.user-profile').addEventListener('click', function(e) {
-        this.classList.toggle('active');
-        e.stopPropagation();
-      });
-      
-      // Close dropdown when clicking outside
-      document.addEventListener('click', function() {
-        document.querySelector('.user-profile').classList.remove('active');
-      });
-      
-      // Handle logout
-      document.querySelector('.dropdown-menu a[href="../account/login.html"]').addEventListener('click', function() {
-        // Clear user data
-        localStorage.removeItem('user_id');
-        sessionStorage.clear();
-      });
-      
-      // Initialize charts on page load if analysis is visible
-      setTimeout(initializeCharts, 100);
-    });
-    
-    function initializeCharts() {
-      const analysisSection = document.getElementById('analysis');
-      
-      // Bar Chart
-      const barCtx = document.getElementById('barChart');
-      if (barCtx) {
-        new Chart(barCtx, {
-            type: 'bar',
-            data: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
-                datasets: [{
-              label: 'Product Sales',
-              data: [12, 19, 15, 25, 22],
-              backgroundColor: 'rgba(102, 103, 104, 0.6)',
-              borderColor: 'rgba(102, 103, 104, 1)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-            responsive: true,
-            maintainAspectRatio: false,
-                scales: {
-              y: {
-                            beginAtZero: true
-                        }
-                }
-            }
-        });
-      }
-
-      // Line Chart
-      const lineCtx = document.getElementById('lineChart');
-      if (lineCtx) {
-        new Chart(lineCtx, {
-            type: 'line',
-            data: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
-                datasets: [{
-              label: 'Revenue Views',
-              data: [5000, 8000, 7500, 12000, 11000],
-              fill: false,
-              borderColor: 'rgba(102, 103, 104, 1)',
-              tension: 0.1
-                }]
-            },
-            options: {
-            responsive: true,
-            maintainAspectRatio: false
-          }
-        });
-      }
-      
-      // Pie Chart
-      const pieCtx = document.getElementById('pieChart');
-      if (pieCtx) {
-        new Chart(pieCtx, {
-            type: 'pie',
-            data: {
-                labels: ['Facebook', 'Instagram', 'Twitter', 'Email'],
-                datasets: [{
-                    label: 'Customer Engagement',
-              data: [30, 40, 15, 15],
-                    backgroundColor: [
-                'rgba(54, 162, 235, 0.6)',
-                'rgba(255, 99, 132, 0.6)',
-                'rgba(75, 192, 192, 0.6)',
-                'rgba(255, 206, 86, 0.6)'
-                    ],
-                    borderColor: [
-                        'rgba(54, 162, 235, 1)',
-                'rgba(255, 99, 132, 1)',
-                'rgba(75, 192, 192, 1)',
-                'rgba(255, 206, 86, 1)'
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-            responsive: true,
-            maintainAspectRatio: false
-            }
-        });
-    }
-    }
-
-    // Upload Cloth Popup Functionality
-    document.addEventListener('DOMContentLoaded', function() {
-      const addClothBtn = document.getElementById('addClothBtn');
-      const uploadPopup = document.getElementById('uploadPopup');
-      const closePopup = document.getElementById('closePopup');
-      const cancelUpload = document.getElementById('cancelUpload');
-      const uploadForm = document.getElementById('uploadClothForm');
-      const dropArea = document.getElementById('dropArea');
-      const clothImage = document.getElementById('clothImage');
-      const previewImage = document.getElementById('previewImage');
-
-      // Open popup
-      addClothBtn.addEventListener('click', function() {
-        console.log("Add Cloth button clicked!");
-        uploadPopup.classList.add('active');
-      });
-
-      // Close popup functions
-      function closeUploadPopup() {
-        uploadPopup.classList.remove('active');
-        uploadForm.reset();
-        previewImage.style.display = 'none';
-        previewImage.src = '';
-      }
-
-      closePopup.addEventListener('click', closeUploadPopup);
-      cancelUpload.addEventListener('click', closeUploadPopup);
-
-      // Close when clicking outside the popup
-      uploadPopup.addEventListener('click', function(e) {
-        if (e.target === uploadPopup) {
-          closeUploadPopup();
-        }
-      });
-
-      // Image preview functionality
-      clothImage.addEventListener('change', function(e) {
-        handleImageSelect(e.target.files[0]);
-      });
-
-      // Drag and drop functionality
-      dropArea.addEventListener('dragover', function(e) {
-        e.preventDefault();
-        dropArea.style.borderColor = 'var(--accent-color)';
-        dropArea.style.backgroundColor = 'rgba(76, 175, 80, 0.1)';
-      });
-
-      dropArea.addEventListener('dragleave', function() {
-        dropArea.style.borderColor = 'var(--primary-color)';
-        dropArea.style.backgroundColor = 'transparent';
-      });
-
-      dropArea.addEventListener('drop', function(e) {
-        e.preventDefault();
-        dropArea.style.borderColor = 'var(--primary-color)';
-        dropArea.style.backgroundColor = 'transparent';
+      // Function to update navigation profile elements
+      function updateNavProfileElements(sellerData) {
+        if (!sellerData) return;
         
-        const file = e.dataTransfer.files[0];
-        if (file && file.type.match('image.*')) {
-          clothImage.files = e.dataTransfer.files;
-          handleImageSelect(file);
+        // Update seller name in nav
+        if (navSellerName) {
+          navSellerName.textContent = sellerData.username || 'Seller';
         }
-      });
-
-      function handleImageSelect(file) {
-        if (file && file.type.match('image.*')) {
-          const reader = new FileReader();
-          
-          reader.onload = function(e) {
-            previewImage.src = e.target.result;
-            previewImage.style.display = 'block';
-          };
-          
-          reader.readAsDataURL(file);
+        
+        // Update profile image if available
+        if (sellerData.profile_image && navProfileImage) {
+          console.log('Setting profile image in nav');
+          navProfileImage.src = sellerData.profile_image;
         }
       }
-
-      // Form submission
-      uploadForm.addEventListener('submit', function(e) {
-        e.preventDefault();
+      
+      // Function to display alert messages
+      function showAlert(message, type) {
+        if (!alertMessage) return;
         
-        // Here you would normally send the data to your server
-        // For demonstration, we'll just create a new product card
-
-        // Get form values
-        const clothTitle = document.getElementById('clothTitle').value;
-        const rentalPrice = document.getElementById('rentalPrice').value;
+        alertMessage.textContent = message;
+        alertMessage.className = 'alert alert-' + type;
+        alertMessage.style.display = 'block';
         
-        // Create a new product card
-        const productCard = document.createElement('div');
-        productCard.className = 'product-card';
+        // Scroll to top to see the message
+        window.scrollTo(0, 0);
         
-        // Get the image source from the preview
-        const imgSrc = previewImage.src || '../Image/placeholder.jpg';
-        
-        productCard.innerHTML = `
-          <div class="product-image">
-            <img src="${imgSrc}" alt="${clothTitle}" />
-          </div>
-          <div class="product-details">
-            <h3>${clothTitle}</h3>
-            <div class="price">₹${rentalPrice}/day</div>
-            <div class="stock">Available for rent</div>
-            <div class="product-actions">
-              <button>Edit</button>
-              <button>View</button>
-            </div>
-          </div>
-        `;
-        
-        // Add the new product to the grid
-        const productGrid = document.querySelector('.product-grid');
-        productGrid.insertBefore(productCard, productGrid.firstChild);
-        
-        // Close the popup
-        closeUploadPopup();
-        
-        // Show success message
-        alert('Cloth uploaded successfully!');
-      });
+        // Hide the alert after 5 seconds
+        setTimeout(() => {
+          alertMessage.style.display = 'none';
+        }, 5000);
+      }
     });
   </script>
 </body>
