@@ -16,6 +16,7 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            background-color: #f5f5f6;
         }
         
         /* Header Section */
@@ -23,69 +24,62 @@
             background-color: white;
             padding: 10px;
             box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-            display: flex; /* Use flexbox layout */
-            justify-content: space-between; /* Space between items */
-            align-items: center; /* Vertically center items */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
           
         .container {
             max-width: 1200px;
-            margin: 0 auto; /* Center the container */
-            width: 100%; /* Ensure full width */
-            display: flex; /* Make the container a flexbox */
-            justify-content: space-between; /* Space items in the container */
-            align-items: center; /* Vertically center items in the container */
+            margin: 0 auto;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
           
         .logo {
-            height: 50px; /* Logo height */
-            width: 50px; /* Logo width */
-            border-radius: 50%;
-            object-fit: cover;
+            height: 50px;
+            margin-right: 10px;
         }
           
         .header-buttons {
-            margin-left: auto; /* Push button to the right */
             display: flex;
             gap: 10px;
         }
           
-        .header-buttons button {
-            background-color: #333; /* Button background color */
-            color: white; /* Button text color */
-            padding: 10px 20px; /* Button padding */
-            margin-left: 10px; /* Space between buttons if needed */
-            border: none; /* Remove border */
-            border-radius: 5px; /* Rounded corners */
-            cursor: pointer; /* Pointer on hover */
+        .header-button {
+            background-color: #ff3e6c;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
             transition: all 0.3s ease;
+            font-weight: 500;
         }
           
-        .header-buttons button:hover {
-            background-color: #555; /* Darken button on hover */
+        .header-button:hover {
+            background-color: #e83e65;
             transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        }
-        
-        .header-buttons button:active {
-            transform: translateY(0);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
         
         /* Wishlist Main Section */
         main {
             padding: 20px;
-            text-align: center;
         }
         
         h2 {
-            font-size: 2rem;
-            animation: fadeIn 0.8s ease-out;
-            position: relative;
+            font-size: 24px;
+            text-align: center;
+            margin: 20px 0;
+            color: #282c3f;
         }
         
         .wishlist-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 20px;
             padding: 20px;
             max-width: 1200px;
@@ -93,29 +87,122 @@
         }
         
         .wishlist-item {
-            padding: 20px;
-            border-radius: 15px;
-            text-align: center;
-            transition: all 0.3s ease;
-            animation: fadeIn 0.5s ease-out;
-            cursor: pointer;
-            position: relative;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            width: 96%;
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+        }
+        
+        .wishlist-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
         }
         
         .wishlist-img {
             width: 100%;
-            height: 300px;
+            height: 280px;
             object-fit: cover;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            transition: all 0.3s ease;
+            display: block;
         }
         
-        .wishlist-item h3 {
-            font-size: 1.2rem;
+        .wishlist-details {
+            padding: 15px;
+        }
+        
+        .wishlist-title {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #282c3f;
+        }
+        
+        .wishlist-price {
+            color: #ff3e6c;
+            font-weight: 500;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+        
+        .wishlist-seller {
+            color: #535766;
+            font-size: 12px;
+            margin-bottom: 15px;
+        }
+        
+        .wishlist-actions {
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .view-btn, .remove-btn {
+            padding: 8px 0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 14px;
+            flex: 1;
+            text-align: center;
+        }
+        
+        .view-btn {
+            background-color: #ff3e6c;
+            color: white;
+            margin-right: 8px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .view-btn:hover {
+            background-color: #e83e65;
+        }
+        
+        .remove-btn {
+            background-color: white;
+            color: #282c3f;
+            border: 1px solid #d4d5d9;
+        }
+        
+        .remove-btn:hover {
+            background-color: #f5f5f6;
+        }
+        
+        .empty-wishlist {
+            text-align: center;
+            padding: 40px 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .empty-wishlist i {
+            font-size: 48px;
+            color: #95a5a6;
+            margin-bottom: 20px;
+        }
+        
+        .empty-wishlist p {
+            margin-bottom: 20px;
+            color: #535766;
+        }
+        
+        .browse-btn {
+            display: inline-block;
+            background-color: #ff3e6c;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+        
+        .browse-btn:hover {
+            background-color: #e83e65;
         }
         
         /* Animation Keyframes */
@@ -130,36 +217,8 @@
             }
         }
         
-        @keyframes scaleIn {
-            from {
-                transform: scale(0.95);
-            }
-            to {
-                transform: scale(1);
-            }
-        }
-        
-        /* Header Animation */
-        .header {
-            animation: slideDown 0.5s ease-out;
-        }
-        
-        @keyframes slideDown {
-            from {
-                transform: translateY(-100%);
-            }
-            to {
-                transform: translateY(0);
-            }
-        }
-        
-        .wishlist-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-        }
-        
-        .wishlist-item:hover .wishlist-img {
-            transform: scale(1.05);
+        .wishlist-item {
+            animation: fadeIn 0.5s ease-out;
         }
         
         /* Responsive */
@@ -168,14 +227,24 @@
                 grid-template-columns: repeat(2, 1fr);
             }
             
-            .wishlist-img {
-                height: 250px;
+            .header-buttons {
+                flex-direction: column;
             }
         }
         
         @media (max-width: 480px) {
             .wishlist-grid {
                 grid-template-columns: 1fr;
+            }
+            
+            .container {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            
+            .header-buttons {
+                margin-top: 15px;
             }
         }
     </style>
@@ -189,139 +258,173 @@
                 <img src="../../assets/images/logo.webp" alt="ClothLoop Logo" class="logo">
             </a>
             <div class="header-buttons">
-                <button onclick="window.location.href='buyer_dashboard.html'">Back to home page</button>
-                <button onclick="window.location.href='../account/login.html'">Logout</button>
+                <button class="header-button" onclick="window.location.href='buyer_dashboard.html'">Back to Home</button>
+                <button class="header-button" onclick="handleLogout()">Logout</button>
             </div>
         </div>
     </header>
 
     <!-- Wishlist Main Content -->
-    <h2 style="text-align: center; margin: 20px 0;">Your Wishlist</h2>
+    <main>
+        <h2>Your Wishlist</h2>
 
-    <main class="container">
-
-        <div class="wishlist-grid" id="wishlist">
-            <!-- Wishlist items will be dynamically loaded here -->
+        <div id="wishlist-container">
+            <div class="wishlist-grid" id="wishlist-grid">
+                <!-- Wishlist items will be dynamically loaded here -->
+            </div>
+            
+            <!-- Empty wishlist message (hidden by default) -->
+            <div class="empty-wishlist" id="empty-wishlist" style="display: none;">
+                <i class="far fa-heart"></i>
+                <p>Your wishlist is empty</p>
+                <a href="buyer_dashboard.html" class="browse-btn">Browse Products</a>
+            </div>
         </div>
     </main>
 
     <script>
-        // Sample Wishlist Data with exactly 3 items
-        const wishlistItems = [
-            {
-                imgSrc: "../../assets/images/p3.jpg",
-                title: "Traditional Woman Attire"
-            },
-            {
-                imgSrc: "../../assets/images/p1.jpg",
-                title: "Traditional Man Attire"
-            },
-            {
-                imgSrc: "../../assets/images/p2.jpg",
-                title: "Couple in Traditional Clothes"
+        // Function to get wishlist items from localStorage
+        function getWishlistItems() {
+            const wishlistIds = JSON.parse(localStorage.getItem('wishlist') || '[]');
+            return wishlistIds;
+        }
+        
+        // Function to remove an item from wishlist
+        function removeFromWishlist(productId) {
+            let wishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
+            wishlist = wishlist.filter(id => id !== productId);
+            localStorage.setItem('wishlist', JSON.stringify(wishlist));
+            loadWishlistItems(); // Reload the wishlist
+        }
+        
+        // Function to load and display wishlist items
+        function loadWishlistItems() {
+            const wishlistGrid = document.getElementById('wishlist-grid');
+            const emptyWishlist = document.getElementById('empty-wishlist');
+            
+            // Get wishlist product IDs
+            const wishlistIds = getWishlistItems();
+            
+            // Clear current items
+            wishlistGrid.innerHTML = '';
+            
+            if (wishlistIds.length === 0) {
+                // Show empty wishlist message
+                wishlistGrid.style.display = 'none';
+                emptyWishlist.style.display = 'block';
+                return;
             }
-        ];
-
-        const wishlistContainer = document.getElementById("wishlist");
-
-        // Dynamically load exactly 3 wishlist items
-        wishlistItems.forEach(item => {
-            const wishlistItem = document.createElement("div");
-            wishlistItem.classList.add("wishlist-item");
-
-            wishlistItem.innerHTML = `
-                <img src="${item.imgSrc}" alt="${item.title}" class="wishlist-img">
-                <h3>${item.title}</h3>
-            `;
-
-            wishlistContainer.appendChild(wishlistItem);
-        });
-
-        // Existing script remains, adding new animation logic
+            
+            // Hide empty message, show grid
+            wishlistGrid.style.display = 'grid';
+            emptyWishlist.style.display = 'none';
+            
+            // Get all products from the API
+            fetch('../../backend/utils/product_operations.php?operation=fetch_all')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.status === 'success') {
+                        const products = data.products || [];
+                        
+                        // Filter products to only include those in the wishlist
+                        const wishlistProducts = products.filter(product => 
+                            wishlistIds.includes(product.id.toString()));
+                        
+                        if (wishlistProducts.length === 0) {
+                            // No matching products found
+                            wishlistGrid.style.display = 'none';
+                            emptyWishlist.style.display = 'block';
+                            return;
+                        }
+                        
+                        // Display each wishlist product
+                        wishlistProducts.forEach(product => {
+                            // Map product properties for consistency
+                            const mappedProduct = {
+                                id: product.id,
+                                title: product.title || product.cloth_title || '',
+                                description: product.description || '',
+                                category: product.category || '',
+                                rental_price: product.rental_price || product.rentalPrice || 0,
+                                seller_id: product.seller_id || 0,
+                                shop_name: product.shop_name || 'ClothLoop Seller',
+                                image: product.image || '../../assets/images/placeholder.png'
+                            };
+                            
+                            // Create wishlist item element
+                            const wishlistItem = document.createElement('div');
+                            wishlistItem.className = 'wishlist-item';
+                            wishlistItem.style.animationDelay = '0.1s';
+                            
+                            // Create URL params for details page
+                            const queryParams = new URLSearchParams({
+                                id: mappedProduct.id,
+                                title: mappedProduct.title,
+                                price: mappedProduct.rental_price,
+                                image: mappedProduct.image,
+                                description: mappedProduct.description || '',
+                                seller_id: mappedProduct.seller_id
+                            });
+                            
+                            wishlistItem.innerHTML = `
+                                <img src="${mappedProduct.image}" alt="${mappedProduct.title}" class="wishlist-img" onerror="this.src='../../assets/images/placeholder.png';">
+                                <div class="wishlist-details">
+                                    <h3 class="wishlist-title">${mappedProduct.title}</h3>
+                                    <p class="wishlist-price">₹${mappedProduct.rental_price} / day</p>
+                                    <p class="wishlist-seller">${mappedProduct.shop_name}</p>
+                                    <div class="wishlist-actions">
+                                        <a href="details.html?${queryParams.toString()}" class="view-btn">View Details</a>
+                                        <button class="remove-btn" data-product-id="${mappedProduct.id}">Remove</button>
+                                    </div>
+                                </div>
+                            `;
+                            
+                            wishlistGrid.appendChild(wishlistItem);
+                            
+                            // Add event listener to remove button
+                            const removeBtn = wishlistItem.querySelector('.remove-btn');
+                            removeBtn.addEventListener('click', function() {
+                                const productId = this.getAttribute('data-product-id');
+                                
+                                // Add animation before removing
+                                wishlistItem.style.animation = 'fadeIn 0.3s reverse forwards';
+                                
+                                // Remove from wishlist after animation
+                                setTimeout(() => {
+                                    removeFromWishlist(productId);
+                                }, 300);
+                            });
+                        });
+                    } else {
+                        console.error('Error fetching products:', data.message);
+                        wishlistGrid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: #e74c3c;">Error loading wishlist items</p>`;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    wishlistGrid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: #e74c3c;">Error loading wishlist items</p>`;
+                });
+        }
+        
+        // Function to handle logout
+        function handleLogout() {
+            // Clear user data from localStorage
+            localStorage.removeItem('userId');
+            localStorage.removeItem('userType');
+            localStorage.removeItem('username');
+            // Redirect to login page
+            window.location.href = '../account/login.html';
+        }
+        
+        // Load wishlist items when the page loads
         document.addEventListener('DOMContentLoaded', function() {
-            // Add staggered animation to wishlist items
-            const items = document.querySelectorAll('.wishlist-item');
-            items.forEach((item, index) => {
-                item.style.animationDelay = `${index * 0.2}s`;
-            });
-
-            // Add click animation for remove button
-            items.forEach(item => {
-                item.addEventListener('click', function(e) {
-                    if (e.target === this.querySelector('::before')) {
-                        this.style.animation = 'fadeOut 0.3s ease-out forwards';
-                        setTimeout(() => {
-                            this.remove();
-                        }, 300);
-                    }
-                });
-            });
-
-            // Mark current page in dashboard
-            const currentPage = document.querySelector('.dashboard-item.wishlist');
-            if (currentPage) {
-                currentPage.classList.add('selected-dashboard');
-            }
-
-            // Create remove buttons for each item
-            items.forEach(item => {
-                const removeBtn = document.createElement('button');
-                removeBtn.className = 'remove-btn';
-                removeBtn.innerHTML = '×';
-                removeBtn.style.position = 'absolute';
-                removeBtn.style.top = '10px';
-                removeBtn.style.right = '10px';
-                removeBtn.style.background = 'rgba(255, 0, 0, 0.7)';
-                removeBtn.style.color = 'white';
-                removeBtn.style.border = 'none';
-                removeBtn.style.borderRadius = '50%';
-                removeBtn.style.width = '30px';
-                removeBtn.style.height = '30px';
-                removeBtn.style.cursor = 'pointer';
-                removeBtn.style.opacity = '0';
-                removeBtn.style.transition = 'opacity 0.3s';
-                
-                removeBtn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    item.style.animation = 'slideUp 0.3s reverse forwards';
-                    setTimeout(() => item.remove(), 300);
-                });
-
-                item.appendChild(removeBtn);
-                
-                // Show remove button on hover
-                item.addEventListener('mouseenter', function() {
-                    removeBtn.style.opacity = '1';
-                });
-                
-                item.addEventListener('mouseleave', function() {
-                    removeBtn.style.opacity = '0';
-                });
-            });
+            loadWishlistItems();
         });
-
-        // Define the slideUp animation
-        document.head.insertAdjacentHTML('beforeend', `
-            <style>
-                @keyframes slideUp {
-                    from { 
-                        opacity: 0;
-                        transform: translateY(20px);
-                    }
-                    to { 
-                        opacity: 1;
-                        transform: translateY(0);
-                    }
-                }
-                
-                @keyframes fadeOut {
-                    to { 
-                        opacity: 0;
-                        transform: scale(0.9);
-                    }
-                }
-            </style>
-        `);
     </script>
 </body>
 </html>

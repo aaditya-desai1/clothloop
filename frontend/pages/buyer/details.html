@@ -166,6 +166,7 @@
         function getQueryParams() {
             const params = new URLSearchParams(window.location.search);
             return {
+                id: params.get('id'),
                 image: params.get('image'),
                 title: params.get('title'),
                 description: params.get('description'),
@@ -177,33 +178,172 @@
                 location: params.get('location'),
                 shop: params.get('shop'),
                 address: params.get('address'),
-                terms: params.get('terms')
+                terms: params.get('terms'),
+                seller_id: params.get('seller_id')
             };
         }
 
-        // Populate the details section based on URL parameters
-        const params = getQueryParams();
+        // Fetch complete product details from the server
+        async function fetchProductDetails(productId) {
+            // Show loading indicator or similar
+            document.getElementById('clothTitle').textContent = 'Loading...';
+            
+            try {
+                // Build URL with the correct path
+                const possiblePaths = [
+                    '/ClothLoop/backend/utils/product_operations.php',   // For standard XAMPP setup
+                    '../../../backend/utils/product_operations.php',     // Relative path option 1
+                    '../../backend/utils/product_operations.php',        // Relative path option 2
+                    '/backend/utils/product_operations.php'              // Direct from root
+                ];
+                
+                let url = possiblePaths[0] + `?operation=fetch_all&id=${productId}`;
+                
+                console.log('Fetching product details from:', url);
+                
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch product details: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.status === 'success' && data.products && data.products.length > 0) {
+                    // Found the product, populate the UI
+                    const product = data.products[0];
+                    populateProductDetails(product);
+                } else {
+                    // No product found or error occurred
+                    console.error('Product not found or error:', data);
+                    // Use URL parameters as fallback
+                    populateFromUrlParams();
+                }
+            } catch (error) {
+                console.error('Error fetching product details:', error);
+                // Use URL parameters as fallback
+                populateFromUrlParams();
+            }
+        }
         
-        // Set image source
-        const imageEl = document.getElementById('clothImage');
-        imageEl.src = params.image;
-        // Add error handling for image loading
-        imageEl.onerror = function() {
-            console.error('Failed to load image:', params.image);
+        // Populate details from server data
+        function populateProductDetails(product) {
+            // Set image source - try to use the image from the database first
+            const imageEl = document.getElementById('clothImage');
+            
+            // First attempt with the image data from the response
+            if (product.image && product.image.startsWith('data:image/')) {
+                imageEl.src = product.image;
+                console.log('Using base64 image data from response');
+            } 
+            // If no valid image or placeholder, use direct API URL
+            else if (!product.image || product.image.includes('placeholder.png')) {
+                imageEl.src = `/ClothLoop/backend/api/image_display.php?type=cloth&id=${product.id}`;
+                console.log('Using direct image API URL');
+            }
+            // Otherwise use whatever image path we got
+            else {
+                imageEl.src = product.image;
+                console.log('Using image path from response:', product.image.substring(0, 50) + '...');
+            }
+            
+            // Add error handling for image loading with retry
+            imageEl.onerror = function() {
+                console.error('Failed to load image, trying direct API as fallback');
+                // Try direct API URL as fallback
+                this.src = `/ClothLoop/backend/api/image_display.php?type=cloth&id=${product.id}`;
+                
+                // If that fails too, use placeholder
+                this.onerror = function() {
+                    console.error('API fallback failed too, using placeholder');
+                    this.src = '../../assets/images/placeholder.png';
+                    this.onerror = null; // Prevent infinite error handling
+                };
+            };
+            
+            // Set text content
+            document.getElementById('clothTitle').textContent = product.title || product.cloth_title || 'Product';
+            document.getElementById('clothDescription').textContent = product.description || 'No description available';
+            document.getElementById('clothSize').textContent = product.size || 'Not specified';
+            document.getElementById('clothColor').textContent = product.color || 'Not specified';
+            document.getElementById('clothPrice').textContent = product.rental_price || product.rentalPrice || '0';
+            document.getElementById('contactNumber').textContent = product.contact_number || product.contactNo || 'Not provided';
+            document.getElementById('whatsappNumber').textContent = product.whatsapp_number || product.whatsappNo || 'Not provided';
+            document.getElementById('shopName').textContent = product.shop_name || 'ClothLoop Shop';
+            document.getElementById('shopAddress').textContent = product.shop_address || 'Address not specified';
+            document.getElementById('termsConditions').textContent = product.terms_and_conditions || product.terms || 'No specific terms';
+        }
+        
+        // Fallback: Populate the details section based on URL parameters
+        function populateFromUrlParams() {
+            const params = getQueryParams();
+            
+            // Set image source
+            const imageEl = document.getElementById('clothImage');
+            
+            // Try to load image from URL params first
+            if (params.image) {
+                imageEl.src = params.image;
+                console.log('Using image from URL parameters');
+            } 
+            // If we have an ID but no image, try the direct API URL
+            else if (params.id) {
+                imageEl.src = `/ClothLoop/backend/api/image_display.php?type=cloth&id=${params.id}`;
+                console.log('Using direct image API URL with ID from URL params');
+            }
             // Fallback to placeholder
-            this.src = '../../assets/images/shop_logo.png';
-        };
+            else {
+                imageEl.src = '../../assets/images/placeholder.png';
+                console.log('No image data available, using placeholder');
+            }
+            
+            // Add error handling for image loading
+            imageEl.onerror = function() {
+                console.error('Failed to load image from URL params, trying direct API');
+                
+                // If we have an ID, try the API
+                if (params.id) {
+                    this.src = `/ClothLoop/backend/api/image_display.php?type=cloth&id=${params.id}`;
+                    
+                    // If API also fails, use placeholder
+                    this.onerror = function() {
+                        console.error('API fallback failed too, using placeholder');
+                        this.src = '../../assets/images/placeholder.png';
+                        this.onerror = null; // Prevent infinite error handling
+                    };
+                } else {
+                    // No ID, just use placeholder
+                    this.src = '../../assets/images/placeholder.png';
+                }
+            };
+            
+            document.getElementById('clothTitle').textContent = params.title || 'Product';
+            document.getElementById('clothDescription').textContent = params.description || 'No description available';
+            document.getElementById('clothSize').textContent = params.size || 'Not specified';
+            document.getElementById('clothColor').textContent = params.color || 'Not specified';
+            document.getElementById('clothPrice').textContent = params.price || '0';
+            document.getElementById('contactNumber').textContent = params.contact || 'Not provided';
+            document.getElementById('whatsappNumber').textContent = params.whatsapp || 'Not provided';
+            document.getElementById('shopName').textContent = params.shop || 'ClothLoop Shop';
+            document.getElementById('shopAddress').textContent = params.address || 'Address not specified';
+            document.getElementById('termsConditions').textContent = params.terms || 'No specific terms';
+        }
+
+        // Initialize the page
+        function initPage() {
+            const params = getQueryParams();
+            
+            if (params.id) {
+                // If we have an ID, fetch complete details from server
+                fetchProductDetails(params.id);
+            } else {
+                // Otherwise use the URL parameters
+                populateFromUrlParams();
+            }
+        }
         
-        document.getElementById('clothTitle').textContent = params.title;
-        document.getElementById('clothDescription').textContent = params.description;
-        document.getElementById('clothSize').textContent = params.size;
-        document.getElementById('clothColor').textContent = params.color;
-        document.getElementById('clothPrice').textContent = params.price;
-        document.getElementById('contactNumber').textContent = params.contact;
-        document.getElementById('whatsappNumber').textContent = params.whatsapp;
-        document.getElementById('shopName').textContent = params.shop;
-        document.getElementById('shopAddress').textContent = params.address;
-        document.getElementById('termsConditions').textContent = params.terms;
+        // Call initialize when page loads
+        document.addEventListener('DOMContentLoaded', initPage);
 
         // Initialize counts
         let likeCount = 0;

@@ -153,6 +153,21 @@ function fetchAllProducts() {
     }
     
     try {
+        // Verify database connection
+        if ($conn->connect_error) {
+            throw new Exception("Database connection error: " . $conn->connect_error);
+        }
+
+        // Check if the cloth_details table exists
+        $tables_result = $conn->query("SHOW TABLES LIKE 'cloth_details'");
+        if (!$tables_result) {
+            throw new Exception("Error checking tables: " . $conn->error);
+        }
+        
+        if ($tables_result->num_rows === 0) {
+            throw new Exception("cloth_details table does not exist. Please run setup script first.");
+        }
+        
         // Get user type and ID from URL parameters or session
         $user_type = isset($_GET['user_type']) ? $_GET['user_type'] : 
                     (isset($_SESSION['user_type']) ? $_SESSION['user_type'] : 'buyer');
@@ -167,44 +182,27 @@ function fetchAllProducts() {
         $min_price = isset($_GET['min_price']) ? floatval($_GET['min_price']) : 0;
         $max_price = isset($_GET['max_price']) ? floatval($_GET['max_price']) : PHP_FLOAT_MAX;
         
-        // Build base query - check if cloth_details table exists first
-        $tables_query = "SHOW TABLES LIKE 'cloth_details'";
-        $tables_result = $conn->query($tables_query);
-        
-        if ($tables_result->num_rows > 0) {
-            // Use cloth_details table
-            $table_name = "cloth_details";
-            $title_field = "cloth_title";
-            $image_table = "cloth_images";
-            $product_id_field = "cloth_id";
-        } else {
-            // Fallback to products table
-            $table_name = "products";
-            $title_field = "name";
-            $image_table = "product_images";
-            $product_id_field = "product_id";
-        }
-        
-        // Build query
-        $sql = "SELECT p.* FROM $table_name p WHERE 1=1";
+        // Build query - directly use cloth_details table
+        $sql = "SELECT cd.* FROM cloth_details cd WHERE 1=1";
         
         // Add seller filter for sellers (only show their own products)
         if ($user_type === 'seller' && $user_id > 0) {
-            $sql .= " AND p.seller_id = $user_id";
+            $sql .= " AND cd.seller_id = $user_id";
         }
         
         // Add category filter if provided
         if (!empty($category)) {
-            $sql .= " AND p.category = '$category'";
+            $sql .= " AND cd.category = '$category'";
         }
         
         // Add price filter
-        $sql .= " AND p.rental_price >= $min_price";
+        $sql .= " AND cd.rental_price >= $min_price";
         if ($max_price < PHP_FLOAT_MAX) {
-            $sql .= " AND p.rental_price <= $max_price";
+            $sql .= " AND cd.rental_price <= $max_price";
         }
         
-        // Execute the query
+        // Execute the query with debugging
+        error_log("Executing SQL query: " . $sql);
         $result = $conn->query($sql);
         
         if (!$result) {
@@ -218,8 +216,8 @@ function fetchAllProducts() {
                 // Get product image (if available)
                 $image_data = '../../assets/images/placeholder.png'; // Default image
                 
-                // Try to get image from database
-                $img_query = "SELECT * FROM $image_table WHERE $product_id_field = {$row['id']} LIMIT 1";
+                // Try to get image from cloth_images table
+                $img_query = "SELECT * FROM cloth_images WHERE cloth_id = {$row['id']} LIMIT 1";
                 $img_result = $conn->query($img_query);
                 
                 if ($img_result && $img_result->num_rows > 0) {
@@ -229,24 +227,21 @@ function fetchAllProducts() {
                     if (isset($img_row['image_data'])) {
                         $image_type = $img_row['image_type'] ?? 'jpeg';
                         $image_data = 'data:image/' . $image_type . ';base64,' . base64_encode($img_row['image_data']);
-                    } 
-                    // Check if we have image_url field
-                    else if (isset($img_row['image_url'])) {
-                        $image_data = $img_row['image_url'];
                     }
                 }
                 
                 // Format the product data
                 $products[] = [
                     'id' => $row['id'],
-                    'title' => $row[$title_field] ?? $row['cloth_title'] ?? $row['name'] ?? '',
+                    'cloth_title' => $row['cloth_title'] ?? '',
+                    'title' => $row['cloth_title'] ?? '',  // Add title alias for consistency
                     'description' => $row['description'] ?? '',
                     'size' => $row['size'] ?? '',
                     'category' => $row['category'] ?? '',
-                    'rental_price' => $row['rental_price'] ?? $row['price'] ?? 0,
-                    'contact_number' => $row['contact_number'] ?? $row['contact'] ?? '',
-                    'whatsapp_number' => $row['whatsapp_number'] ?? $row['whatsapp'] ?? '',
-                    'terms_and_conditions' => $row['terms_and_conditions'] ?? $row['terms'] ?? '',
+                    'rental_price' => floatval($row['rental_price'] ?? 0),
+                    'contact_number' => $row['contact_number'] ?? '',
+                    'whatsapp_number' => $row['whatsapp_number'] ?? '',
+                    'terms_and_conditions' => $row['terms_and_conditions'] ?? '',
                     'created_at' => $row['created_at'] ?? date('Y-m-d H:i:s'),
                     'seller_id' => $row['seller_id'] ?? 0,
                     'shop_name' => 'ClothLoop Shop',  // Default shop name
@@ -259,7 +254,15 @@ function fetchAllProducts() {
         echo json_encode([
             'status' => 'success', 
             'products' => $products,
-            'count' => count($products)
+            'count' => count($products),
+            'debug' => [
+                'query' => $sql,
+                'user_type' => $user_type,
+                'user_id' => $user_id,
+                'result_rows' => $result->num_rows,
+                'php_version' => PHP_VERSION,
+                'mysql_version' => $conn->server_info
+            ]
         ]);
     } catch (Exception $e) {
         // Return error response
@@ -268,7 +271,9 @@ function fetchAllProducts() {
             'message' => 'Error fetching products: ' . $e->getMessage(),
             'debug' => [
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
+                'php_version' => PHP_VERSION,
+                'mysql_version' => $conn->server_info ?? 'Unknown'
             ]
         ]);
     }

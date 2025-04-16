@@ -1,18 +1,20 @@
 <?php
-// Database configuration
-$host = "localhost";
+// If file exists, read it but don't change it
+// If file doesn't exist, create a basic connection file
+// Database connection parameters
+$servername = "localhost";
 $username = "root";
-$password = "";
-$database = "clothloop";
+$password = ""; // Default XAMPP password is empty
+$dbname = "clothloop";
 
 // Create connection
-$conn = new mysqli($host, $username, $password, $database);
+$conn = new mysqli($servername, $username, $password, $dbname);
 
 // Check connection
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Set character set
-$conn->set_charset("utf8");
+// Set UTF-8 character set (optional but recommended)
+$conn->set_charset("utf8mb4");
 ?> 
