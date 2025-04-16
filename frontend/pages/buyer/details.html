@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cloth Details</title>
+    <title>Product Details</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
     <style>
@@ -16,147 +16,206 @@
             background-color: #f5f5f5;
         }
 
-        .details-container {
-            max-width: 1000px;
-            margin: 50px auto;
+        /* Modal Styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
             background-color: white;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            width: 95%;
+            max-width: 800px;
+            max-height: 90vh;
             border-radius: 8px;
             overflow: hidden;
             display: flex;
-            flex-direction: row;
-        }
-
-        .image-section, .info-section {
-            flex: 1;
-            padding: 20px;
-        }
-
-        .info-section {
-            display: flex;
             flex-direction: column;
-            justify-content: center;
-        }
-
-        .info-section h1 {
-            margin-top: 0;
-            font-size: 24px;
-        }
-
-        .info-section p {
-            margin: 10px 0;
-            font-size: 16px;
-        }
-
-        /* Like, Comment, Share, Save Section */
-        .interaction-section {
-            display: flex;
-            justify-content: space-around;
-            margin-top: 20px;
-            border-top: 1px solid #ccc;
-            padding-top: 20px;
             position: relative;
         }
 
-        .interaction-section button {
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .close-btn {
             background: none;
             border: none;
-            font-size: 16px;
+            font-size: 24px;
             cursor: pointer;
-            color: #555;
+        }
+
+        .modal-body {
             display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .interaction-section button i {
-            margin-bottom: 5px;
-        }
-
-        /* Count Text Styling */
-        .count-text {
-            font-size: 14px;
-            color: #888;
-            margin-top: 5px;
-        }
-
-        /* Comment Section */
-        .comments-container {
-            margin-top: 20px;
-        }
-
-        .comments-container textarea {
-            width: 100%;
-            padding: 10px;
-            font-size: 14px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            margin-bottom: 10px;
-        }
-
-        .comments-list {
-            list-style: none;
+            overflow-y: auto;
             padding: 0;
         }
 
-        .comments-list li {
-            background-color: #f5f5f5;
-            padding: 10px;
+        .image-section {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .image-section img {
+            max-width: 100%;
+            max-height: 400px;
+            object-fit: contain;
+            border-radius: 4px;
+        }
+
+        .info-section {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .product-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .product-price {
+            font-size: 24px;
+            color: #00aa5b;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
             margin-bottom: 10px;
-            border-radius: 5px;
+        }
+
+        .info-item i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+            color: #666;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin: 20px 0 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .description-text, .terms-text {
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .modal-footer {
+            padding: 15px 20px;
+            border-top: 1px solid #eee;
+            text-align: right;
+        }
+
+        .close-button {
+            background-color: #f0f0f0;
+            color: #333;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .close-button:hover {
+            background-color: #e0e0e0;
         }
 
         /* Responsive Styling */
         @media (max-width: 768px) {
-            .details-container {
+            .modal-body {
                 flex-direction: column;
+            }
+            
+            .image-section, .info-section {
+                flex: none;
+                width: 100%;
             }
         }
     </style>
     
 </head>
 <body>
-    <div class="details-container">
-        <div class="image-section">
-            <img src="" alt="Cloth Image" id="clothImage" style="width: 100%; border-radius: 5px;">
-        </div>
-        <div class="info-section">
-            <h1 id="clothTitle">Cloth Title</h1>
-            <p id="clothDescription">Description of the cloth will appear here.</p>
-            <p><strong>Size:</strong> <span id="clothSize"></span></p>
-            <p><strong>Color:</strong> <span id="clothColor"></span></p>
-            <p><strong>Rental Price:</strong> ₹<span id="clothPrice"></span>/day</p>
-            <p><strong>Contact No:</strong> <span id="contactNumber"></span></p>
-            <p><strong>Whatsapp No:</strong> <span id="whatsappNumber"></span></p>
-            <p><strong>Shop Name:</strong> <span id="shopName"></span></p>
-            <p><strong>Shop Address:</strong> <span id="shopAddress"></span></p>
-            <p><strong>Terms and Conditions:</strong> <span id="termsConditions"></span></p>
-            <p><strong></strong> <button onclick="openMap()"><i class="fas fa-map-marker-alt"></i><span>Location</span></button></p>
-            <!-- Like, Comment, Share, Save Section -->
-            <div class="interaction-section">
-                <button onclick="toggleLike()">
-                    <i class="far fa-thumbs-up" id="likeIcon"></i><span>Like</span>
-                    <div class="count-text" id="likeCount">0</div>
-                </button>
-                <button onclick="showCommentBox()">
-                    <i class="far fa-comment"></i><span>Comment</span>
-                    <div class="count-text" id="commentCount">0</div>
-                </button>
-                <button onclick="shareItem()">
-                    <i class="far fa-share-square"></i><span>Share</span>
-                    <div class="count-text" id="shareCount">0</div>
-                </button>
-                <button onclick="toggleSave()">
-                    <i class="far fa-bookmark" id="saveIcon"></i><span>Save</span>
-                    <div class="count-text" id="saveCount">0</div>
-                </button>
+    <div class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Product Details</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
             </div>
-
-            <!-- Comment Section -->
-            <div class="comments-container" id="commentBox" style="display:none;">
-                <textarea id="commentInput" placeholder="Add a comment..."></textarea>
-                <button onclick="addComment()">Post Comment</button>
-                <ul class="comments-list" id="commentsList"></ul>
+            <div class="modal-body">
+                <div class="image-section">
+                    <img src="" alt="Product Image" id="clothImage">
+                </div>
+                <div class="info-section">
+                    <h1 class="product-title" id="clothTitle">Product Title</h1>
+                    <div class="product-price">₹<span id="clothPrice">0.00</span>/day</div>
+                    
+                    <div class="product-specs">
+                        <div class="info-item">
+                            <i class="fas fa-tshirt"></i>
+                            <span id="clothSize">M</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-tag"></i>
+                            <span id="clothCategory">Men</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-phone"></i>
+                            <span id="contactNumber">1234567890</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fab fa-whatsapp"></i>
+                            <span id="whatsappNumber">1234567890</span>
+                        </div>
+                    </div>
+                    
+                    <h3 class="section-title">Description</h3>
+                    <p class="description-text" id="clothDescription">Product description will appear here.</p>
+                    
+                    <h3 class="section-title">Terms & Conditions</h3>
+                    <p class="terms-text" id="termsConditions">Terms and conditions will appear here.</p>
+                    
+                    <div class="info-item" style="display: none;">
+                        <i class="fas fa-store"></i>
+                        <span id="shopName">Shop Name</span>
+                    </div>
+                    <div class="info-item" style="display: none;">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span id="shopAddress">Shop Address</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="close-button" onclick="closeModal()">Close</button>
             </div>
         </div>
     </div>
@@ -179,8 +238,14 @@
                 shop: params.get('shop'),
                 address: params.get('address'),
                 terms: params.get('terms'),
-                seller_id: params.get('seller_id')
+                seller_id: params.get('seller_id'),
+                category: params.get('category')
             };
+        }
+
+        // Close modal and return to previous page
+        function closeModal() {
+            window.history.back();
         }
 
         // Fetch complete product details from the server
@@ -265,7 +330,7 @@
             document.getElementById('clothTitle').textContent = product.title || product.cloth_title || 'Product';
             document.getElementById('clothDescription').textContent = product.description || 'No description available';
             document.getElementById('clothSize').textContent = product.size || 'Not specified';
-            document.getElementById('clothColor').textContent = product.color || 'Not specified';
+            document.getElementById('clothCategory').textContent = product.category || 'Not specified';
             document.getElementById('clothPrice').textContent = product.rental_price || product.rentalPrice || '0';
             document.getElementById('contactNumber').textContent = product.contact_number || product.contactNo || 'Not provided';
             document.getElementById('whatsappNumber').textContent = product.whatsapp_number || product.whatsappNo || 'Not provided';
@@ -320,7 +385,7 @@
             document.getElementById('clothTitle').textContent = params.title || 'Product';
             document.getElementById('clothDescription').textContent = params.description || 'No description available';
             document.getElementById('clothSize').textContent = params.size || 'Not specified';
-            document.getElementById('clothColor').textContent = params.color || 'Not specified';
+            document.getElementById('clothCategory').textContent = params.category || 'Not specified';
             document.getElementById('clothPrice').textContent = params.price || '0';
             document.getElementById('contactNumber').textContent = params.contact || 'Not provided';
             document.getElementById('whatsappNumber').textContent = params.whatsapp || 'Not provided';
@@ -340,66 +405,17 @@
                 // Otherwise use the URL parameters
                 populateFromUrlParams();
             }
+
+            // Handle ESC key to close modal
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape') {
+                    closeModal();
+                }
+            });
         }
         
         // Call initialize when page loads
         document.addEventListener('DOMContentLoaded', initPage);
-
-        // Initialize counts
-        let likeCount = 0;
-        let commentCount = 0;
-        let shareCount = 0;
-        let saveCount = 0;
-
-        // Like functionality
-        let liked = false;
-        function toggleLike() {
-            liked = !liked;
-            document.getElementById('likeIcon').className = liked ? 'fas fa-thumbs-up' : 'far fa-thumbs-up';
-            likeCount += liked ? 1 : -1;
-            document.getElementById('likeCount').textContent = likeCount;
-        }
-
-        // Save functionality
-        let saved = false;
-        function toggleSave() {
-            saved = !saved;
-            document.getElementById('saveIcon').className = saved ? 'fas fa-bookmark' : 'far fa-bookmark';
-            saveCount += saved ? 1 : -1;
-            document.getElementById('saveCount').textContent = saveCount;
-        }
-
-        // Share functionality
-        function shareItem() {
-            shareCount++;
-            document.getElementById('shareCount').textContent = shareCount;
-            alert("Item shared successfully!");
-        }
-
-        // Comment functionality
-        function showCommentBox() {
-            document.getElementById('commentBox').style.display = 'block';
-        }
-
-        function addComment() {
-            const commentInput = document.getElementById('commentInput');
-            const commentText = commentInput.value;
-            if (commentText) {
-                commentCount++;
-                document.getElementById('commentCount').textContent = commentCount;
-                const commentItem = document.createElement('li');
-                commentItem.textContent = commentText;
-                document.getElementById('commentsList').appendChild(commentItem);
-                commentInput.value = ''; // Clear the input
-            }
-        }
-
-        // Open Google Maps for the location
-        function openMap() {
-            const location = params.location; // Get the location from the URL parameters
-            const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`;
-            window.open(googleMapsUrl, '_blank');
-        }
     </script>
 </body>
 </html>

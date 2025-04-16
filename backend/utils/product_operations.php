@@ -175,6 +175,19 @@ function fetchAllProducts() {
         $user_id = isset($_GET['user_id']) ? intval($_GET['user_id']) : 
                   (isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 0);
         
+        // Clear any existing session seller data when accessing as buyer
+        if ($user_type === 'buyer' && isset($_SESSION['user_type']) && $_SESSION['user_type'] === 'seller') {
+            // Only for this request - don't change the actual session
+            $user_type = 'buyer';
+            $user_id = 0;
+        }
+        
+        // Force showing all products if explicitly requesting as buyer
+        if (isset($_GET['user_type']) && $_GET['user_type'] === 'buyer') {
+            $user_type = 'buyer';
+            $user_id = 0;
+        }
+        
         // Category filter (optional)
         $category = isset($_GET['category']) ? $conn->real_escape_string($_GET['category']) : '';
         
@@ -186,6 +199,7 @@ function fetchAllProducts() {
         $sql = "SELECT cd.* FROM cloth_details cd WHERE 1=1";
         
         // Add seller filter for sellers (only show their own products)
+        // IMPORTANT: Only filter by seller_id if user_type is 'seller' AND user_id is valid
         if ($user_type === 'seller' && $user_id > 0) {
             $sql .= " AND cd.seller_id = $user_id";
         }
@@ -228,6 +242,12 @@ function fetchAllProducts() {
                         $image_type = $img_row['image_type'] ?? 'jpeg';
                         $image_data = 'data:image/' . $image_type . ';base64,' . base64_encode($img_row['image_data']);
                     }
+                }
+                
+                // If no image in cloth_images, try the direct cloth_photo field
+                if ($image_data == '../../assets/images/placeholder.png' && !empty($row['cloth_photo'])) {
+                    $image_type = $row['photo_type'] ?? 'jpeg';
+                    $image_data = 'data:image/' . $image_type . ';base64,' . base64_encode($row['cloth_photo']);
                 }
                 
                 // Format the product data

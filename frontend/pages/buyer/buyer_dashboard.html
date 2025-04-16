@@ -537,13 +537,32 @@
                 </button>
                 <div class="sort-dropdown" id="sortDropdown">
                     <div class="sort-option" data-sort="clear">
-                        <i class="fas fa-times"></i> Clear Sort
+                        <i class="fas fa-times"></i> Clear All Filters
                     </div>
                     <div class="sort-option" data-sort="price-low">
                         <i class="fas fa-sort-amount-down"></i> Price: Low to High
                     </div>
                     <div class="sort-option" data-sort="price-high">
                         <i class="fas fa-sort-amount-up"></i> Price: High to Low
+                    </div>
+                    <div class="price-filter-option">
+                        <hr style="margin: 8px 0; border-top: 1px solid #eee;">
+                        <div style="padding: 10px 15px; font-size: 14px; font-weight: 500;">
+                            <i class="fas fa-filter"></i> Price Range
+                        </div>
+                        <div style="padding: 5px 15px 15px;">
+                            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                                <span style="margin-right: 10px; font-size: 13px;">Min: ₹</span>
+                                <input type="number" id="minPriceFilter" placeholder="0" style="padding: 6px; width: 100%; border: 1px solid #ddd; border-radius: 4px;">
+                            </div>
+                            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                                <span style="margin-right: 10px; font-size: 13px;">Max: ₹</span>
+                                <input type="number" id="maxPriceFilter" placeholder="Any" style="padding: 6px; width: 100%; border: 1px solid #ddd; border-radius: 4px;">
+                            </div>
+                            <button id="applyPriceFilter" style="width: 100%; background-color: #ff3e6c; color: white; border: none; padding: 8px; border-radius: 4px; cursor: pointer; font-weight: 500;">
+                                Apply
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -737,12 +756,30 @@
         // Sort products
         function sortProducts(sortType, savePreference = true) {
             if (sortType === 'clear') {
+                // Reset sorting
                 currentSort = '';
                 sortButton.innerHTML = `<i class="fas fa-sort"></i> Sort`;
                 
-                // Clear saved preference
+                // Clear saved preferences
                 if (savePreference) {
                     localStorage.removeItem('clothloopSortPreference');
+                    localStorage.removeItem('clothloopMinPrice');
+                    localStorage.removeItem('clothloopMaxPrice');
+                    
+                    // Clear input fields
+                    document.getElementById('minPriceFilter').value = '';
+                    document.getElementById('maxPriceFilter').value = '';
+                }
+                
+                // Reset URL parameters
+                const url = new URL(window.location.href);
+                const params = new URLSearchParams();
+                window.history.replaceState({}, '', url.pathname);
+                
+                // Reload products from server without filters
+                if (savePreference) {
+                    loadProducts();
+                    return; // Skip the normal applyFiltersAndSort since we're reloading
                 }
             } else {
                 currentSort = sortType;
@@ -808,17 +845,32 @@
                 '/backend/utils/product_operations.php'              // Direct from root
             ];
             
-            let url = possiblePaths[0] + '?operation=fetch_all';
+            // Always use fetch_all operation and explicitly set user_type to 'buyer'
+            // This ensures we always get all products regardless of session state
+            let url = possiblePaths[0] + '?operation=fetch_all&user_type=buyer';
             
-            // Add user params if available
-            if (userId && userType) {
-                url += `&user_id=${userId}&user_type=${userType}`;
-            }
+            // Add price filter parameters if available
+            const minPrice = document.getElementById('minPriceFilter').value;
+            const maxPrice = document.getElementById('maxPriceFilter').value;
+            
+            if (minPrice) url += `&min_price=${minPrice}`;
+            if (maxPrice) url += `&max_price=${maxPrice}`;
+            
+            // Add timestamp to prevent caching - this is crucial to avoid cached responses
+            url += `&timestamp=${new Date().getTime()}`;
             
             console.log('Attempting to fetch products from:', url);
             
-            // Fetch products from backend
-            fetch(url)
+            // Fetch products from backend with no-cache headers
+            fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Cache-Control': 'no-cache, no-store, must-revalidate',
+                    'Pragma': 'no-cache',
+                    'Expires': '0'
+                },
+                credentials: 'same-origin' // Include session cookies but force fresh session check
+            })
                 .then(response => {
                     console.log('Response status:', response.status);
                     if (!response.ok) {
@@ -842,7 +894,8 @@
                             // Check if this is just a product ID without image data
                             // In that case, get the image directly from the image API
                             if (product.id && (!imagePath || imagePath.includes('placeholder.png'))) {
-                                imagePath = `/ClothLoop/backend/api/image_display.php?type=cloth&id=${product.id}`;
+                                // Add timestamp to prevent caching
+                                imagePath = `/ClothLoop/backend/api/image_display.php?type=cloth&id=${product.id}&t=${new Date().getTime()}`;
                                 console.log(`Using image API URL for product ${product.id}`);
                             }
                             // No path conversion needed for base64 images or full URLs
@@ -1233,10 +1286,98 @@
         
         // Load products when the page loads
         document.addEventListener("DOMContentLoaded", function() {
+            // Load saved price filters first
+            loadSavedPriceFilters();
+            
+            // Load products from server
             loadProducts();
+            
             // Load saved preferences after a short delay to ensure products are loaded
             setTimeout(loadSavedPreferences, 300);
         });
+        
+        // Add event listener for price filter button
+        document.getElementById('applyPriceFilter').addEventListener('click', function() {
+            applyPriceFilter();
+            sortDropdown.classList.remove('active');
+        });
+        
+        // Function to apply price filter
+        function applyPriceFilter() {
+            const minPrice = document.getElementById('minPriceFilter').value;
+            const maxPrice = document.getElementById('maxPriceFilter').value;
+            
+            // Only apply filter if at least one value is provided
+            if (minPrice || maxPrice) {
+                // Save values to localStorage
+                if (minPrice) localStorage.setItem('clothloopMinPrice', minPrice);
+                if (maxPrice) localStorage.setItem('clothloopMaxPrice', maxPrice);
+                
+                // Update URL with price filter parameters without page reload
+                const url = new URL(window.location.href);
+                const params = new URLSearchParams(url.search);
+                
+                if (minPrice) params.set('min_price', minPrice);
+                else params.delete('min_price');
+                
+                if (maxPrice) params.set('max_price', maxPrice);
+                else params.delete('max_price');
+                
+                // Update the URL without page reload
+                window.history.replaceState({}, '', `${url.pathname}?${params.toString()}`);
+                
+                // Apply client-side filtering for immediate feedback
+                filterProductsByPrice();
+                
+                // Show visual feedback that filter is applied
+                sortButton.innerHTML = `<i class="fas fa-filter"></i> Filtered`;
+                
+                // Also reload products with the price filter
+                loadProducts();
+            }
+        }
+        
+        // Function to filter products by price on client side
+        function filterProductsByPrice() {
+            const minPrice = parseFloat(document.getElementById('minPriceFilter').value) || 0;
+            const maxPrice = parseFloat(document.getElementById('maxPriceFilter').value) || Infinity;
+            
+            filteredProducts = allProducts.filter(product => {
+                const price = parseFloat(product.rental_price);
+                return price >= minPrice && price <= maxPrice;
+            });
+            
+            renderProducts(filteredProducts);
+        }
+        
+        // Load saved price filters
+        function loadSavedPriceFilters() {
+            const savedMinPrice = localStorage.getItem('clothloopMinPrice');
+            const savedMaxPrice = localStorage.getItem('clothloopMaxPrice');
+            
+            if (savedMinPrice) {
+                document.getElementById('minPriceFilter').value = savedMinPrice;
+            }
+            
+            if (savedMaxPrice) {
+                document.getElementById('maxPriceFilter').value = savedMaxPrice;
+            }
+            
+            // Apply filters if they exist
+            if (savedMinPrice || savedMaxPrice) {
+                // Update URL with price filter parameters
+                const url = new URL(window.location.href);
+                const params = new URLSearchParams(url.search);
+                
+                if (savedMinPrice) params.set('min_price', savedMinPrice);
+                if (savedMaxPrice) params.set('max_price', savedMaxPrice);
+                
+                window.history.replaceState({}, '', `${url.pathname}?${params.toString()}`);
+                
+                // Show visual feedback that filter is applied
+                sortButton.innerHTML = `<i class="fas fa-filter"></i> Filtered`;
+            }
+        }
     </script>
 </body>
 </html>
