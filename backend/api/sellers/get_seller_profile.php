@@ -5,12 +5,13 @@ error_reporting(E_ALL);
 
 // Start session
 session_start();
+header('Content-Type: application/json');
 
 // Check if user is logged in
-if (!isset($_SESSION['user_id'])) {
+if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] !== 'seller') {
     echo json_encode([
         'status' => 'error',
-        'message' => 'User not logged in'
+        'message' => 'Unauthorized access. Please login as a seller.'
     ]);
     exit;
 }
@@ -18,49 +19,81 @@ if (!isset($_SESSION['user_id'])) {
 // Include database connection
 require_once '../../config/db_connect.php';
 
-// Get user ID from session
-$userId = $_SESSION['user_id'];
-
 try {
-    // Prepare and execute query to get seller information
-    $query = "SELECT u.username, u.email, u.phone, s.shop_name, s.shop_address, s.profile_image 
-              FROM users u 
-              LEFT JOIN sellers s ON u.id = s.user_id 
-              WHERE u.id = ?";
-    $stmt = $conn->prepare($query);
-    $stmt->bind_param("i", $userId);
+    // Get seller ID from session
+    $sellerId = $_SESSION['user_id'];
+    
+    // Prepare SQL to fetch seller details
+    $stmt = $conn->prepare("SELECT id, name, email, phone_no, shop_name, shop_address, shop_location, shop_logo, shop_bio FROM sellers WHERE id = ?");
+    $stmt->bind_param("i", $sellerId);
     $stmt->execute();
     $result = $stmt->get_result();
     
-    if ($result->num_rows > 0) {
-        // Fetch seller data
-        $seller = $result->fetch_assoc();
-        
-        // The profile_image is now directly stored as base64 in the database,
-        // so no path modification is needed
-        
-        // Return success response with seller data
-        echo json_encode([
-            'status' => 'success',
-            'seller' => $seller
-        ]);
-    } else {
-        // No seller found with this ID
+    if ($result->num_rows === 0) {
         echo json_encode([
             'status' => 'error',
-            'message' => 'Seller not found'
+            'message' => 'Seller profile not found.'
         ]);
+        exit;
     }
     
-    // Close statement and connection
-    $stmt->close();
-    $conn->close();
+    // Fetch seller data
+    $seller = $result->fetch_assoc();
+    
+    // Format data for response
+    $response = [
+        'status' => 'success',
+        'seller' => [
+            'id' => $seller['id'],
+            'username' => $seller['name'],
+            'email' => $seller['email'],
+            'phone' => $seller['phone_no'],
+            'shop_name' => $seller['shop_name'],
+            'shop_address' => $seller['shop_address'],
+            'shop_location' => $seller['shop_location'],
+            'shop_bio' => $seller['shop_bio'],
+            'profile_image' => null
+        ]
+    ];
+    
+    // Handle profile image (shop logo)
+    if (!empty($seller['shop_logo'])) {
+        $imagePath = '../../../' . $seller['shop_logo'];
+        if (file_exists($imagePath)) {
+            // Get file information
+            $fileInfo = pathinfo($imagePath);
+            $extension = strtolower($fileInfo['extension']);
+            
+            // Determine MIME type
+            $mimeTypes = [
+                'jpg' => 'image/jpeg',
+                'jpeg' => 'image/jpeg',
+                'png' => 'image/png',
+                'gif' => 'image/gif',
+                'webp' => 'image/webp'
+            ];
+            
+            $mimeType = isset($mimeTypes[$extension]) ? $mimeTypes[$extension] : 'application/octet-stream';
+            
+            // Read file and convert to base64
+            $imageData = file_get_contents($imagePath);
+            $base64Image = 'data:' . $mimeType . ';base64,' . base64_encode($imageData);
+            
+            // Add to response
+            $response['seller']['profile_image'] = $base64Image;
+        }
+    }
+    
+    // Return the response
+    echo json_encode($response);
     
 } catch (Exception $e) {
-    // Return error response
     echo json_encode([
         'status' => 'error',
-        'message' => 'Database error: ' . $e->getMessage()
+        'message' => 'Error fetching seller profile: ' . $e->getMessage()
     ]);
 }
+
+// Close connection
+$conn->close();
 ?> 

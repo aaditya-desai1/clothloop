@@ -35,88 +35,97 @@ try {
     // Include database connection
     require_once '../../config/db_connect.php';
     
-    // Get and validate POST data
-    $raw_data = file_get_contents('php://input');
-    if (empty($raw_data)) {
-        throw new Exception("No data received");
-    }
-    
-    $data = json_decode($raw_data, true);
-    if (!$data || json_last_error() !== JSON_ERROR_NONE) {
-        throw new Exception("Invalid JSON data: " . json_last_error_msg());
-    }
-    
-    // Check if required fields are present
-    if (!isset($data['email']) || !isset($data['password'])) {
-        throw new Exception("Email and password are required");
-    }
-    
-    $email = $data['email'];
-    $password = $data['password'];
-    
-    // Log login attempt (for debugging)
-    error_log("Login attempt for email: " . $email);
-    
-    // Check database connection
-    if (!isset($conn) || $conn->connect_error) {
-        error_log("Database connection error in login.php");
-        throw new Exception("Database connection failed. Please try again later.");
-    }
-    
-    // Prepare SQL statement with parameterized query
-    // Try to find user by email
-    $stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
-    if (!$stmt) {
-        throw new Exception("Database query preparation failed: " . $conn->error);
-    }
-    
-    $stmt->bind_param("s", $email);
-    if (!$stmt->execute()) {
-        throw new Exception("Query execution failed: " . $stmt->error);
-    }
-    
-    $result = $stmt->get_result();
-    
-    if ($result->num_rows > 0) {
-        $user = $result->fetch_assoc();
+    // Initialize response
+    $response = [
+        'success' => false,
+        'message' => '',
+        'user_id' => null,
+        'user_type' => null
+    ];
+
+    // Get JSON input
+    $input = json_decode(file_get_contents('php://input'), true);
+
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        // Get login credentials
+        $email = isset($input['email']) ? trim($input['email']) : '';
+        $password = isset($input['password']) ? $input['password'] : '';
+        $destination = isset($input['destination']) ? $input['destination'] : null;
         
-        // First try with password_verify (for hashed passwords)
-        $password_correct = password_verify($password, $user['password']);
-        
-        // If that fails, try direct comparison (for plain text passwords - not recommended)
-        if (!$password_correct && $password === $user['password']) {
-            $password_correct = true;
-            // Log that password is stored in plain text (security issue)
-            error_log("WARNING: User {$email} has plain text password stored!");
+        // Validate inputs
+        if (empty($email) || empty($password)) {
+            $response['message'] = 'Email and password are required';
+            echo json_encode($response);
+            exit;
         }
         
-        if ($password_correct) {
-            // Set session variables
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['email'] = $user['email'];
-            $_SESSION['username'] = $user['username'];
-            $_SESSION['user_type'] = $user['user_type'];
+        // First check buyers table
+        $buyerStmt = $conn->prepare("SELECT id, name, email, password, phone_no FROM buyers WHERE email = ?");
+        $buyerStmt->bind_param("s", $email);
+        $buyerStmt->execute();
+        $buyerResult = $buyerStmt->get_result();
+        
+        if ($buyerResult->num_rows > 0) {
+            // User found in buyers table
+            $buyer = $buyerResult->fetch_assoc();
             
-            // Return success response with user type
-            echo json_encode([
-                'success' => true,
-                'user_type' => $user['user_type'],
-                'user_id' => $user['id'],
-                'message' => 'Login successful'
-            ]);
+            // Verify password
+            if (password_verify($password, $buyer['password'])) {
+                // Password is correct
+                $response['success'] = true;
+                $response['message'] = 'Login successful as buyer';
+                $response['user_id'] = $buyer['id'];
+                $response['user_type'] = 'buyer';
+                
+                // Start session and store user data
+                $_SESSION['user_id'] = $buyer['id'];
+                $_SESSION['user_type'] = 'buyer';
+                $_SESSION['user_name'] = $buyer['name'];
+                $_SESSION['user_email'] = $buyer['email'];
+            } else {
+                // Invalid password
+                $response['message'] = 'Invalid email or password';
+            }
         } else {
-            error_log("Password verification failed for user: {$email}");
-            throw new Exception("Invalid password. Please try again.");
+            // Check sellers table
+            $sellerStmt = $conn->prepare("SELECT id, name, email, password, phone_no, shop_name FROM sellers WHERE email = ?");
+            $sellerStmt->bind_param("s", $email);
+            $sellerStmt->execute();
+            $sellerResult = $sellerStmt->get_result();
+            
+            if ($sellerResult->num_rows > 0) {
+                // User found in sellers table
+                $seller = $sellerResult->fetch_assoc();
+                
+                // Verify password
+                if (password_verify($password, $seller['password'])) {
+                    // Password is correct
+                    $response['success'] = true;
+                    $response['message'] = 'Login successful as seller';
+                    $response['user_id'] = $seller['id'];
+                    $response['user_type'] = 'seller';
+                    
+                    // Start session and store user data
+                    $_SESSION['user_id'] = $seller['id'];
+                    $_SESSION['user_type'] = 'seller';
+                    $_SESSION['user_name'] = $seller['name'];
+                    $_SESSION['user_email'] = $seller['email'];
+                    $_SESSION['shop_name'] = $seller['shop_name'];
+                } else {
+                    // Invalid password
+                    $response['message'] = 'Invalid email or password';
+                }
+            } else {
+                // User not found in either table
+                $response['message'] = 'Invalid email or password';
+            }
         }
     } else {
-        error_log("User not found: {$email}");
-        throw new Exception("User not found. Please check your email or register a new account.");
+        $response['message'] = 'Invalid request method';
     }
-    
-    // Close resources
-    if (isset($stmt)) {
-        $stmt->close();
-    }
+
+    // Return JSON response
+    echo json_encode($response);
     
 } catch (Exception $e) {
     // Log the error

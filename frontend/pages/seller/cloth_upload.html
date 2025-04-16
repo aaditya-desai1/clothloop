@@ -114,6 +114,45 @@
             margin-right: 5px;
         }
         
+        /* Profile dropdown styles */
+        .profile-dropdown {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        .profile-dropdown img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 10px;
+        }
+        .profile-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            min-width: 180px;
+            display: none;
+            z-index: 100;
+        }
+        .profile-menu.show {
+            display: block;
+        }
+        .profile-menu a {
+            display: block;
+            padding: 10px 15px;
+            text-decoration: none;
+            color: #333;
+            transition: background-color 0.3s;
+        }
+        .profile-menu a:hover {
+            background-color: #f5f5f5;
+        }
+        
         /* Alert styles */
         .alert {
             padding: 15px;
@@ -138,9 +177,16 @@
         <a href="seller_dashboard.html" class="back-button">
             <i class="fas fa-arrow-left"></i> Back to Dashboard
         </a>
-        <a href="../account/login.html" class="logout-button" onclick="handleLogout()">
-            <i class="fas fa-sign-out-alt"></i> Logout
-        </a>
+        <div class="profile-dropdown">
+            <img src="../../../assets/images/default-profile.jpg" alt="Profile Image" id="profileImage">
+            <span class="seller-name">Seller</span>
+            <i class="fas fa-chevron-down"></i>
+            <div class="profile-menu">
+                <a href="seller_profile.html"><i class="fas fa-user"></i> My Profile</a>
+                <a href="seller_dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                <a href="#" onclick="handleLogout(); return false;"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+        </div>
     </div>
 
     <!-- Alert messages -->
@@ -162,198 +208,239 @@
         </div>
         <div class="right-column">
             <h1>Add New Cloth</h1>
-            <form id="clothForm">
-                <div class="form-group">
-                    <label for="title">Cloth Title</label>
-                    <input type="text" id="title" required />
+            <div class="form-container">
+                <h2>Add New Item</h2>
+                
+                <!-- Success and Error Alert Messages -->
+                <div id="successAlert" class="alert alert-success" style="display: none;">
+                    Item added successfully! Redirecting to dashboard...
                 </div>
-                <div class="form-group">
-                    <label for="description">Description</label>
-                    <textarea id="description" required></textarea>
+                
+                <div id="errorAlert" class="alert alert-danger" style="display: none;">
+                    <span id="errorMessage">Error occurred</span>
                 </div>
-                <div class="form-group">
-                    <label for="category">Category</label>
-                    <select id="category" required>
-                        <option value="">Select Category</option>
-                        <option value="Formal">Formal</option>
-                        <option value="Casual">Casual</option>
-                        <option value="Wedding">Wedding</option>
-                        <option value="Traditional">Traditional</option>
-                        <option value="Ethnic">Ethnic</option>
-                        <option value="Western">Western</option>
-                        <option value="Other">Other</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="size">Size</label>
-                    <input type="text" id="size" required />
-                </div>
-                <div class="form-group">
-                    <label for="rental_price">Rental Price (₹/day)</label>
-                    <input type="number" id="rental_price" required />
-                </div>
-                <div class="form-group">
-                    <label for="contact_number">Contact No</label>
-                    <input type="text" id="contact_number" required />
-                </div>
-                <div class="form-group">
-                    <label for="whatsapp_number">WhatsApp No</label>
-                    <input type="text" id="whatsapp_number" required />
-                </div>
-                <div class="form-group">
-                    <label for="terms">Terms and Conditions</label>
-                    <textarea id="terms" required></textarea>
-                </div>
-                <div class="button-container">
-                    <button type="submit" id="submitBtn">Add Item</button>
-                </div>
-            </form>
+                
+                <form id="clothForm" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="title">Cloth Title</label>
+                        <input type="text" id="title" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea id="description" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="category">Category</label>
+                        <select id="category" required>
+                            <option value="">Select Category</option>
+                            <option value="Formal">Formal</option>
+                            <option value="Casual">Casual</option>
+                            <option value="Wedding">Wedding</option>
+                            <option value="Traditional">Traditional</option>
+                            <option value="Ethnic">Ethnic</option>
+                            <option value="Western">Western</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="size">Size</label>
+                        <input type="text" id="size" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="rental_price">Rental Price (₹/day)</label>
+                        <input type="number" id="rental_price" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="contact_number">Contact No</label>
+                        <input type="text" id="contact_number" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="whatsapp_number">WhatsApp No</label>
+                        <input type="text" id="whatsapp_number" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="terms">Terms and Conditions</label>
+                        <textarea id="terms" required></textarea>
+                    </div>
+                    <div class="button-container">
+                        <button type="submit" id="submitBtn">Add Item</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
     <script>
         // Check if user is logged in
         document.addEventListener('DOMContentLoaded', function() {
-            const userId = localStorage.getItem('userId');
-            const userType = localStorage.getItem('userType');
-            
-            if (!userId || userType !== 'seller') {
-                alert('You must be logged in as a seller to access this page');
+            const userId = localStorage.getItem('userId') || sessionStorage.getItem('userId');
+            if (!userId) {
                 window.location.href = '../account/login.html';
+                return;
             }
+            
+            // Initialize profile dropdown
+            initProfileDropdown();
+            
+            // Fetch and display seller information
+            fetchSellerProfile();
+            
+            // Setup form submission
+            document.getElementById('clothForm').addEventListener('submit', handleFormSubmission);
         });
         
-        // Image upload preview
-        function previewImages() {
-            const files = document.getElementById('images').files;
-            const preview = document.getElementById('imagePreview');
-            preview.innerHTML = '';
-            for (let i = 0; i < files.length && i < 5; i++) { // Limit to 5 images
-                const img = document.createElement('img');
-                img.src = URL.createObjectURL(files[i]);
-                preview.appendChild(img);
-            }
+        // Dropdown menu functionality
+        function initProfileDropdown() {
+            const dropdown = document.querySelector('.profile-dropdown');
+            const menu = document.querySelector('.profile-menu');
+            
+            dropdown.addEventListener('click', function(e) {
+                menu.classList.toggle('show');
+                e.stopPropagation();
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!dropdown.contains(e.target)) {
+                    menu.classList.remove('show');
+                }
+            });
+        }
+        
+        // Fetch seller profile information
+        function fetchSellerProfile() {
+            fetch('../../../backend/api/sellers/get_seller_profile.php')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Server returned status: ' + response.status);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.status === 'success') {
+                        // Update profile information
+                        document.querySelector('.seller-name').textContent = data.seller.username || 'Seller';
+                        
+                        // Update profile image if available
+                        if (data.seller.profile_image) {
+                            document.getElementById('profileImage').src = data.seller.profile_image;
+                        }
+                    } else {
+                        console.error('Error fetching seller profile:', data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching profile:', error);
+                });
         }
         
         // Handle form submission
-        document.getElementById('clothForm').addEventListener('submit', function(e) {
+        function handleFormSubmission(e) {
             e.preventDefault();
+            
+            // Hide any existing alerts
+            document.getElementById('successAlert').style.display = 'none';
+            document.getElementById('errorAlert').style.display = 'none';
             
             // Get form data
             const title = document.getElementById('title').value;
             const description = document.getElementById('description').value;
             const category = document.getElementById('category').value;
             const size = document.getElementById('size').value;
-            const rental_price = document.getElementById('rental_price').value;
-            const contact_number = document.getElementById('contact_number').value;
-            const whatsapp_number = document.getElementById('whatsapp_number').value;
+            const rentalPrice = document.getElementById('rental_price').value;
+            const contactNumber = document.getElementById('contact_number').value;
+            const whatsappNumber = document.getElementById('whatsapp_number').value;
             const terms = document.getElementById('terms').value;
+            const images = document.getElementById('images').files;
             
-            // Get seller info from localStorage
-            const seller_id = localStorage.getItem('userId');
-            
-            // Validate form
-            if (!title || !description || !category || !size || !rental_price || !contact_number || !whatsapp_number || !terms) {
+            // Validate form data
+            if (!title || !description || !category || !size || !rentalPrice || !contactNumber || !whatsappNumber || !terms) {
                 showError('Please fill in all required fields');
                 return;
             }
             
-            // Validate image
-            const images = document.getElementById('images').files;
             if (images.length === 0) {
-                showError('Please select at least one image');
+                showError('Please upload at least one image');
                 return;
             }
             
-            // Disable submit button while processing
-            const submitBtn = document.getElementById('submitBtn');
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Adding...';
-            
-            // Create FormData object
+            // Create form data object
             const formData = new FormData();
-            formData.append('title', title);
+            formData.append('seller_id', localStorage.getItem('userId') || sessionStorage.getItem('userId'));
+            formData.append('clothTitle', title);
             formData.append('description', description);
             formData.append('category', category);
             formData.append('size', size);
-            formData.append('rental_price', rental_price);
-            formData.append('contact_number', contact_number);
-            formData.append('whatsapp_number', whatsapp_number);
-            formData.append('terms_and_conditions', terms);
-            formData.append('seller_id', seller_id);
+            formData.append('rentalPrice', rentalPrice);
+            formData.append('contactNo', contactNumber);
+            formData.append('whatsappNo', whatsappNumber);
+            formData.append('terms', terms);
             
-            // Add image file
-            formData.append('image', images[0]);
+            // Append image file
+            formData.append('clothImage', images[0]);
             
-            // Log FormData contents for debugging
-            console.log('FormData contains:');
-            for(let pair of formData.entries()) {
-                console.log(pair[0] + ': ' + (pair[0] === 'image' ? '[File]' : pair[1]));
-            }
-            
-            // Send data to server - USE NEW BACKEND FILE
-            fetch('../../backend/products_fix.php?operation=add', {
+            // Send data to server
+            fetch('../../../backend/api/sellers/upload_cloth.php', {
                 method: 'POST',
                 body: formData
             })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok: ' + response.status);
-                }
-                return response.json();
-            })
+            .then(response => response.json())
             .then(data => {
-                console.log('Success:', data);
                 if (data.status === 'success') {
-                    showSuccess();
+                    // Show success message
+                    document.getElementById('successAlert').style.display = 'block';
+                    
                     // Reset form
                     document.getElementById('clothForm').reset();
-                    document.getElementById('imagePreview').innerHTML = '';
+                    document.querySelector('.image-preview').innerHTML = '';
+                    
+                    // Redirect to dashboard after a delay
+                    setTimeout(() => {
+                        window.location.href = 'seller_dashboard.html';
+                    }, 2000);
                 } else {
-                    showError(data.message || 'Error adding cloth');
-                    console.error('API Error:', data);
+                    showError(data.message || 'Failed to add cloth');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                showError('An error occurred while adding the cloth: ' + error.message);
-            })
-            .finally(() => {
-                // Re-enable submit button
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Add Item';
+                showError('An error occurred. Please try again later.');
             });
-        });
-        
-        // Show success message
-        function showSuccess() {
-            const alert = document.getElementById('successAlert');
-            alert.style.display = 'block';
-            
-            // Auto-hide after 5 seconds
-            setTimeout(() => {
-                alert.style.display = 'none';
-            }, 5000);
         }
         
-        // Show error message
+        // Display error message
         function showError(message) {
-            const alert = document.getElementById('errorAlert');
+            const errorAlert = document.getElementById('errorAlert');
             document.getElementById('errorMessage').textContent = message;
-            alert.style.display = 'block';
+            errorAlert.style.display = 'block';
             
-            // Auto-hide after 5 seconds
-            setTimeout(() => {
-                alert.style.display = 'none';
-            }, 5000);
+            // Scroll to error message
+            errorAlert.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
         
         // Handle logout
         function handleLogout() {
+            // Clear storage
             localStorage.removeItem('userId');
+            sessionStorage.removeItem('userId');
             localStorage.removeItem('userType');
-            localStorage.removeItem('username');
-            // Redirection happens via the href
+            sessionStorage.removeItem('userType');
+            
+            // Redirect to login page
+            window.location.href = '../account/login.html';
+        }
+
+        // Image upload preview
+        function previewImages() {
+            const files = document.getElementById('images').files;
+            const preview = document.getElementById('imagePreview');
+            preview.innerHTML = '';
+            
+            for (let i = 0; i < files.length && i < 5; i++) { // Limit to 5 images
+                const img = document.createElement('img');
+                img.src = URL.createObjectURL(files[i]);
+                preview.appendChild(img);
+            }
         }
     </script>
 </body>

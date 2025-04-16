@@ -419,6 +419,27 @@
     .image-upload-container {
       text-align: center;
     }
+
+    .form-group .help-text {
+      font-size: 12px;
+      color: #666;
+      margin-top: 5px;
+      font-style: italic;
+    }
+
+    .form-group textarea#shopBio {
+      resize: vertical;
+      min-height: 100px;
+      font-family: sans-serif;
+      line-height: 1.5;
+    }
+
+    .character-count {
+      text-align: right;
+      font-size: 12px;
+      color: #666;
+      margin-top: 5px;
+    }
   </style>
 </head>
 <body>
@@ -477,7 +498,7 @@
             <img id="profileImagePreview" class="profile-image-preview" src="../../assets/images/shop_logo.png" alt="Profile Picture">
             <div class="upload-btn-wrapper">
               <button type="button" class="upload-btn">Upload New Picture</button>
-              <input type="file" id="profilePicture" accept="image/*" onchange="previewImage(event)">
+              <input type="file" id="profilePicture" name="profile_image" accept="image/*" onchange="previewImage(event)">
             </div>
           </div>
         </div>
@@ -487,51 +508,105 @@
           <input type="text" id="username" name="username" required>
         </div>
         
-      <div class="form-group">
-        <label for="email">Email:</label>
+        <div class="form-group">
+          <label for="email">Email:</label>
           <input type="email" id="email" name="email" required>
-      </div>
+        </div>
         
-      <div class="form-group">
-        <label for="phone">Phone Number:</label>
+        <div class="form-group">
+          <label for="phone">Phone Number:</label>
           <input type="tel" id="phone" name="phone" required>
-      </div>
+        </div>
         
-      <div class="form-group">
+        <div class="form-group">
           <label for="shopName">Shop Name:</label>
-          <input type="text" id="shopName" name="shopName" required>
-      </div>
+          <input type="text" id="shopName" name="shop_name" required>
+        </div>
         
-      <div class="form-group">
+        <div class="form-group">
+          <label for="shopBio">Shop Bio:</label>
+          <textarea id="shopBio" name="shop_bio" rows="4" placeholder="Tell customers about your shop..." maxlength="500" onkeyup="updateCharCount()"></textarea>
+          <div class="character-count"><span id="bioCharCount">0</span>/500 characters</div>
+          <div class="help-text">Describe your shop, services, and specialty.</div>
+        </div>
+        
+        <div class="form-group">
           <label for="shopAddress">Shop Address:</label>
-          <textarea id="shopAddress" name="shopAddress" required></textarea>
-      </div>
+          <textarea id="shopAddress" name="shop_address" required></textarea>
+        </div>
         
-      <div class="form-group">
+        <div class="form-group">
           <label for="password">Password:</label>
           <input type="password" id="password" name="password" placeholder="Leave blank to keep current password">
-      </div>
+        </div>
         
-      <div class="form-group">
+        <div class="form-group">
           <label for="confirmPassword">Confirm Password:</label>
           <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Leave blank to keep current password">
-      </div>
+        </div>
         
         <div class="button-group">
           <button type="button" class="back-btn" onclick="window.location.href='seller_dashboard.html'">Back to Dashboard</button>
           <button type="submit" class="save-btn">Update Profile</button>
-      </div>
+        </div>
       </form>
     </main>
   </div>
   
   <script>
+    // Ensure updateCharCount is available in global scope
+    function updateCharCount() {
+      const shopBio = document.getElementById('shopBio');
+      const charCount = document.getElementById('bioCharCount');
+      if (shopBio && charCount) {
+        const count = shopBio.value.length;
+        
+        charCount.textContent = count;
+        
+        // Add visual indication when approaching limit
+        if (count > 450) {
+          charCount.style.color = '#e74c3c';
+        } else if (count > 400) {
+          charCount.style.color = '#f39c12';
+        } else {
+          charCount.style.color = '#666';
+        }
+      }
+    }
+    
+    // Function to preview profile image
+    function previewImage(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          document.getElementById('profileImagePreview').src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+    
     document.addEventListener('DOMContentLoaded', function() {
       // DOM Elements
       const profileForm = document.getElementById('profileForm');
       const alertMessage = document.getElementById('alertMessage');
       const navSellerName = document.getElementById('navSellerName');
       const navProfileImage = document.getElementById('navProfileImage');
+      const userProfile = document.querySelector('.user-profile');
+      
+      // Profile dropdown functionality
+      if (userProfile) {
+        userProfile.addEventListener('click', function(e) {
+          console.log('Profile clicked');
+          this.classList.toggle('active');
+          e.stopPropagation();
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function() {
+          userProfile.classList.remove('active');
+        });
+      }
       
       // Show loading message
       showAlert('Loading profile data...', 'info');
@@ -539,65 +614,79 @@
       // Fetch seller profile data
       fetchSellerProfile();
       
-      // User profile dropdown
-      document.querySelector('.user-profile').addEventListener('click', function(e) {
-        this.classList.toggle('active');
-        e.stopPropagation();
-      });
-      
-      // Close dropdown when clicking outside
-      document.addEventListener('click', function() {
-        document.querySelector('.user-profile').classList.remove('active');
-      });
-      
       // Handle logout
-      document.querySelector('.dropdown-menu a[href="../account/login.html"]').addEventListener('click', function() {
-        // Clear user data
-        localStorage.removeItem('user_id');
-        sessionStorage.clear();
-      });
+      const logoutLink = document.querySelector('.dropdown-menu a[href="../account/login.html"]');
+      if (logoutLink) {
+        logoutLink.addEventListener('click', function() {
+          // Clear user data
+          localStorage.removeItem('user_id');
+          sessionStorage.clear();
+        });
+      }
       
       // Form submission
-      profileForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        // Validate passwords if provided
-        const password = document.getElementById('password').value;
-        const confirmPassword = document.getElementById('confirmPassword').value;
-        
-        if (password && password !== confirmPassword) {
-          showAlert('Passwords do not match!', 'danger');
-          return;
-        }
-        
-        // Get form data
-        const formData = new FormData();
-        formData.append('username', document.getElementById('username').value);
-        formData.append('email', document.getElementById('email').value);
-        formData.append('phone', document.getElementById('phone').value);
-        formData.append('shopName', document.getElementById('shopName').value);
-        formData.append('shopAddress', document.getElementById('shopAddress').value);
-        
-        if (password) {
-          formData.append('password', password);
-          formData.append('confirmPassword', confirmPassword);
-        }
-        
-        // Append profile picture if selected
-        const profilePicInput = document.getElementById('profilePicture');
-        if (profilePicInput.files.length > 0) {
-          formData.append('profilePicture', profilePicInput.files[0]);
-        }
-        
-        // Show loading message
-        showAlert('Updating profile...', 'info');
-        
-        // Update profile in database
-        updateProfile(formData);
-      });
+      if (profileForm) {
+        profileForm.addEventListener('submit', function(e) {
+          e.preventDefault();
+          
+          // Validate passwords if provided
+          const password = document.getElementById('password').value;
+          const confirmPassword = document.getElementById('confirmPassword').value;
+          
+          if (password && password !== confirmPassword) {
+            showAlert('Passwords do not match!', 'danger');
+            return;
+          }
+          
+          // Validate shop bio length
+          const shopBio = document.getElementById('shopBio').value;
+          if (shopBio && shopBio.length > 500) {
+            showAlert('Shop bio should be less than 500 characters.', 'danger');
+            return;
+          }
+          
+          // Get form data
+          const formData = new FormData();
+          formData.append('username', document.getElementById('username').value);
+          formData.append('email', document.getElementById('email').value);
+          formData.append('phone', document.getElementById('phone').value);
+          formData.append('shop_name', document.getElementById('shopName').value);
+          formData.append('shop_address', document.getElementById('shopAddress').value);
+          formData.append('shop_bio', document.getElementById('shopBio').value);
+          
+          if (password) {
+            formData.append('password', password);
+            formData.append('confirm_password', confirmPassword);
+          }
+          
+          // Append profile picture if selected
+          const profilePicInput = document.getElementById('profilePicture');
+          if (profilePicInput.files.length > 0) {
+            formData.append('profile_image', profilePicInput.files[0]);
+          }
+          
+          // Show loading message
+          showAlert('Updating profile...', 'info');
+          
+          // Update profile in database
+          updateProfile(formData);
+        });
+      }
       
       // Function to fetch seller profile from database
       function fetchSellerProfile() {
+        // First try to get data from sessionStorage to show immediately
+        const cachedData = sessionStorage.getItem('sellerData');
+        if (cachedData) {
+          try {
+            const sellerData = JSON.parse(cachedData);
+            populateFormWithData(sellerData);
+          } catch (e) {
+            console.error('Error parsing cached data:', e);
+          }
+        }
+        
+        // Then fetch fresh data from server
         fetch('../../../backend/api/sellers/get_seller_profile.php')
           .then(response => {
             if (!response.ok) {
@@ -606,29 +695,24 @@
             return response.json();
           })
           .then(data => {
+            console.log('Profile data received:', data);
             if (data.status === 'success') {
               // Clear alert
               alertMessage.style.display = 'none';
               
+              // Update sessionStorage with fresh data
+              sessionStorage.setItem('sellerData', JSON.stringify(data.seller));
+              
               // Fill form with seller data
-              document.getElementById('username').value = data.seller.username || '';
-              document.getElementById('email').value = data.seller.email || '';
-              document.getElementById('phone').value = data.seller.phone || '';
-              document.getElementById('shopName').value = data.seller.shop_name || '';
-              document.getElementById('shopAddress').value = data.seller.shop_address || '';
-              
-              // Update navigation elements
-              navSellerName.textContent = data.seller.username || 'Seller';
-              
-              // Update profile images if available
-              if (data.seller.profile_image) {
-                // The image is now a base64 string, we can use it directly
-                document.getElementById('profileImagePreview').src = data.seller.profile_image;
-                navProfileImage.src = data.seller.profile_image;
-              }
+              populateFormWithData(data.seller);
             } else {
               showAlert('Error loading profile data: ' + (data.message || 'Unknown error'), 'danger');
               console.error('Error from server:', data);
+              
+              // If unauthorized, redirect to login
+              if (data.message && (data.message.includes('Unauthorized') || data.message.includes('login'))) {
+                window.location.href = '../account/login.html';
+              }
             }
           })
           .catch(error => {
@@ -637,33 +721,44 @@
           });
       }
       
+      // Function to populate form with seller data
+      function populateFormWithData(sellerData) {
+        if (!sellerData) return;
+        
+        if (document.getElementById('username')) 
+          document.getElementById('username').value = sellerData.username || '';
+        if (document.getElementById('email')) 
+          document.getElementById('email').value = sellerData.email || '';
+        if (document.getElementById('phone')) 
+          document.getElementById('phone').value = sellerData.phone || '';
+        if (document.getElementById('shopName')) 
+          document.getElementById('shopName').value = sellerData.shop_name || '';
+        if (document.getElementById('shopAddress')) 
+          document.getElementById('shopAddress').value = sellerData.shop_address || '';
+        if (document.getElementById('shopBio')) {
+          document.getElementById('shopBio').value = sellerData.shop_bio || '';
+          updateCharCount(); // Update character count after setting shop bio
+        }
+        
+        // Update navigation elements
+        if (navSellerName) {
+          navSellerName.textContent = sellerData.username || 'Seller';
+        }
+        
+        // Update profile images if available
+        if (sellerData.profile_image) {
+          console.log('Setting profile image:', sellerData.profile_image.substring(0, 30) + '...');
+          if (document.getElementById('profileImagePreview')) {
+            document.getElementById('profileImagePreview').src = sellerData.profile_image;
+          }
+          if (navProfileImage) {
+            navProfileImage.src = sellerData.profile_image;
+          }
+        }
+      }
+      
       // Function to update profile in database
       function updateProfile(formData) {
-        // Make sure we use the correct field names expected by the backend
-        if (formData.has('shopName')) {
-          const shopName = formData.get('shopName');
-          formData.delete('shopName');
-          formData.append('shop_name', shopName);
-        }
-        
-        if (formData.has('shopAddress')) {
-          const shopAddress = formData.get('shopAddress');
-          formData.delete('shopAddress');
-          formData.append('shop_address', shopAddress);
-        }
-        
-        if (formData.has('confirmPassword')) {
-          const confirmPassword = formData.get('confirmPassword');
-          formData.delete('confirmPassword');
-          formData.append('confirm_password', confirmPassword);
-        }
-        
-        if (formData.has('profilePicture')) {
-          const profilePic = formData.get('profilePicture');
-          formData.delete('profilePicture');
-          formData.append('profile_image', profilePic);
-        }
-
         fetch('../../../backend/api/sellers/update_seller_profile.php', {
           method: 'POST',
           body: formData
@@ -674,16 +769,48 @@
               showAlert('Profile updated successfully!', 'success');
               
               // Update navigation elements with new data
-              navSellerName.textContent = formData.get('username');
+              const username = formData.get('username');
+              if (navSellerName) {
+                navSellerName.textContent = username;
+              }
               
               // Update profile image if it was provided
               if (data.profileImageUrl) {
-                navProfileImage.src = data.profileImageUrl;
+                const profileImage = document.getElementById('profileImagePreview').src;
+                if (navProfileImage) {
+                  navProfileImage.src = profileImage;
+                }
+              }
+              
+              // Update session storage with new data
+              const cachedData = sessionStorage.getItem('sellerData');
+              if (cachedData) {
+                try {
+                  const sellerData = JSON.parse(cachedData);
+                  sellerData.username = formData.get('username');
+                  sellerData.email = formData.get('email');
+                  sellerData.phone = formData.get('phone');
+                  sellerData.shop_name = formData.get('shop_name');
+                  sellerData.shop_address = formData.get('shop_address');
+                  sellerData.shop_bio = formData.get('shop_bio');
+                  
+                  if (data.profileImageUrl) {
+                    sellerData.profile_image = document.getElementById('profileImagePreview').src;
+                  }
+                  
+                  sessionStorage.setItem('sellerData', JSON.stringify(sellerData));
+                } catch (e) {
+                  console.error('Error updating session storage:', e);
+                }
               }
               
               // Clear password fields
-              document.getElementById('password').value = '';
-              document.getElementById('confirmPassword').value = '';
+              if (document.getElementById('password')) {
+                document.getElementById('password').value = '';
+              }
+              if (document.getElementById('confirmPassword')) {
+                document.getElementById('confirmPassword').value = '';
+              }
             } else {
               showAlert('Error updating profile: ' + data.message, 'danger');
             }
@@ -696,14 +823,11 @@
       
       // Function to show alert messages
       function showAlert(message, type) {
+        if (!alertMessage) return;
+        
         alertMessage.textContent = message;
         alertMessage.className = 'alert alert-' + type;
         alertMessage.style.display = 'block';
-        alertMessage.style.padding = '15px';
-        alertMessage.style.margin = '0 auto 20px auto';
-        alertMessage.style.maxWidth = '600px';
-        alertMessage.style.textAlign = 'center';
-        alertMessage.style.fontWeight = 'bold';
         
         // Add specific colors based on type
         if (type === 'danger') {
@@ -730,19 +854,10 @@
           }, 5000);
         }
       }
+      
+      // Initialize character counter
+      updateCharCount();
     });
-    
-    // Function to preview profile image
-    function previewImage(event) {
-      const file = event.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          document.getElementById('profileImagePreview').src = e.target.result;
-        };
-        reader.readAsDataURL(file);
-      }
-    }
   </script>
 </body>
 </html> 
