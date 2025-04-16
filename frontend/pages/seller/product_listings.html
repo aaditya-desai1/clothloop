@@ -845,6 +845,135 @@
     .btn-danger:hover {
       background-color: #c0392b;
     }
+
+    /* Product Placeholder */
+    .placeholder-image {
+      width: 100%;
+      height: 100%;
+      background-color: var(--secondary-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+    }
+    
+    .placeholder-image i {
+      font-size: 48px;
+      margin-bottom: 10px;
+    }
+    
+    .placeholder-image p {
+      font-size: 14px;
+    }
+    
+    img.product-placeholder {
+      background-color: var(--secondary-color);
+      object-fit: contain;
+      object-position: center;
+    }
+    
+    .product-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      max-height: 280px;
+      transition: transform 0.3s ease;
+    }
+    
+    /* Fallback for failed images */
+    .product-image img[src="../../assets/images/placeholder.png"] {
+      padding: 20px;
+      background-color: var(--secondary-color);
+    }
+
+    /* Alert styles */
+    .alert {
+      padding: 15px 20px;
+      margin-bottom: 20px;
+      border-radius: var(--border-radius);
+      position: relative;
+    }
+    
+    .alert-success {
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    
+    .alert-danger {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+    
+    .alert-warning {
+      background-color: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffeeba;
+    }
+    
+    /* Spinner */
+    .loading-spinner {
+      display: none;
+      background-color: rgba(255, 255, 255, 0.8);
+      z-index: 3000;
+    }
+    
+    /* Product Image Placeholders */
+    .product-image {
+      position: relative;
+    }
+    
+    .placeholder-image {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background-color: var(--secondary-color);
+      color: var(--text-secondary);
+      z-index: 1;
+    }
+    
+    .placeholder-image i {
+      font-size: 48px;
+      margin-bottom: 10px;
+      color: var(--primary-color);
+    }
+    
+    .placeholder-image p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      text-align: center;
+      max-width: 80%;
+    }
+    
+    .product-image img {
+      position: relative;
+      z-index: 2;
+      background-color: transparent;
+    }
+    
+    /* Fix modal styles */
+    .view-modal, .delete-modal {
+      opacity: 1;
+      visibility: visible;
+      display: none;
+    }
+    
+    .view-modal.active, .delete-modal.active {
+      display: flex;
+    }
+    
+    /* Fix button hover states */
+    .product-actions button {
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -1449,12 +1578,18 @@
           productCard.className = 'product-card';
           productCard.setAttribute('data-id', product.id);
           
-          // Get image URL for cloth
-          const imageUrl = `../../../backend/api/sellers/get_cloth_image.php?id=${product.id}`;
+          // Get image URL for cloth - add timestamp to prevent caching
+          const imageUrl = `../../../backend/api/sellers/get_cloth_image.php?id=${product.id}&t=${new Date().getTime()}`;
           
           productCard.innerHTML = `
             <div class="product-image">
-              <img src="${imageUrl}" alt="${product.cloth_title}" />
+              <div class="placeholder-image">
+                <i class="fas fa-tshirt"></i>
+                <p>Loading image...</p>
+              </div>
+              <img src="${imageUrl}" alt="${product.cloth_title}" style="display:none;" 
+                   onload="this.style.display='block'; this.previousElementSibling.style.display='none';" 
+                   onerror="this.style.display='none'; this.previousElementSibling.querySelector('p').textContent='No image available';" />
             </div>
             <div class="product-details">
               <h3>${product.cloth_title}</h3>
@@ -1464,14 +1599,39 @@
               </div>
               <p class="product-description">${shortDescription}</p>
               <div class="product-actions">
-                <button class="edit-btn" onclick="editProduct(${product.id})">Edit</button>
-                <button class="view-btn" onclick="viewProduct(${product.id})">View</button>
-                <button class="delete-btn" onclick="confirmDelete(${product.id})">Delete</button>
+                <button type="button" class="edit-btn" onclick="editProduct(${product.id})">Edit</button>
+                <button type="button" class="view-btn" onclick="viewProduct(${product.id})">View</button>
+                <button type="button" class="delete-btn" onclick="confirmDelete(${product.id})">Delete</button>
               </div>
             </div>
           `;
           
           productGrid.appendChild(productCard);
+        });
+        
+        // Add global event handler for view, edit and delete buttons
+        document.querySelectorAll('.view-btn').forEach(btn => {
+          btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const productId = this.closest('.product-card').getAttribute('data-id');
+            viewProduct(productId);
+          });
+        });
+        
+        document.querySelectorAll('.edit-btn').forEach(btn => {
+          btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const productId = this.closest('.product-card').getAttribute('data-id');
+            editProduct(productId);
+          });
+        });
+        
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+          btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const productId = this.closest('.product-card').getAttribute('data-id');
+            confirmDelete(productId);
+          });
         });
       }
 
@@ -1497,11 +1657,46 @@
         document.getElementById('viewProductDescription').textContent = product.description;
         document.getElementById('viewProductTerms').textContent = product.terms_conditions;
         
-        // Set product image
-        document.getElementById('viewProductImage').src = `../../../backend/api/sellers/get_cloth_image.php?id=${id}`;
+        // Create a placeholder first
+        const imageContainer = document.querySelector('.view-product-image');
+        imageContainer.innerHTML = `
+          <div class="placeholder-image">
+            <i class="fas fa-tshirt"></i>
+            <p>Loading image...</p>
+          </div>
+          <img id="viewProductImage" src="" alt="Product Image" style="display:none;">
+        `;
         
-        // Show the modal
+        // Set image with timestamp to prevent caching
+        const viewProductImage = document.getElementById('viewProductImage');
+        viewProductImage.src = `../../../backend/api/sellers/get_cloth_image.php?id=${id}&t=${new Date().getTime()}`;
+        
+        // When image loads, hide placeholder
+        viewProductImage.onload = function() {
+          this.style.display = 'block';
+          this.previousElementSibling.style.display = 'none';
+        };
+        
+        // If image fails to load, show fallback
+        viewProductImage.onerror = function() {
+          this.style.display = 'none';
+          this.previousElementSibling.querySelector('p').textContent = 'No image available';
+        };
+        
+        // Show the modal - use active class instead of flex display
+        viewModal.classList.add('active');
         viewModal.style.display = 'flex';
+        
+        // Make sure close buttons work
+        document.getElementById('closeViewModal').onclick = function() {
+          viewModal.classList.remove('active');
+          viewModal.style.display = 'none';
+        };
+        
+        document.getElementById('closeViewBtn').onclick = function() {
+          viewModal.classList.remove('active');
+          viewModal.style.display = 'none';
+        };
       }
       
       // Edit product
@@ -1519,27 +1714,42 @@
         // Set the current product ID for form submission
         currentProductId = id;
         
-        // Populate the form with product details
-        document.getElementById('clothTitle').value = product.cloth_title;
-        document.getElementById('description').value = product.description;
-        document.getElementById('size').value = product.size;
+        // Populate the form with product details - handle possible undefined values
+        document.getElementById('clothTitle').value = product.cloth_title || '';
+        document.getElementById('description').value = product.description || '';
+        document.getElementById('size').value = product.size || '';
         
         // Set the correct radio button for category
         const categoryRadios = document.querySelectorAll('input[name="category"]');
+        let categoryFound = false;
         categoryRadios.forEach(radio => {
           if (radio.value === product.category) {
             radio.checked = true;
+            categoryFound = true;
           }
         });
         
-        document.getElementById('rentalPrice').value = product.rental_price;
-        document.getElementById('contactNo').value = product.contact_no;
-        document.getElementById('whatsappNo').value = product.whatsapp_no;
-        document.getElementById('terms').value = product.terms_conditions;
+        // If no matching category found, select the first option
+        if (!categoryFound && categoryRadios.length > 0) {
+          categoryRadios[0].checked = true;
+        }
         
-        // Show a preview of the current image
-        previewImage.src = `../../../backend/api/sellers/get_cloth_image.php?id=${id}`;
+        document.getElementById('rentalPrice').value = product.rental_price || '';
+        document.getElementById('contactNo').value = product.contact_no || '';
+        document.getElementById('whatsappNo').value = product.whatsapp_no || '';
+        document.getElementById('terms').value = product.terms_conditions || '';
+        
+        // Show a preview of the current image with timestamp to prevent caching
+        previewImage.src = `../../../backend/api/sellers/get_cloth_image.php?id=${id}&t=${new Date().getTime()}`;
         previewImage.style.display = 'block';
+        
+        // Add an error handler for the image
+        previewImage.onerror = function() {
+          // If image fails to load, show a placeholder
+          this.src = '';
+          this.style.display = 'none';
+          showAlert('Product image could not be loaded', 'warning');
+        };
         
         // Update form title
         document.querySelector('.popup-header h2').textContent = 'Edit Cloth Item';
@@ -1555,12 +1765,19 @@
         // Store the product ID to delete
         currentProductId = id;
         
-        // Show the confirmation modal
+        // Show the confirmation modal - use active class
+        deleteModal.classList.add('active');
         deleteModal.style.display = 'flex';
         
         // Set up confirm button
         document.getElementById('confirmDeleteBtn').onclick = function() {
           deleteProduct(currentProductId);
+        };
+        
+        // Set up cancel button
+        document.getElementById('cancelDeleteBtn').onclick = function() {
+          deleteModal.classList.remove('active');
+          deleteModal.style.display = 'none';
         };
       }
       
@@ -1591,6 +1808,7 @@
           }
           
           // Hide the delete modal
+          deleteModal.classList.remove('active');
           deleteModal.style.display = 'none';
         })
         .catch(error => {
@@ -1599,6 +1817,7 @@
           console.error('Delete error:', error);
           
           // Hide the delete modal
+          deleteModal.classList.remove('active');
           deleteModal.style.display = 'none';
         });
       }
@@ -1654,6 +1873,37 @@
           spinner.style.display = 'none';
         }
       }
+
+      // Event listeners for modal closings
+      closeViewModal.addEventListener('click', function() {
+        viewModal.style.display = 'none';
+      });
+      
+      closeViewBtn.addEventListener('click', function() {
+        viewModal.style.display = 'none';
+      });
+      
+      cancelDeleteBtn.addEventListener('click', function() {
+        deleteModal.style.display = 'none';
+      });
+      
+      // Close modals when clicking outside them
+      viewModal.addEventListener('click', function(e) {
+        if (e.target === viewModal) {
+          viewModal.style.display = 'none';
+        }
+      });
+      
+      deleteModal.addEventListener('click', function(e) {
+        if (e.target === deleteModal) {
+          deleteModal.style.display = 'none';
+        }
+      });
+
+      // Make window functions globally available
+      window.viewProduct = viewProduct;
+      window.editProduct = editProduct;
+      window.confirmDelete = confirmDelete;
     });
   </script>
 </body>
