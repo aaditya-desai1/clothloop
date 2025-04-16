@@ -8,126 +8,182 @@ require_once '../../config/db_connect.php';
 
 session_start();
 
-// Check if the form is submitted
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+// Initialize response array
+$response = [
+    'success' => false,
+    'message' => '',
+    'errors' => []
+];
+
+// Check if the form was submitted via POST
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Get form data
-    $username = $_POST['username'];
-    $email = $_POST['email'];
+    $username = trim($_POST['username']);
+    $email = trim($_POST['email']);
     $password = $_POST['password'];
-    $confirm_password = $_POST['confirm_password'];
-    $phone = $_POST['phone'];
-    $user_type = $_POST['user_type'];
+    $phone = trim($_POST['phone']);
+    $userType = $_POST['user_type']; // 'buyer' or 'seller'
     
-    // Validate data
-    $errors = array();
-    
-    // Validate username
+    // Basic validation
     if (empty($username)) {
-        $errors[] = "Username is required";
+        $response['errors'][] = 'Username is required';
     }
     
-    // Validate email
     if (empty($email)) {
-        $errors[] = "Email is required";
+        $response['errors'][] = 'Email is required';
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $errors[] = "Invalid email format";
+        $response['errors'][] = 'Invalid email format';
     }
     
-    // Check if email already exists
-    $check_email = $conn->prepare("SELECT * FROM users WHERE email = ?");
-    $check_email->bind_param("s", $email);
-    $check_email->execute();
-    $result = $check_email->get_result();
-    if ($result->num_rows > 0) {
-        $errors[] = "Email already exists";
-    }
-    
-    // Validate password
     if (empty($password)) {
-        $errors[] = "Password is required";
+        $response['errors'][] = 'Password is required';
     } elseif (strlen($password) < 8) {
-        $errors[] = "Password must be at least 8 characters";
+        $response['errors'][] = 'Password must be at least 8 characters';
     }
     
-    // Validate confirm password
-    if ($password !== $confirm_password) {
-        $errors[] = "Passwords do not match";
-    }
-    
-    // Validate phone
     if (empty($phone)) {
-        $errors[] = "Phone number is required";
-    } elseif (!preg_match("/^\d{10}$/", $phone)) {
-        $errors[] = "Phone number must be 10 digits";
+        $response['errors'][] = 'Phone number is required';
+    } elseif (!preg_match('/^\d{10}$/', $phone)) {
+        $response['errors'][] = 'Invalid phone number format (must be 10 digits)';
     }
     
-    // Check for seller-specific fields if user is a seller
-    if ($user_type === "seller") {
-        $shop_name = $_POST['shop_name'] ?? '';
-        $shop_address = $_POST['shop_address'] ?? '';
-        $latitude = $_POST['shop_latitude'] ?? '';
-        $longitude = $_POST['shop_longitude'] ?? '';
+    // Check if email already exists in either buyers or sellers table
+    $checkBuyerEmail = $conn->prepare("SELECT id FROM buyers WHERE email = ?");
+    $checkBuyerEmail->bind_param("s", $email);
+    $checkBuyerEmail->execute();
+    $buyerResult = $checkBuyerEmail->get_result();
+    
+    $checkSellerEmail = $conn->prepare("SELECT id FROM sellers WHERE email = ?");
+    $checkSellerEmail->bind_param("s", $email);
+    $checkSellerEmail->execute();
+    $sellerResult = $checkSellerEmail->get_result();
+    
+    if ($buyerResult->num_rows > 0 || $sellerResult->num_rows > 0) {
+        $response['errors'][] = 'Email already exists. Please use a different email or login.';
+    }
+    
+    // Additional validation for seller account
+    if ($userType === 'seller') {
+        $shopName = trim($_POST['shop_name']);
+        $shopAddress = trim($_POST['shop_address']);
+        $shopLatitude = $_POST['shop_latitude'];
+        $shopLongitude = $_POST['shop_longitude'];
+        $shopBio = trim($_POST['shop_bio']);
         
-        if (empty($shop_name)) {
-            $errors[] = "Shop name is required";
+        // Validate required seller fields
+        if (empty($shopName)) {
+            $response['errors'][] = 'Shop name is required';
         }
         
-        if (empty($shop_address)) {
-            $errors[] = "Shop address is required";
+        if (empty($shopAddress)) {
+            $response['errors'][] = 'Shop address is required';
         }
         
-        if (empty($latitude) || empty($longitude)) {
-            $errors[] = "Shop location is required";
+        if (empty($shopLatitude) || empty($shopLongitude)) {
+            $response['errors'][] = 'Shop location is required';
+        }
+        
+        if (empty($shopBio)) {
+            $response['errors'][] = 'Shop bio is required';
+        }
+        
+        // Handle shop logo upload
+        $shopLogoPath = null;
+        if (isset($_FILES['shop_logo']) && $_FILES['shop_logo']['error'] === UPLOAD_ERR_OK) {
+            $fileInfo = pathinfo($_FILES['shop_logo']['name']);
+            $fileExtension = strtolower($fileInfo['extension']);
+            
+            // Validate file extension
+            $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+            if (!in_array($fileExtension, $allowedExtensions)) {
+                $response['errors'][] = 'Invalid file format. Only JPG, JPEG, PNG, GIF, and WEBP files are allowed.';
+            }
+            
+            // Validate file size (max 2MB)
+            if ($_FILES['shop_logo']['size'] > 2 * 1024 * 1024) {
+                $response['errors'][] = 'File size exceeds the maximum limit of 2MB.';
+            }
+            
+            // Process file upload if no errors
+            if (empty($response['errors'])) {
+                // Create upload directory if it doesn't exist
+                $uploadDir = '../../../frontend/assets/images/shop_logos/';
+                if (!file_exists($uploadDir)) {
+                    mkdir($uploadDir, 0777, true);
+                }
+                
+                // Generate unique filename
+                $newFileName = uniqid('shop_logo_') . '.' . $fileExtension;
+                $shopLogoPath = 'frontend/assets/images/shop_logos/' . $newFileName;
+                $uploadPath = $uploadDir . $newFileName;
+                
+                // Move uploaded file
+                if (!move_uploaded_file($_FILES['shop_logo']['tmp_name'], $uploadPath)) {
+                    $response['errors'][] = 'Failed to upload logo. Please try again.';
+                }
+            }
+        } else {
+            $response['errors'][] = 'Shop logo is required';
         }
     }
     
-    // If no errors, proceed with registration
-    if (empty($errors)) {
-        // Hash the password
-        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+    // Process registration if no errors
+    if (empty($response['errors'])) {
+        // Hash password
+        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
         
         // Start transaction
         $conn->begin_transaction();
         
         try {
-            // Insert user into users table
-            $insert_user = $conn->prepare("INSERT INTO users (username, email, password, phone, user_type) VALUES (?, ?, ?, ?, ?)");
-            $insert_user->bind_param("sssss", $username, $email, $hashed_password, $phone, $user_type);
-            $insert_user->execute();
-            
-            // Get the user ID
-            $user_id = $conn->insert_id;
-            
-            // Insert user type specific details
-            if ($user_type === "buyer") {
-                // Insert into buyer_details table
-                $insert_buyer = $conn->prepare("INSERT INTO buyer_details (user_id) VALUES (?)");
-                $insert_buyer->bind_param("i", $user_id);
-                $insert_buyer->execute();
-            } else if ($user_type === "seller") {
-                // Insert into seller_details table
-                $insert_seller = $conn->prepare("INSERT INTO seller_details (user_id, shop_name, shop_address, latitude, longitude) VALUES (?, ?, ?, ?, ?)");
-                $insert_seller->bind_param("issdd", $user_id, $shop_name, $shop_address, $latitude, $longitude);
-                $insert_seller->execute();
+            if ($userType === 'buyer') {
+                // Insert into buyers table
+                $insertBuyer = $conn->prepare("INSERT INTO buyers (name, email, password, phone_no) VALUES (?, ?, ?, ?)");
+                $insertBuyer->bind_param("ssss", $username, $email, $hashedPassword, $phone);
+                $insertBuyer->execute();
+                
+                if ($insertBuyer->affected_rows <= 0) {
+                    throw new Exception("Failed to create buyer account");
+                }
+                
+                $response['success'] = true;
+                $response['message'] = 'Registration successful! You can now login as a buyer.';
+            } else {
+                // Insert into sellers table
+                $insertSeller = $conn->prepare("INSERT INTO sellers (name, email, password, phone_no, shop_name, shop_address, shop_location, shop_logo, shop_bio) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                $shopLocation = $shopLatitude . ',' . $shopLongitude; // Combine lat/long for storage
+                $insertSeller->bind_param("sssssssss", $username, $email, $hashedPassword, $phone, $shopName, $shopAddress, $shopLocation, $shopLogoPath, $shopBio);
+                $insertSeller->execute();
+                
+                if ($insertSeller->affected_rows <= 0) {
+                    throw new Exception("Failed to create seller account");
+                }
+                
+                $response['success'] = true;
+                $response['message'] = 'Registration successful! You can now login as a seller.';
             }
             
-            // Commit the transaction
+            // Commit transaction
             $conn->commit();
-            
-            // Registration successful
-            echo "Registration successful";
         } catch (Exception $e) {
-            // Rollback transaction if something failed
+            // Rollback transaction on error
             $conn->rollback();
-            echo "Registration failed: " . $e->getMessage();
+            
+            // Delete uploaded file if exists
+            if ($userType === 'seller' && $shopLogoPath && file_exists($uploadPath)) {
+                unlink($uploadPath);
+            }
+            
+            $response['errors'][] = 'Registration failed: ' . $e->getMessage();
         }
-    } else {
-        // Display errors
-        echo "Registration failed: " . implode(', ', $errors);
     }
 } else {
     // If not a POST request, redirect to registration page
     header("Location: ../Account/register.html");
     exit();
 }
+
+// Return JSON response
+header('Content-Type: application/json');
+echo json_encode($response);
 ?> 
