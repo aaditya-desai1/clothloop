@@ -2,36 +2,46 @@
 session_start();
 require_once '../../config/db_connect.php';
 
-// Check if the user is logged in and is a seller
-if (!isset($_SESSION['user_email']) || $_SESSION['user_type'] !== 'seller') {
-    echo json_encode(['status' => 'error', 'message' => 'Unauthorized access']);
+// Check if the user is logged in as a seller
+if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] !== 'seller') {
+    echo json_encode(['status' => 'error', 'message' => 'Unauthorized access. Please login as a seller.']);
     exit;
 }
 
-$response = ['status' => 'error', 'message' => 'Unknown error occurred'];
+$seller_id = $_SESSION['user_id'];
+$response = ['status' => 'error', 'message' => 'Failed to retrieve cloth items'];
 
-// Get seller email from session
-$seller_email = $_SESSION['user_email'];
-
-// Get clothes data from database
-$stmt = $conn->prepare("SELECT * FROM clothes WHERE seller_email = ? ORDER BY created_at DESC");
-$stmt->bind_param("s", $seller_email);
-$stmt->execute();
-$result = $stmt->get_result();
-
-$clothes = [];
-while ($row = $result->fetch_assoc()) {
-    // Convert JSON string of images back to array
-    $row['images'] = json_decode($row['images']);
-    $clothes[] = $row;
+try {
+    // Query to get all cloth items for the seller
+    $sql = "SELECT id, cloth_title, description, size, category, rental_price, 
+                   contact_no, whatsapp_no, terms_conditions, photo_type, 
+                   created_at, updated_at, is_active
+            FROM cloth_details 
+            WHERE seller_id = ? 
+            ORDER BY created_at DESC";
+    
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $seller_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    $clothes = [];
+    while ($row = $result->fetch_assoc()) {
+        // Don't include the actual image data in the list to keep response small
+        $row['has_image'] = true;
+        $clothes[] = $row;
+    }
+    
+    $response = [
+        'status' => 'success',
+        'clothes' => $clothes
+    ];
+    
+    $stmt->close();
+} catch (Exception $e) {
+    $response = ['status' => 'error', 'message' => 'Error: ' . $e->getMessage()];
 }
 
-$stmt->close();
-
-$response = [
-    'status' => 'success',
-    'clothes' => $clothes
-];
-
+header('Content-Type: application/json');
 echo json_encode($response);
 ?> 

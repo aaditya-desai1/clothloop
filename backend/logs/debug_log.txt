@@ -1,0 +1,87 @@
+[2025-04-16 07:10:13] Database connection successful
+[2025-04-16 07:10:13] Starting cloth upload process
+[2025-04-16 07:10:13] Seller authenticated: 1
+[2025-04-16 07:10:13] Script started - SESSION data: Array
+(
+    [user_id] => 1
+    [user_type] => seller
+    [user_name] => Seller
+    [user_email] => seller@gmail.com
+    [shop_name] => Seller Hub
+)
+
+[2025-04-16 07:10:13] POST data: Array
+(
+    [seller_id] => 1
+    [description] => cc
+    [size] => M
+    [category] => Men
+    [clothTitle] => cc
+    [contactNo] => 1234567890
+    [whatsappNo] => 1234567890
+    [terms] => cc
+    [rentalPrice] => 9
+)
+
+[2025-04-16 07:10:13] FILES data: Array
+(
+    [clothImage] => Array
+        (
+            [name] => Screenshot (53).png
+            [full_path] => Screenshot (53).png
+            [type] => image/png
+            [tmp_name] => C:\xampp\tmp\phpF86F.tmp
+            [error] => 0
+            [size] => 466503
+        )
+
+)
+
+[2025-04-16 07:10:13] POST request received
+[2025-04-16 07:10:13] Form data parsed: Array
+(
+    [cloth_title] => cc
+    [size] => M
+    [category] => Men
+    [rental_price] => 9
+)
+
+[2025-04-16 07:10:13] Image file information: Array
+(
+    [name] => Screenshot (53).png
+    [full_path] => Screenshot (53).png
+    [type] => image/png
+    [tmp_name] => C:\xampp\tmp\phpF86F.tmp
+    [error] => 0
+    [size] => 466503
+)
+
+[2025-04-16 07:10:13] Preparing SQL statement
+[2025-04-16 07:10:13] SQL statement: INSERT INTO cloth_details (seller_id, cloth_title, description, size, category, rental_price, 
+                                         contact_no, whatsapp_no, terms_conditions, cloth_photo, photo_type) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2025-04-16 07:10:13] Binding parameters
+[2025-04-16 07:10:13] Parameter types: issssdsssss
+[2025-04-16 07:10:13] Parameter values: Array
+(
+    [seller_id] => 1
+    [cloth_title] => cc
+    [description] => cc...
+    [size] => M
+    [category] => Men
+    [rental_price] => 9
+    [contact_no] => 1234567890
+    [whatsapp_no] => 1234567890
+    [terms_conditions] => cc...
+    [image_type] => image/png
+)
+
+[2025-04-16 07:10:13] Executing statement
+[2025-04-16 07:10:13] Cloth added successfully: 1
+[2025-04-16 07:10:13] Response: Array
+(
+    [status] => success
+    [message] => Cloth added successfully
+    [cloth_id] => 1
+)
+

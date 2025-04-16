@@ -25,6 +25,30 @@ CREATE TABLE IF NOT EXISTS sellers (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
+-- Create the cloth_details table
+CREATE TABLE IF NOT EXISTS cloth_details (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    seller_id INT NOT NULL,
+    cloth_title VARCHAR(100) NOT NULL,
+    description TEXT NOT NULL,
+    size VARCHAR(50) NOT NULL,
+    category ENUM('Men', 'Women', 'Kids') NOT NULL,
+    rental_price DECIMAL(10,2) NOT NULL,
+    contact_no VARCHAR(20) NOT NULL,
+    whatsapp_no VARCHAR(20) NOT NULL,
+    terms_conditions TEXT NOT NULL,
+    cloth_photo MEDIUMBLOB NOT NULL,
+    photo_type VARCHAR(50) NOT NULL,
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (seller_id) REFERENCES sellers(id) ON DELETE CASCADE
+);
+
 -- Index for faster email lookups
 CREATE INDEX idx_buyers_email ON buyers(email);
-CREATE INDEX idx_sellers_email ON sellers(email); 
+CREATE INDEX idx_sellers_email ON sellers(email);
+
+-- Index for faster searches
+CREATE INDEX idx_cloth_details_seller ON cloth_details(seller_id);
+CREATE INDEX idx_cloth_details_category ON cloth_details(category); 

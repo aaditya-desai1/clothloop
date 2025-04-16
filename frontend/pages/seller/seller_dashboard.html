@@ -1244,6 +1244,128 @@
           alertMessage.style.display = 'none';
         }, 5000);
       }
+
+      // Upload form submission
+      if (uploadForm) {
+        uploadForm.addEventListener('submit', function(e) {
+          e.preventDefault();
+          
+          // Get form values
+          const clothTitle = document.getElementById('clothTitle').value;
+          const description = document.getElementById('description').value;
+          const size = document.getElementById('size').value;
+          const category = document.querySelector('input[name="category"]:checked').value;
+          const rentalPrice = document.getElementById('rentalPrice').value;
+          const contactNo = document.getElementById('contactNo').value;
+          const whatsappNo = document.getElementById('whatsappNo').value;
+          const terms = document.getElementById('terms').value;
+          const clothImage = document.getElementById('clothImage').files[0];
+          
+          // Validate form fields
+          if (!clothTitle || !description || !size || !category || !rentalPrice || 
+              !contactNo || !whatsappNo || !terms || !clothImage) {
+            alert('Please fill all fields and upload an image');
+            return;
+          }
+          
+          // Create FormData object to send data
+          const formData = new FormData();
+          formData.append('clothTitle', clothTitle);
+          formData.append('description', description);
+          formData.append('size', size);
+          formData.append('category', category);
+          formData.append('rentalPrice', rentalPrice);
+          formData.append('contactNo', contactNo);
+          formData.append('whatsappNo', whatsappNo);
+          formData.append('terms', terms);
+          formData.append('clothImage', clothImage);
+          
+          // Show loading message
+          const submitBtn = uploadForm.querySelector('button[type="submit"]');
+          const originalBtnText = submitBtn.textContent;
+          submitBtn.textContent = 'Uploading...';
+          submitBtn.disabled = true;
+          
+          // Send data to server
+          fetch('../../../backend/api/sellers/upload_cloth.php', {
+            method: 'POST',
+            body: formData
+          })
+          .then(response => response.json())
+          .then(data => {
+            // Reset button
+            submitBtn.textContent = originalBtnText;
+            submitBtn.disabled = false;
+            
+            if (data.status === 'success') {
+              // Close the popup
+              closeUploadPopup();
+              
+              // Show success message
+              showAlert('Cloth uploaded successfully!', 'success');
+              
+              // Create a new product card and add to the grid
+              addProductToGrid(clothTitle, rentalPrice);
+              
+              // Refresh the products count
+              updateProductCount();
+            } else {
+              showAlert('Error: ' + data.message, 'danger');
+            }
+          })
+          .catch(error => {
+            console.error('Error uploading cloth:', error);
+            submitBtn.textContent = originalBtnText;
+            submitBtn.disabled = false;
+            showAlert('Failed to upload cloth. Please try again.', 'danger');
+          });
+        });
+      }
+      
+      // Function to create and add a product card to the grid
+      function addProductToGrid(title, price) {
+        const productGrid = document.querySelector('.product-grid');
+        if (!productGrid) return;
+        
+        const productCard = document.createElement('div');
+        productCard.className = 'product-card';
+        
+        // Get the image source from the preview or use placeholder
+        const imgSrc = previewImage.src || '../../assets/images/placeholder.jpg';
+        
+        productCard.innerHTML = `
+          <div class="product-image">
+            <img src="${imgSrc}" alt="${title}" />
+          </div>
+          <div class="product-details">
+            <h3>${title}</h3>
+            <div class="price">₹${price}/day</div>
+            <div class="stock">Available for rent</div>
+            <div class="product-actions">
+              <button>Edit</button>
+              <button>View</button>
+            </div>
+          </div>
+        `;
+        
+        // Add the new product to the grid
+        productGrid.insertBefore(productCard, productGrid.firstChild);
+      }
+      
+      // Function to update the product count in the stats
+      function updateProductCount() {
+        const productCountElement = document.querySelector('.stat-card:first-child .stat-value');
+        if (productCountElement) {
+          let count = parseInt(productCountElement.textContent) || 0;
+          count++;
+          productCountElement.textContent = count;
+          
+          const changeElement = document.querySelector('.stat-card:first-child .stat-change');
+          if (changeElement) {
+            changeElement.textContent = count === 1 ? 'First product added!' : `${count} products available`;
+          }
+        }
+      }
     });
   </script>
 </body>
