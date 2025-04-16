@@ -146,15 +146,15 @@ try {
     <div class="step">
         <span class="step-number">1</span>
         <h3>Initialize Database</h3>
-        <p>Run the test script to create required tables and sample data:</p>
-        <p><a href="test_products.php" class="btn">Initialize Database</a></p>
+        <p>Set up the database with required tables:</p>
+        <p><a href="setup_database.php" class="btn">Initialize Database</a></p>
     </div>
     
     <div class="step">
         <span class="step-number">2</span>
-        <h3>Test File Uploads</h3>
-        <p>Make sure file uploads are working correctly:</p>
-        <p><a href="test_upload.php" class="btn">Test File Uploads</a></p>
+        <h3>Check Database Connection</h3>
+        <p>Verify that database connection and structure are correct:</p>
+        <p><a href="check_database.php" class="btn">Check Database</a></p>
     </div>
     
     <div class="step">
@@ -185,7 +185,7 @@ try {
     <h2>Additional Resources</h2>
     
     <ul>
-        <li><strong>Database Structure:</strong> <a href="test_table_structure.php">View Database Structure</a></li>
+        <li><strong>Database Check:</strong> <a href="check_database.php">Check Database Status</a></li>
         <li><strong>Source Code:</strong> <a href="https://github.com/your-repo/clothloop" target="_blank">GitHub Repository</a></li>
     </ul>
 </body>

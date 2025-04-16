@@ -39,9 +39,9 @@ if (isset($_SESSION['user_id']) && isset($_SESSION['user_type'])) {
     print_r($_SESSION);
     echo "</pre>";
     
-    // Add a link to test seller forms
-    echo "<p><a href='../frontend/pages/seller/seller_profile.html'>Test Shop Profile Form</a></p>";
-    echo "<p><a href='../frontend/pages/seller/settings.html'>Test Account Settings Form</a></p>";
+    // Add links to seller pages
+    echo "<p><a href='../frontend/pages/seller/seller_profile.html'>Go to Shop Profile</a></p>";
+    echo "<p><a href='../frontend/pages/seller/settings.html'>Go to Account Settings</a></p>";
     
     // Add logout link
     echo "<p><a href='?logout=1'>Logout</a></p>";

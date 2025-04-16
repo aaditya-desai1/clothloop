@@ -173,5 +173,5 @@ $conn->close();
 
 echo "\n====== Setup Complete =======\n";
 echo "You can now access the products endpoint at: http://localhost/ClothLoop/backend/utils/product_operations.php?operation=fetch_all\n";
-echo "Or test the products using the test page: http://localhost/ClothLoop/backend/test_products_page.html\n";
+echo "Or access the buyer dashboard at: http://localhost/ClothLoop/frontend/pages/buyer/buyer_dashboard.html\n";
 ?>
