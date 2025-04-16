@@ -133,7 +133,28 @@
         .modal-footer {
             padding: 15px 20px;
             border-top: 1px solid #eee;
-            text-align: right;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .location-button {
+            background-color: #4285F4;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+        }
+
+        .location-button i {
+            margin-right: 8px;
+        }
+
+        .location-button:hover {
+            background-color: #3367D6;
         }
 
         .close-button {
@@ -215,6 +236,9 @@
                 </div>
             </div>
             <div class="modal-footer">
+                <button class="location-button" id="locationBtn" onclick="openLocation()">
+                    <i class="fas fa-map-marker-alt"></i> View on Map
+                </button>
                 <button class="close-button" onclick="closeModal()">Close</button>
             </div>
         </div>
@@ -239,13 +263,31 @@
                 address: params.get('address'),
                 terms: params.get('terms'),
                 seller_id: params.get('seller_id'),
-                category: params.get('category')
+                category: params.get('category'),
+                latitude: params.get('latitude'),
+                longitude: params.get('longitude')
             };
         }
 
         // Close modal and return to previous page
         function closeModal() {
             window.history.back();
+        }
+
+        // Function to open Google Maps with seller's location
+        function openLocation() {
+            // Get stored latitude and longitude
+            const latitude = window.sellerLatitude || 0;
+            const longitude = window.sellerLongitude || 0;
+            
+            console.log('Opening location with coordinates:', latitude, longitude);
+            
+            if (latitude && longitude) {
+                // Open Google Maps with the coordinates
+                window.open(`https://www.google.com/maps?q=${latitude},${longitude}`, '_blank');
+            } else {
+                alert('Location information is not available for this seller.');
+            }
         }
 
         // Fetch complete product details from the server
@@ -298,9 +340,19 @@
                     // If we found a matching product, use it
                     if (product) {
                         populateProductDetails(product);
+                        
+                        // Fetch seller location if we have a seller_id
+                        if (product.seller_id) {
+                            fetchSellerLocation(product.seller_id);
+                        }
                     } else if (data.products.length > 0) {
                         // Fallback: use the first product if no exact match
                         populateProductDetails(data.products[0]);
+                        
+                        // Fetch seller location if we have a seller_id
+                        if (data.products[0].seller_id) {
+                            fetchSellerLocation(data.products[0].seller_id);
+                        }
                     } else {
                         // No products found
                         populateFromUrlParams();
@@ -364,6 +416,70 @@
             document.getElementById('shopName').textContent = product.shop_name || 'ClothLoop Shop';
             document.getElementById('shopAddress').textContent = product.shop_address || 'Address not specified';
             document.getElementById('termsConditions').textContent = product.terms_and_conditions || product.terms || 'No specific terms';
+            
+            // Check for shop_location in the product data
+            if (product.shop_location) {
+                // Parse location data if available
+                try {
+                    const coordinates = product.shop_location.split(',');
+                    if (coordinates.length === 2) {
+                        window.sellerLatitude = coordinates[0].trim();
+                        window.sellerLongitude = coordinates[1].trim();
+                        console.log('Location data found in product:', window.sellerLatitude, window.sellerLongitude);
+                        
+                        // Enable the location button if we have coordinates
+                        const locationBtn = document.getElementById('locationBtn');
+                        if (locationBtn) {
+                            locationBtn.disabled = false;
+                        }
+                    }
+                } catch (e) {
+                    console.error('Error parsing location from product data:', e);
+                }
+            }
+        }
+        
+        // Function to fetch seller location by seller_id
+        async function fetchSellerLocation(sellerId) {
+            try {
+                // Build URL with the correct path
+                const path = '/ClothLoop/backend/utils/seller_operations.php';
+                let url = path + `?operation=get_location&seller_id=${sellerId}`;
+                
+                console.log('Fetching seller location from:', url);
+                
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Cache-Control': 'no-cache',
+                        'Pragma': 'no-cache'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch seller location: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.status === 'success' && data.location) {
+                    // Store the location data in window object for later use
+                    window.sellerLatitude = data.location.latitude;
+                    window.sellerLongitude = data.location.longitude;
+                    
+                    // Enable the location button if we have coordinates
+                    const locationBtn = document.getElementById('locationBtn');
+                    if (locationBtn) {
+                        locationBtn.disabled = false;
+                    }
+                    
+                    console.log('Successfully retrieved location:', data.location);
+                } else {
+                    console.error('Seller location not found or error:', data);
+                }
+            } catch (error) {
+                console.error('Error fetching seller location:', error);
+            }
         }
         
         // Fallback: Populate the details section based on URL parameters
@@ -419,6 +535,12 @@
             document.getElementById('shopName').textContent = params.shop || 'ClothLoop Shop';
             document.getElementById('shopAddress').textContent = params.address || 'Address not specified';
             document.getElementById('termsConditions').textContent = params.terms || 'No specific terms';
+            
+            // Store location data from URL params if available
+            if (params.latitude && params.longitude) {
+                window.sellerLatitude = params.latitude;
+                window.sellerLongitude = params.longitude;
+            }
         }
 
         // Initialize the page

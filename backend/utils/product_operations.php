@@ -215,7 +215,10 @@ function fetchAllProducts() {
         $max_price = isset($_GET['max_price']) ? floatval($_GET['max_price']) : PHP_FLOAT_MAX;
         
         // Build query - directly use cloth_details table
-        $sql = "SELECT cd.* FROM cloth_details cd WHERE 1=1";
+        $sql = "SELECT cd.*, s.shop_name, s.shop_address, s.shop_location 
+               FROM cloth_details cd 
+               LEFT JOIN sellers s ON cd.seller_id = s.id 
+               WHERE 1=1";
         
         // If requesting a specific product by ID, add that condition with highest priority
         if ($specific_product_id !== null) {
@@ -278,23 +281,21 @@ function fetchAllProducts() {
                     $image_data = 'data:image/' . $image_type . ';base64,' . base64_encode($row['cloth_photo']);
                 }
                 
-                // Get seller info to get shop name
-                $seller_id = $row['seller_id'] ?? 0;
-                $shop_name = 'ClothLoop Shop'; // Default shop name
-                
                 // Try to get shop name from sellers table
-                if ($seller_id > 0) {
-                    $seller_query = "SELECT shop_name FROM sellers WHERE id = $seller_id LIMIT 1";
+                if ($row['seller_id'] > 0) {
+                    $seller_query = "SELECT shop_name, shop_location FROM sellers WHERE id = {$row['seller_id']} LIMIT 1";
                     $seller_result = $conn->query($seller_query);
-                    
+
                     if ($seller_result && $seller_result->num_rows > 0) {
                         $seller_row = $seller_result->fetch_assoc();
                         if (!empty($seller_row['shop_name'])) {
                             $shop_name = $seller_row['shop_name'];
                         }
+                        // Get shop_location if available
+                        $shop_location = !empty($seller_row['shop_location']) ? $seller_row['shop_location'] : '';
                     }
                 }
-                
+
                 // Format the product data
                 $products[] = [
                     'id' => $row['id'],
@@ -310,6 +311,7 @@ function fetchAllProducts() {
                     'created_at' => $row['created_at'] ?? date('Y-m-d H:i:s'),
                     'seller_id' => $row['seller_id'] ?? 0,
                     'shop_name' => $shop_name,
+                    'shop_location' => $shop_location ?? '',
                     'image' => $image_data
                 ];
             }
