@@ -600,3 +600,15 @@
 [2025-04-16 19:30:12] Processing image request: {"id":1}
 [2025-04-16 19:30:12] Query executed: {"rows":1}
 [2025-04-16 19:30:12] Image found, serving with content type: image/jpeg
+[2025-04-16 19:36:52] Starting image request
+[2025-04-16 19:36:52] Processing image request: {"id":1}
+[2025-04-16 19:36:52] Query executed: {"rows":1}
+[2025-04-16 19:36:52] Image found, serving with content type: image/jpeg
+[2025-04-16 19:36:53] Starting image request
+[2025-04-16 19:36:53] Processing image request: {"id":1}
+[2025-04-16 19:36:53] Query executed: {"rows":1}
+[2025-04-16 19:36:53] Image found, serving with content type: image/jpeg
+[2025-04-16 19:37:45] Starting image request
+[2025-04-16 19:37:46] Processing image request: {"id":1}
+[2025-04-16 19:37:46] Query executed: {"rows":1}
+[2025-04-16 19:37:46] Image found, serving with content type: image/jpeg
