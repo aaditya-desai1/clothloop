@@ -1,0 +1,12 @@
+[2025-04-16 20:57:11] Starting image request
+[2025-04-16 20:57:11] Processing image request: {"id":2}
+[2025-04-16 20:57:11] Query executed: {"rows":1}
+[2025-04-16 20:57:11] Image found, serving with content type: image/jpeg
+[2025-04-16 20:57:13] Starting image request
+[2025-04-16 20:57:13] Processing image request: {"id":2}
+[2025-04-16 20:57:13] Query executed: {"rows":1}
+[2025-04-16 20:57:13] Image found, serving with content type: image/jpeg
+[2025-04-16 20:57:28] Starting image request
+[2025-04-16 20:57:28] Processing image request: {"id":1}
+[2025-04-16 20:57:28] Query executed: {"rows":1}
+[2025-04-16 20:57:28] Image found, serving with content type: image/jpeg

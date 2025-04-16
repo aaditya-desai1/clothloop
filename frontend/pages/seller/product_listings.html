@@ -995,7 +995,7 @@
       <div class="header-right">
         <div class="account-info">
           <div class="user-profile">
-            <img src="../../assets/images/shop_logo.png" alt="User Shop logo" />
+            <img id="navProfileImage" src="../../assets/images/shop_logo.png" alt="User Shop logo" />
             <div class="user-details">
               <h4 id="seller-name">Loading...</h4>
               <p>Seller Account</p>
@@ -1274,10 +1274,11 @@
               const sellerName = document.getElementById('seller-name');
               sellerName.textContent = data.seller.username || 'Seller';
               
-              // Update profile image if available
-              if (data.seller.profile_image) {
-                const profileImage = document.querySelector('.user-profile img');
-                profileImage.src = data.seller.profile_image;
+              // Update profile image if available - use shop_logo instead of profile_image
+              if (data.seller.shop_logo) {
+                const profileImage = document.getElementById('navProfileImage');
+                profileImage.src = data.seller.shop_logo;
+                console.log('Setting shop logo in nav:', data.seller.shop_logo.substring(0, 30) + '...');
               }
               
               // Store seller ID in localStorage if not already there

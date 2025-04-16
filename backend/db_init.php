@@ -50,7 +50,8 @@ $sql = "CREATE TABLE IF NOT EXISTS sellers (
     shop_name VARCHAR(100) NOT NULL,
     shop_address TEXT NOT NULL,
     shop_location VARCHAR(100) NOT NULL,
-    shop_logo VARCHAR(255) DEFAULT NULL,
+    shop_logo MEDIUMBLOB,
+    shop_logo_type VARCHAR(50),
     shop_bio TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -63,7 +64,7 @@ if ($conn->query($sql) === TRUE) {
 }
 
 // Create directory for shop logos if it doesn't exist
-$uploadDir = 'frontend/assets/images/shop_logos/';
+$uploadDir = '../uploads/shop_logos/';
 if (!file_exists($uploadDir)) {
     if (mkdir($uploadDir, 0777, true)) {
         echo "Created directory for shop logos<br>";
@@ -73,7 +74,7 @@ if (!file_exists($uploadDir)) {
 }
 
 echo "<p>Database initialization completed successfully! You can now register users and use the ClothLoop platform.</p>";
-echo "<p><a href='home.html'>Go to homepage</a></p>";
+echo "<p><a href='../home.html'>Go to homepage</a></p>";
 
 // Close connection
 $conn->close();

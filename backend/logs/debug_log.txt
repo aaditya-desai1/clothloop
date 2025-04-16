@@ -1,0 +1,65 @@
+[2025-04-16 20:57:11] Database connection successful
+[2025-04-16 20:57:11] Starting cloth upload process
+[2025-04-16 20:57:11] POST data: Array
+(
+    [seller_id] => 2
+    [description] => ok
+    [size] => M
+    [category] => Men
+    [clothTitle] => Savani no kurto
+    [contactNo] => 1234567890
+    [whatsappNo] => 1234567890
+    [terms] => cc
+    [rentalPrice] => 34
+)
+
+[2025-04-16 20:57:11] FILES data: Array
+(
+    [clothImage] => Array
+        (
+            [name] => jenis-savani.jpg
+            [full_path] => jenis-savani.jpg
+            [type] => image/jpeg
+            [tmp_name] => C:\xampp\tmp\phpF5B0.tmp
+            [error] => 0
+            [size] => 96109
+        )
+
+)
+
+[2025-04-16 20:57:11] POST request received
+[2025-04-16 20:57:11] Seller ID from POST: 2
+[2025-04-16 20:57:11] Form data parsed: Array
+(
+    [cloth_title] => Savani no kurto
+    [size] => M
+    [category] => Men
+    [rental_price] => 34
+)
+
+[2025-04-16 20:57:11] Processing image upload: Array
+(
+    [name] => jenis-savani.jpg
+    [full_path] => jenis-savani.jpg
+    [type] => image/jpeg
+    [tmp_name] => C:\xampp\tmp\phpF5B0.tmp
+    [error] => 0
+    [size] => 96109
+)
+
+[2025-04-16 20:57:11] Image loaded successfully: Array
+(
+    [size] => 96109
+    [type] => image/jpeg
+)
+
+[2025-04-16 20:57:11] Inserting new cloth item
+[2025-04-16 20:57:11] Executing insert statement
+[2025-04-16 20:57:11] Cloth added successfully: 2
+[2025-04-16 20:57:11] Response: Array
+(
+    [status] => success
+    [message] => Cloth added successfully
+    [cloth_id] => 2
+)
+

@@ -1232,10 +1232,10 @@
           navSellerName.textContent = sellerData.username || 'Seller';
         }
         
-        // Update profile image if available
-        if (sellerData.profile_image && navProfileImage) {
-          console.log('Setting profile image in nav');
-          navProfileImage.src = sellerData.profile_image;
+        // Update profile image if available - use shop_logo instead of profile_image
+        if (sellerData.shop_logo && navProfileImage) {
+          console.log('Setting shop logo in nav:', sellerData.shop_logo.substring(0, 30) + '...');
+          navProfileImage.src = sellerData.shop_logo;
         }
       }
       
