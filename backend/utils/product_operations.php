@@ -103,6 +103,21 @@ function fetchProducts() {
                 $image_data = '../Image/placeholder.jpg';
             }
             
+            // Get seller's shop name
+            $shop_name = 'ClothLoop Seller'; // Default name
+            $shop_query = "SELECT shop_name FROM sellers WHERE id = ? LIMIT 1";
+            $shop_stmt = $conn->prepare($shop_query);
+            $shop_stmt->bind_param("i", $row['seller_id']);
+            $shop_stmt->execute();
+            $shop_result = $shop_stmt->get_result();
+            
+            if ($shop_row = $shop_result->fetch_assoc()) {
+                if (!empty($shop_row['shop_name'])) {
+                    $shop_name = $shop_row['shop_name'];
+                }
+            }
+            $shop_stmt->close();
+            
             // Format the product data
             $products[] = [
                 'id' => $row['id'],
@@ -116,6 +131,7 @@ function fetchProducts() {
                 'terms' => $row['terms_and_conditions'],
                 'created_at' => $row['created_at'],
                 'image' => $image_data,
+                'shop_name' => $shop_name,
                 'seller_id' => $row['seller_id'] // Include seller ID for debugging
             ];
             
@@ -175,6 +191,9 @@ function fetchAllProducts() {
         $user_id = isset($_GET['user_id']) ? intval($_GET['user_id']) : 
                   (isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 0);
         
+        // Check if we're looking for a specific product by ID
+        $specific_product_id = isset($_GET['id']) ? $_GET['id'] : null;
+        
         // Clear any existing session seller data when accessing as buyer
         if ($user_type === 'buyer' && isset($_SESSION['user_type']) && $_SESSION['user_type'] === 'seller') {
             // Only for this request - don't change the actual session
@@ -198,21 +217,30 @@ function fetchAllProducts() {
         // Build query - directly use cloth_details table
         $sql = "SELECT cd.* FROM cloth_details cd WHERE 1=1";
         
-        // Add seller filter for sellers (only show their own products)
-        // IMPORTANT: Only filter by seller_id if user_type is 'seller' AND user_id is valid
-        if ($user_type === 'seller' && $user_id > 0) {
-            $sql .= " AND cd.seller_id = $user_id";
-        }
-        
-        // Add category filter if provided
-        if (!empty($category)) {
-            $sql .= " AND cd.category = '$category'";
-        }
-        
-        // Add price filter
-        $sql .= " AND cd.rental_price >= $min_price";
-        if ($max_price < PHP_FLOAT_MAX) {
-            $sql .= " AND cd.rental_price <= $max_price";
+        // If requesting a specific product by ID, add that condition with highest priority
+        if ($specific_product_id !== null) {
+            // Handle both numeric and string IDs - use direct equality comparison
+            $specific_product_id = $conn->real_escape_string($specific_product_id);
+            $sql .= " AND cd.id = '$specific_product_id'";
+            
+            // Skip other filtering conditions if we're looking for a specific product
+        } 
+        else {
+            // Add seller filter for sellers (only show their own products)
+            if ($user_type === 'seller' && $user_id > 0) {
+                $sql .= " AND cd.seller_id = $user_id";
+            }
+            
+            // Add category filter if provided
+            if (!empty($category)) {
+                $sql .= " AND cd.category = '$category'";
+            }
+            
+            // Add price filter
+            $sql .= " AND cd.rental_price >= $min_price";
+            if ($max_price < PHP_FLOAT_MAX) {
+                $sql .= " AND cd.rental_price <= $max_price";
+            }
         }
         
         // Execute the query with debugging
@@ -250,6 +278,23 @@ function fetchAllProducts() {
                     $image_data = 'data:image/' . $image_type . ';base64,' . base64_encode($row['cloth_photo']);
                 }
                 
+                // Get seller info to get shop name
+                $seller_id = $row['seller_id'] ?? 0;
+                $shop_name = 'ClothLoop Shop'; // Default shop name
+                
+                // Try to get shop name from sellers table
+                if ($seller_id > 0) {
+                    $seller_query = "SELECT shop_name FROM sellers WHERE id = $seller_id LIMIT 1";
+                    $seller_result = $conn->query($seller_query);
+                    
+                    if ($seller_result && $seller_result->num_rows > 0) {
+                        $seller_row = $seller_result->fetch_assoc();
+                        if (!empty($seller_row['shop_name'])) {
+                            $shop_name = $seller_row['shop_name'];
+                        }
+                    }
+                }
+                
                 // Format the product data
                 $products[] = [
                     'id' => $row['id'],
@@ -264,7 +309,7 @@ function fetchAllProducts() {
                     'terms_and_conditions' => $row['terms_and_conditions'] ?? '',
                     'created_at' => $row['created_at'] ?? date('Y-m-d H:i:s'),
                     'seller_id' => $row['seller_id'] ?? 0,
-                    'shop_name' => 'ClothLoop Shop',  // Default shop name
+                    'shop_name' => $shop_name,
                     'image' => $image_data
                 ];
             }

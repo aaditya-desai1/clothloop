@@ -603,7 +603,7 @@
         <div id="loading-indicator" class="loading-indicator">
             <div class="spinner"></div>
             <p style="margin-top: 20px; color: #666;">Loading products...</p>
-        </div>
+            </div>
         
         <!-- Error message -->
         <div id="error-message" class="error-message" style="display: none;">
@@ -613,13 +613,13 @@
                 <button class="try-again-btn" onclick="reloadPage()">Try Again</button>
                 <button class="try-again-btn" onclick="loadPlaceholderProducts()">Show Demo Products</button>
             </div>
-        </div>
+            </div>
         
         <!-- Empty state -->
         <div id="empty-state" class="empty-state" style="display: none;">
             <i class="fas fa-box-open" style="color: #95a5a6;"></i>
             <p>No products found. Check back later for new arrivals!</p>
-        </div>
+            </div>
         
         <!-- Product Grid -->
         <div id="product-grid" class="grid">
@@ -742,14 +742,31 @@
             }
             
             return products.filter(product => {
-                // Get product category and convert to lowercase for case-insensitive comparison
-                const productCategory = (product.category || '').toLowerCase();
+                // Get product category and standardize format
+                const productCategory = (product.category || '').trim().toLowerCase();
                 
-                // Check if product category is in selected categories
-                return selectedCategories.some(cat => 
-                    productCategory === cat.toLowerCase() || 
-                    productCategory.includes(cat.toLowerCase())
-                );
+                // Use exact category matching, not partial string inclusion
+                for (const cat of selectedCategories) {
+                    const categoryToMatch = cat.toLowerCase().trim();
+                    
+                    // Only match exact categories - "Women" should only match "Women", not "Women's" or other variants
+                    if (productCategory === categoryToMatch) {
+                        return true;
+                    }
+                    
+                    // Special handling for some known category variations
+                    if (categoryToMatch === 'men' && (productCategory === 'men' || productCategory === 'men\'s')) {
+                        return true;
+                    }
+                    if (categoryToMatch === 'women' && (productCategory === 'women' || productCategory === 'women\'s')) {
+                        return true;
+                    }
+                    if (categoryToMatch === 'kids' && (productCategory === 'kids' || productCategory === 'children')) {
+                        return true;
+                    }
+                }
+                
+                return false;
             });
         }
         
@@ -913,7 +930,7 @@
                                 id: product.id,
                                 title: product.title || product.cloth_title || '',
                                 description: product.description || '',
-                                category: product.category || '',
+                                category: standardizeCategory(product.category) || '',
                                 rental_price: product.rental_price || product.rentalPrice || 0,
                                 contact_number: product.contact_number || product.contactNo || '',
                                 whatsapp_number: product.whatsapp_number || product.whatsappNo || '',
@@ -1019,50 +1036,22 @@
                 const wishlistBtnIcon = inWishlist ? 'fas fa-heart' : 'far fa-heart';
                 const wishlistBtnText = inWishlist ? 'Remove from Wishlist' : 'Add to Wishlist';
                 
-                // Use only essential parameters to avoid long URLs
-                // For base64 images, we should not include them in URLs as they can be very long
-                // Instead, just pass the ID and fetch complete details on the detail page
-                const queryParams = new URLSearchParams({
-                    id: product.id || '',
-                    title: product.title || 'Product',
-                    price: product.rental_price || '0',
-                    seller_id: product.seller_id || '0'
-                });
-                
-                // Only add image URL if it's not a base64 string (which would be too long for a URL)
-                if (product.image && !product.image.startsWith('data:image/')) {
-                    queryParams.append('image', product.image);
-                }
-                
-                // Add shortened description if available
-                if (product.description) {
-                    const shortDesc = product.description.length > 100 
-                        ? product.description.substring(0, 97) + '...' 
-                        : product.description;
-                    queryParams.append('description', shortDesc);
-                }
-                
-                // Add optional parameters if they exist
-                if (product.contact_number) queryParams.append('contact', product.contact_number);
-                if (product.whatsapp_number) queryParams.append('whatsapp', product.whatsapp_number);
-                if (product.shop_address) queryParams.append('location', product.shop_address);
-                if (product.shop_name) queryParams.append('shop', product.shop_name);
-                if (product.terms_and_conditions) queryParams.append('terms', product.terms_and_conditions);
-                if (product.category) queryParams.append('category', product.category);
-                
                 // Generate unique image ID for logging purposes
                 const imageId = 'product-img-' + product.id;
                 
+                // Simple direct URL with only product ID - the details page will fetch all other info
+                const detailsUrl = `details.html?id=${product.id}`;
+                
                 productItem.innerHTML = `
                     <img src="${product.image}" alt="${product.title}" id="${imageId}"
-                         onerror="this.src='../../assets/images/placeholder.png'; console.log('Image failed to load for product ${product.id}: ' + this.alt);"
+                         onerror="this.src='../../assets/images/placeholder.png';"
                          onload="console.log('Image loaded successfully for product ${product.id}');">
                     <div class="item-details">
                         <h3 class="item-title">${product.title}</h3>
                         <p class="item-price">₹${product.rental_price} / day</p>
                         <p class="item-seller">${product.shop_name || 'ClothLoop Seller'}</p>
                         <div class="item-actions">
-                            <a href="details.html?${queryParams.toString()}" class="view-btn">View Details</a>
+                            <a href="${detailsUrl}" class="view-btn">View Details</a>
                             <button class="${wishlistBtnClass}" data-product-id="${product.id}">
                                 <i class="${wishlistBtnIcon}"></i> ${wishlistBtnText.split(' ')[0]}
                             </button>
@@ -1114,24 +1103,23 @@
             window.location.href = '../account/login.html';
         }
         
-        // Function to reload the page
+        // Function to reload the page when reconnect button is clicked
         function reloadPage() {
-            // Clear any cached data
-            productGrid.innerHTML = '';
-            allProducts = [];
-            filteredProducts = [];
+            // Clear cached data
+            localStorage.removeItem('clothloopSelectedCategory');
+            localStorage.removeItem('clothloopSortOption');
             
-            
-            console.log('Attempting to reload products from server...');
-            
-            // Remove demo mode banner if it exists
+            // Remove demo banner if it exists
             const demoBanner = document.querySelector('.demo-mode-banner');
             if (demoBanner) {
                 demoBanner.remove();
             }
             
-            // Load products again
+            // Reload products from server
             loadProducts();
+            
+            // Show loading indicator
+            loadingIndicator.style.display = 'block';
         }
         
         // Function to load placeholder products if the backend fails
@@ -1377,6 +1365,65 @@
                 // Show visual feedback that filter is applied
                 sortButton.innerHTML = `<i class="fas fa-filter"></i> Filtered`;
             }
+        }
+
+        // Function to standardize category names
+        function standardizeCategory(category) {
+            if (!category) return 'Uncategorized';
+            
+            const cat = category.trim().toLowerCase();
+            
+            // Map variants to standard categories
+            if (cat === 'men' || cat === 'men\'s' || cat === 'mens' || cat === 'male') {
+                return 'Men';
+            }
+            
+            if (cat === 'women' || cat === 'women\'s' || cat === 'womens' || cat === 'female') {
+                return 'Women';
+            }
+            
+            if (cat === 'kids' || cat === 'children' || cat === 'child' || cat === 'baby' || cat === 'infant') {
+                return 'Kids';
+            }
+            
+            // If it's already one of our main categories but possibly with different casing
+            if (cat === 'men' || cat === 'women' || cat === 'kids') {
+                return cat.charAt(0).toUpperCase() + cat.slice(1);
+            }
+            
+            // Default to the original with proper casing
+            return category.charAt(0).toUpperCase() + category.slice(1).toLowerCase();
+        }
+
+        function filterProducts() {
+            return allProducts.filter(product => {
+                const price = Number(product.rental_price);
+                // Price filter
+                if (price < currentMinPrice || price > currentMaxPrice) {
+                    return false;
+                }
+
+                // Category filter
+                if (selectedCategories.length > 0) {
+                    // Standardize the product's category
+                    const productCategory = standardizeCategory(product.category);
+                    let categoryMatch = false;
+                    
+                    for (const selected of selectedCategories) {
+                        // Use exact match on standardized categories
+                        if (productCategory === selected) {
+                            categoryMatch = true;
+                            break;
+                        }
+                    }
+                    
+                    if (!categoryMatch) {
+                        return false;
+                    }
+                }
+
+                return true;
+            });
         }
     </script>
 </body>

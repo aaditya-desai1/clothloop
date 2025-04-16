@@ -172,10 +172,10 @@
                 <button class="close-btn" onclick="closeModal()">&times;</button>
             </div>
             <div class="modal-body">
-                <div class="image-section">
+        <div class="image-section">
                     <img src="" alt="Product Image" id="clothImage">
-                </div>
-                <div class="info-section">
+        </div>
+        <div class="info-section">
                     <h1 class="product-title" id="clothTitle">Product Title</h1>
                     <div class="product-price">₹<span id="clothPrice">0.00</span>/day</div>
                     
@@ -250,7 +250,7 @@
 
         // Fetch complete product details from the server
         async function fetchProductDetails(productId) {
-            // Show loading indicator or similar
+            // Show loading indicator
             document.getElementById('clothTitle').textContent = 'Loading...';
             
             try {
@@ -262,11 +262,19 @@
                     '/backend/utils/product_operations.php'              // Direct from root
                 ];
                 
+                // Create API URL with operation type and product ID
                 let url = possiblePaths[0] + `?operation=fetch_all&id=${productId}`;
                 
                 console.log('Fetching product details from:', url);
                 
-                const response = await fetch(url);
+                // Make the request with cache-busting headers
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Cache-Control': 'no-cache',
+                        'Pragma': 'no-cache'
+                    }
+                });
                 
                 if (!response.ok) {
                     throw new Error(`Failed to fetch product details: ${response.status}`);
@@ -275,9 +283,28 @@
                 const data = await response.json();
                 
                 if (data.status === 'success' && data.products && data.products.length > 0) {
-                    // Found the product, populate the UI
-                    const product = data.products[0];
-                    populateProductDetails(product);
+                    // Find the exact product in the response
+                    let product = null;
+                    
+                    // Try to find the product with matching ID
+                    for (let i = 0; i < data.products.length; i++) {
+                        // Check both string and numeric equality
+                        if (data.products[i].id == productId) {
+                            product = data.products[i];
+                            break;
+                        }
+                    }
+                    
+                    // If we found a matching product, use it
+                    if (product) {
+                        populateProductDetails(product);
+                    } else if (data.products.length > 0) {
+                        // Fallback: use the first product if no exact match
+                        populateProductDetails(data.products[0]);
+                    } else {
+                        // No products found
+                        populateFromUrlParams();
+                    }
                 } else {
                     // No product found or error occurred
                     console.error('Product not found or error:', data);

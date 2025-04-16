@@ -301,3 +301,109 @@
     [cloth_id] => 3
 )
 
+[2025-04-16 22:10:40] Database connection successful
+[2025-04-16 22:10:40] Starting cloth upload process
+[2025-04-16 22:10:40] POST data: Array
+(
+    [seller_id] => 1
+    [description] => Pink
+    [size] => XS
+    [category] => Kids
+    [clothTitle] => Yash nu TShirt
+    [contactNo] => 1234567890
+    [whatsappNo] => 1234567890
+    [terms] => Lai Jao
+    [rentalPrice] => 100
+)
+
+[2025-04-16 22:10:40] FILES data: Array
+(
+    [clothImage] => Array
+        (
+            [name] => yash-jariwala.jpg
+            [full_path] => yash-jariwala.jpg
+            [type] => image/jpeg
+            [tmp_name] => C:\xampp\tmp\php3D78.tmp
+            [error] => 0
+            [size] => 50375
+        )
+
+)
+
+[2025-04-16 22:10:40] POST request received
+[2025-04-16 22:10:40] Seller ID from POST: 1
+[2025-04-16 22:10:40] Form data parsed: Array
+(
+    [cloth_title] => Yash nu TShirt
+    [size] => XS
+    [category] => Kids
+    [rental_price] => 100
+)
+
+[2025-04-16 22:10:40] Processing image upload: Array
+(
+    [name] => yash-jariwala.jpg
+    [full_path] => yash-jariwala.jpg
+    [type] => image/jpeg
+    [tmp_name] => C:\xampp\tmp\php3D78.tmp
+    [error] => 0
+    [size] => 50375
+)
+
+[2025-04-16 22:10:40] Image loaded successfully: Array
+(
+    [size] => 50375
+    [type] => image/jpeg
+)
+
+[2025-04-16 22:10:40] Inserting new cloth item
+[2025-04-16 22:10:40] Executing insert statement
+[2025-04-16 22:10:40] Cloth added successfully: 4
+[2025-04-16 22:10:40] Response: Array
+(
+    [status] => success
+    [message] => Cloth added successfully
+    [cloth_id] => 4
+)
+
+[2025-04-16 22:18:09] Database connection successful
+[2025-04-16 22:18:09] Starting cloth upload process
+[2025-04-16 22:18:09] POST data: Array
+(
+    [id] => 1
+    [seller_id] => 1
+    [description] => Peedu Padelu che
+    [size] => L
+    [category] => Men
+    [clothTitle] => Nishidh TShirt
+    [contactNo] => 1234567890
+    [whatsappNo] => 1234567890
+    [terms] => c
+    [rentalPrice] => 3.00
+)
+
+[2025-04-16 22:18:09] FILES data: Array
+(
+)
+
+[2025-04-16 22:18:09] POST request received
+[2025-04-16 22:18:09] Seller ID from POST: 1
+[2025-04-16 22:18:09] Form data parsed: Array
+(
+    [cloth_title] => Nishidh TShirt
+    [size] => L
+    [category] => Men
+    [rental_price] => 3.00
+)
+
+[2025-04-16 22:18:09] No new image provided or error in upload: No image uploaded
+[2025-04-16 22:18:09] Updating existing cloth: 1
+[2025-04-16 22:18:09] Executing update statement
+[2025-04-16 22:18:09] Cloth updated successfully: 1
+[2025-04-16 22:18:09] Response: Array
+(
+    [status] => success
+    [message] => Cloth updated successfully
+    [cloth_id] => 1
+)
+
