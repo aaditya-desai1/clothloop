@@ -1,80 +1,57 @@
 <?php
-// Set error reporting for debugging
+// Enable error reporting for debugging
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 // Include database connection
 require_once '../../config/db_connect.php';
 
-// Prevent image caching
-header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
-header("Cache-Control: post-check=0, pre-check=0", false);
+// Prevent caching
+header("Cache-Control: no-cache, no-store, must-revalidate");
 header("Pragma: no-cache");
+header("Expires: 0");
 
-// Path to fallback image
-$fallback_image = '../../assets/placeholder.jpg';
-
-// Create simple text log function
-function log_error($message) {
-    $log_file = '../../logs/image_errors.txt';
-    $time = date('Y-m-d H:i:s');
-    $log_message = "[$time] $message\n";
-    file_put_contents($log_file, $log_message, FILE_APPEND);
-}
-
-// Function to serve fallback image
-function serve_fallback_image() {
-    global $fallback_image;
-    
-    // If fallback image exists, serve it
-    if (file_exists($fallback_image)) {
-        header('Content-Type: image/jpeg');
-        readfile($fallback_image);
-    } else {
-        // If fallback doesn't exist, serve a text response
-        header('Content-Type: text/plain');
-        echo "Image not available";
-    }
+// Function to output a transparent 1x1 PNG as fallback
+function sendTransparentPixel() {
+    header("Content-Type: image/png");
+    // Base64 encoded 1x1 transparent PNG
+    echo base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=');
     exit;
 }
 
 // Check if ID parameter exists
 if (!isset($_GET['id']) || empty($_GET['id'])) {
-    log_error("No ID parameter provided");
-    serve_fallback_image();
+    sendTransparentPixel();
+    exit;
 }
 
 $id = intval($_GET['id']);
 
 try {
-    // Super simple direct query approach
+    // Simple direct query focusing on just getting the raw image data
     $query = "SELECT cloth_photo, photo_type FROM cloth_details WHERE id = $id";
     $result = $conn->query($query);
     
-    if (!$result) {
-        log_error("Query failed: " . $conn->error);
-        serve_fallback_image();
+    if ($result && $result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        
+        if (!empty($row['cloth_photo'])) {
+            // Set the correct content type
+            $contentType = !empty($row['photo_type']) ? $row['photo_type'] : 'image/jpeg';
+            header("Content-Type: $contentType");
+            
+            // Output the binary image data directly
+            echo $row['cloth_photo'];
+            exit;
+        }
     }
     
-    if ($result->num_rows === 0) {
-        log_error("No image found for ID: $id");
-        serve_fallback_image();
-    }
-    
-    $row = $result->fetch_assoc();
-    
-    // Check if we have image data
-    if (empty($row['cloth_photo'])) {
-        log_error("Empty image data for ID: $id");
-        serve_fallback_image();
-    }
-    
-    // Set content type and output image
-    header("Content-Type: " . $row['photo_type']);
-    echo $row['cloth_photo'];
+    // If we get here, no image was found
+    sendTransparentPixel();
     
 } catch (Exception $e) {
-    log_error("Error: " . $e->getMessage());
-    serve_fallback_image();
+    // Log error silently
+    error_log("Error retrieving image: " . $e->getMessage());
+    sendTransparentPixel();
 }
 ?> 
