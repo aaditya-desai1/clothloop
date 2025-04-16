@@ -116,7 +116,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Insert data into database
         debug_log("Preparing SQL statement");
         $sql = "INSERT INTO cloth_details (seller_id, cloth_title, description, size, category, rental_price, 
-                                         contact_no, whatsapp_no, terms_conditions, cloth_photo, photo_type) 
+                                         contact_number, whatsapp_number, terms_and_conditions, cloth_photo, photo_type) 
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         
         debug_log("SQL statement", $sql);
@@ -137,10 +137,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'size' => $size,
             'category' => $category,
             'rental_price' => $rental_price,
-            'contact_no' => $contact_no,
-            'whatsapp_no' => $whatsapp_no,
-            'terms_conditions' => mb_substr($terms_conditions, 0, 50) . "...",
-            'image_type' => $image_type
+            'contact_number' => $contact_no,
+            'whatsapp_number' => $whatsapp_no,
+            'terms_and_conditions' => mb_substr($terms_conditions, 0, 50) . "...",
+            'photo_type' => $image_type
         ]);
         
         $stmt->bind_param("issssdsssss", 

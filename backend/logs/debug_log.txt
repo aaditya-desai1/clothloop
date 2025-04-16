@@ -85,3 +85,89 @@
     [cloth_id] => 1
 )
 
+[2025-04-16 07:24:14] Database connection successful
+[2025-04-16 07:24:14] Starting cloth upload process
+[2025-04-16 07:24:14] Seller authenticated: 1
+[2025-04-16 07:24:14] Script started - SESSION data: Array
+(
+    [user_id] => 1
+    [user_type] => seller
+    [user_name] => Seller
+    [user_email] => seller@gmail.com
+    [shop_name] => Seller Hub
+)
+
+[2025-04-16 07:24:14] POST data: Array
+(
+    [seller_id] => 1
+    [description] => cc
+    [size] => M
+    [category] => Men
+    [clothTitle] => ccccc
+    [contactNo] => 1234567890
+    [whatsappNo] => 1234567890
+    [terms] => cc
+    [rentalPrice] => 9
+)
+
+[2025-04-16 07:24:14] FILES data: Array
+(
+    [clothImage] => Array
+        (
+            [name] => Screenshot (53).png
+            [full_path] => Screenshot (53).png
+            [type] => image/png
+            [tmp_name] => C:\xampp\tmp\phpCC22.tmp
+            [error] => 0
+            [size] => 466503
+        )
+
+)
+
+[2025-04-16 07:24:14] POST request received
+[2025-04-16 07:24:14] Form data parsed: Array
+(
+    [cloth_title] => ccccc
+    [size] => M
+    [category] => Men
+    [rental_price] => 9
+)
+
+[2025-04-16 07:24:14] Image file information: Array
+(
+    [name] => Screenshot (53).png
+    [full_path] => Screenshot (53).png
+    [type] => image/png
+    [tmp_name] => C:\xampp\tmp\phpCC22.tmp
+    [error] => 0
+    [size] => 466503
+)
+
+[2025-04-16 07:24:14] Preparing SQL statement
+[2025-04-16 07:24:14] SQL statement: INSERT INTO cloth_details (seller_id, cloth_title, description, size, category, rental_price, 
+                                         contact_number, whatsapp_number, terms_and_conditions, cloth_photo, photo_type) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+[2025-04-16 07:24:14] Binding parameters
+[2025-04-16 07:24:14] Parameter types: issssdsssss
+[2025-04-16 07:24:14] Parameter values: Array
+(
+    [seller_id] => 1
+    [cloth_title] => ccccc
+    [description] => cc...
+    [size] => M
+    [category] => Men
+    [rental_price] => 9
+    [contact_number] => 1234567890
+    [whatsapp_number] => 1234567890
+    [terms_and_conditions] => cc...
+    [photo_type] => image/png
+)
+
+[2025-04-16 07:24:14] Executing statement
+[2025-04-16 07:24:14] Exception caught: Cannot add or update a child row: a foreign key constraint fails (`clothloop`.`cloth_details`, CONSTRAINT `cloth_details_ibfk_1` FOREIGN KEY (`seller_id`) REFERENCES `sellers` (`id`) ON DELETE CASCADE)
+[2025-04-16 07:24:14] Response: Array
+(
+    [status] => error
+    [message] => Error: Cannot add or update a child row: a foreign key constraint fails (`clothloop`.`cloth_details`, CONSTRAINT `cloth_details_ibfk_1` FOREIGN KEY (`seller_id`) REFERENCES `sellers` (`id`) ON DELETE CASCADE)
+)
+

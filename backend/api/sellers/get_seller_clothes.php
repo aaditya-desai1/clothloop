@@ -14,7 +14,7 @@ $response = ['status' => 'error', 'message' => 'Failed to retrieve cloth items']
 try {
     // Query to get all cloth items for the seller
     $sql = "SELECT id, cloth_title, description, size, category, rental_price, 
-                   contact_no, whatsapp_no, terms_conditions, photo_type, 
+                   contact_number, whatsapp_number, terms_and_conditions, photo_type, 
                    created_at, updated_at, is_active
             FROM cloth_details 
             WHERE seller_id = ? 
