@@ -893,6 +893,9 @@
       margin-bottom: 20px;
       border-radius: var(--border-radius);
       position: relative;
+      font-weight: bold;
+      text-align: center;
+      box-shadow: var(--shadow-md);
     }
     
     .alert-success {
@@ -1578,18 +1581,12 @@
           productCard.className = 'product-card';
           productCard.setAttribute('data-id', product.id);
           
-          // Get image URL for cloth - add timestamp to prevent caching
-          const imageUrl = `../../../backend/api/sellers/get_cloth_image.php?id=${product.id}&t=${new Date().getTime()}`;
+          // Create simple image URL with cache busting
+          const imageUrl = `../../../backend/api/sellers/get_cloth_image.php?id=${product.id}&rand=${Math.random()}`;
           
           productCard.innerHTML = `
             <div class="product-image">
-              <div class="placeholder-image">
-                <i class="fas fa-tshirt"></i>
-                <p>Loading image...</p>
-              </div>
-              <img src="${imageUrl}" alt="${product.cloth_title}" style="display:none;" 
-                   onload="this.style.display='block'; this.previousElementSibling.style.display='none';" 
-                   onerror="this.style.display='none'; this.previousElementSibling.querySelector('p').textContent='No image available';" />
+              <img src="${imageUrl}" alt="${product.cloth_title}" />
             </div>
             <div class="product-details">
               <h3>${product.cloth_title}</h3>
@@ -1599,39 +1596,14 @@
               </div>
               <p class="product-description">${shortDescription}</p>
               <div class="product-actions">
-                <button type="button" class="edit-btn" onclick="editProduct(${product.id})">Edit</button>
-                <button type="button" class="view-btn" onclick="viewProduct(${product.id})">View</button>
-                <button type="button" class="delete-btn" onclick="confirmDelete(${product.id})">Delete</button>
+                <button class="edit-btn" onclick="editProduct(${product.id})">Edit</button>
+                <button class="view-btn" onclick="viewProduct(${product.id})">View</button>
+                <button class="delete-btn" onclick="confirmDelete(${product.id})">Delete</button>
               </div>
             </div>
           `;
           
           productGrid.appendChild(productCard);
-        });
-        
-        // Add global event handler for view, edit and delete buttons
-        document.querySelectorAll('.view-btn').forEach(btn => {
-          btn.addEventListener('click', function(e) {
-            e.preventDefault();
-            const productId = this.closest('.product-card').getAttribute('data-id');
-            viewProduct(productId);
-          });
-        });
-        
-        document.querySelectorAll('.edit-btn').forEach(btn => {
-          btn.addEventListener('click', function(e) {
-            e.preventDefault();
-            const productId = this.closest('.product-card').getAttribute('data-id');
-            editProduct(productId);
-          });
-        });
-        
-        document.querySelectorAll('.delete-btn').forEach(btn => {
-          btn.addEventListener('click', function(e) {
-            e.preventDefault();
-            const productId = this.closest('.product-card').getAttribute('data-id');
-            confirmDelete(productId);
-          });
         });
       }
 
@@ -1657,33 +1629,17 @@
         document.getElementById('viewProductDescription').textContent = product.description;
         document.getElementById('viewProductTerms').textContent = product.terms_conditions;
         
-        // Create a placeholder first
-        const imageContainer = document.querySelector('.view-product-image');
-        imageContainer.innerHTML = `
-          <div class="placeholder-image">
-            <i class="fas fa-tshirt"></i>
-            <p>Loading image...</p>
-          </div>
-          <img id="viewProductImage" src="" alt="Product Image" style="display:none;">
-        `;
-        
-        // Set image with timestamp to prevent caching
+        // Set image with random parameter to break cache
         const viewProductImage = document.getElementById('viewProductImage');
-        viewProductImage.src = `../../../backend/api/sellers/get_cloth_image.php?id=${id}&t=${new Date().getTime()}`;
+        if (viewProductImage) {
+          viewProductImage.src = `../../../backend/api/sellers/get_cloth_image.php?id=${id}&rand=${Math.random()}`;
+        } else {
+          // If the image element doesn't exist, create it
+          const imageContainer = document.querySelector('.view-product-image');
+          imageContainer.innerHTML = `<img id="viewProductImage" src="../../../backend/api/sellers/get_cloth_image.php?id=${id}&rand=${Math.random()}" alt="Product Image">`;
+        }
         
-        // When image loads, hide placeholder
-        viewProductImage.onload = function() {
-          this.style.display = 'block';
-          this.previousElementSibling.style.display = 'none';
-        };
-        
-        // If image fails to load, show fallback
-        viewProductImage.onerror = function() {
-          this.style.display = 'none';
-          this.previousElementSibling.querySelector('p').textContent = 'No image available';
-        };
-        
-        // Show the modal - use active class instead of flex display
+        // Show the modal
         viewModal.classList.add('active');
         viewModal.style.display = 'flex';
         
@@ -1830,7 +1786,14 @@
           alertElement = document.createElement('div');
           alertElement.id = 'alertMessage';
           alertElement.className = 'alert';
-          document.querySelector('main').prepend(alertElement);
+          alertElement.style.position = 'fixed';
+          alertElement.style.top = '80px';
+          alertElement.style.left = '50%';
+          alertElement.style.transform = 'translateX(-50%)';
+          alertElement.style.zIndex = '2000';
+          alertElement.style.width = '80%';
+          alertElement.style.maxWidth = '600px';
+          document.body.appendChild(alertElement);
         }
         
         // Set message and type
@@ -1900,7 +1863,7 @@
         }
       });
 
-      // Make window functions globally available
+      // Make functions globally available via window object
       window.viewProduct = viewProduct;
       window.editProduct = editProduct;
       window.confirmDelete = confirmDelete;

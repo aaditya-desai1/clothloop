@@ -317,3 +317,63 @@
     [cloth_id] => 2
 )
 
+[2025-04-16 17:01:22] Database connection successful
+[2025-04-16 17:01:22] Starting cloth upload process
+[2025-04-16 17:01:22] POST data: Array
+(
+    [id] => 1
+    [seller_id] => 1
+    [description] => cc
+    [size] => M
+    [category] => Men
+    [clothTitle] => Nishidh Kapdu
+    [contactNo] => 1234567890
+    [whatsappNo] => 1234567890
+    [terms] => cc
+    [rentalPrice] => 6.00
+)
+
+[2025-04-16 17:01:22] FILES data: Array
+(
+    [clothImage] => Array
+        (
+            [name] => nishidh-jasani.jpg
+            [full_path] => nishidh-jasani.jpg
+            [type] => image/jpeg
+            [tmp_name] => C:\xampp\tmp\phpF43.tmp
+            [error] => 0
+            [size] => 813766
+        )
+
+)
+
+[2025-04-16 17:01:22] POST request received
+[2025-04-16 17:01:22] Seller ID from POST: 1
+[2025-04-16 17:01:22] Form data parsed: Array
+(
+    [cloth_title] => Nishidh Kapdu
+    [size] => M
+    [category] => Men
+    [rental_price] => 6.00
+)
+
+[2025-04-16 17:01:22] Processing image upload: Array
+(
+    [name] => nishidh-jasani.jpg
+    [full_path] => nishidh-jasani.jpg
+    [type] => image/jpeg
+    [tmp_name] => C:\xampp\tmp\phpF43.tmp
+    [error] => 0
+    [size] => 813766
+)
+
+[2025-04-16 17:01:22] Updating existing cloth: 1
+[2025-04-16 17:01:22] Executing update statement
+[2025-04-16 17:01:22] Cloth updated successfully: 1
+[2025-04-16 17:01:22] Response: Array
+(
+    [status] => success
+    [message] => Cloth updated successfully
+    [cloth_id] => 1
+)
+

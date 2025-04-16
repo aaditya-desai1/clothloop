@@ -1,89 +1,80 @@
 <?php
-session_start();
+// Set error reporting for debugging
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+// Include database connection
 require_once '../../config/db_connect.php';
 
-// Prevent caching of images
+// Prevent image caching
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
-// Error logging
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+// Path to fallback image
+$fallback_image = '../../assets/placeholder.jpg';
 
-// Function to log errors
+// Create simple text log function
 function log_error($message) {
-    $log_file = "../../logs/image_errors.log";
-    $timestamp = date('Y-m-d H:i:s');
-    file_put_contents($log_file, "[$timestamp] $message\n", FILE_APPEND);
+    $log_file = '../../logs/image_errors.txt';
+    $time = date('Y-m-d H:i:s');
+    $log_message = "[$time] $message\n";
+    file_put_contents($log_file, $log_message, FILE_APPEND);
 }
 
-// Check if cloth ID is provided
-if (!isset($_GET['id']) || empty($_GET['id'])) {
-    log_error("No cloth ID provided");
-    http_response_code(400);
-    header('Content-Type: application/json');
-    echo json_encode(['status' => 'error', 'message' => 'Cloth ID is required']);
+// Function to serve fallback image
+function serve_fallback_image() {
+    global $fallback_image;
+    
+    // If fallback image exists, serve it
+    if (file_exists($fallback_image)) {
+        header('Content-Type: image/jpeg');
+        readfile($fallback_image);
+    } else {
+        // If fallback doesn't exist, serve a text response
+        header('Content-Type: text/plain');
+        echo "Image not available";
+    }
     exit;
 }
 
-$cloth_id = $_GET['id'];
-log_error("Attempting to retrieve image for cloth ID: $cloth_id");
+// Check if ID parameter exists
+if (!isset($_GET['id']) || empty($_GET['id'])) {
+    log_error("No ID parameter provided");
+    serve_fallback_image();
+}
+
+$id = intval($_GET['id']);
 
 try {
-    // Query to get cloth image
-    $sql = "SELECT cloth_photo, photo_type FROM cloth_details WHERE id = ?";
-    $stmt = $conn->prepare($sql);
+    // Super simple direct query approach
+    $query = "SELECT cloth_photo, photo_type FROM cloth_details WHERE id = $id";
+    $result = $conn->query($query);
     
-    if (!$stmt) {
-        log_error("Prepare failed: " . $conn->error);
-        throw new Exception("Prepare failed: " . $conn->error);
+    if (!$result) {
+        log_error("Query failed: " . $conn->error);
+        serve_fallback_image();
     }
     
-    $stmt->bind_param("i", $cloth_id);
-    
-    if (!$stmt->execute()) {
-        log_error("Execute failed: " . $stmt->error);
-        throw new Exception("Execute failed: " . $stmt->error);
+    if ($result->num_rows === 0) {
+        log_error("No image found for ID: $id");
+        serve_fallback_image();
     }
     
-    // Using get_result() instead of store_result() for BLOB data
-    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
     
-    if ($result->num_rows > 0) {
-        $row = $result->fetch_assoc();
-        $image_data = $row['cloth_photo'];
-        $image_type = $row['photo_type'];
-        
-        if ($image_data && $image_type) {
-            // Log successful retrieval
-            log_error("Successfully retrieved image for cloth ID: $cloth_id, size: " . strlen($image_data) . " bytes, type: $image_type");
-            
-            // Set the appropriate content type
-            header("Content-Type: " . $image_type);
-            
-            // Output the image data
-            echo $image_data;
-        } else {
-            // No image data or type
-            log_error("Image data missing for cloth ID: $cloth_id");
-            http_response_code(404);
-            header('Content-Type: application/json');
-            echo json_encode(['status' => 'error', 'message' => 'Image data is empty or invalid']);
-        }
-    } else {
-        // No image found
-        log_error("No image found for cloth ID: $cloth_id");
-        http_response_code(404);
-        header('Content-Type: application/json');
-        echo json_encode(['status' => 'error', 'message' => 'Image not found']);
+    // Check if we have image data
+    if (empty($row['cloth_photo'])) {
+        log_error("Empty image data for ID: $id");
+        serve_fallback_image();
     }
     
-    $stmt->close();
+    // Set content type and output image
+    header("Content-Type: " . $row['photo_type']);
+    echo $row['cloth_photo'];
+    
 } catch (Exception $e) {
     log_error("Error: " . $e->getMessage());
-    http_response_code(500);
-    header('Content-Type: application/json');
-    echo json_encode(['status' => 'error', 'message' => 'Error: ' . $e->getMessage()]);
+    serve_fallback_image();
 }
 ?> 
