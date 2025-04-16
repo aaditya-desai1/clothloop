@@ -1086,3 +1086,68 @@
     [cloth_id] => 2
 )
 
+[2025-04-16 18:48:26] Database connection successful
+[2025-04-16 18:48:26] Starting cloth upload process
+[2025-04-16 18:48:26] POST data: Array
+(
+    [seller_id] => 1
+    [description] => cc
+    [size] => cc
+    [category] => Men
+    [clothTitle] => Jiyan ni Polo
+    [contactNo] => 1234567890
+    [whatsappNo] => 1234567890
+    [terms] => cc
+    [rentalPrice] => 3
+)
+
+[2025-04-16 18:48:26] FILES data: Array
+(
+    [clothImage] => Array
+        (
+            [name] => aaryan-joshi.jpg
+            [full_path] => aaryan-joshi.jpg
+            [type] => image/jpeg
+            [tmp_name] => C:\xampp\tmp\php1455.tmp
+            [error] => 0
+            [size] => 302279
+        )
+
+)
+
+[2025-04-16 18:48:26] POST request received
+[2025-04-16 18:48:26] Seller ID from POST: 1
+[2025-04-16 18:48:26] Form data parsed: Array
+(
+    [cloth_title] => Jiyan ni Polo
+    [size] => cc
+    [category] => Men
+    [rental_price] => 3
+)
+
+[2025-04-16 18:48:26] Processing image upload: Array
+(
+    [name] => aaryan-joshi.jpg
+    [full_path] => aaryan-joshi.jpg
+    [type] => image/jpeg
+    [tmp_name] => C:\xampp\tmp\php1455.tmp
+    [error] => 0
+    [size] => 302279
+)
+
+[2025-04-16 18:48:26] Image loaded successfully: Array
+(
+    [size] => 302279
+    [type] => image/jpeg
+)
+
+[2025-04-16 18:48:26] Inserting new cloth item
+[2025-04-16 18:48:26] Executing insert statement
+[2025-04-16 18:48:26] Cloth added successfully: 1
+[2025-04-16 18:48:26] Response: Array
+(
+    [status] => success
+    [message] => Cloth added successfully
+    [cloth_id] => 1
+)
+

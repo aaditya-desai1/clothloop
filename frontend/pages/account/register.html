@@ -306,21 +306,6 @@
                 </div>
                 
                 <div class="form-group">
-                    <label for="shop_logo">Shop Logo:</label>
-                    <input type="file" id="shop_logo" name="shop_logo" accept="image/*">
-                    <div id="shop-logo-preview" style="margin-top: 10px; text-align: center; display: none;">
-                        <img id="logo-preview-img" src="#" alt="Logo Preview" style="max-width: 100px; max-height: 100px; border: 1px solid #ddd; border-radius: 5px;">
-                    </div>
-                    <div id="shop-logo-error" class="error-message"></div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="shop_bio">Shop Bio:</label>
-                    <textarea id="shop_bio" name="shop_bio" rows="4" placeholder="Tell customers about your shop..."></textarea>
-                    <div id="shop-bio-error" class="error-message"></div>
-                </div>
-                
-                <div class="form-group">
                     <label for="shop_address">Shop Address:</label>
                     <textarea id="shop_address" name="shop_address"></textarea>
                     <div id="shop-address-error" class="error-message"></div>
@@ -354,6 +339,10 @@
                     <input type="hidden" id="shop_latitude" name="shop_latitude">
                     <input type="hidden" id="shop_longitude" name="shop_longitude">
                     <div id="location-error" class="error-message"></div>
+                </div>
+                
+                <div class="form-group">
+                    <p style="color: #666; font-style: italic; margin-top: 20px;">You can update your shop logo and shop bio later in your seller profile settings.</p>
                 </div>
             </div>
             
@@ -453,71 +442,33 @@
                 });
             }
             
-            // Shop logo preview functionality
-            const shopLogoInput = document.getElementById('shop_logo');
-            const logoPreview = document.getElementById('shop-logo-preview');
-            const logoPreviewImg = document.getElementById('logo-preview-img');
-            
-            if (shopLogoInput) {
-                shopLogoInput.addEventListener('change', function() {
-                    if (this.files && this.files[0]) {
-                        const file = this.files[0];
-                        
-                        // Check if file is an image
-                        if (!file.type.match('image.*')) {
-                            document.getElementById('shop-logo-error').textContent = 'Please select an image file';
-                            logoPreview.style.display = 'none';
-                            return;
-                        }
-                        
-                        // Check file size (max 2MB)
-                        if (file.size > 2 * 1024 * 1024) {
-                            document.getElementById('shop-logo-error').textContent = 'Image size should be less than 2MB';
-                            logoPreview.style.display = 'none';
-                            return;
-                        }
-                        
-                        // Clear any previous error
-                        document.getElementById('shop-logo-error').textContent = '';
-                        
-                        // Show image preview
-                        const reader = new FileReader();
-                        reader.onload = function(e) {
-                            logoPreviewImg.src = e.target.result;
-                            logoPreview.style.display = 'block';
-                        }
-                        reader.readAsDataURL(file);
-                    }
-                });
-            }
-            
             // Toggle seller fields based on user type selection
             const buyerRadio = document.querySelector('input[name="user_type"][value="buyer"]');
             const sellerRadio = document.querySelector('input[name="user_type"][value="seller"]');
             const sellerFields = document.getElementById('seller-fields');
             
-            function toggleSellerFields() {
-                sellerFields.style.display = sellerRadio.checked ? 'block' : 'none';
-                
-                // Make seller fields required only when seller is selected
-                const sellerInputs = sellerFields.querySelectorAll('input:not([type="hidden"]), textarea');
-                sellerInputs.forEach(input => {
-                    if (sellerRadio.checked) {
-                        if (input.id !== 'get_location') {
+            if (buyerRadio && sellerRadio && sellerFields) {
+                function toggleSellerFields() {
+                    sellerFields.style.display = sellerRadio.checked ? 'block' : 'none';
+                    
+                    // Make seller fields required only when seller is selected
+                    const sellerInputs = sellerFields.querySelectorAll('input:not([type="hidden"]):not([type="button"]), textarea');
+                    sellerInputs.forEach(input => {
+                        if (sellerRadio.checked) {
                             input.setAttribute('required', '');
+                        } else {
+                            input.removeAttribute('required');
                         }
-                    } else {
-                        input.removeAttribute('required');
-                    }
-                });
+                    });
+                }
+                
+                // Initial toggle
+                toggleSellerFields();
+                
+                // Add event listeners to radio buttons
+                buyerRadio.addEventListener('change', toggleSellerFields);
+                sellerRadio.addEventListener('change', toggleSellerFields);
             }
-            
-            // Initial toggle
-            toggleSellerFields();
-            
-            // Add event listeners to radio buttons
-            buyerRadio.addEventListener('change', toggleSellerFields);
-            sellerRadio.addEventListener('change', toggleSellerFields);
             
             // Get location button functionality
             const getLocationBtn = document.getElementById('get_location');
@@ -683,8 +634,6 @@
                         const shopAddress = document.getElementById('shop_address').value;
                         const latitude = document.getElementById('shop_latitude').value;
                         const longitude = document.getElementById('shop_longitude').value;
-                        const shopLogo = document.getElementById('shop_logo').files[0];
-                        const shopBio = document.getElementById('shop_bio').value;
                         
                         if (!shopName.trim()) {
                             document.getElementById('shop-name-error').textContent = 'Shop name is required';
@@ -705,23 +654,6 @@
                             return;
                         } else {
                             document.getElementById('location-error').textContent = '';
-                        }
-                        
-                        if (!shopLogo) {
-                            document.getElementById('shop-logo-error').textContent = 'Please upload a shop logo';
-                            return;
-                        } else {
-                            document.getElementById('shop-logo-error').textContent = '';
-                        }
-                        
-                        if (!shopBio.trim()) {
-                            document.getElementById('shop-bio-error').textContent = 'Please provide a short description for your shop';
-                            return;
-                        } else if (shopBio.length > 500) {
-                            document.getElementById('shop-bio-error').textContent = 'Shop bio should be less than 500 characters';
-                            return;
-                        } else {
-                            document.getElementById('shop-bio-error').textContent = '';
                         }
                     }
                     

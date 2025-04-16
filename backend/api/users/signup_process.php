@@ -68,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $shopAddress = trim($_POST['shop_address']);
         $shopLatitude = $_POST['shop_latitude'];
         $shopLongitude = $_POST['shop_longitude'];
-        $shopBio = trim($_POST['shop_bio']);
+        $shopBio = ''; // Default empty shop bio
         
         // Validate required seller fields
         if (empty($shopName)) {
@@ -83,48 +83,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $response['errors'][] = 'Shop location is required';
         }
         
-        if (empty($shopBio)) {
-            $response['errors'][] = 'Shop bio is required';
-        }
-        
-        // Handle shop logo upload
-        $shopLogoPath = null;
-        if (isset($_FILES['shop_logo']) && $_FILES['shop_logo']['error'] === UPLOAD_ERR_OK) {
-            $fileInfo = pathinfo($_FILES['shop_logo']['name']);
-            $fileExtension = strtolower($fileInfo['extension']);
-            
-            // Validate file extension
-            $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
-            if (!in_array($fileExtension, $allowedExtensions)) {
-                $response['errors'][] = 'Invalid file format. Only JPG, JPEG, PNG, GIF, and WEBP files are allowed.';
-            }
-            
-            // Validate file size (max 2MB)
-            if ($_FILES['shop_logo']['size'] > 2 * 1024 * 1024) {
-                $response['errors'][] = 'File size exceeds the maximum limit of 2MB.';
-            }
-            
-            // Process file upload if no errors
-            if (empty($response['errors'])) {
-                // Create upload directory if it doesn't exist
-                $uploadDir = '../../../frontend/assets/images/shop_logos/';
-                if (!file_exists($uploadDir)) {
-                    mkdir($uploadDir, 0777, true);
-                }
-                
-                // Generate unique filename
-                $newFileName = uniqid('shop_logo_') . '.' . $fileExtension;
-                $shopLogoPath = 'frontend/assets/images/shop_logos/' . $newFileName;
-                $uploadPath = $uploadDir . $newFileName;
-                
-                // Move uploaded file
-                if (!move_uploaded_file($_FILES['shop_logo']['tmp_name'], $uploadPath)) {
-                    $response['errors'][] = 'Failed to upload logo. Please try again.';
-                }
-            }
-        } else {
-            $response['errors'][] = 'Shop logo is required';
-        }
+        // Handle shop logo upload - now optional
+        $shopLogoPath = 'frontend/assets/images/shop_logo.png'; // Default logo path
     }
     
     // Process registration if no errors

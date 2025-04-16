@@ -512,3 +512,23 @@
 [2025-04-16 18:43:23] Processing image request: {"id":2}
 [2025-04-16 18:43:23] Query executed: {"rows":1}
 [2025-04-16 18:43:23] Image found, serving with content type: image/jpeg
+[2025-04-16 18:48:26] Starting image request
+[2025-04-16 18:48:26] Processing image request: {"id":1}
+[2025-04-16 18:48:26] Query executed: {"rows":1}
+[2025-04-16 18:48:26] Image found, serving with content type: image/jpeg
+[2025-04-16 18:48:28] Starting image request
+[2025-04-16 18:48:28] Processing image request: {"id":1}
+[2025-04-16 18:48:28] Query executed: {"rows":1}
+[2025-04-16 18:48:28] Image found, serving with content type: image/jpeg
+[2025-04-16 18:49:52] Starting image request
+[2025-04-16 18:49:52] Processing image request: {"id":1}
+[2025-04-16 18:49:52] Query executed: {"rows":1}
+[2025-04-16 18:49:52] Image found, serving with content type: image/jpeg
+[2025-04-16 18:49:54] Starting image request
+[2025-04-16 18:49:54] Processing image request: {"id":1}
+[2025-04-16 18:49:54] Query executed: {"rows":1}
+[2025-04-16 18:49:54] Image found, serving with content type: image/jpeg
+[2025-04-16 18:54:16] Starting image request
+[2025-04-16 18:54:16] Processing image request: {"id":1}
+[2025-04-16 18:54:16] Query executed: {"rows":1}
+[2025-04-16 18:54:16] Image found, serving with content type: image/jpeg

@@ -829,7 +829,7 @@
             <div class="dropdown-menu">
               <a href="seller_profile.html"><i class="fas fa-user"></i> Profile</a>
               <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
-              <a href="#" id="logoutLink"><i class="fas fa-sign-out-alt"></i> Log Out</a>
+              <a href="../account/login.html" id="logoutLink"><i class="fas fa-sign-out-alt"></i> Log Out</a>
             </div>
           </div>
         </div>
@@ -1089,6 +1089,21 @@
       
       // Profile fetch and display
       fetchSellerProfile();
+      
+      // Handle logout
+      const logoutLink = document.getElementById('logoutLink');
+      if (logoutLink) {
+        logoutLink.addEventListener('click', function(e) {
+          e.preventDefault();
+          // Clear user data
+          localStorage.removeItem('user_id');
+          localStorage.removeItem('userType');
+          localStorage.removeItem('username');
+          sessionStorage.clear();
+          // Redirect to login page
+          window.location.href = '../account/login.html';
+        });
+      }
       
       // Handle navigation
       navLinks.forEach(link => {
