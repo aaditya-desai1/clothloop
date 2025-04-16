@@ -24,7 +24,7 @@ try {
     $sellerId = $_SESSION['user_id'];
     
     // Prepare SQL to fetch seller details
-    $stmt = $conn->prepare("SELECT id, name, email, phone_no, shop_name, shop_address, shop_location, shop_logo, shop_bio FROM sellers WHERE id = ?");
+    $stmt = $conn->prepare("SELECT id, name, email, phone_no, shop_name, shop_address, shop_location, shop_logo, shop_bio, created_at FROM sellers WHERE id = ?");
     $stmt->bind_param("i", $sellerId);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -52,11 +52,12 @@ try {
             'shop_address' => $seller['shop_address'],
             'shop_location' => $seller['shop_location'],
             'shop_bio' => $seller['shop_bio'],
-            'profile_image' => null
+            'shop_logo' => $seller['shop_logo'] ? "uploads/sellers/" . $seller['shop_logo'] : null,
+            'created_at' => $seller['created_at']
         ]
     ];
     
-    // Handle profile image (shop logo)
+    // Handle shop logo
     if (!empty($seller['shop_logo'])) {
         $imagePath = '../../../' . $seller['shop_logo'];
         if (file_exists($imagePath)) {
@@ -80,7 +81,7 @@ try {
             $base64Image = 'data:' . $mimeType . ';base64,' . base64_encode($imageData);
             
             // Add to response
-            $response['seller']['profile_image'] = $base64Image;
+            $response['seller']['shop_logo'] = $base64Image;
         }
     }
     

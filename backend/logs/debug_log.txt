@@ -1151,3 +1151,44 @@
     [cloth_id] => 1
 )
 
+[2025-04-16 19:25:24] Database connection successful
+[2025-04-16 19:25:24] Starting cloth upload process
+[2025-04-16 19:25:24] POST data: Array
+(
+    [id] => 1
+    [seller_id] => 1
+    [description] => cc
+    [size] => M
+    [category] => Men
+    [clothTitle] => Jiyan ni Polo
+    [contactNo] => 1234567890
+    [whatsappNo] => 1234567890
+    [terms] => cc
+    [rentalPrice] => 3.00
+)
+
+[2025-04-16 19:25:24] FILES data: Array
+(
+)
+
+[2025-04-16 19:25:24] POST request received
+[2025-04-16 19:25:24] Seller ID from POST: 1
+[2025-04-16 19:25:24] Form data parsed: Array
+(
+    [cloth_title] => Jiyan ni Polo
+    [size] => M
+    [category] => Men
+    [rental_price] => 3.00
+)
+
+[2025-04-16 19:25:24] No new image provided or error in upload: No image uploaded
+[2025-04-16 19:25:24] Updating existing cloth: 1
+[2025-04-16 19:25:24] Executing update statement
+[2025-04-16 19:25:24] Cloth updated successfully: 1
+[2025-04-16 19:25:24] Response: Array
+(
+    [status] => success
+    [message] => Cloth updated successfully
+    [cloth_id] => 1
+)
+

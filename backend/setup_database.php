@@ -16,16 +16,21 @@ function tableExists($conn, $tableName) {
 
 // Function to create users table
 function createUsersTable($conn) {
-    $sql = "CREATE TABLE IF NOT EXISTS users (
-        id INT(11) AUTO_INCREMENT PRIMARY KEY,
-        username VARCHAR(50) NOT NULL,
+    $sql = "CREATE TABLE IF NOT EXISTS `sellers` (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        name VARCHAR(255) NOT NULL,
+        email VARCHAR(255) NOT NULL UNIQUE,
         password VARCHAR(255) NOT NULL,
-        email VARCHAR(100) NOT NULL,
-        first_name VARCHAR(50),
-        last_name VARCHAR(50),
-        user_type ENUM('buyer', 'seller', 'admin') NOT NULL,
-        phone VARCHAR(20),
-        profile_image VARCHAR(255),
+        phone_no VARCHAR(20),
+        shop_name VARCHAR(255),
+        shop_address TEXT,
+        shop_location VARCHAR(255),
+        shop_bio TEXT,
+        shop_logo VARCHAR(255),
+        verification_token VARCHAR(255),
+        is_verified BOOLEAN DEFAULT 0,
+        reset_token VARCHAR(255),
+        reset_token_expires DATETIME,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     )";

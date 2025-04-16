@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-  <title>Seller Profile</title>
+  <title>Shop Profile</title>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
   <style>
     /* Global Variables */
@@ -440,6 +440,49 @@
       color: #666;
       margin-top: 5px;
     }
+
+    .location-input-group {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+      flex-direction: column;
+    }
+    
+    .coordinate-inputs {
+      display: flex;
+      gap: 15px;
+      width: 100%;
+    }
+    
+    .coordinate-input {
+      flex: 1;
+    }
+    
+    .coordinate-input label {
+      font-size: 14px;
+      font-weight: normal;
+      margin-bottom: 5px;
+    }
+    
+    .location-btn {
+      background-color: var(--accent-color);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 10px 15px;
+      cursor: pointer;
+      transition: var(--transition);
+      font-size: 14px;
+      align-self: flex-start;
+    }
+    
+    .location-btn:hover {
+      background-color: #3e8e41;
+    }
+    
+    .location-btn i {
+      margin-right: 5px;
+    }
   </style>
 </head>
 <body>
@@ -451,7 +494,7 @@
           <img src="../../assets/images/logo.webp" alt="ClothLoop logo" />
           <div class="brand-name">
             <h1>ClothLoop</h1>
-            <p>Seller Dashboard</p>
+            <p>Shop Profile</p>
           </div>
         </div>
       </div>
@@ -465,9 +508,9 @@
             </div>
             <i class="fas fa-chevron-down"></i>
             <div class="dropdown-menu">
-              <a href="seller_profile.html" class="active"><i class="fas fa-user"></i> Profile</a>
-              <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
-              <a href="../account/login.html"><i class="fas fa-sign-out-alt"></i> Log Out</a>
+              <a href="seller_profile.html" class="active"><i class="fas fa-store"></i> Shop Profile</a>
+              <a href="settings.html"><i class="fas fa-cog"></i> Account Settings</a>
+              <a href="../account/login.html" id="logoutLink"><i class="fas fa-sign-out-alt"></i> Log Out</a>
             </div>
           </div>
         </div>
@@ -486,7 +529,7 @@
 
     <!-- Main Content -->
     <main class="main-content">
-      <h1>Profile Settings</h1>
+      <h1>Shop Profile</h1>
       
       <div id="alertMessage" class="alert">
         <!-- Alert messages will appear here -->
@@ -495,27 +538,12 @@
       <form id="profileForm">
         <div class="form-group">
           <div class="image-upload-container">
-            <img id="profileImagePreview" class="profile-image-preview" src="../../assets/images/shop_logo.png" alt="Profile Picture">
+            <img id="profileImagePreview" class="profile-image-preview" src="../../assets/images/shop_logo.png" alt="Shop Logo">
             <div class="upload-btn-wrapper">
-              <button type="button" class="upload-btn">Upload New Picture</button>
-              <input type="file" id="profilePicture" name="profile_image" accept="image/*" onchange="previewImage(event)">
+              <button type="button" class="upload-btn">Upload Shop Logo</button>
+              <input type="file" id="profilePicture" name="shop_logo" accept="image/*" onchange="previewImage(event)">
             </div>
           </div>
-        </div>
-        
-        <div class="form-group">
-          <label for="username">Username:</label>
-          <input type="text" id="username" name="username" required>
-        </div>
-        
-        <div class="form-group">
-          <label for="email">Email:</label>
-          <input type="email" id="email" name="email" required>
-        </div>
-        
-        <div class="form-group">
-          <label for="phone">Phone Number:</label>
-          <input type="tel" id="phone" name="phone" required>
         </div>
         
         <div class="form-group">
@@ -536,18 +564,26 @@
         </div>
         
         <div class="form-group">
-          <label for="password">Password:</label>
-          <input type="password" id="password" name="password" placeholder="Leave blank to keep current password">
-        </div>
-        
-        <div class="form-group">
-          <label for="confirmPassword">Confirm Password:</label>
-          <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Leave blank to keep current password">
+          <label for="shopLocation">Shop Location:</label>
+          <div class="location-input-group">
+            <div class="coordinate-inputs">
+              <div class="coordinate-input">
+                <label for="shopLatitude">Latitude:</label>
+                <input type="number" id="shopLatitude" name="shop_latitude" placeholder="e.g. 40.7128" step="0.0001" min="-90" max="90" required>
+              </div>
+              <div class="coordinate-input">
+                <label for="shopLongitude">Longitude:</label>
+                <input type="number" id="shopLongitude" name="shop_longitude" placeholder="e.g. -74.0060" step="0.0001" min="-180" max="180" required>
+              </div>
+            </div>
+            <button type="button" id="getLocationBtn" class="location-btn"><i class="fas fa-map-marker-alt"></i> Get Location</button>
+          </div>
+          <div class="help-text">Enter coordinates manually or use the button to get your current location.</div>
         </div>
         
         <div class="button-group">
           <button type="button" class="back-btn" onclick="window.location.href='seller_dashboard.html'">Back to Dashboard</button>
-          <button type="submit" class="save-btn">Update Profile</button>
+          <button type="submit" class="save-btn">Update Shop Profile</button>
         </div>
       </form>
     </main>
@@ -609,34 +645,30 @@
       }
       
       // Show loading message
-      showAlert('Loading profile data...', 'info');
+      showAlert('Loading shop data...', 'info');
       
       // Fetch seller profile data
       fetchSellerProfile();
       
       // Handle logout
-      const logoutLink = document.querySelector('.dropdown-menu a[href="../account/login.html"]');
+      const logoutLink = document.getElementById('logoutLink');
       if (logoutLink) {
-        logoutLink.addEventListener('click', function() {
+        logoutLink.addEventListener('click', function(e) {
+          e.preventDefault();
           // Clear user data
           localStorage.removeItem('user_id');
+          localStorage.removeItem('userType');
+          localStorage.removeItem('username');
           sessionStorage.clear();
+          // Redirect to login page
+          window.location.href = '../account/login.html';
         });
       }
       
-      // Form submission
+      // Update the form submission to combine latitude and longitude
       if (profileForm) {
         profileForm.addEventListener('submit', function(e) {
           e.preventDefault();
-          
-          // Validate passwords if provided
-          const password = document.getElementById('password').value;
-          const confirmPassword = document.getElementById('confirmPassword').value;
-          
-          if (password && password !== confirmPassword) {
-            showAlert('Passwords do not match!', 'danger');
-            return;
-          }
           
           // Validate shop bio length
           const shopBio = document.getElementById('shopBio').value;
@@ -645,28 +677,49 @@
             return;
           }
           
-          // Get form data
-          const formData = new FormData();
-          formData.append('username', document.getElementById('username').value);
-          formData.append('email', document.getElementById('email').value);
-          formData.append('phone', document.getElementById('phone').value);
-          formData.append('shop_name', document.getElementById('shopName').value);
-          formData.append('shop_address', document.getElementById('shopAddress').value);
-          formData.append('shop_bio', document.getElementById('shopBio').value);
+          // Get values from form
+          const shopName = document.getElementById('shopName').value;
+          const shopAddress = document.getElementById('shopAddress').value;
           
-          if (password) {
-            formData.append('password', password);
-            formData.append('confirm_password', confirmPassword);
+          // Check required fields
+          if (!shopName || !shopAddress) {
+            showAlert('Shop Name and Shop Address are required fields.', 'danger');
+            return;
+          }
+          
+          // Get latitude and longitude values
+          const latitude = document.getElementById('shopLatitude').value;
+          const longitude = document.getElementById('shopLongitude').value;
+          
+          // Create form data
+          const formData = new FormData();
+          formData.append('shop_name', shopName);
+          formData.append('shop_address', shopAddress);
+          formData.append('shop_bio', shopBio);
+          
+          // Combine latitude and longitude for the shop_location
+          if (latitude && longitude) {
+            const combinedLocation = `${latitude},${longitude}`;
+            formData.append('shop_location', combinedLocation);
+          } else {
+            // Add a default or empty value to ensure the field is included
+            formData.append('shop_location', '');
           }
           
           // Append profile picture if selected
           const profilePicInput = document.getElementById('profilePicture');
           if (profilePicInput.files.length > 0) {
-            formData.append('profile_image', profilePicInput.files[0]);
+            formData.append('shop_logo', profilePicInput.files[0]);
+          }
+          
+          // Debug: Log form data
+          console.log('Submitting form data:');
+          for (let pair of formData.entries()) {
+            console.log(pair[0] + ': ' + pair[1]);
           }
           
           // Show loading message
-          showAlert('Updating profile...', 'info');
+          showAlert('Updating shop profile...', 'info');
           
           // Update profile in database
           updateProfile(formData);
@@ -721,16 +774,10 @@
           });
       }
       
-      // Function to populate form with seller data
+      // Modify the populateFormWithData function to split location into latitude and longitude
       function populateFormWithData(sellerData) {
         if (!sellerData) return;
         
-        if (document.getElementById('username')) 
-          document.getElementById('username').value = sellerData.username || '';
-        if (document.getElementById('email')) 
-          document.getElementById('email').value = sellerData.email || '';
-        if (document.getElementById('phone')) 
-          document.getElementById('phone').value = sellerData.phone || '';
         if (document.getElementById('shopName')) 
           document.getElementById('shopName').value = sellerData.shop_name || '';
         if (document.getElementById('shopAddress')) 
@@ -740,42 +787,68 @@
           updateCharCount(); // Update character count after setting shop bio
         }
         
+        // Handle shop location splitting
+        if (sellerData.shop_location) {
+          const locationParts = sellerData.shop_location.split(',');
+          if (locationParts.length === 2) {
+            if (document.getElementById('shopLatitude')) {
+              document.getElementById('shopLatitude').value = locationParts[0].trim();
+            }
+            if (document.getElementById('shopLongitude')) {
+              document.getElementById('shopLongitude').value = locationParts[1].trim();
+            }
+          }
+        }
+        
         // Update navigation elements
         if (navSellerName) {
           navSellerName.textContent = sellerData.username || 'Seller';
         }
         
         // Update profile images if available
-        if (sellerData.profile_image) {
-          console.log('Setting profile image:', sellerData.profile_image.substring(0, 30) + '...');
+        if (sellerData.shop_logo) {
+          console.log('Setting shop logo:', sellerData.shop_logo.substring(0, 30) + '...');
           if (document.getElementById('profileImagePreview')) {
-            document.getElementById('profileImagePreview').src = sellerData.profile_image;
+            document.getElementById('profileImagePreview').src = sellerData.shop_logo;
           }
           if (navProfileImage) {
-            navProfileImage.src = sellerData.profile_image;
+            navProfileImage.src = sellerData.shop_logo;
           }
         }
       }
       
       // Function to update profile in database
       function updateProfile(formData) {
+        // Debug log
+        console.log('Sending request to: ../../../backend/api/sellers/update_seller_profile.php');
+        
+        // Add credentials to fetch to include cookies/session
         fetch('../../../backend/api/sellers/update_seller_profile.php', {
           method: 'POST',
-          body: formData
+          body: formData,
+          credentials: 'include' // Include cookies for session
         })
-          .then(response => response.json())
+          .then(response => {
+            // Check if response is ok
+            if (!response.ok) {
+              console.error('HTTP error:', response.status, response.statusText);
+              throw new Error('Server returned status: ' + response.status);
+            }
+            return response.json();
+          })
           .then(data => {
+            console.log('Server response:', data);
+            
             if (data.status === 'success') {
-              showAlert('Profile updated successfully!', 'success');
+              showAlert('Shop profile updated successfully!', 'success');
               
               // Update navigation elements with new data
-              const username = formData.get('username');
-              if (navSellerName) {
-                navSellerName.textContent = username;
+              if (data.shop_name && navSellerName) {
+                navSellerName.textContent = data.shop_name;
               }
               
               // Update profile image if it was provided
-              if (data.profileImageUrl) {
+              if (data.shopLogoUrl) {
                 const profileImage = document.getElementById('profileImagePreview').src;
                 if (navProfileImage) {
                   navProfileImage.src = profileImage;
@@ -787,15 +860,13 @@
               if (cachedData) {
                 try {
                   const sellerData = JSON.parse(cachedData);
-                  sellerData.username = formData.get('username');
-                  sellerData.email = formData.get('email');
-                  sellerData.phone = formData.get('phone');
                   sellerData.shop_name = formData.get('shop_name');
                   sellerData.shop_address = formData.get('shop_address');
                   sellerData.shop_bio = formData.get('shop_bio');
+                  sellerData.shop_location = formData.get('shop_location');
                   
-                  if (data.profileImageUrl) {
-                    sellerData.profile_image = document.getElementById('profileImagePreview').src;
+                  if (data.shopLogoUrl) {
+                    sellerData.shop_logo = document.getElementById('profileImagePreview').src;
                   }
                   
                   sessionStorage.setItem('sellerData', JSON.stringify(sellerData));
@@ -804,20 +875,18 @@
                 }
               }
               
-              // Clear password fields
-              if (document.getElementById('password')) {
-                document.getElementById('password').value = '';
-              }
-              if (document.getElementById('confirmPassword')) {
-                document.getElementById('confirmPassword').value = '';
-              }
+              // Reload page to show updated data
+              setTimeout(() => {
+                window.location.reload();
+              }, 2000);
             } else {
-              showAlert('Error updating profile: ' + data.message, 'danger');
+              showAlert('Error updating shop profile: ' + (data.message || 'Unknown error'), 'danger');
+              console.error('Server response:', data);
             }
           })
           .catch(error => {
             console.error('Error updating profile:', error);
-            showAlert('Failed to update profile. Please try again later.', 'danger');
+            showAlert('Failed to update shop profile. Please try again later.', 'danger');
           });
       }
       
@@ -857,6 +926,71 @@
       
       // Initialize character counter
       updateCharCount();
+
+      // Get location button functionality
+      const getLocationBtn = document.getElementById('getLocationBtn');
+      if (getLocationBtn) {
+        getLocationBtn.addEventListener('click', function() {
+          if (navigator.geolocation) {
+            // Show a loading state
+            getLocationBtn.disabled = true;
+            getLocationBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Getting location...';
+            
+            navigator.geolocation.getCurrentPosition(
+              // Success callback
+              function(position) {
+                const latitude = position.coords.latitude;
+                const longitude = position.coords.longitude;
+                
+                // Update the latitude and longitude fields
+                document.getElementById('shopLatitude').value = latitude.toFixed(4);
+                document.getElementById('shopLongitude').value = longitude.toFixed(4);
+                
+                // Reset button state
+                getLocationBtn.disabled = false;
+                getLocationBtn.innerHTML = '<i class="fas fa-map-marker-alt"></i> Get Location';
+                
+                // Show success message
+                showAlert('Current location fetched successfully!', 'success');
+              },
+              // Error callback
+              function(error) {
+                let errorMessage = 'Unable to retrieve your location. ';
+                
+                switch(error.code) {
+                  case error.PERMISSION_DENIED:
+                    errorMessage += 'You denied the request for geolocation.';
+                    break;
+                  case error.POSITION_UNAVAILABLE:
+                    errorMessage += 'Location information is unavailable.';
+                    break;
+                  case error.TIMEOUT:
+                    errorMessage += 'The request to get user location timed out.';
+                    break;
+                  case error.UNKNOWN_ERROR:
+                    errorMessage += 'An unknown error occurred.';
+                    break;
+                }
+                
+                // Show error message
+                showAlert(errorMessage, 'danger');
+                
+                // Reset button state
+                getLocationBtn.disabled = false;
+                getLocationBtn.innerHTML = '<i class="fas fa-map-marker-alt"></i> Get Location';
+              },
+              // Options
+              {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 0
+              }
+            );
+          } else {
+            showAlert('Geolocation is not supported by this browser.', 'danger');
+          }
+        });
+      }
     });
   </script>
 </body>
