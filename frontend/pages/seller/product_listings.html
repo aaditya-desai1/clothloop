@@ -1584,9 +1584,13 @@
           // Simple approach with direct HTML buttons
           productCard.innerHTML = `
             <div class="product-image">
-              <img src="../../../backend/api/sellers/get_cloth_image.php?id=${product.id}&t=${Date.now()}" 
+              <div class="placeholder-image">
+                <i class="fas fa-tshirt"></i>
+                <p>Image loading...</p>
+              </div>
+              <img src="../../../backend/api/sellers/get_cloth_image.php?id=${product.id}&t=${new Date().getTime()}" 
                    alt="${product.cloth_title}" 
-                   onerror="this.src='../../assets/images/placeholder.png'; this.onerror=null;" />
+                   onerror="this.onerror=null; console.log('Failed to load image for ${product.id}'); this.src='../../assets/images/shop_logo.png'; this.style.padding='20px';" />
             </div>
             <div class="product-details">
               <h3>${product.cloth_title}</h3>
@@ -1641,18 +1645,29 @@
         // Set image with random parameter to break cache
         const viewProductImage = document.getElementById('viewProductImage');
         if (viewProductImage) {
-          viewProductImage.src = `../../../backend/api/sellers/get_cloth_image.php?id=${id}&rand=${Math.random()}`;
+          // Add a timestamp to prevent browser caching
+          const timestamp = new Date().getTime();
+          viewProductImage.src = `../../../backend/api/sellers/get_cloth_image.php?id=${id}&t=${timestamp}`;
           viewProductImage.onerror = function() {
-            this.src = '../../assets/images/placeholder.png';
             this.onerror = null;
+            console.log('Failed to load detail image for ID:', id);
+            this.src = '../../assets/images/shop_logo.png';
+            this.style.padding = '20px';
+            this.style.background = '#f5f5f5';
           };
         } else {
           // If the image element doesn't exist, create it
           const imageContainer = document.querySelector('.view-product-image');
-          imageContainer.innerHTML = `<img id="viewProductImage" 
-                                          src="../../../backend/api/sellers/get_cloth_image.php?id=${id}&rand=${Math.random()}" 
-                                          alt="Product Image"
-                                          onerror="this.src='../../assets/images/placeholder.png'; this.onerror=null;">`;
+          imageContainer.innerHTML = `
+            <div class="placeholder-image">
+              <i class="fas fa-tshirt"></i>
+              <p>Loading product image...</p>
+            </div>
+            <img id="viewProductImage" 
+                 src="../../../backend/api/sellers/get_cloth_image.php?id=${id}&t=${new Date().getTime()}" 
+                 alt="Product Image"
+                 onerror="this.onerror=null; console.log('Failed to load detail image for ID: ${id}'); this.src='../../assets/images/shop_logo.png'; this.style.padding='20px'; this.style.background='#f5f5f5';">
+          `;
         }
         
         // Show the modal
@@ -1717,8 +1732,12 @@
         
         // Add an error handler for the image
         previewImage.onerror = function() {
-          this.src = '../../assets/images/placeholder.png';
+          this.onerror = null;
+          console.log('Failed to load preview image for ID:', id);
+          this.src = '../../assets/images/shop_logo.png';
           this.style.display = 'block';
+          this.style.padding = '20px';
+          this.style.background = '#f5f5f5';
         };
         
         // Update form title

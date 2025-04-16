@@ -76,3 +76,162 @@
 [2025-04-16 16:56:16] GD library is not installed - using text fallback
 [2025-04-16 16:56:16] GD library is not installed - using text fallback
 [2025-04-16 16:56:16] GD library is not installed - using text fallback
+[2025-04-16 17:24:07] Starting image request
+[2025-04-16 17:24:07] Processing image request: {"id":1}
+[2025-04-16 17:24:07] Query executed: {"rows":1}
+[2025-04-16 17:24:07] Image found: {"type":"image\/jpeg","size":50375}
+[2025-04-16 17:24:07] GD library not available, sending raw data
+[2025-04-16 17:24:09] Starting image request
+[2025-04-16 17:24:09] Processing image request: {"id":1}
+[2025-04-16 17:24:09] Query executed: {"rows":1}
+[2025-04-16 17:24:09] Image found: {"type":"image\/jpeg","size":50375}
+[2025-04-16 17:24:09] GD library not available, sending raw data
+[2025-04-16 17:24:09] Starting image request
+[2025-04-16 17:24:09] Processing image request: {"id":1}
+[2025-04-16 17:24:09] Query executed: {"rows":1}
+[2025-04-16 17:24:09] Image found: {"type":"image\/jpeg","size":50375}
+[2025-04-16 17:24:09] GD library not available, sending raw data
+[2025-04-16 17:24:10] Starting image request
+[2025-04-16 17:24:10] Processing image request: {"id":1}
+[2025-04-16 17:24:10] Query executed: {"rows":1}
+[2025-04-16 17:24:10] Image found: {"type":"image\/jpeg","size":50375}
+[2025-04-16 17:24:10] GD library not available, sending raw data
+[2025-04-16 17:26:07] Starting image request
+[2025-04-16 17:26:07] Processing image request: {"id":1}
+[2025-04-16 17:26:07] Query executed: {"rows":1}
+[2025-04-16 17:26:07] Image found: {"type":"image\/jpeg","size":50375}
+[2025-04-16 17:26:07] GD library not available, sending raw data
+[2025-04-16 17:26:07] Starting image request
+[2025-04-16 17:26:07] Processing image request: {"id":1}
+[2025-04-16 17:26:07] Query executed: {"rows":1}
+[2025-04-16 17:26:07] Image found: {"type":"image\/jpeg","size":50375}
+[2025-04-16 17:26:07] GD library not available, sending raw data
+[2025-04-16 17:26:22] Starting image request
+[2025-04-16 17:26:22] Processing image request: {"id":1}
+[2025-04-16 17:26:22] Query executed: {"rows":1}
+[2025-04-16 17:26:22] Image found: {"type":"image\/jpeg","size":50375}
+[2025-04-16 17:26:22] GD library not available, sending raw data
+[2025-04-16 17:26:23] Starting image request
+[2025-04-16 17:26:23] Processing image request: {"id":1}
+[2025-04-16 17:26:23] Query executed: {"rows":1}
+[2025-04-16 17:26:23] Image found: {"type":"image\/jpeg","size":50375}
+[2025-04-16 17:26:23] GD library not available, sending raw data
+[2025-04-16 17:26:35] Starting image request
+[2025-04-16 17:26:35] Processing image request: {"id":1}
+[2025-04-16 17:26:35] Query executed: {"rows":1}
+[2025-04-16 17:26:35] Image found: {"type":"image\/jpeg","size":813766}
+[2025-04-16 17:26:35] GD library not available, sending raw data
+[2025-04-16 17:26:37] Starting image request
+[2025-04-16 17:26:37] Processing image request: {"id":1}
+[2025-04-16 17:26:37] Query executed: {"rows":1}
+[2025-04-16 17:26:37] Image found: {"type":"image\/jpeg","size":813766}
+[2025-04-16 17:26:37] GD library not available, sending raw data
+[2025-04-16 17:26:37] Starting image request
+[2025-04-16 17:26:37] Processing image request: {"id":1}
+[2025-04-16 17:26:37] Query executed: {"rows":1}
+[2025-04-16 17:26:37] Image found: {"type":"image\/jpeg","size":813766}
+[2025-04-16 17:26:37] GD library not available, sending raw data
+[2025-04-16 17:28:07] Starting image request
+[2025-04-16 17:28:07] Processing image request: {"id":1}
+[2025-04-16 17:28:07] Query executed: {"rows":1}
+[2025-04-16 17:28:07] Image found: {"type":"image\/jpeg","size":813766}
+[2025-04-16 17:28:07] GD library not available, sending raw data
+[2025-04-16 17:28:07] Starting image request
+[2025-04-16 17:28:07] Processing image request: {"id":1}
+[2025-04-16 17:28:07] Query executed: {"rows":1}
+[2025-04-16 17:28:07] Image found: {"type":"image\/jpeg","size":813766}
+[2025-04-16 17:28:07] GD library not available, sending raw data
+[2025-04-16 17:28:08] Starting image request
+[2025-04-16 17:28:08] Processing image request: {"id":1}
+[2025-04-16 17:28:08] Query executed: {"rows":1}
+[2025-04-16 17:28:08] Image found: {"type":"image\/jpeg","size":813766}
+[2025-04-16 17:28:08] GD library not available, sending raw data
+[2025-04-16 17:28:08] Starting image request
+[2025-04-16 17:28:08] Processing image request: {"id":1}
+[2025-04-16 17:28:08] Query executed: {"rows":1}
+[2025-04-16 17:28:08] Image found: {"type":"image\/jpeg","size":813766}
+[2025-04-16 17:28:08] GD library not available, sending raw data
+[2025-04-16 17:28:12] Starting image request
+[2025-04-16 17:28:12] Processing image request: {"id":1}
+[2025-04-16 17:28:12] Query executed: {"rows":1}
+[2025-04-16 17:28:12] Image found: {"type":"image\/jpeg","size":813766}
+[2025-04-16 17:28:12] GD library not available, sending raw data
+[2025-04-16 17:28:19] Starting image request
+[2025-04-16 17:28:19] Processing image request: {"id":1}
+[2025-04-16 17:28:19] Query executed: {"rows":1}
+[2025-04-16 17:28:19] Image found: {"type":"image\/jpeg","size":302279}
+[2025-04-16 17:28:19] GD library not available, sending raw data
+[2025-04-16 17:31:31] Starting image request
+[2025-04-16 17:31:31] GD library not available - continuing without image validation
+[2025-04-16 17:31:31] Processing image request: {"id":1}
+[2025-04-16 17:31:31] Query executed: {"rows":1}
+[2025-04-16 17:31:31] Sending image data directly
+[2025-04-16 17:31:31] Starting image request
+[2025-04-16 17:31:31] GD library not available - continuing without image validation
+[2025-04-16 17:31:31] Processing image request: {"id":1}
+[2025-04-16 17:31:31] Query executed: {"rows":1}
+[2025-04-16 17:31:31] Sending image data directly
+[2025-04-16 17:36:04] Starting image request
+[2025-04-16 17:36:04] GD library not available - continuing without image validation
+[2025-04-16 17:36:04] Processing image request: {"id":1}
+[2025-04-16 17:36:04] Query executed: {"rows":1}
+[2025-04-16 17:36:04] Sending image data directly
+[2025-04-16 17:36:04] Starting image request
+[2025-04-16 17:36:04] GD library not available - continuing without image validation
+[2025-04-16 17:36:04] Processing image request: {"id":1}
+[2025-04-16 17:36:04] Query executed: {"rows":1}
+[2025-04-16 17:36:04] Sending image data directly
+[2025-04-16 17:36:32] Starting image request
+[2025-04-16 17:36:32] GD library not available - continuing without image validation
+[2025-04-16 17:36:32] Processing image request: {"id":1}
+[2025-04-16 17:36:32] Query executed: {"rows":1}
+[2025-04-16 17:36:32] Sending image data directly
+[2025-04-16 17:36:32] Starting image request
+[2025-04-16 17:36:32] GD library not available - continuing without image validation
+[2025-04-16 17:36:32] Processing image request: {"id":1}
+[2025-04-16 17:36:32] Query executed: {"rows":1}
+[2025-04-16 17:36:32] Sending image data directly
+[2025-04-16 17:37:48] Starting image request
+[2025-04-16 17:37:48] GD library still not available - continuing without image validation
+[2025-04-16 17:37:48] Processing image request: {"id":1}
+[2025-04-16 17:37:48] Query executed: {"rows":1}
+[2025-04-16 17:37:48] Sending image data directly (no GD)
+[2025-04-16 17:37:49] Starting image request
+[2025-04-16 17:37:49] GD library still not available - continuing without image validation
+[2025-04-16 17:37:49] Processing image request: {"id":1}
+[2025-04-16 17:37:49] Query executed: {"rows":1}
+[2025-04-16 17:37:49] Sending image data directly (no GD)
+[2025-04-16 17:38:15] Starting image request
+[2025-04-16 17:38:15] GD library still not available - continuing without image validation
+[2025-04-16 17:38:15] Processing image request: {"id":1}
+[2025-04-16 17:38:15] Query executed: {"rows":1}
+[2025-04-16 17:38:15] Sending image data directly (no GD)
+[2025-04-16 17:38:16] Starting image request
+[2025-04-16 17:38:16] GD library still not available - continuing without image validation
+[2025-04-16 17:38:16] Processing image request: {"id":1}
+[2025-04-16 17:38:16] Query executed: {"rows":1}
+[2025-04-16 17:38:16] Sending image data directly (no GD)
+[2025-04-16 17:39:40] Starting image request
+[2025-04-16 17:39:40] Processing image request: {"id":1}
+[2025-04-16 17:39:40] Query executed: {"rows":1}
+[2025-04-16 17:39:40] Sending image data directly - length: 302279
+[2025-04-16 17:39:40] Starting image request
+[2025-04-16 17:39:40] Processing image request: {"id":1}
+[2025-04-16 17:39:40] Query executed: {"rows":1}
+[2025-04-16 17:39:40] Sending image data directly - length: 302279
+[2025-04-16 17:40:00] Starting image request
+[2025-04-16 17:40:01] Processing image request: {"id":1}
+[2025-04-16 17:40:01] Query executed: {"rows":1}
+[2025-04-16 17:40:01] Sending image data directly - length: 302279
+[2025-04-16 17:40:02] Starting image request
+[2025-04-16 17:40:02] Processing image request: {"id":1}
+[2025-04-16 17:40:02] Query executed: {"rows":1}
+[2025-04-16 17:40:02] Sending image data directly - length: 302279
+[2025-04-16 17:40:06] Starting image request
+[2025-04-16 17:40:06] Processing image request: {"id":1}
+[2025-04-16 17:40:06] Query executed: {"rows":1}
+[2025-04-16 17:40:06] Sending image data directly - length: 813766
+[2025-04-16 17:40:09] Starting image request
+[2025-04-16 17:40:09] Processing image request: {"id":1}
+[2025-04-16 17:40:09] Query executed: {"rows":1}
+[2025-04-16 17:40:09] Sending image data directly - length: 813766
