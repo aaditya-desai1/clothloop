@@ -289,6 +289,12 @@
             return wishlistIds;
         }
         
+        // Function to check if a product is in the wishlist
+        function isInWishlist(productId) {
+            const wishlist = getWishlistItems();
+            return wishlist.includes(productId.toString());
+        }
+        
         // Function to remove an item from wishlist
         function removeFromWishlist(productId) {
             let wishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
@@ -319,11 +325,11 @@
             wishlistGrid.style.display = 'grid';
             emptyWishlist.style.display = 'none';
             
-            // Get all products from the API
-            fetch('../../backend/utils/product_operations.php?operation=fetch_all')
+            // Get all products from the API - Fix the path to the correct location
+            fetch('/ClothLoop/backend/utils/product_operations.php?operation=fetch_all')
                 .then(response => {
                     if (!response.ok) {
-                        throw new Error('Network response was not ok');
+                        throw new Error(`Network response was not ok: ${response.status} ${response.statusText}`);
                     }
                     return response.json();
                 })
@@ -398,8 +404,8 @@
                                 setTimeout(() => {
                                     removeFromWishlist(productId);
                                 }, 300);
-                });
-            });
+                            });
+                        });
                     } else {
                         console.error('Error fetching products:', data.message);
                         wishlistGrid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: #e74c3c;">Error loading wishlist items</p>`;
@@ -407,7 +413,39 @@
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    wishlistGrid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: #e74c3c;">Error loading wishlist items</p>`;
+                    wishlistGrid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: #e74c3c;">Error loading wishlist items. Please try again later.</p>`;
+                    
+                    // Try an alternative method if the API fails
+                    try {
+                        // Display wishlist items from localStorage only as a fallback
+                        const wishlistIds = getWishlistItems();
+                        if (wishlistIds.length > 0) {
+                            wishlistIds.forEach(id => {
+                                const wishlistItem = document.createElement('div');
+                                wishlistItem.className = 'wishlist-item';
+                                wishlistItem.innerHTML = `
+                                    <div class="wishlist-details">
+                                        <h3 class="wishlist-title">Wishlist Item #${id}</h3>
+                                        <p class="wishlist-seller">Item details unavailable</p>
+                                        <div class="wishlist-actions">
+                                            <button class="remove-btn" data-product-id="${id}">Remove</button>
+                                        </div>
+                                    </div>
+                                `;
+                                wishlistGrid.appendChild(wishlistItem);
+                                
+                                // Add event listener to remove button
+                                const removeBtn = wishlistItem.querySelector('.remove-btn');
+                                removeBtn.addEventListener('click', function() {
+                                    removeFromWishlist(id);
+                                });
+                            });
+                            wishlistGrid.style.display = 'grid';
+                            emptyWishlist.style.display = 'none';
+                        }
+                    } catch (fallbackError) {
+                        console.error('Fallback error:', fallbackError);
+                    }
                 });
         }
         
