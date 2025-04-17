@@ -4,35 +4,141 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add New Product | ClothLoop</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* Theme Variables */
         :root {
-            --background: #FFFFFF;
-            --text-primary: #333333;
-            --text-secondary: #666666;
-            --button-primary: #333333;
-            --button-text: #FFFFFF;
-            --button-hover: #555555;
+            /* Dark Theme (Default) */
+            --primary-color: #000000;
+            --secondary-color: #333333;
+            --accent-color: #ffffff;
+            --text-color: #ffffff;
+            --light-bg: #111111;
+            --card-bg: #1a1a1a;
+            --footer-bg: #000000;
+            --footer-text: #cccccc;
+            --border-radius: 0;
+            --box-shadow: 0 5px 10px rgba(0, 0, 0, 0.8);
+            --border-color: #333333;
+            --hover-bg: #222222;
+            --input-bg: #262626;
+            --error-color: #FF3B30;
+            --success-color: #34C759;
+        }
+
+        /* Light Theme Variables */
+        .light-theme {
+            --primary-color: #ffffff;
+            --secondary-color: #000000;
+            --accent-color: #000000;
+            --text-color: #000000;
+            --light-bg: #f5f5f5;
+            --card-bg: #ffffff;
+            --footer-bg: #f5f5f5;
+            --footer-text: #000000;
+            --border-radius: 0;
+            --box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
             --border-color: #EEEEEE;
             --hover-bg: #F5F5F5;
             --input-bg: #F9F9F9;
             --error-color: #FF3B30;
             --success-color: #34C759;
-            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
         }
         
         body {
-            font-family: 'Roboto', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f8f9fa;
-            color: var(--text-primary);
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.7;
+            color: var(--text-color);
+            background-color: var(--light-bg);
+        }
+        
+        /* Theme Switcher */
+        .theme-switcher {
+            background: var(--primary-color);
+            border: 2px solid var(--accent-color);
+            color: var(--accent-color);
+            width: 40px;
+            height: 40px;
+            border-radius: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            margin-left: 20px;
+            transition: all 0.2s linear;
+        }
+        
+        .theme-switcher:hover {
+            transform: skewX(-5deg);
+            box-shadow: 3px 3px 0 rgba(128, 128, 128, 0.3);
+        }
+
+        /* Navigation */
+        nav {
+            background-color: var(--primary-color);
+            padding: 1.2rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(255, 255, 255, 0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        nav .logo {
+            color: var(--accent-color);
+            font-size: 1.8rem;
+            font-weight: 700;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        nav .logo i {
+            margin-right: 10px;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 1.5rem;
+        }
+
+        nav ul li a {
+            color: var(--accent-color);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0;
+            transition: all 0.2s linear;
+            font-weight: 500;
+            border-bottom: 2px solid transparent;
+        }
+
+        nav ul li a:hover, nav ul li a.active {
+            background-color: transparent;
+            color: var(--accent-color);
+            border-bottom: 2px solid var(--accent-color);
         }
         
         .page-container {
             max-width: 1200px;
-            margin: 30px auto;
+            margin: 120px auto 30px;
             padding: 0 20px;
         }
         
@@ -41,36 +147,47 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 30px;
+            animation: fadeIn 1s ease-out;
         }
         
         .page-title {
-            font-size: 24px;
+            font-size: 2.5rem;
             font-weight: 700;
             margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--accent-color);
         }
         
         .back-button {
             display: inline-flex;
             align-items: center;
             text-decoration: none;
-            color: var(--text-primary);
+            color: var(--accent-color);
             font-weight: 500;
-            transition: color 0.3s;
+            transition: all 0.2s linear;
+            border-bottom: 2px solid transparent;
+            padding: 0.5rem 1rem;
         }
         
         .back-button:hover {
-            color: var(--button-hover);
+            color: var(--accent-color);
+            border-bottom: 2px solid var(--accent-color);
+            transform: translateY(-3px);
         }
         
         .back-button i {
             margin-right: 8px;
         }
         
+        /* Upload Container */
         .upload-container {
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: var(--shadow-sm);
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
             overflow: hidden;
+            animation: fadeIn 1.5s ease-out;
+            border: 1px solid var(--border-color);
         }
         
         .upload-grid {
@@ -84,22 +201,27 @@
         }
         
         .section-title {
-            font-size: 18px;
+            font-size: 1.5rem;
             font-weight: 600;
             margin-top: 0;
             margin-bottom: 20px;
             padding-bottom: 10px;
             border-bottom: 1px solid var(--border-color);
+            color: var(--accent-color);
+            letter-spacing: 1px;
+            text-transform: uppercase;
         }
         
         .form-group {
             margin-bottom: 20px;
+            animation: fadeIn 1.8s ease-out;
         }
         
         .form-label {
             display: block;
             font-weight: 500;
             margin-bottom: 8px;
+            color: var(--accent-color);
         }
         
         .form-input, 
@@ -108,10 +230,12 @@
             width: 100%;
             padding: 12px 15px;
             font-size: 14px;
+            font-family: 'Poppins', sans-serif;
             border: 1px solid var(--border-color);
-            border-radius: 4px;
+            border-radius: var(--border-radius);
             background-color: var(--input-bg);
-            transition: border-color 0.3s, box-shadow 0.3s;
+            color: var(--text-color);
+            transition: all 0.2s linear;
             box-sizing: border-box;
         }
         
@@ -124,13 +248,14 @@
         .form-textarea:focus, 
         .form-select:focus {
             outline: none;
-            border-color: var(--button-primary);
-            box-shadow: 0 0 0 3px rgba(51, 51, 51, 0.1);
+            border-color: var(--accent-color);
+            box-shadow: 3px 3px 0 rgba(128, 128, 128, 0.2);
+            transform: translateY(-2px);
         }
         
         .upload-area {
             border: 2px dashed var(--border-color);
-            border-radius: 8px;
+            border-radius: var(--border-radius);
             padding: 30px;
             text-align: center;
             cursor: pointer;
@@ -139,38 +264,47 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            transition: border-color 0.3s, background-color 0.3s;
+            transition: all 0.2s linear;
+            background-color: var(--card-bg);
         }
         
         .upload-area:hover {
-            border-color: var(--button-primary);
-            background-color: rgba(51, 51, 51, 0.02);
+            border-color: var(--accent-color);
+            transform: translateY(-5px) skewX(-2deg);
+            box-shadow: 3px 3px 0 rgba(128, 128, 128, 0.2);
         }
         
         .upload-icon {
             font-size: 40px;
-            color: var(--text-secondary);
+            color: var(--accent-color);
             margin-bottom: 15px;
         }
         
         .upload-text {
             margin-bottom: 20px;
-            color: var(--text-secondary);
+            color: var(--text-color);
         }
         
         .browse-button {
-            background-color: var(--button-primary);
-            color: var(--button-text);
-            border: none;
+            background-color: transparent;
+            color: var(--accent-color);
+            border: 2px solid var(--accent-color);
             padding: 10px 20px;
             font-size: 14px;
-            border-radius: 4px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            border-radius: var(--border-radius);
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: all 0.2s linear;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         
         .browse-button:hover {
-            background-color: var(--button-hover);
+            background-color: var(--accent-color);
+            color: var(--primary-color);
+            transform: translateY(-3px) skewX(-5deg);
+            box-shadow: 3px 3px 0 rgba(128, 128, 128, 0.2);
         }
         
         .image-preview {
@@ -184,8 +318,14 @@
             position: relative;
             width: 80px;
             height: 80px;
-            border-radius: 4px;
+            border-radius: var(--border-radius);
             overflow: hidden;
+            transition: all 0.2s linear;
+        }
+        
+        .preview-item:hover {
+            transform: translateY(-3px) skewX(-5deg);
+            box-shadow: 3px 3px 0 rgba(128, 128, 128, 0.2);
         }
         
         .preview-item img {
@@ -217,20 +357,21 @@
         .existing-product-image h3 {
             font-size: 16px;
             margin-bottom: 15px;
-            color: var(--text-secondary);
+            color: var(--accent-color);
         }
         
         .existing-product-image img {
             max-width: 100%;
             max-height: 300px;
-            border-radius: 8px;
-            box-shadow: var(--shadow-sm);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
             cursor: pointer;
-            transition: transform 0.3s ease;
+            transition: all 0.2s linear;
         }
         
         .existing-product-image img:hover {
-            transform: scale(1.02);
+            transform: scale(1.02) skewX(-2deg);
+            box-shadow: 5px 5px 0 rgba(128, 128, 128, 0.2);
         }
         
         /* Modal for enlarged image */
@@ -251,7 +392,8 @@
         .image-modal img {
             max-width: 90%;
             max-height: 80vh;
-            border-radius: 8px;
+            border-radius: var(--border-radius);
+            animation: fadeIn 0.5s ease-out;
         }
         
         .close-modal {
@@ -262,6 +404,11 @@
             font-size: 30px;
             font-weight: bold;
             cursor: pointer;
+            transition: all 0.2s linear;
+        }
+        
+        .close-modal:hover {
+            transform: scale(1.2) rotate(90deg);
         }
         
         .action-buttons {
@@ -269,50 +416,74 @@
             justify-content: space-between;
             margin-top: 30px;
             padding: 20px 30px;
-            background-color: #f8f9fa;
+            background-color: var(--card-bg);
             border-top: 1px solid var(--border-color);
         }
         
         .cancel-button {
             background-color: transparent;
-            color: var(--text-primary);
-            border: 1px solid var(--border-color);
+            color: var(--accent-color);
+            border: 2px solid var(--border-color);
             padding: 12px 24px;
             font-size: 14px;
-            border-radius: 4px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            border-radius: var(--border-radius);
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: all 0.2s linear;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         
         .cancel-button:hover {
             background-color: var(--hover-bg);
+            transform: translateY(-3px) skewX(-5deg);
+            box-shadow: 3px 3px 0 rgba(128, 128, 128, 0.2);
         }
         
         .submit-button {
-            background-color: var(--button-primary);
-            color: var(--button-text);
-            border: none;
+            background-color: transparent;
+            color: var(--accent-color);
+            border: 2px solid var(--accent-color);
             padding: 12px 24px;
             font-size: 14px;
-            border-radius: 4px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            border-radius: var(--border-radius);
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: all 0.2s linear;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         
         .submit-button:hover {
-            background-color: var(--button-hover);
+            background-color: var(--accent-color);
+            color: var(--primary-color);
+            transform: translateY(-3px) skewX(-5deg);
+            box-shadow: 3px 3px 0 rgba(128, 128, 128, 0.2);
         }
         
         .submit-button:disabled {
-            background-color: #cccccc;
+            background-color: #555555;
+            color: #888888;
+            border-color: #555555;
             cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .light-theme .submit-button:disabled {
+            background-color: #cccccc;
+            color: #888888;
+            border-color: #cccccc;
         }
         
         .alert {
             padding: 15px;
             margin-bottom: 20px;
-            border-radius: 4px;
+            border-radius: var(--border-radius);
             display: none;
+            animation: fadeIn 0.5s ease-out;
         }
         
         .alert-success {
@@ -337,13 +508,35 @@
             display: flex;
             align-items: center;
             cursor: pointer;
+            color: var(--text-color);
         }
         
         .radio-label input[type="radio"] {
             margin-right: 8px;
         }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
         
+        /* Responsive */
         @media (max-width: 768px) {
+            nav {
+                padding: 1rem;
+            }
+            
+            .page-title {
+                font-size: 2rem;
+            }
+            
             .upload-grid {
                 grid-template-columns: 1fr;
             }
@@ -362,9 +555,39 @@
                 gap: 10px;
             }
         }
+
+        @media (max-width: 576px) {
+            nav ul li {
+                margin-left: 0.5rem;
+            }
+            
+            nav ul li a {
+                padding: 0.5rem 0.8rem;
+                font-size: 0.9rem;
+            }
+
+            .page-title {
+                font-size: 1.8rem;
+            }
+        }
     </style>
 </head>
 <body>
+    <!-- Navigation -->
+    <nav>
+        <a href="../../home.html" class="logo">
+            <i class="fas fa-recycle"></i> ClothLoop
+        </a>
+        <div style="display: flex; align-items: center;">
+            <ul>
+                <li><a href="product_listings.html">Listings</a></li>
+            </ul>
+            <button class="theme-switcher" id="theme-toggle" aria-label="Toggle theme">
+                <i class="fas fa-sun"></i>
+            </button>
+        </div>
+    </nav>
+
     <div class="page-container">
         <!-- Page Header -->
         <div class="page-header">
@@ -483,6 +706,34 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Theme switcher functionality
+            const themeToggle = document.getElementById('theme-toggle');
+            const themeIcon = themeToggle.querySelector('i');
+            
+            // Check for saved theme preference or use default
+            const savedTheme = localStorage.getItem('clothloop-theme');
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-theme');
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+            }
+            
+            // Toggle theme
+            themeToggle.addEventListener('click', () => {
+                document.body.classList.toggle('light-theme');
+                
+                // Update icon
+                if (document.body.classList.contains('light-theme')) {
+                    themeIcon.classList.remove('fa-sun');
+                    themeIcon.classList.add('fa-moon');
+                    localStorage.setItem('clothloop-theme', 'light');
+                } else {
+                    themeIcon.classList.remove('fa-moon');
+                    themeIcon.classList.add('fa-sun');
+                    localStorage.setItem('clothloop-theme', 'dark');
+                }
+            });
+            
             // Setup form submission
             document.getElementById('clothForm').addEventListener('submit', function(e) {
                 e.preventDefault();

@@ -6,44 +6,105 @@
   <title>Product Details | ClothLoop</title>
   
   <!-- Font Awesome CDN -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
   
   <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   
   <!-- Inline CSS -->
   <style>
-    /* Root variables */
+    /* Theme Variables */
     :root {
-        --background: #FFFFFF;
-        --text-primary: #333333;
-        --text-secondary: #666666;
-        --button-primary: #333333;
-        --button-text: #FFFFFF;
-        --button-hover: #555555;
-        --button-secondary: transparent;
-        --button-secondary-text: #333333;
-        --header-bg: #FFFFFF;
-        --border-color: #EEEEEE;
-        --hover-bg: #F5F5F5;
-        --input-bg: #F9F9F9;
+        /* Dark Theme (Default) */
+        --primary-color: #000000;
+        --secondary-color: #333333;
+        --accent-color: #ffffff;
+        --text-color: #ffffff;
+        --light-bg: #111111;
+        --card-bg: #1a1a1a;
+        --footer-bg: #000000;
+        --footer-text: #cccccc;
+        --border-color: #333333;
+        --hover-bg: #222222;
+        --input-bg: #1a1a1a;
         --error-color: #FF3B30;
         --success-color: #34C759;
-        --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
-        --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.1);
-        --seller-highlight: #333333;
+        --shadow-sm: 0 5px 10px rgba(0, 0, 0, 0.8);
+        --shadow-md: 0 5px 10px rgba(0, 0, 0, 0.8);
+        --button-primary: #ffffff;
+        --button-text: #000000;
+        --button-hover: #cccccc;
+        --button-secondary: transparent;
+        --button-secondary-text: #ffffff;
+        --header-bg: #000000;
+        --border-radius: 0;
+    }
+
+    /* Light Theme Variables */
+    .light-theme {
+        --primary-color: #ffffff;
+        --secondary-color: #000000;
+        --accent-color: #000000;
+        --text-color: #000000;
+        --light-bg: #f5f5f5;
+        --card-bg: #ffffff;
+        --footer-bg: #f5f5f5;
+        --footer-text: #000000;
+        --border-color: #e0e0e0;
+        --hover-bg: #f0f0f0;
+        --input-bg: #f9f9f9;
+        --error-color: #FF3B30;
+        --success-color: #34C759;
+        --shadow-sm: 0 5px 10px rgba(0, 0, 0, 0.1);
+        --shadow-md: 0 5px 10px rgba(0, 0, 0, 0.1);
+        --button-primary: #000000;
+        --button-text: #ffffff;
+        --button-hover: #333333;
+        --button-secondary: transparent;
+        --button-secondary-text: #000000;
+        --header-bg: #ffffff;
+        --border-radius: 0;
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
     }
 
     /* Apply colors to elements */
     body {
-        background-color: var(--background);
-        color: var(--text-primary);
-        font-family: 'Roboto', sans-serif;
+        background-color: var(--light-bg);
+        color: var(--text-color);
+        font-family: 'Poppins', sans-serif;
         margin: 0;
         padding: 0;
         box-sizing: border-box;
         letter-spacing: 0.02em;
         overflow-x: hidden;
+        line-height: 1.7;
+    }
+
+    /* Theme Switcher */
+    .theme-switcher {
+        background: var(--primary-color);
+        border: 2px solid var(--accent-color);
+        color: var(--accent-color);
+        width: 40px;
+        height: 40px;
+        border-radius: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        margin-left: 20px;
+        transition: all 0.2s linear;
+    }
+    
+    .theme-switcher:hover {
+        transform: skewX(-5deg);
+        box-shadow: 3px 3px 0 rgba(128, 128, 128, 0.3);
     }
 
     /* Make images responsive */
@@ -99,7 +160,8 @@
         font-size: 24px;
         font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: 2px;
+        letter-spacing: 3px;
+        color: var(--accent-color);
     }
     
     /* Seller badge */
@@ -107,8 +169,8 @@
         position: absolute;
         top: -10px;
         right: -10px;
-        background-color: var(--seller-highlight);
-        color: white;
+        background-color: var(--accent-color);
+        color: var(--primary-color);
         font-size: 10px;
         font-weight: bold;
         padding: 3px 8px;
@@ -154,7 +216,7 @@
 
     .nav-items li a {
         text-decoration: none;
-        color: var(--text-primary);
+        color: var(--accent-color);
         font-weight: 500;
         font-size: 14px;
         text-transform: uppercase;
@@ -163,42 +225,19 @@
         display: flex;
         align-items: center;
         position: relative;
+        padding: 0 10px;
+        border-bottom: 2px solid transparent;
+        transition: all 0.2s linear;
     }
 
     .nav-items li a:hover {
-        color: var(--button-hover);
-    }
-    
-    .nav-items li a:hover::after {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        height: 3px;
-        background-color: var(--seller-highlight);
-        transform: scaleX(0);
-        animation: expandLine 0.3s forwards;
-    }
-    
-    @keyframes expandLine {
-        to {
-            transform: scaleX(1);
-        }
+        color: var(--accent-color);
+        border-bottom: 2px solid var(--accent-color);
     }
 
     .nav-items li a.active {
         font-weight: 700;
-    }
-
-    .nav-items li a.active::after {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        height: 3px;
-        background-color: var(--text-primary);
+        border-bottom: 2px solid var(--accent-color);
     }
 
     /* User actions */
@@ -215,17 +254,22 @@
         margin: 0 15px;
         cursor: pointer;
         position: relative;
+        transition: all 0.2s linear;
+    }
+
+    .action-item:hover {
+        transform: translateY(-3px);
     }
 
     .action-item i {
         font-size: 20px;
         margin-bottom: 4px;
-        color: var(--text-primary);
+        color: var(--accent-color);
     }
 
     .action-item span {
         font-size: 12px;
-        color: var(--text-primary);
+        color: var(--accent-color);
         text-transform: uppercase;
         letter-spacing: 0.5px;
     }
@@ -235,6 +279,27 @@
         max-width: 1200px;
         margin: 0 auto;
         padding: 30px 20px;
+        animation: fadeIn 1s ease-out;
+    }
+
+    .content-header {
+        margin-bottom: 20px;
+    }
+
+    .error-container {
+        text-align: center;
+        padding: 30px;
+        background-color: rgba(255, 59, 48, 0.1);
+        border-radius: var(--border-radius);
+        margin-top: 20px;
+        border: 1px solid var(--error-color);
+        animation: fadeIn 0.5s ease-out;
+    }
+    
+    .error-container p {
+        margin-bottom: 20px;
+        color: var(--error-color);
+        font-size: 16px;
     }
 
     /* Product Detail Section */
@@ -243,11 +308,18 @@
         flex-direction: column;
         gap: 30px;
         margin-top: 20px;
-        background-color: white;
-        border-radius: 5px;
+        background-color: var(--card-bg);
+        border-radius: var(--border-radius);
         box-shadow: var(--shadow-sm);
         overflow: hidden;
         max-width: 100%;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border: 1px solid var(--border-color);
+    }
+
+    .product-detail:hover {
+        transform: translateY(-5px) skewX(-1deg);
+        box-shadow: 5px 5px 0 rgba(128, 128, 128, 0.2);
     }
 
     @media (min-width: 992px) {
@@ -260,12 +332,12 @@
         flex: 1;
         max-width: 100%;
         position: relative;
-        background-color: #f9f9f9;
+        background-color: var(--light-bg);
         display: flex;
         align-items: center;
         justify-content: center;
         padding: 10px;
-        border-radius: 5px;
+        border-radius: var(--border-radius);
         min-height: 500px;
     }
 
@@ -280,9 +352,14 @@
         object-fit: contain;
         max-width: 100%;
         max-height: 500px;
-        border-radius: 5px;
+        border-radius: var(--border-radius);
         width: auto;
         height: auto;
+        transition: transform 0.3s ease;
+    }
+
+    .product-image:hover img {
+        transform: scale(1.03);
     }
 
     @media (min-width: 992px) {
@@ -301,13 +378,14 @@
         font-weight: 700;
         margin-bottom: 10px;
         text-transform: uppercase;
+        letter-spacing: 2px;
     }
 
     .product-price {
         font-size: 28px;
         font-weight: 600;
         margin-bottom: 25px;
-        color: var(--text-primary);
+        color: var(--accent-color);
     }
 
     .product-attributes {
@@ -323,7 +401,7 @@
     .attribute-name {
         min-width: 100px;
         font-weight: 500;
-        color: var(--text-secondary);
+        color: var(--accent-color);
     }
 
     .divider {
@@ -332,16 +410,25 @@
         margin: 20px 0;
     }
 
-    .shop-info {
-        margin-bottom: 30px;
-    }
-
     .section-title {
         font-size: 20px;
         font-weight: 600;
         margin-bottom: 15px;
         letter-spacing: 1px;
         text-transform: uppercase;
+        position: relative;
+        display: inline-block;
+    }
+
+    .section-title::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: -5px;
+        width: 40px;
+        height: 2px;
+        background-color: var(--accent-color);
+        transform: skewX(-20deg);
     }
 
     .shop-detail {
@@ -354,7 +441,7 @@
         width: 25px;
         margin-right: 15px;
         font-size: 18px;
-        color: var(--text-secondary);
+        color: var(--accent-color);
     }
 
     .terms-section {
@@ -364,12 +451,13 @@
     .terms-content {
         padding: 15px;
         background-color: var(--input-bg);
-        border-radius: 4px;
+        border-radius: var(--border-radius);
         font-size: 14px;
         line-height: 1.5;
         word-wrap: break-word;
         overflow-wrap: break-word;
         max-width: 100%;
+        border: 1px solid var(--border-color);
     }
 
     /* Action Buttons */
@@ -391,7 +479,7 @@
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 1px;
-        border-radius: 4px;
+        border-radius: var(--border-radius);
         cursor: pointer;
         transition: all 0.3s ease;
         border: none;
@@ -406,31 +494,40 @@
 
     .btn-primary:hover {
         background-color: var(--button-hover);
+        transform: translateY(-3px) skewX(-5deg);
+        box-shadow: 3px 3px 0 rgba(128, 128, 128, 0.3);
     }
 
     .btn-secondary {
         background-color: var(--button-secondary);
         color: var(--button-secondary-text);
-        border: 1px solid var(--text-primary);
+        border: 1px solid var(--accent-color);
     }
 
     .btn-secondary:hover {
         background-color: var(--hover-bg);
+        transform: translateY(-3px) skewX(-5deg);
+        box-shadow: 3px 3px 0 rgba(128, 128, 128, 0.3);
     }
 
     /* Back Button */
     .back-button {
         display: inline-flex;
         align-items: center;
-        color: var(--text-primary);
+        color: var(--text-color);
         text-decoration: none;
         font-size: 14px;
         margin-bottom: 20px;
-        transition: color 0.3s ease;
+        transition: all 0.3s ease;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        border-bottom: 2px solid transparent;
     }
 
     .back-button:hover {
-        color: var(--button-hover);
+        color: var(--accent-color);
+        border-bottom: 2px solid var(--accent-color);
     }
 
     .back-button i {
@@ -446,9 +543,9 @@
     }
 
     .spinner {
-        border: 4px solid rgba(0, 0, 0, 0.1);
+        border: 4px solid rgba(128, 128, 128, 0.1);
         border-radius: 50%;
-        border-top: 4px solid var(--text-primary);
+        border-top: 4px solid var(--accent-color);
         width: 30px;
         height: 30px;
         animation: spin 1s linear infinite;
@@ -463,8 +560,9 @@
     .alert {
         padding: 15px;
         margin-bottom: 20px;
-        border-radius: 4px;
+        border-radius: var(--border-radius);
         display: none;
+        animation: fadeIn 0.5s ease-out;
     }
     
     .alert-success {
@@ -477,6 +575,18 @@
         background-color: rgba(255, 59, 48, 0.1);
         color: var(--error-color);
         border: 1px solid var(--error-color);
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
     /* Responsive Styles */
@@ -574,6 +684,10 @@
                         <i class="fas fa-question-circle"></i>
                         <span>ABOUT US</span>
                     </div>
+                    
+                    <button class="theme-switcher" id="theme-toggle" aria-label="Toggle theme">
+                        <i class="fas fa-sun"></i>
+                    </button>
                 </div>
             </div>
         </div>
@@ -611,6 +725,34 @@
             
             // Load product data
             loadProductData();
+            
+            // Check for saved theme preference or use default
+            const savedTheme = localStorage.getItem('clothloop-theme');
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-theme');
+                document.querySelector('#theme-toggle i').classList.remove('fa-sun');
+                document.querySelector('#theme-toggle i').classList.add('fa-moon');
+            }
+            
+            // Theme toggle functionality
+            const themeToggle = document.getElementById('theme-toggle');
+            if (themeToggle) {
+                themeToggle.addEventListener('click', function() {
+                    document.body.classList.toggle('light-theme');
+                    
+                    // Update icon and save preference
+                    const themeIcon = this.querySelector('i');
+                    if (document.body.classList.contains('light-theme')) {
+                        themeIcon.classList.remove('fa-sun');
+                        themeIcon.classList.add('fa-moon');
+                        localStorage.setItem('clothloop-theme', 'light');
+                    } else {
+                        themeIcon.classList.remove('fa-moon');
+                        themeIcon.classList.add('fa-sun');
+                        localStorage.setItem('clothloop-theme', 'dark');
+                    }
+                });
+            }
         });
         
         // Function to setup all event listeners

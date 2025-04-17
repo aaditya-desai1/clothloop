@@ -12,8 +12,33 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
 
   <style>
-        /* Root variables */
-    :root {
+        /* Root variables for theme switching */
+        :root {
+            /* Dark Theme (Default) */
+            --background: #121212;
+            --text-primary: #FFFFFF;
+            --text-secondary: #CCCCCC;
+            --button-primary: #333333;
+            --button-text: #FFFFFF;
+            --button-hover: #555555;
+            --button-secondary: transparent;
+            --button-secondary-text: #FFFFFF;
+            --header-bg: #000000;
+            --border-color: #333333;
+            --hover-bg: #1a1a1a;
+            --input-bg: #1a1a1a;
+            --error-color: #FF3B30;
+            --success-color: #34C759;
+            --accent-color: #FFFFFF;
+            --seller-highlight: #FFFFFF;
+            --card-bg: #1a1a1a;
+            --footer-bg: #000000;
+            --footer-text: #cccccc;
+            --box-shadow: 0 5px 10px rgba(0, 0, 0, 0.8);
+        }
+
+        /* Light Theme Variables */
+        .light-theme {
             --background: #FFFFFF;
             --text-primary: #333333;
             --text-secondary: #666666;
@@ -30,6 +55,10 @@
             --success-color: #34C759;
             --accent-color: #333333;
             --seller-highlight: #333333;
+            --card-bg: #ffffff;
+            --footer-bg: #f5f5f5;
+            --footer-text: #000000;
+            --box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
         }
 
         /* Apply colors to elements */
@@ -37,17 +66,39 @@
             background-color: var(--background);
             color: var(--text-primary);
             font-family: 'Roboto', sans-serif;
-      margin: 0;
-      padding: 0;
+            margin: 0;
+            padding: 0;
             box-sizing: border-box;
             letter-spacing: 0.02em;
             overflow-x: hidden;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Theme Switcher */
+        .theme-switcher {
+            background: var(--header-bg);
+            border: 2px solid var(--accent-color);
+            color: var(--accent-color);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            margin-left: 20px;
+            transition: all 0.2s linear;
+        }
+        
+        .theme-switcher:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
 
         /* Header styles */
         .header {
             background-color: var(--header-bg);
-      padding: 0;
+            padding: 0;
             box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.05);
             position: sticky;
             top: 0;
@@ -55,13 +106,14 @@
             height: 80px;
             display: flex;
             align-items: center;
+            transition: background-color 0.3s ease;
         }
 
         .header-container {
-      display: flex;
+            display: flex;
             align-items: center;
             justify-content: space-between;
-      width: 100%;
+            width: 100%;
             max-width: 1400px;
             margin: 0 auto;
             padding: 0 30px;
@@ -110,15 +162,20 @@
             top: -10px;
             right: -10px;
             background-color: var(--seller-highlight);
-            color: white;
+            color: #000000;
             font-size: 10px;
-      font-weight: bold;
+            font-weight: bold;
             padding: 3px 8px;
             border-radius: 10px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
             animation: pulse 2s infinite;
+        }
+        
+        /* Light theme specific overrides */
+        .light-theme .seller-badge {
+            color: #000000;
         }
         
         @keyframes pulse {
@@ -135,7 +192,7 @@
 
         /* Navigation styles */
         .nav-container {
-      display: flex;
+            display: flex;
             align-items: center;
         }
 
@@ -200,22 +257,22 @@
             content: '';
             position: absolute;
             bottom: 0;
-      left: 0;
-      right: 0;
+            left: 0;
+            right: 0;
             height: 3px;
             background-color: var(--seller-highlight);
-    }
-    
+        }
+        
         /* User actions */
         .actions {
-      display: flex;
-      align-items: center;
-    }
-    
+            display: flex;
+            align-items: center;
+        }
+        
         .action-item {
-      display: flex;
+            display: flex;
             flex-direction: column;
-      align-items: center;
+            align-items: center;
             justify-content: center;
             margin: 0 15px;
             cursor: pointer;
@@ -235,7 +292,7 @@
 
         .action-item span {
             font-size: 12px;
-      color: var(--text-primary);
+            color: var(--text-primary);
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
@@ -278,8 +335,8 @@
         }
         
         .profile-dropdown a {
-      display: flex;
-      align-items: center;
+            display: flex;
+            align-items: center;
             padding: 10px 15px;
             color: var(--text-primary);
             text-decoration: none;
@@ -331,25 +388,25 @@
         }
 
         .profile-subtitle {
-      font-size: 14px;
+            font-size: 14px;
             color: var(--text-secondary);
             font-weight: 400;
-    }
-    
+        }
+        
         .form-container {
-      background-color: white;
+            background-color: var(--card-bg);
             border-radius: 4px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            box-shadow: var(--box-shadow);
             padding: 30px;
             margin-top: 20px;
             width: 100%;
             box-sizing: border-box;
-            transition: box-shadow 0.3s ease, transform 0.3s ease;
+            transition: box-shadow 0.3s ease, transform 0.3s ease, background-color 0.3s ease;
         }
         
         .form-container:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
         }
         
         @keyframes fadeIn {
@@ -383,6 +440,7 @@
             margin-bottom: 8px;
             font-weight: 500;
             color: var(--text-primary);
+            transition: color 0.3s ease;
         }
 
         .form-input {
@@ -393,6 +451,7 @@
             border: 1px solid var(--border-color);
             border-radius: 4px;
             background-color: var(--input-bg);
+            color: var(--text-primary);
             transition: all 0.3s ease;
             box-sizing: border-box;
         }
@@ -400,11 +459,11 @@
         .form-input:focus {
             outline: none;
             border-color: var(--seller-highlight);
-            box-shadow: 0 0 0 1px rgba(51, 51, 51, 0.1);
+            box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1);
         }
 
         .form-input:disabled {
-            background-color: #f0f0f0;
+            background-color: var(--hover-bg);
             cursor: not-allowed;
         }
         
@@ -427,8 +486,8 @@
         
         .logo-preview-container {
             margin-bottom: 10px;
-      position: relative;
-      display: inline-block;
+            position: relative;
+            display: inline-block;
         }
         
         .logo-preview {
@@ -445,10 +504,10 @@
             height: 50px;
             padding: 0 30px;
             border: none;
-      font-size: 14px;
+            font-size: 14px;
             text-transform: uppercase;
             letter-spacing: 1px;
-      cursor: pointer;
+            cursor: pointer;
             transition: all 0.3s ease;
             font-weight: 500;
             border-radius: 4px;
@@ -484,7 +543,7 @@
                 opacity: 1;
             }
             100% {
-      opacity: 0;
+                opacity: 0;
                 transform: scale(40, 40);
             }
         }
@@ -518,14 +577,14 @@
             justify-content: flex-end;
             align-items: center;
             margin-top: 30px;
-    }
+        }
 
-    .alert {
-      padding: 15px;
-      margin-bottom: 20px;
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
             border-radius: 4px;
             font-size: 14px;
-      display: none;  /* Make sure alerts are hidden by default */
+            display: none;  /* Make sure alerts are hidden by default */
             width: 100%;
             max-width: 800px;
             margin: 0 auto 20px;
@@ -541,9 +600,9 @@
             left: 0;
             height: 100%;
             width: 5px;
-    }
+        }
 
-    .alert-success {
+        .alert-success {
             background-color: rgba(52, 199, 89, 0.1);
             color: var(--success-color);
             border: 1px solid var(--success-color);
@@ -585,7 +644,7 @@
         .password-strength-meter {
             height: 5px;
             background-color: #eee;
-      margin-top: 5px;
+            margin-top: 5px;
             border-radius: 3px;
             overflow: hidden;
         }
@@ -598,13 +657,13 @@
         
         .form-hint {
             display: block;
-      margin-top: 5px;
+            margin-top: 5px;
             font-size: 12px;
             color: var(--text-secondary);
-    }
+        }
 
         .loading-spinner {
-      display: flex;
+            display: flex;
             align-items: center;
             justify-content: center;
             padding: 30px;
@@ -632,7 +691,7 @@
         .section-title {
             font-size: 18px;
             margin-bottom: 20px;
-      display: flex;
+            display: flex;
             align-items: center;
             color: var(--seller-highlight);
         }
@@ -674,105 +733,105 @@
         .form-group:focus-within::after {
             width: 100%;
             left: 0;
-    }
+        }
 
-    /* Location input container styles */
-    .location-input-container {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        margin-top: 5px;
-    }
-    
-    .location-fields {
-        display: flex;
-        gap: 15px;
-    }
-    
-    .coordinate-field {
-        flex: 1;
-    }
-    
-    .coord-label {
-        display: block;
-        font-size: 13px;
-        margin-bottom: 5px;
-        color: var(--text-secondary);
-    }
-    
-    .coordinate-input {
-        width: 100%;
-        height: 45px;
-    }
-    
-    .location-btn {
-        background-color: var(--button-primary);
-        color: var(--button-text);
-        border: none;
-        padding: 12px 15px;
-        font-size: 14px;
-        border-radius: 4px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        margin-top: 5px;
-    }
-    
-    .location-btn:hover {
-        background-color: var(--button-hover);
-        transform: translateY(-2px);
-    }
-    
-    .location-btn i {
-        font-size: 16px;
-    }
-    
-    @media (min-width: 768px) {
+        /* Location input container styles */
         .location-input-container {
-            flex-direction: row;
-            align-items: flex-start;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 5px;
         }
         
         .location-fields {
-            flex: 2;
+            display: flex;
+            gap: 15px;
+        }
+        
+        .coordinate-field {
+            flex: 1;
+        }
+        
+        .coord-label {
+            display: block;
+            font-size: 13px;
+            margin-bottom: 5px;
+            color: var(--text-secondary);
+        }
+        
+        .coordinate-input {
+            width: 100%;
+            height: 45px;
         }
         
         .location-btn {
-            flex: 1;
-            margin-top: 25px;
-            height: 45px;
+            background-color: var(--button-primary);
+            color: var(--button-text);
+            border: none;
+            padding: 12px 15px;
+            font-size: 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 5px;
         }
-    }
-  </style>
+        
+        .location-btn:hover {
+            background-color: var(--button-hover);
+            transform: translateY(-2px);
+        }
+        
+        .location-btn i {
+            font-size: 16px;
+        }
+        
+        @media (min-width: 768px) {
+            .location-input-container {
+                flex-direction: row;
+                align-items: flex-start;
+            }
+            
+            .location-fields {
+                flex: 2;
+            }
+            
+            .location-btn {
+                flex: 1;
+                margin-top: 25px;
+                height: 45px;
+            }
+        }
+    </style>
 </head>
 <body>
     <!-- Header Section -->
     <header class="header">
         <div class="header-container">
-      <div class="header-left">
-        <div class="logo">
+            <div class="header-left">
+                <div class="logo animate__animated animate__fadeIn">
                     <span class="logo-name">CLOTHLOOP</span>
                     <span class="seller-badge">Seller</span>
-          </div>
+                </div>
                 
-                <nav class="nav-container">
+                <nav class="nav-container animate__animated animate__fadeIn animate__delay-1s">
                     <ul class="nav-items">
                         <li><a href="seller_dashboard.html">Dashboard</a></li>
                         <li><a href="product_listings.html">Listings</a></li>
                         <li><a href="seller_profile.html" class="active">Profile</a></li>
                     </ul>
                 </nav>
-        </div>
+            </div>
             
-      <div class="header-right">
-                <div class="actions">
+            <div class="header-right">
+                <div class="actions animate__animated animate__fadeIn animate__delay-2s">
                     <div class="action-item" id="logoutBtn">
                         <i class="fas fa-sign-out-alt"></i>
                         <span>LOGOUT</span>
-            </div>
+                    </div>
                     
                     <div class="action-item" id="statisticsBtn">
                         <i class="fas fa-chart-bar"></i>
@@ -782,26 +841,30 @@
                     <div class="action-item" id="helpBtn">
                         <i class="fas fa-question-circle"></i>
                         <span>ABOUT US</span>
+                    </div>
+                    
+                    <button class="theme-switcher" id="theme-toggle" aria-label="Toggle theme">
+                        <i class="fas fa-sun"></i>
+                    </button>
+                </div>
             </div>
-          </div>
         </div>
-      </div>
     </header>
 
     <!-- Profile Content -->
     <main class="profile-container">
-        <div class="profile-header">
+        <div class="profile-header animate__animated animate__fadeInDown">
             <h1 class="profile-title">Seller Profile</h1>
             <p class="profile-subtitle">Manage your shop and personal information</p>
         </div>
 
-        <div class="alert alert-success" id="successAlert"></div>
-        <div class="alert alert-error" id="errorAlert"></div>
+        <div class="alert alert-success animate__animated animate__fadeIn" id="successAlert"></div>
+        <div class="alert alert-error animate__animated animate__fadeIn" id="errorAlert"></div>
 
-        <div id="loginPrompt" style="display: none; text-align: center; margin: 30px auto;">
+        <div id="loginPrompt" style="display: none; text-align: center; margin: 30px auto;" class="animate__animated animate__fadeIn">
             <p style="margin-bottom: 20px;">You need to be logged in to view your profile.</p>
             
-            <div style="max-width: 400px; margin: 0 auto; padding: 20px; border: 1px solid var(--border-color); background-color: #f9f9f9;">
+            <div style="max-width: 400px; margin: 0 auto; padding: 20px; border: 1px solid var(--border-color); background-color: var(--input-bg);">
                 <form id="loginForm">
                     <div class="form-group">
                         <label for="loginEmail" class="form-label">Email</label>
@@ -817,9 +880,9 @@
                     <a href="../../../index.html" style="color: var(--text-primary); text-decoration: none;">Return to Home</a>
                 </div>
             </div>
-      </div>
-      
-        <div class="form-container">
+        </div>
+        
+        <div class="form-container animate__animated animate__fadeIn animate__delay-1s">
             <div id="profileLoading" class="loading-spinner" style="display: none;">
                 <i class="fas fa-spinner fa-spin"></i> Loading profile information...
             </div>
@@ -828,10 +891,10 @@
                 <div class="form-section animate__animated animate__fadeIn">
                     <h2 class="section-title"><i class="fas fa-user-circle"></i> Personal Information</h2>
                     
-        <div class="form-group">
+                    <div class="form-group">
                         <label for="name" class="form-label">Full Name</label>
                         <input type="text" id="name" name="name" class="form-input" required>
-            </div>
+                    </div>
 
                     <div class="form-group">
                         <label for="email" class="form-label">Email</label>
@@ -841,24 +904,24 @@
                     <div class="form-group">
                         <label for="phone_no" class="form-label">Phone Number</label>
                         <input type="tel" id="phone_no" name="phone_no" class="form-input" required>
-          </div>
-        </div>
+                    </div>
+                </div>
                 
                 <!-- Shop Information Section -->
                 <div class="form-section animate__animated animate__fadeIn" style="animation-delay: 0.2s;">
                     <h2 class="section-title"><i class="fas fa-store"></i> Shop Information</h2>
         
-        <div class="form-group">
+                    <div class="form-group">
                         <label for="shop_name" class="form-label">Shop Name</label>
                         <input type="text" id="shop_name" name="shop_name" class="form-input" required>
-        </div>
+                    </div>
         
-        <div class="form-group">
+                    <div class="form-group">
                         <label for="shop_address" class="form-label">Shop Address</label>
                         <input type="text" id="shop_address" name="shop_address" class="form-input" required>
-        </div>
+                    </div>
         
-        <div class="form-group">
+                    <div class="form-group">
                         <label for="shop_location" class="form-label">Shop Location (Coordinates)</label>
                         <div class="location-input-container">
                             <div class="location-fields">
@@ -876,20 +939,20 @@
                             </button>
                         </div>
                         <small class="form-hint">These coordinates help customers find your shop on the map</small>
-        </div>
+                </div>
         
-        <div class="form-group">
+                <div class="form-group">
                         <label for="shop_bio" class="form-label">Shop Description</label>
                         <textarea id="shop_bio" name="shop_bio" class="form-input" rows="4"></textarea>
-        </div>
+                </div>
         
-        <div class="form-group">
+                <div class="form-group">
                         <label for="shop_logo" class="form-label">Shop Logo</label>
                         <div class="logo-preview-container">
                             <img id="logoPreview" src="#" alt="Shop Logo Preview" class="logo-preview" style="display: none; max-width: 150px; max-height: 150px; margin-bottom: 10px;">
-              </div>
+                        </div>
                         <input type="file" id="shop_logo" name="shop_logo" class="form-input file-input" accept="image/*">
-              </div>
+                </div>
             </div>
 
                 <!-- Account Information Section -->
@@ -899,12 +962,12 @@
                     <div class="form-group">
                         <label for="created_at" class="form-label">Account Created</label>
                         <input type="text" id="created_at" name="created_at" class="form-input" disabled>
-          </div>
+                    </div>
 
                     <div class="password-toggle">
                         <input type="checkbox" id="changePassword">
                         <label for="changePassword">Change Password</label>
-        </div>
+                    </div>
         
                     <div id="passwordSection" class="password-section" style="display: none;">
                         <div class="form-group">
@@ -926,14 +989,14 @@
                 <div class="form-actions">
                     <button type="button" class="btn btn-secondary" id="cancelBtn">Cancel</button>
                     <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
         </div>
-      </form>
-  </div>
     </main>
   
   <script>
     // Wait for DOM to be fully loaded
-        document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function() {
         // Hide any error alerts on initial page load
         const errorAlert = document.getElementById('errorAlert');
         if (errorAlert) {
@@ -960,7 +1023,7 @@
         
         // Load profile data
         loadProfileData();
-            });
+    });
             
     // Function to setup all event listeners
     function setupEventListeners() {
@@ -1014,7 +1077,7 @@
             });
         }
     }
-    
+            
     // Function to handle logout
     function logout() {
         // Call logout API
@@ -1093,7 +1156,7 @@
             }
         }
     }
-    
+            
     // Function to populate profile form with data
     function populateProfileForm(profile) {
         console.log('Populating form with profile data:', profile);
@@ -1166,7 +1229,7 @@
             document.getElementById('created_at').value = createdDate.toLocaleDateString();
         }
     }
-    
+            
     // Function to update profile
     function updateProfile() {
         // Show loading state
@@ -1256,7 +1319,7 @@
             showAlert('Error occurred while updating profile. Please try again.', 'error');
         });
     }
-    
+            
     // Function to handle image preview for shop logo
     function handleShopLogoPreview(event) {
         const file = event.target.files[0];
@@ -1270,7 +1333,7 @@
             reader.readAsDataURL(file);
         }
     }
-    
+            
     // Function to show alerts
     function showAlert(message, type) {
         const successAlert = document.getElementById('successAlert');
@@ -1470,7 +1533,7 @@
                 return data.logged_in === true && data.user_type === 'seller';
             });
     }
-    
+            
     // Function to show login prompt
     function showLoginPrompt() {
         showLoadingState(false);
@@ -1488,6 +1551,36 @@
         // Also show a message to the user
         showAlert('Please log in to view your profile.', 'error');
     }
+
+    // Theme switcher functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = themeToggle.querySelector('i');
+        
+        // Check for saved theme preference or use default
+        const savedTheme = localStorage.getItem('clothloop-theme');
+        if (savedTheme === 'light') {
+            document.body.classList.add('light-theme');
+            themeIcon.classList.remove('fa-sun');
+            themeIcon.classList.add('fa-moon');
+        }
+        
+        // Toggle theme
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('light-theme');
+            
+            // Update icon
+            if (document.body.classList.contains('light-theme')) {
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+                localStorage.setItem('clothloop-theme', 'light');
+            } else {
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+                localStorage.setItem('clothloop-theme', 'dark');
+            }
+        });
+    });
   </script>
 </body>
 </html> 
