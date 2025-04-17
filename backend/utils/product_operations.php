@@ -370,6 +370,7 @@ function addProduct() {
     $description = isset($_POST['description']) ? $_POST['description'] : '';
     $size = isset($_POST['size']) ? $_POST['size'] : '';
     $category = isset($_POST['category']) ? $_POST['category'] : 'General';
+    $occasion = isset($_POST['occasion']) ? $_POST['occasion'] : '';
     $rental_price = isset($_POST['rental_price']) ? $_POST['rental_price'] : 0;
     $contact_number = isset($_POST['contact_number']) ? $_POST['contact_number'] : '';
     $whatsapp_number = isset($_POST['whatsapp_number']) ? $_POST['whatsapp_number'] : '';
@@ -404,7 +405,8 @@ function addProduct() {
                     cloth_title, 
                     description, 
                     size, 
-                    category, 
+                    category,
+                    occasion,
                     rental_price, 
                     contact_number, 
                     whatsapp_number, 
@@ -412,7 +414,7 @@ function addProduct() {
                     cloth_photo,
                     photo_type,
                     status
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active')";
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active')";
                 
             $stmt = $conn->prepare($sql);
             
@@ -427,6 +429,7 @@ function addProduct() {
                 $description,
                 $size,
                 $category,
+                $occasion,
                 $rental_price,
                 $contact_number,
                 $whatsapp_number,
@@ -441,13 +444,14 @@ function addProduct() {
                     cloth_title, 
                     description, 
                     size, 
-                    category, 
+                    category,
+                    occasion,
                     rental_price, 
                     contact_number, 
                     whatsapp_number, 
                     terms_and_conditions, 
                     status
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'active')";
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active')";
                 
             $stmt = $conn->prepare($sql);
             
@@ -456,12 +460,13 @@ function addProduct() {
             }
             
             $stmt->bind_param(
-                "issssdsss", 
+                "isssssdsss", 
                 $seller_id,
                 $title,
                 $description,
                 $size,
                 $category,
+                $occasion,
                 $rental_price,
                 $contact_number,
                 $whatsapp_number,
@@ -507,15 +512,16 @@ function updateProduct() {
     try {
         // Update cloth_details table
         $sql = "UPDATE cloth_details 
-                SET cloth_title = ?, description = ?, size = ?, category = ?, 
+                SET cloth_title = ?, description = ?, size = ?, category = ?, occasion = ?,
                     rental_price = ?, contact_number = ?, whatsapp_number = ?, terms_and_conditions = ? 
                 WHERE id = ?";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ssssdsssi", 
+        $stmt->bind_param("sssssdsssi", 
             $data['title'], 
             $data['description'], 
             $data['size'], 
-            $data['category'], 
+            $data['category'],
+            $data['occasion'],
             $data['rentalPrice'], 
             $data['contactNo'], 
             $data['whatsappNo'], 

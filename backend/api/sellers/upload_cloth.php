@@ -38,6 +38,7 @@ debug_log("Starting cloth upload process");
 // Debug POST data
 debug_log("POST data", $_POST);
 debug_log("FILES data", isset($_FILES) ? $_FILES : 'No files uploaded');
+debug_log("Product ID from POST", isset($_POST['id']) ? $_POST['id'] : 'Not provided');
 
 $response = ['status' => 'error', 'message' => 'Unknown error occurred'];
 
@@ -65,13 +66,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     
     // Get form data
-    $cloth_title = $_POST['clothTitle'] ?? '';
+    $cloth_title = $_POST['title'] ?? '';
     $description = $_POST['description'] ?? '';
     $size = $_POST['size'] ?? '';
     $category = $_POST['category'] ?? '';
-    $rental_price = $_POST['rentalPrice'] ?? 0;
-    $contact_no = $_POST['contactNo'] ?? '';
-    $whatsapp_no = $_POST['whatsappNo'] ?? '';
+    $occasion = $_POST['occasion'] ?? '';
+    $rental_price = $_POST['rental_price'] ?? 0;
     $shop_address = $_POST['shopAddress'] ?? '';
     $terms_conditions = $_POST['terms'] ?? '';
     
@@ -79,24 +79,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'cloth_title' => $cloth_title,
         'size' => $size,
         'category' => $category,
+        'occasion' => $occasion,
         'rental_price' => $rental_price
     ]);
     
-    // Validate required fields
-    if (empty($cloth_title) || empty($description) || empty($size) || empty($category) || 
-        empty($rental_price) || empty($contact_no) || empty($whatsapp_no) || empty($terms_conditions)) {
-        
-        $missing_fields = [];
-        if (empty($cloth_title)) $missing_fields[] = 'clothTitle';
-        if (empty($description)) $missing_fields[] = 'description';
-        if (empty($size)) $missing_fields[] = 'size';
-        if (empty($category)) $missing_fields[] = 'category';
-        if (empty($rental_price)) $missing_fields[] = 'rentalPrice';
-        if (empty($contact_no)) $missing_fields[] = 'contactNo';
-        if (empty($whatsapp_no)) $missing_fields[] = 'whatsappNo';
-        if (empty($terms_conditions)) $missing_fields[] = 'terms';
-        
-        debug_log("Missing required fields", $missing_fields);
+    // Check for required fields
+    $missing_fields = [];
+    if (empty($cloth_title)) $missing_fields[] = 'title';
+    if (empty($description)) $missing_fields[] = 'description';
+    if (empty($size)) $missing_fields[] = 'size';
+    if (empty($category)) $missing_fields[] = 'category';
+    if (empty($occasion)) $missing_fields[] = 'occasion';
+    if (empty($rental_price)) $missing_fields[] = 'rental_price';
+    if (empty($terms_conditions)) $missing_fields[] = 'terms';
+
+    debug_log("Missing required fields", $missing_fields);
+    if (!empty($missing_fields)) {
         echo json_encode(['status' => 'error', 'message' => 'All fields are required. Missing: ' . implode(', ', $missing_fields)]);
         exit;
     }
@@ -150,9 +148,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // If image data is provided, update it too
             if ($image_data && $image_type) {
                 $sql = "UPDATE cloth_details SET 
-                        cloth_title = ?, description = ?, size = ?, category = ?, 
-                        rental_price = ?, contact_number = ?, whatsapp_number = ?, 
-                        shop_address = ?, terms_and_conditions = ?, cloth_photo = ?, photo_type = ? 
+                        cloth_title = ?, description = ?, size = ?, category = ?, occasion = ?,
+                        rental_price = ?, shop_address = ?, terms_and_conditions = ?, cloth_photo = ?, photo_type = ? 
                         WHERE id = ? AND seller_id = ?";
                         
                 $stmt = $conn->prepare($sql);
@@ -162,14 +159,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     throw new Exception("SQL prepare failed: " . $conn->error);
                 }
                 
-                $stmt->bind_param("ssssdsssssis", 
+                $stmt->bind_param("sssssdsssssis", 
                     $cloth_title, 
                     $description, 
                     $size, 
-                    $category, 
+                    $category,
+                    $occasion,
                     $rental_price, 
-                    $contact_no, 
-                    $whatsapp_no,
                     $shop_address,
                     $terms_conditions, 
                     $image_data,
@@ -180,9 +176,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } else {
                 // Update without changing the image
                 $sql = "UPDATE cloth_details SET 
-                        cloth_title = ?, description = ?, size = ?, category = ?, 
-                        rental_price = ?, contact_number = ?, whatsapp_number = ?, 
-                        shop_address = ?, terms_and_conditions = ? 
+                        cloth_title = ?, description = ?, size = ?, category = ?, occasion = ?,
+                        rental_price = ?, shop_address = ?, terms_and_conditions = ? 
                         WHERE id = ? AND seller_id = ?";
                         
                 $stmt = $conn->prepare($sql);
@@ -192,14 +187,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     throw new Exception("SQL prepare failed: " . $conn->error);
                 }
                 
-                $stmt->bind_param("ssssdsssis", 
+                $stmt->bind_param("sssssdssis", 
                     $cloth_title, 
                     $description, 
                     $size, 
-                    $category, 
+                    $category,
+                    $occasion,
                     $rental_price, 
-                    $contact_no, 
-                    $whatsapp_no,
                     $shop_address,
                     $terms_conditions, 
                     $cloth_id,
@@ -229,9 +223,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 throw new Exception('Image is required for new cloth items');
             }
             
-            $sql = "INSERT INTO cloth_details (seller_id, cloth_title, description, size, category, 
-                    rental_price, contact_number, whatsapp_number, shop_address, terms_and_conditions, cloth_photo, photo_type) 
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            $sql = "INSERT INTO cloth_details (seller_id, cloth_title, description, size, category, occasion,
+                    rental_price, shop_address, terms_and_conditions, cloth_photo, photo_type) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             
             $stmt = $conn->prepare($sql);
             
@@ -240,15 +234,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 throw new Exception("SQL prepare failed: " . $conn->error);
             }
             
-            $stmt->bind_param("issssdssssss", 
+            $stmt->bind_param("isssssdssssss", 
                 $seller_id, 
                 $cloth_title, 
                 $description, 
                 $size, 
-                $category, 
+                $category,
+                $occasion,
                 $rental_price, 
-                $contact_no, 
-                $whatsapp_no,
                 $shop_address,
                 $terms_conditions, 
                 $image_data,

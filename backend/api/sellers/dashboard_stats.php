@@ -6,20 +6,15 @@
 header('Content-Type: application/json');
 
 // Include the database connection
-require_once '../../config/database.php';
-require_once '../../utils/auth.php';
+require_once '../../config/db_connect.php';
 
 // Start session if not already started
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// For the purpose of debugging/development
-$debug_mode = true;
-$use_sample_data = $debug_mode;
-
 // Check if user is authenticated and is a seller
-if (!isAuthenticated() || !isSeller()) {
+if (!isset($_SESSION['user_id'])) {
     echo json_encode([
         'status' => 'error',
         'message' => 'Unauthorized access. Please log in as a seller.'
@@ -31,79 +26,71 @@ if (!isAuthenticated() || !isSeller()) {
 $seller_id = $_SESSION['user_id'];
 
 try {
-    $db = getDbConnection();
+    // Get total number of products for the seller from cloth_details table
+    $sql_products = "SELECT COUNT(*) as total_products FROM cloth_details WHERE seller_id = ?";
+    $stmt_products = $conn->prepare($sql_products);
     
-    // Get total number of products for the seller
-    $stmt = $db->prepare("
-        SELECT COUNT(*) as total_products 
-        FROM products 
-        WHERE seller_id = :seller_id
-    ");
-    $stmt->bindParam(':seller_id', $seller_id, PDO::PARAM_INT);
-    $stmt->execute();
-    $productResult = $stmt->fetch(PDO::FETCH_ASSOC);
-    
-    // Get average rating for the seller's products
-    $stmt = $db->prepare("
-        SELECT AVG(rating) as average_rating 
-        FROM product_ratings 
-        WHERE product_id IN (
-            SELECT id FROM products WHERE seller_id = :seller_id
-        )
-    ");
-    $stmt->bindParam(':seller_id', $seller_id, PDO::PARAM_INT);
-    $stmt->execute();
-    $ratingResult = $stmt->fetch(PDO::FETCH_ASSOC);
-    
-    // Format the average rating to one decimal place
-    $avgRating = $ratingResult['average_rating'] ? 
-                 number_format((float)$ratingResult['average_rating'], 1) : 
-                 '0.0';
-    
-    // Get total products count
-    $totalProducts = (int)$productResult['total_products'];
-    
-    // If we have no products and debug mode is on, use sample data
-    if ($totalProducts === 0 && $use_sample_data) {
-        echo json_encode([
-            'status' => 'success',
-            'stats' => [
-                'total_products' => 12,
-                'average_rating' => '4.7'
-            ]
-        ]);
-        exit;
+    if ($stmt_products === false) {
+        throw new Exception("Failed to prepare statement: " . $conn->error);
     }
     
-    // Return the stats in JSON format
+    $stmt_products->bind_param("i", $seller_id);
+    $stmt_products->execute();
+    $result_products = $stmt_products->get_result();
+    $product_count = $result_products->fetch_assoc();
+    $total_products = $product_count['total_products'];
+    
+    // Get recent products (limit to 5)
+    $sql_recent = "SELECT id, cloth_title as name, rental_price as price_per_day, 
+                  created_at, category, occasion, size 
+                  FROM cloth_details 
+                  WHERE seller_id = ? 
+                  ORDER BY created_at DESC LIMIT 5";
+    
+    $stmt_recent = $conn->prepare($sql_recent);
+    
+    if ($stmt_recent === false) {
+        throw new Exception("Failed to prepare recent products statement: " . $conn->error);
+    }
+    
+    $stmt_recent->bind_param("i", $seller_id);
+    $stmt_recent->execute();
+    $result_recent = $stmt_recent->get_result();
+    
+    $recent_products = [];
+    while ($row = $result_recent->fetch_assoc()) {
+        // Add image URL
+        $row['image_url'] = "../../../backend/api/sellers/get_cloth_image.php?id=" . $row['id'];
+        
+        // Format created_at date
+        if (isset($row['created_at'])) {
+            $date = new DateTime($row['created_at']);
+            $row['created_at_formatted'] = $date->format('M d, Y');
+        } else {
+            $row['created_at_formatted'] = 'N/A';
+        }
+        
+        $recent_products[] = $row;
+    }
+    
+    // Return the stats and recent products in JSON format
     echo json_encode([
         'status' => 'success',
         'stats' => [
-            'total_products' => $totalProducts,
-            'average_rating' => $avgRating
-        ]
+            'total_products' => $total_products,
+            'average_rating' => '4.7' // This could be replaced with actual ratings in the future
+        ],
+        'recent_products' => $recent_products
     ]);
     
-} catch (PDOException $e) {
-    // Log the error (in a production environment)
-    error_log("Database error: " . $e->getMessage());
-    
-    // If debug mode is on and an error occurs, return sample data
-    if ($use_sample_data) {
-        echo json_encode([
-            'status' => 'success',
-            'stats' => [
-                'total_products' => 12,
-                'average_rating' => '4.7'
-            ]
-        ]);
-        exit;
-    }
+} catch (Exception $e) {
+    // Log the error
+    error_log("Database error in dashboard_stats.php: " . $e->getMessage());
     
     // Return error message
     echo json_encode([
         'status' => 'error',
-        'message' => 'Database error occurred. Please try again later.'
+        'message' => 'Database error occurred: ' . $e->getMessage()
     ]);
 }
 ?> 

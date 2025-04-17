@@ -675,6 +675,77 @@
             width: 100%;
             left: 0;
     }
+
+    /* Location input container styles */
+    .location-input-container {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 5px;
+    }
+    
+    .location-fields {
+        display: flex;
+        gap: 15px;
+    }
+    
+    .coordinate-field {
+        flex: 1;
+    }
+    
+    .coord-label {
+        display: block;
+        font-size: 13px;
+        margin-bottom: 5px;
+        color: var(--text-secondary);
+    }
+    
+    .coordinate-input {
+        width: 100%;
+        height: 45px;
+    }
+    
+    .location-btn {
+        background-color: var(--button-primary);
+        color: var(--button-text);
+        border: none;
+        padding: 12px 15px;
+        font-size: 14px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 5px;
+    }
+    
+    .location-btn:hover {
+        background-color: var(--button-hover);
+        transform: translateY(-2px);
+    }
+    
+    .location-btn i {
+        font-size: 16px;
+    }
+    
+    @media (min-width: 768px) {
+        .location-input-container {
+            flex-direction: row;
+            align-items: flex-start;
+        }
+        
+        .location-fields {
+            flex: 2;
+        }
+        
+        .location-btn {
+            flex: 1;
+            margin-top: 25px;
+            height: 45px;
+        }
+    }
   </style>
 </head>
 <body>
@@ -788,6 +859,26 @@
         </div>
         
         <div class="form-group">
+                        <label for="shop_location" class="form-label">Shop Location (Coordinates)</label>
+                        <div class="location-input-container">
+                            <div class="location-fields">
+                                <div class="coordinate-field">
+                                    <label for="shop_latitude" class="coord-label">Latitude</label>
+                                    <input type="text" id="shop_latitude" name="shop_latitude" class="form-input coordinate-input" placeholder="e.g. 28.6139">
+                                </div>
+                                <div class="coordinate-field">
+                                    <label for="shop_longitude" class="coord-label">Longitude</label>
+                                    <input type="text" id="shop_longitude" name="shop_longitude" class="form-input coordinate-input" placeholder="e.g. 77.2090">
+                                </div>
+                            </div>
+                            <button type="button" id="getLocationBtn" class="location-btn">
+                                <i class="fas fa-map-marker-alt"></i> Get Current Location
+                            </button>
+                        </div>
+                        <small class="form-hint">These coordinates help customers find your shop on the map</small>
+        </div>
+        
+        <div class="form-group">
                         <label for="shop_bio" class="form-label">Shop Description</label>
                         <textarea id="shop_bio" name="shop_bio" class="form-input" rows="4"></textarea>
         </div>
@@ -861,27 +952,44 @@
             });
         }
             
-            // Logout button
-            const logoutBtn = document.getElementById('logoutBtn');
+        // Get Location button
+        const getLocationBtn = document.getElementById('getLocationBtn');
+        if (getLocationBtn) {
+            getLocationBtn.addEventListener('click', getCurrentLocation);
+        }
+            
+        // Logout button
+        const logoutBtn = document.getElementById('logoutBtn');
         if (logoutBtn) {
             logoutBtn.addEventListener('click', function() {
                 logout();
             });
-                        }
+        }
 
-            // Statistics button
-            const statisticsBtn = document.getElementById('statisticsBtn');
+        // Statistics button
+        const statisticsBtn = document.getElementById('statisticsBtn');
         if (statisticsBtn) {
             statisticsBtn.addEventListener('click', function() {
                 window.location.href = 'seller_statistics.html';
             });
         }
             
-            // Help button
-            const helpBtn = document.getElementById('helpBtn');
+        // Help button
+        const helpBtn = document.getElementById('helpBtn');
         if (helpBtn) {
             helpBtn.addEventListener('click', function() {
                 window.location.href = '../about/about_us.html';
+            });
+        }
+        
+        // Change password toggle
+        const changePasswordCheckbox = document.getElementById('changePassword');
+        if (changePasswordCheckbox) {
+            changePasswordCheckbox.addEventListener('change', function() {
+                const passwordSection = document.getElementById('passwordSection');
+                if (passwordSection) {
+                    passwordSection.style.display = this.checked ? 'block' : 'none';
+                }
             });
         }
     }
@@ -971,7 +1079,13 @@
         document.getElementById('shop_name').value = profile.shop_name || '';
         document.getElementById('shop_address').value = profile.shop_address || '';
         document.getElementById('shop_bio').value = profile.shop_bio || '';
-                
+        
+        // Shop Location
+        if (profile.shop_latitude && profile.shop_longitude) {
+            document.getElementById('shop_latitude').value = profile.shop_latitude;
+            document.getElementById('shop_longitude').value = profile.shop_longitude;
+        }
+        
         // If there's a shop logo, display it
         if (profile.shop_logo) {
             document.getElementById('logoPreview').src = profile.shop_logo;
@@ -1060,6 +1174,82 @@
 
     // Add event listeners for image uploads
     document.getElementById('shop_logo').addEventListener('change', handleShopLogoPreview);
+
+    // Get seller profile data
+    document.addEventListener('DOMContentLoaded', function () {
+        fetchSellerData();
+        
+        // Set up location detection button
+        const locationBtn = document.getElementById('getLocationBtn');
+        if (locationBtn) {
+            locationBtn.addEventListener('click', getCurrentLocation);
+        }
+    });
+
+    function getCurrentLocation() {
+        const latInput = document.getElementById('shop_latitude');
+        const lngInput = document.getElementById('shop_longitude');
+        const locationBtn = document.getElementById('getLocationBtn');
+        
+        if (!navigator.geolocation) {
+            alert('Geolocation is not supported by your browser');
+            return;
+        }
+        
+        // Change button text to show loading
+        locationBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Getting location...';
+        locationBtn.disabled = true;
+        
+        navigator.geolocation.getCurrentPosition(
+            // Success callback
+            function(position) {
+                latInput.value = position.coords.latitude.toFixed(6);
+                lngInput.value = position.coords.longitude.toFixed(6);
+                
+                // Reset button text
+                locationBtn.innerHTML = '<i class="fas fa-map-marker-alt"></i> Get Current Location';
+                locationBtn.disabled = false;
+                
+                // Add visual feedback
+                latInput.classList.add('is-valid');
+                lngInput.classList.add('is-valid');
+                setTimeout(() => {
+                    latInput.classList.remove('is-valid');
+                    lngInput.classList.remove('is-valid');
+                }, 2000);
+            },
+            // Error callback
+            function(error) {
+                let errorMessage = 'Unknown error occurred while getting location';
+                
+                switch(error.code) {
+                    case error.PERMISSION_DENIED:
+                        errorMessage = 'Location permission denied. Please enable location access.';
+                        break;
+                    case error.POSITION_UNAVAILABLE:
+                        errorMessage = 'Location information is unavailable.';
+                        break;
+                    case error.TIMEOUT:
+                        errorMessage = 'Location request timed out.';
+                        break;
+                }
+                
+                alert(errorMessage);
+                
+                // Reset button text
+                locationBtn.innerHTML = '<i class="fas fa-map-marker-alt"></i> Get Current Location';
+                locationBtn.disabled = false;
+            },
+            // Options
+            {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 0
+            }
+        );
+    }
+
+    function fetchSellerData() {
   </script>
 </body>
 </html> 

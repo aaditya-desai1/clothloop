@@ -321,7 +321,7 @@
     /* Dashboard specific styles */
     .dashboard-grid {
       display: grid;
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: repeat(2, 1fr);
       gap: 20px;
       margin-bottom: 30px;
     }
@@ -548,6 +548,143 @@
             padding: 8px 10px;
         }
     }
+
+    /* Recent products section */
+    .recent-products {
+        margin-top: 40px;
+        margin-bottom: 40px;
+    }
+    
+    .recent-products-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    
+    .recent-products-title {
+        font-size: 18px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    .view-all-link {
+        text-decoration: none;
+        color: var(--text-primary);
+        font-size: 14px;
+        font-weight: 500;
+        transition: color 0.3s ease;
+    }
+    
+    .view-all-link:hover {
+        text-decoration: underline;
+    }
+    
+    .products-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+    }
+    
+    .product-card {
+        background-color: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    .product-image {
+        height: 180px;
+        overflow: hidden;
+    }
+    
+    .product-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+    
+    .product-card:hover .product-image img {
+        transform: scale(1.1);
+    }
+    
+    .product-info {
+        padding: 15px;
+    }
+    
+    .product-name {
+        font-size: 16px;
+        font-weight: 600;
+        margin: 0 0 10px 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .product-price {
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 5px;
+    }
+    
+    .product-date {
+        font-size: 12px;
+        color: var(--text-secondary);
+        margin-bottom: 5px;
+    }
+    
+    .product-details {
+        font-size: 12px;
+        color: var(--text-secondary);
+        margin-bottom: 15px;
+    }
+    
+    .product-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .view-details-btn {
+        text-decoration: none;
+        color: var(--text-primary);
+        font-size: 14px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        transition: color 0.3s ease;
+    }
+    
+    .view-details-btn:hover {
+        color: var(--button-hover);
+    }
+    
+    .no-products {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 40px;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+    
+    .no-products i {
+        font-size: 40px;
+        margin-bottom: 20px;
+        color: var(--text-secondary);
+    }
+    
+    .no-products p {
+        margin-bottom: 20px;
+        color: var(--text-secondary);
+    }
   </style>
 </head>
 <body>
@@ -623,6 +760,17 @@
         <div id="loadingSpinner" class="loading-spinner" style="display: none;">
             <div class="spinner"></div>
             </div>
+
+        <!-- Recent products section -->
+        <div class="recent-products">
+            <div class="recent-products-header">
+                <h2 class="recent-products-title">Recently Added Products</h2>
+                <a href="product_listings.html" class="view-all-link">View All</a>
+            </div>
+            <div class="products-grid">
+                <!-- Product cards will be dynamically added here -->
+            </div>
+        </div>
     </main>
 
     <!-- JavaScript code for functionality -->
@@ -708,6 +856,13 @@
                     if (data.status === 'success') {
                         // Update dashboard stats
                         updateDashboardStats(data.stats);
+                        
+                        // Display recent products
+                        if (data.recent_products && data.recent_products.length > 0) {
+                            displayRecentProducts(data.recent_products);
+                        } else {
+                            showNoProductsMessage();
+                        }
                     } else {
                         showAlert(data.message || 'Error loading dashboard data', 'error');
                     }
@@ -731,6 +886,52 @@
             if (averageRatingElement) {
                 averageRatingElement.textContent = stats.average_rating || '0.0';
             }
+        }
+        
+        // Function to display recent products
+        function displayRecentProducts(products) {
+            const productsGrid = document.querySelector('.products-grid');
+            
+            // Clear existing content
+            productsGrid.innerHTML = '';
+            
+            // Add product cards
+            products.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+                
+                productCard.innerHTML = `
+                    <div class="product-image">
+                        <img src="${product.image_url}" alt="${product.name}">
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-name">${product.name}</h3>
+                        <p class="product-price">₹${product.price_per_day}/day</p>
+                        <p class="product-date">Added: ${product.created_at_formatted}</p>
+                        <p class="product-details">${product.category} | ${product.size} | ${product.occasion}</p>
+                        <div class="product-actions">
+                            <a href="product_detail.html?id=${product.id}" class="view-details-btn">VIEW DETAILS</a>
+                        </div>
+                    </div>
+                `;
+                
+                productsGrid.appendChild(productCard);
+            });
+        }
+        
+        // Function to show "no products" message
+        function showNoProductsMessage() {
+            const productsGrid = document.querySelector('.products-grid');
+            
+            productsGrid.innerHTML = `
+                <div class="no-products">
+                    <i class="fas fa-box-open"></i>
+                    <p>You haven't added any products yet.</p>
+                    <button class="action-button" onclick="window.location.href='cloth_upload.html'">
+                        <i class="fas fa-plus"></i> Add Your First Product
+                    </button>
+                </div>
+            `;
         }
         
         // Function to show alerts

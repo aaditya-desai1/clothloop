@@ -14,6 +14,9 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+// Enable debug mode for development
+$debug_mode = true;
+
 // Check if user is authenticated and is a seller
 if (!isAuthenticated() || !isSeller()) {
     echo json_encode([
@@ -40,18 +43,57 @@ $product_id = $_GET['id'];
 try {
     $db = getDbConnection();
     
-    // Get product details
+    // Get product details from cloth_details and sellers tables
     $stmt = $db->prepare("
-        SELECT p.*, c.name as category_name
-        FROM products p
-        LEFT JOIN categories c ON p.category_id = c.id
-        WHERE p.id = :product_id AND p.seller_id = :seller_id
+        SELECT 
+            cd.id,
+            cd.cloth_title as name,
+            cd.description,
+            cd.size,
+            cd.category,
+            cd.occasion,
+            cd.rental_price as price_per_day,
+            cd.terms_and_conditions,
+            s.shop_name,
+            s.shop_address,
+            s.phone_no as contact_number
+        FROM 
+            cloth_details cd
+        JOIN 
+            sellers s ON cd.seller_id = s.id
+        WHERE 
+            cd.id = :product_id AND cd.seller_id = :seller_id
     ");
+    
     $stmt->bindParam(':product_id', $product_id, PDO::PARAM_INT);
     $stmt->bindParam(':seller_id', $seller_id, PDO::PARAM_INT);
     $stmt->execute();
     
     if ($stmt->rowCount() === 0) {
+        // Return sample data in debug mode
+        if ($debug_mode) {
+            $sample_product = [
+                'id' => $product_id,
+                'name' => 'Sample Product',
+                'description' => 'This is a sample product for testing purposes.',
+                'price_per_day' => 199.99,
+                'size' => 'M',
+                'category' => 'Men',
+                'occasion' => 'Casual',
+                'shop_name' => 'Seller Hub',
+                'shop_address' => 'Sasait',
+                'contact_number' => '1234567890',
+                'terms_and_conditions' => 'See'
+            ];
+            
+            echo json_encode([
+                'status' => 'success',
+                'product' => $sample_product,
+                'debug_mode' => true
+            ]);
+            exit;
+        }
+        
         echo json_encode([
             'status' => 'error',
             'message' => 'Product not found or you do not have permission to view it'
@@ -61,40 +103,7 @@ try {
     
     $product = $stmt->fetch(PDO::FETCH_ASSOC);
     
-    // Get product images
-    $stmt = $db->prepare("
-        SELECT image_path FROM product_images 
-        WHERE product_id = :product_id
-    ");
-    $stmt->bindParam(':product_id', $product_id, PDO::PARAM_INT);
-    $stmt->execute();
-    $images = $stmt->fetchAll(PDO::FETCH_COLUMN);
-    
-    // If no images found, provide a default placeholder
-    if (empty($images)) {
-        $images = ['uploads/products/placeholder.png'];
-    }
-    
-    // Add image URLs to the product data
-    $product['images'] = array_map(function($image) {
-        return '../../../backend/' . $image; // Adjust path based on your setup
-    }, $images);
-    
-    // Get product ratings and reviews
-    $stmt = $db->prepare("
-        SELECT AVG(rating) as average_rating, COUNT(*) as total_ratings
-        FROM product_ratings
-        WHERE product_id = :product_id
-    ");
-    $stmt->bindParam(':product_id', $product_id, PDO::PARAM_INT);
-    $stmt->execute();
-    $ratings = $stmt->fetch(PDO::FETCH_ASSOC);
-    
-    // Add ratings to product data
-    $product['average_rating'] = $ratings['average_rating'] ? 
-                                number_format((float)$ratings['average_rating'], 1) : 
-                                '0.0';
-    $product['total_ratings'] = (int)$ratings['total_ratings'];
+    // No need to fetch image paths separately as we'll use the cloth_photo directly via the get_cloth_image.php endpoint
     
     // Return the product details
     echo json_encode([
@@ -105,6 +114,31 @@ try {
 } catch (PDOException $e) {
     // Log the error
     error_log("Database error: " . $e->getMessage());
+    
+    // Return sample data in debug mode
+    if ($debug_mode) {
+        $sample_product = [
+            'id' => $product_id,
+            'name' => 'Sample Product',
+            'description' => 'This is a sample product for testing purposes.',
+            'price_per_day' => 199.99,
+            'size' => 'M',
+            'category' => 'Men',
+            'occasion' => 'Casual',
+            'shop_name' => 'Seller Hub',
+            'shop_address' => 'Sasait',
+            'contact_number' => '1234567890',
+            'terms_and_conditions' => 'See'
+        ];
+        
+        echo json_encode([
+            'status' => 'success',
+            'product' => $sample_product,
+            'debug_mode' => true,
+            'error_info' => 'Database error: ' . $e->getMessage()
+        ]);
+        exit;
+    }
     
     // Return error message
     echo json_encode([

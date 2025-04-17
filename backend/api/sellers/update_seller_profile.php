@@ -43,7 +43,16 @@ try {
     $shopName = isset($_POST['shop_name']) ? $_POST['shop_name'] : null;
     $shopAddress = isset($_POST['shop_address']) ? $_POST['shop_address'] : null;
     $shopBio = isset($_POST['shop_bio']) ? $_POST['shop_bio'] : null;
-    $shopLocation = isset($_POST['shop_location']) ? $_POST['shop_location'] : null;
+    
+    // Get location coordinates
+    $shopLatitude = isset($_POST['shop_latitude']) ? $_POST['shop_latitude'] : '';
+    $shopLongitude = isset($_POST['shop_longitude']) ? $_POST['shop_longitude'] : '';
+    $shopLocation = '';
+    
+    // If we have valid coordinates, combine them into the shop_location field
+    if (!empty($shopLatitude) && !empty($shopLongitude)) {
+        $shopLocation = $shopLatitude . ',' . $shopLongitude;
+    }
 
     // Validate required fields
     if (empty($shopName) || empty($shopAddress)) {

@@ -45,7 +45,8 @@ try {
             p.brand,
             p.condition,
             c.name as category_name,
-            (SELECT image_path FROM product_images WHERE product_id = p.id LIMIT 1) as image_path
+            (SELECT image_path FROM product_images WHERE product_id = p.id) as image_path,
+            p.id as cloth_id
         FROM 
             products p
         LEFT JOIN 
@@ -73,15 +74,23 @@ try {
                 'brand' => 'POLO',
                 'condition' => 'Excellent',
                 'category_name' => 'Men',
-                'image_path' => 'uploads/products/p1.jpg'
+                'image_url' => '../../../backend/api/sellers/get_cloth_image.php?id=1',
+                'shop_name' => 'Seller Hub'
+            ],
+            [
+                'id' => 2,
+                'name' => 'Yash',
+                'description' => 'Casual t-shirt for everyday wear.',
+                'price_per_day' => 3,
+                'size' => 'M',
+                'color' => 'cc',
+                'brand' => 'Generic',
+                'condition' => 'Good',
+                'category_name' => 'Men',
+                'image_url' => '../../../backend/api/sellers/get_cloth_image.php?id=2',
+                'shop_name' => 'Seller Hub'
             ]
         ];
-        
-        // Process image paths for sample data
-        foreach ($sample_products as &$product) {
-            $product['image_url'] = '../../../frontend/assets/images/' . basename($product['image_path']);
-            $product['shop_name'] = 'Seller Hub';
-        }
         
         echo json_encode([
             'status' => 'success',
@@ -92,12 +101,8 @@ try {
     
     // Process products
     foreach ($products as &$product) {
-        // Add image URL
-        if (!empty($product['image_path'])) {
-            $product['image_url'] = '../../../backend/' . $product['image_path'];
-        } else {
-            $product['image_url'] = '../../../frontend/assets/images/placeholder.png';
-        }
+        // Add image URL - use cloth_details image API instead of file path
+        $product['image_url'] = '../../../backend/api/sellers/get_cloth_image.php?id=' . $product['cloth_id'];
         
         // Get shop name
         $stmt = $db->prepare("
@@ -132,7 +137,20 @@ try {
                 'brand' => 'POLO',
                 'condition' => 'Excellent',
                 'category_name' => 'Men',
-                'image_url' => '../../../frontend/assets/images/p1.jpg',
+                'image_url' => '../../../backend/api/sellers/get_cloth_image.php?id=1',
+                'shop_name' => 'Seller Hub'
+            ],
+            [
+                'id' => 2,
+                'name' => 'Yash',
+                'description' => 'Casual t-shirt for everyday wear.',
+                'price_per_day' => 3,
+                'size' => 'M',
+                'color' => 'cc',
+                'brand' => 'Generic',
+                'condition' => 'Good',
+                'category_name' => 'Men',
+                'image_url' => '../../../backend/api/sellers/get_cloth_image.php?id=2',
                 'shop_name' => 'Seller Hub'
             ]
         ];

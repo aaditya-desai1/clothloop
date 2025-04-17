@@ -43,6 +43,13 @@
         padding: 0;
         box-sizing: border-box;
         letter-spacing: 0.02em;
+        overflow-x: hidden;
+    }
+
+    /* Make images responsive */
+    img {
+        max-width: 100%;
+        height: auto;
     }
 
     /* Header styles */
@@ -225,33 +232,63 @@
 
     /* Main Content */
     .main-content {
-        max-width: 1400px;
+        max-width: 1200px;
         margin: 0 auto;
-        padding: 30px;
+        padding: 30px 20px;
     }
 
     /* Product Detail Section */
     .product-detail {
         display: flex;
-        gap: 40px;
+        flex-direction: column;
+        gap: 30px;
         margin-top: 20px;
         background-color: white;
         border-radius: 5px;
         box-shadow: var(--shadow-sm);
         overflow: hidden;
+        max-width: 100%;
+    }
+
+    @media (min-width: 992px) {
+        .product-detail {
+            flex-direction: row;
+        }
     }
 
     .product-image {
         flex: 1;
-        max-width: 600px;
+        max-width: 100%;
         position: relative;
+        background-color: #f9f9f9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px;
+        border-radius: 5px;
+        min-height: 500px;
+    }
+
+    @media (min-width: 992px) {
+        .product-image {
+            max-width: 550px;
+            min-height: 550px;
+        }
     }
 
     .product-image img {
-        width: 100%;
-        height: 500px;
-        object-fit: cover;
-        display: block;
+        object-fit: contain;
+        max-width: 100%;
+        max-height: 500px;
+        border-radius: 5px;
+        width: auto;
+        height: auto;
+    }
+
+    @media (min-width: 992px) {
+        .product-image img {
+            max-height: 530px;
+        }
     }
 
     .product-info {
@@ -260,17 +297,17 @@
     }
 
     .product-title {
-        font-size: 28px;
+        font-size: 32px;
         font-weight: 700;
-        margin: 0 0 15px 0;
+        margin-bottom: 10px;
         text-transform: uppercase;
     }
 
     .product-price {
-        font-size: 24px;
-        color: var(--text-primary);
-        margin-bottom: 20px;
+        font-size: 28px;
         font-weight: 600;
+        margin-bottom: 25px;
+        color: var(--text-primary);
     }
 
     .product-attributes {
@@ -278,13 +315,15 @@
     }
 
     .product-attribute {
+        display: flex;
         margin-bottom: 15px;
         font-size: 16px;
     }
 
     .attribute-name {
+        min-width: 100px;
+        font-weight: 500;
         color: var(--text-secondary);
-        margin-right: 10px;
     }
 
     .divider {
@@ -298,23 +337,24 @@
     }
 
     .section-title {
-        font-size: 18px;
+        font-size: 20px;
         font-weight: 600;
         margin-bottom: 15px;
-        text-transform: uppercase;
         letter-spacing: 1px;
+        text-transform: uppercase;
     }
 
     .shop-detail {
         display: flex;
         align-items: center;
-        margin-bottom: 10px;
+        margin-bottom: 12px;
     }
 
     .shop-detail i {
-        width: 20px;
+        width: 25px;
+        margin-right: 15px;
+        font-size: 18px;
         color: var(--text-secondary);
-        margin-right: 10px;
     }
 
     .terms-section {
@@ -322,29 +362,41 @@
     }
 
     .terms-content {
-        background-color: var(--input-bg);
         padding: 15px;
+        background-color: var(--input-bg);
         border-radius: 4px;
         font-size: 14px;
         line-height: 1.5;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        max-width: 100%;
     }
 
     /* Action Buttons */
     .product-actions {
         display: flex;
         gap: 15px;
+        margin-top: 25px;
+    }
+
+    @media (max-width: 768px) {
+        .product-actions {
+            flex-direction: column;
+        }
     }
 
     .btn {
         padding: 12px 25px;
         font-size: 14px;
-        font-weight: 500;
+        font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 1px;
         border-radius: 4px;
         cursor: pointer;
         transition: all 0.3s ease;
         border: none;
+        white-space: nowrap;
+        text-align: center;
     }
 
     .btn-primary {
@@ -454,6 +506,36 @@
         .btn {
             width: 100%;
         }
+        
+        .main-content {
+            padding: 20px 15px;
+        }
+    }
+
+    /* Additional styling for product details page */
+    .error-container {
+        text-align: center;
+        padding: 30px;
+        background-color: rgba(255, 59, 48, 0.1);
+        border-radius: 4px;
+        margin-top: 20px;
+    }
+    
+    .error-container p {
+        margin-bottom: 20px;
+        color: var(--error-color);
+        font-size: 16px;
+    }
+    
+    .product-detail {
+        padding-bottom: 30px;
+    }
+    
+    .product-image img {
+        object-fit: contain;
+        width: 100%;
+        height: 450px;
+        border-top-left-radius: 5px;
     }
   </style>
 </head>
@@ -500,7 +582,7 @@
     <!-- Main Content -->
     <main class="main-content">
         <div class="content-header">
-            <a href="product_listings.html" class="back-link">
+            <a href="product_listings.html" class="back-button">
             <i class="fas fa-arrow-left"></i> Back to Listings
         </a>
         </div>
@@ -512,7 +594,7 @@
         </div>
         
         <div id="errorMessage" class="error-container" style="display: none;">
-            <p>Invalid product ID</p>
+            <p></p>
                 </div>
                 
         <div id="productDetails" class="product-details-container" style="display: none;">
@@ -592,23 +674,31 @@
             if (!productId) {
                 document.getElementById('loadingSpinner').style.display = 'none';
                 document.getElementById('errorMessage').style.display = 'block';
+                document.getElementById('errorMessage').innerHTML = '<p>No product ID provided</p>';
                 return;
                 }
+            
+            console.log('Loading product data for ID:', productId);
             
             // Show loading spinner
             document.getElementById('loadingSpinner').style.display = 'flex';
             
             // Fetch product data from backend API
-            fetch(`../../../backend/api/sellers/get_product_details.php?id=${productId}`)
+            const apiUrl = `../../../backend/api/sellers/get_product_details.php?id=${productId}`;
+            console.log('Fetching from:', apiUrl);
+            
+            fetch(apiUrl)
                 .then(response => {
+                    console.log('Response status:', response.status);
                     if (!response.ok) {
-                        throw new Error('Network response was not ok');
+                        throw new Error('Network response was not ok: ' + response.status);
                     }
                     return response.json();
                 })
                 .then(data => {
                     // Hide loading spinner
                     document.getElementById('loadingSpinner').style.display = 'none';
+                    console.log('API response:', data);
                     
                     if (data.status === 'success') {
                         // Update product details
@@ -616,87 +706,105 @@
                         document.getElementById('productDetails').style.display = 'block';
                     } else {
                         document.getElementById('errorMessage').style.display = 'block';
-                        document.getElementById('errorMessage').querySelector('p').textContent = data.message || 'Error loading product data';
+                        document.getElementById('errorMessage').innerHTML = `
+                            <p>Error: ${data.message || 'Database error occurred. Please try again later.'}</p>
+                            <a href="product_listings.html" class="back-button">
+                                <i class="fas fa-arrow-left"></i> Back to Listings
+                            </a>`;
                     }
                 })
                 .catch(error => {
                     console.error('Error fetching product data:', error);
                     document.getElementById('loadingSpinner').style.display = 'none';
                     document.getElementById('errorMessage').style.display = 'block';
-                    document.getElementById('errorMessage').querySelector('p').textContent = 'Error loading product data';
+                    document.getElementById('errorMessage').innerHTML = `
+                        <p>Database error occurred: ${error.message}</p>
+                        <a href="product_listings.html" class="back-button">
+                            <i class="fas fa-arrow-left"></i> Back to Listings
+                        </a>`;
                 });
         }
         
         // Function to display product details
         function displayProductDetails(product) {
+            console.log('Displaying product:', product);
             const productDetailsContainer = document.getElementById('productDetails');
             
             // Update page title
             document.title = `${product.name} | Product Details | ClothLoop`;
             
+            // Create image URL using the cloth image API endpoint
+            const imageUrl = `../../../backend/api/sellers/get_cloth_image.php?id=${product.id}`;
+            console.log('Image URL:', imageUrl);
+            
             // Create HTML for product details
             const html = `
-                <div class="product-details">
-                    <div class="product-images">
-                        <div class="main-image">
-                            <img src="${product.images[0] || '../../assets/images/placeholder.png'}" alt="${product.name}" id="mainProductImage">
-                        </div>
-                        <div class="thumbnail-images">
-                            ${product.images.map((img, index) => `
-                                <div class="thumbnail${index === 0 ? ' active' : ''}" onclick="changeMainImage('${img}', this)">
-                                    <img src="${img}" alt="Thumbnail ${index + 1}">
-                                </div>
-                            `).join('')}
-                        </div>
+                <div class="product-detail">
+                    <div class="product-image">
+                        <img src="${imageUrl}" alt="${product.name || 'Product Image'}" id="productImg" onload="adjustImageSize()">
                     </div>
                     
                     <div class="product-info">
-                        <h1 class="product-name">${product.name}</h1>
+                        <h2 class="product-title">${product.name || 'Product Title'}</h2>
+                        <p class="product-price">₹${product.price_per_day || '0.00'}/day</p>
                         
-                        <div class="product-meta">
-                            <div class="product-price">₹${product.price_per_day}/day</div>
-                            <div class="product-rating">
-                                <span class="rating-stars">${generateStarRating(product.average_rating)}</span>
-                                <span class="rating-number">${product.average_rating}</span>
-                                <span class="rating-count">(${product.total_ratings} reviews)</span>
+                        <div class="product-attributes">
+                            <div class="product-attribute">
+                                <span class="attribute-name">Size:</span>
+                                <span>${product.size || 'Not specified'}</span>
+                            </div>
+                            <div class="product-attribute">
+                                <span class="attribute-name">Category:</span>
+                                <span>${product.category || 'Not specified'}</span>
+                            </div>
+                            <div class="product-attribute">
+                                <span class="attribute-name">Occasion:</span>
+                                <span>${product.occasion || 'Not specified'}</span>
                             </div>
                         </div>
                         
-                        <div class="product-category">
-                            <span class="label">Category:</span>
-                            <span class="value">${product.category_name || 'Uncategorized'}</span>
+                        <div class="divider"></div>
+                        
+                        <div class="description-section">
+                            <h3 class="section-title">DESCRIPTION</h3>
+                            <p>${product.description || 'No description available.'}</p>
                         </div>
                         
-                        <div class="product-description">
-                            <h3>Description</h3>
-                            <p>${product.description || 'No description available'}</p>
+                        <div class="divider"></div>
+
+                        <div class="shop-info">
+                            <h3 class="section-title">SHOP INFORMATION</h3>
+                            <div class="shop-detail">
+                                <i class="fas fa-store"></i>
+                                <span>${product.shop_name || 'Seller Hub'}</span>
+                            </div>
+                            <div class="shop-detail">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>${product.shop_address || 'No location specified'}</span>
+                            </div>
+                            <div class="shop-detail">
+                                <i class="fas fa-phone"></i>
+                                <span>${product.contact_number || '1234567890'}</span>
+                            </div>
                         </div>
                         
-                        <div class="product-details-list">
-                            <div class="detail-item">
-                                <span class="label">Size:</span>
-                                <span class="value">${product.size || 'Not specified'}</span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="label">Color:</span>
-                                <span class="value">${product.color || 'Not specified'}</span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="label">Brand:</span>
-                                <span class="value">${product.brand || 'Not specified'}</span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="label">Condition:</span>
-                                <span class="value">${product.condition || 'Not specified'}</span>
+                        <div class="divider"></div>
+
+                        <div class="terms-section">
+                            <h3 class="section-title">TERMS & CONDITIONS</h3>
+                            <div class="terms-content">
+                                ${product.terms_and_conditions || 'See'}
                             </div>
                         </div>
+                        
+                        <div class="divider"></div>
                         
                         <div class="product-actions">
-                            <button class="action-button edit-button" onclick="editProduct(${product.id})">
-                                <i class="fas fa-edit"></i> Edit Product
+                            <button class="btn btn-primary" onclick="editProduct(${product.id})">
+                                <i class="fas fa-edit"></i> EDIT
                             </button>
-                            <button class="action-button delete-button" onclick="deleteProduct(${product.id})">
-                                <i class="fas fa-trash-alt"></i> Delete Product
+                            <button class="btn btn-secondary" onclick="deleteProduct(${product.id})">
+                                <i class="fas fa-trash"></i> DELETE
                             </button>
                         </div>
                     </div>
@@ -705,60 +813,37 @@
             
             // Update the container
             productDetailsContainer.innerHTML = html;
-            
-            // Setup thumbnail click handlers
-            setupThumbnailHandlers();
+            console.log('Product details HTML updated');
         }
         
-        // Function to generate star rating HTML
-        function generateStarRating(rating) {
-            const fullStars = Math.floor(rating);
-            const halfStar = rating % 1 >= 0.5;
-            const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+        // Function to adjust image size based on aspect ratio
+        function adjustImageSize() {
+            const img = document.getElementById('productImg');
+            if (!img) return;
             
-            let starsHtml = '';
+            const container = img.parentElement;
+            if (!container) return;
             
-            // Full stars
-            for (let i = 0; i < fullStars; i++) {
-                starsHtml += '<i class="fas fa-star"></i>';
+            // Ensure the image is loaded
+            if (img.complete) {
+                const imgRatio = img.naturalWidth / img.naturalHeight;
+                
+                // If the image is portrait (taller than wide)
+                if (imgRatio < 0.8) {
+                    img.style.maxHeight = '500px';
+                    img.style.maxWidth = '80%';
+                }
+                // If the image is landscape or square
+                else {
+                    img.style.maxWidth = '95%';
+                    img.style.maxHeight = '95%';
+                }
+            } else {
+                // If not loaded yet, wait for it to load
+                img.onload = function() {
+                    adjustImageSize();
+                };
             }
-            
-            // Half star
-            if (halfStar) {
-                starsHtml += '<i class="fas fa-star-half-alt"></i>';
-            }
-            
-            // Empty stars
-            for (let i = 0; i < emptyStars; i++) {
-                starsHtml += '<i class="far fa-star"></i>';
-            }
-            
-            return starsHtml;
-        }
-        
-        // Function to change main product image
-        function changeMainImage(imgSrc, thumbnailElement) {
-            // Update main image
-            document.getElementById('mainProductImage').src = imgSrc;
-            
-            // Update active thumbnail
-            const thumbnails = document.querySelectorAll('.thumbnail');
-            thumbnails.forEach(thumbnail => {
-                thumbnail.classList.remove('active');
-            });
-            
-            thumbnailElement.classList.add('active');
-        }
-        
-        // Function to setup thumbnail handlers
-        function setupThumbnailHandlers() {
-            const thumbnails = document.querySelectorAll('.thumbnail');
-            thumbnails.forEach(thumbnail => {
-                thumbnail.addEventListener('click', function() {
-                    const imgSrc = this.querySelector('img').src;
-                    changeMainImage(imgSrc, this);
-                });
-            });
         }
         
         // Function to navigate to edit product page
