@@ -369,165 +369,131 @@
         margin-right: 10px;
     }
 
-    /* Grid layout */
-    .grid {
+    /* Product grid styles */
+    .products-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-        gap: 30px;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
         margin-top: 30px;
     }
 
-    .item {
-        overflow: hidden;
+    .product-card {
         background-color: white;
-        position: relative;
-        border: 1px solid #eaeaea;
-        border-radius: 2px;
-        box-shadow: none;
-      transition: all 0.3s ease;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
 
-    .item:hover {
+    .product-card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
-        border-color: #cccccc;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
 
-    .item-image {
+    .product-image {
+        height: 200px;
+        overflow: hidden;
+    }
+
+    .product-image img {
       width: 100%;
-        height: 300px;
+        height: 100%;
         object-fit: cover;
-        display: block;
+        transition: transform 0.5s ease;
     }
 
-    .item-details {
+    .product-card:hover .product-image img {
+        transform: scale(1.1);
+    }
+
+    .product-info {
       padding: 15px;
-        border-top: 1px solid rgba(0, 0, 0, 0.05);
     }
 
-    .item-title {
+    .product-name {
         font-size: 16px;
-        font-weight: 500;
-        margin: 0 0 5px 0;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
+        font-weight: 600;
+        margin: 0 0 10px 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
-    .item-price {
-        font-size: 16px;
-        font-weight: 400;
-        margin-top: 5px;
+    .product-price {
+        font-weight: 700;
       color: var(--text-primary);
+        margin-bottom: 5px;
     }
 
-    .item-seller {
-        font-size: 13px;
+    .product-shop {
+        font-size: 12px;
         color: var(--text-secondary);
-        margin-top: 10px;
+        margin-bottom: 15px;
     }
 
-    .item-actions {
+    .product-actions {
       display: flex;
-        margin-top: 15px;
+        justify-content: space-between;
+        align-items: center;
     }
 
     .view-details-btn {
-        background-color: transparent;
-      color: var(--text-primary);
-        border: 1px solid var(--text-primary);
-        padding: 8px 20px;
-        font-size: 12px;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        cursor: pointer;
-        transition: all 0.3s;
         text-decoration: none;
-        display: inline-block;
+      color: var(--text-primary);
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        transition: color 0.3s ease;
     }
 
     .view-details-btn:hover {
-        background-color: var(--text-primary);
-        color: white;
+        color: var(--button-hover);
     }
 
-    .heart-btn {
-        background-color: transparent;
+    .favorite-btn {
+        background: none;
         border: none;
-        margin-left: auto;
         cursor: pointer;
-        padding: 8px;
+        font-size: 18px;
         color: var(--text-primary);
-        font-size: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-        transition: color 0.3s;
+        transition: transform 0.3s ease;
     }
 
-    .heart-btn:hover {
-        color: #ff3e6c;
+    .favorite-btn:hover {
+        transform: scale(1.2);
     }
 
-    /* Responsive */
-    @media (max-width: 992px) {
-        .header-container {
-            padding: 0 15px;
-        }
-
-        .grid {
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 20px;
-        }
-
-        .nav-items li {
-            margin: 0 10px;
-        }
+    .favorite-btn i.fas {
+        color: #ff385c;
     }
 
-    @media (max-width: 768px) {
-        .header {
-            height: auto;
-        }
+    .no-products {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 40px;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
 
-        .header-container {
-            flex-wrap: wrap;
-            padding: 10px 15px;
-        }
+    .no-products i {
+        font-size: 40px;
+        margin-bottom: 20px;
+        color: var(--text-secondary);
+    }
 
-        .logo {
-            margin-right: 15px;
-        }
-
-        .nav-items li {
-            height: 60px;
-        }
-
-        .search-container {
-            width: 100%;
-            margin: 10px 0;
-        }
-
-        .content-header {
-      flex-direction: column;
-            align-items: flex-start;
-        }
-
-        .action-button {
-            margin-top: 15px;
-        }
-
-        .grid {
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 15px;
-        }
+    .no-products p {
+        margin-bottom: 20px;
+        color: var(--text-secondary);
     }
 
     /* Loading spinner */
     .loading-spinner {
+        grid-column: 1 / -1;
       display: flex;
       justify-content: center;
         align-items: center;
-        height: 100px;
+        height: 200px;
     }
 
     .spinner {
@@ -614,20 +580,8 @@
       
         <div id="alertContainer"></div>
 
-        <div id="productGrid" class="grid">
+        <div id="productsContainer" class="products-grid">
             <!-- Products will be loaded here dynamically -->
-            <div class="item" data-product-id="sample">
-                <img src="../../assets/images/products/polo.jpg" alt="Product" class="item-image">
-                <div class="item-details">
-                    <h3 class="item-title">POLO</h3>
-                    <div class="item-price">₹500/day</div>
-                    <div class="item-seller">Seller Hub</div>
-                    <div class="item-actions">
-                        <a href="product_detail.html?id=sample" class="view-details-btn">VIEW DETAILS</a>
-                        <button class="heart-btn"><i class="far fa-heart"></i></button>
-  </div>
-      </div>
-    </div>
   </div>
 
         <div id="loadingSpinner" class="loading-spinner" style="display: none;">
@@ -659,100 +613,70 @@
             // Setup event listeners
             setupEventListeners();
             
-            // Load products
-            loadProducts();
-            
-            // Setup static sample product view details link
-            const staticViewDetailsBtn = document.querySelector('.item[data-product-id="sample"] .view-details-btn');
-            if (staticViewDetailsBtn) {
-                staticViewDetailsBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    window.location.href = 'product_detail.html?id=sample';
-                });
-            }
+        // Load product listings
+        loadProductListings();
         });
         
         // Function to setup all event listeners
         function setupEventListeners() {
-            // Add Product button
+        // Add product button
             const addProductBtn = document.getElementById('addProductBtn');
+        if (addProductBtn) {
             addProductBtn.addEventListener('click', function() {
                 window.location.href = 'cloth_upload.html';
             });
+        }
             
             // Logout button
             const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
             logoutBtn.addEventListener('click', function() {
-                // Call logout API
-                fetch('../../../backend/api/users/logout.php')
-                    .then(response => response.json())
-          .then(data => {
-            if (data.status === 'success') {
-                            window.location.href = '../../pages/account/login.html';
-            } else {
-                            showAlert('Error logging out. Please try again.', 'error');
-            }
-          })
-          .catch(error => {
-                        console.error('Error:', error);
-                        showAlert('Error logging out. Please try again.', 'error');
-                    });
+                logout();
             });
+        }
             
             // Statistics button
             const statisticsBtn = document.getElementById('statisticsBtn');
+        if (statisticsBtn) {
             statisticsBtn.addEventListener('click', function() {
                 window.location.href = 'seller_statistics.html';
             });
+        }
             
             // Help button
             const helpBtn = document.getElementById('helpBtn');
+        if (helpBtn) {
             helpBtn.addEventListener('click', function() {
                 window.location.href = '../about/about_us.html';
             });
-            
-            // Search input
-            const searchInput = document.getElementById('searchInput');
-            searchInput.addEventListener('keyup', function(e) {
-                if (e.key === 'Enter') {
-                    const searchTerm = this.value.trim();
-                    if (searchTerm) {
-                        loadProducts(null, searchTerm);
-                    } else {
-                        loadProducts();
-                    }
-                }
-            });
-            
-            // Sort button
-            const sortButton = document.getElementById('sortButton');
-            sortButton.addEventListener('click', function() {
-                // Toggle sort order between price ascending and descending
-                const currentOrder = this.getAttribute('data-order') || 'asc';
-                const newOrder = currentOrder === 'asc' ? 'desc' : 'asc';
-                this.setAttribute('data-order', newOrder);
-                
-                loadProducts(null, null, newOrder);
-                showAlert(`Sorting by price: ${newOrder === 'asc' ? 'Low to High' : 'High to Low'}`, 'success');
-            });
         }
-        
-        // Function to load products
-        function loadProducts(category = null, searchTerm = null, sortOrder = null) {
-        // Show loading spinner
-            const loadingSpinner = document.getElementById('loadingSpinner');
-            loadingSpinner.style.display = 'flex';
-            
-            // Get grid container
-            const productGrid = document.getElementById('productGrid');
-            
-            // Build query parameters
-            let queryParams = new URLSearchParams();
-            if (searchTerm) queryParams.append('search', searchTerm);
-            if (sortOrder) queryParams.append('sort', sortOrder);
+    }
+    
+    // Function to handle logout
+    function logout() {
+        // Call logout API
+        fetch('../../../backend/api/users/logout.php')
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    window.location.href = '../../pages/account/login.html';
+                    } else {
+                    showAlert('Error logging out. Please try again.', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlert('Error logging out. Please try again.', 'error');
+            });
+    }
+    
+    // Function to load product listings
+    function loadProductListings() {
+        // Show loading spinner or message
+        document.getElementById('productsContainer').innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
             
             // Fetch products from backend API
-            fetch(`../../../backend/api/products/seller_products.php?${queryParams.toString()}`)
+        fetch('../../../backend/api/sellers/get_seller_products.php')
         .then(response => {
           if (!response.ok) {
                         throw new Error('Network response was not ok');
@@ -760,163 +684,84 @@
           return response.json();
         })
         .then(data => {
-                    // Hide loading spinner
-                    loadingSpinner.style.display = 'none';
-                    
-                    // Clear existing products
-                    productGrid.innerHTML = '';
-                    
-                    if (data.status === 'success' && data.products && data.products.length > 0) {
-                        // Render each product
-                        data.products.forEach(product => {
-                            renderProduct(product, productGrid);
-                        });
+                if (data.status === 'success') {
+                    displayProducts(data.products);
             } else {
-                        // No products found
-                        productGrid.innerHTML = '<div class="no-products">No products found. Click "Add New Product" to get started.</div>';
+                    showAlert(data.message || 'Error loading products', 'error');
+                    document.getElementById('productsContainer').innerHTML = '<div class="no-products">Failed to load products. Please try again.</div>';
             }
           })
           .catch(error => {
                     console.error('Error fetching products:', error);
-                    loadingSpinner.style.display = 'none';
-                    showAlert('Error loading products. Please try again later.', 'error');
-                    
-                    // For development/demo purposes, show sample products on error
-                    renderSampleProducts(productGrid);
-                });
+                showAlert('Error loading products. Please try again.', 'error');
+                document.getElementById('productsContainer').innerHTML = '<div class="no-products">Failed to load products. Please try again.</div>';
+            });
+    }
+    
+    // Function to display products
+    function displayProducts(products) {
+        const productsContainer = document.getElementById('productsContainer');
+        
+        // Clear container
+        productsContainer.innerHTML = '';
+        
+        if (products.length === 0) {
+            productsContainer.innerHTML = `
+                <div class="no-products">
+                    <i class="fas fa-box-open"></i>
+                    <p>You haven't added any products yet.</p>
+                    <button class="action-button" onclick="window.location.href='cloth_upload.html'">
+                        <i class="fas fa-plus"></i> Add Your First Product
+                    </button>
+                </div>
+            `;
+            return;
         }
         
-        // Function to render a single product
-        function renderProduct(product, container) {
-            // Clone the template
-            const template = document.getElementById('product-template');
-            const productElement = document.importNode(template.content, true).querySelector('.item');
+        // Loop through products and create cards
+        products.forEach(product => {
+            const productCard = document.createElement('div');
+            productCard.className = 'product-card';
             
-            // Set product data
-            const image = productElement.querySelector('.item-image');
-            image.src = product.image_url || '../../assets/images/products/placeholder.jpg';
-            image.alt = product.title;
+            productCard.innerHTML = `
+                <div class="product-image">
+                    <img src="${product.image_url || '../../assets/images/placeholder.png'}" alt="${product.name}">
+                </div>
+                <div class="product-info">
+                    <h3 class="product-name">${product.name}</h3>
+                    <p class="product-price">₹${product.price_per_day}/day</p>
+                    <p class="product-shop">${product.shop_name}</p>
+                    <div class="product-actions">
+                        <a href="product_detail.html?id=${product.id}" class="view-details-btn">VIEW DETAILS</a>
+                        <button class="favorite-btn" onclick="toggleFavorite(this, ${product.id})">
+                            <i class="far fa-heart"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
             
-            productElement.querySelector('.item-title').textContent = product.title;
-            productElement.querySelector('.item-price').textContent = `₹${product.price}/day`;
-            
-            // Set the product seller info
-            const sellerInfo = productElement.querySelector('.item-seller');
-            sellerInfo.textContent = product.shop_name || 'Your Shop';
-            
-            // Set up the view details link
-            const viewDetailsBtn = productElement.querySelector('.view-details-btn');
-            viewDetailsBtn.href = `product_detail.html?id=${product.id}`;
-            
-            // Set up edit button
-            const editBtn = productElement.querySelector('.edit-btn');
-            editBtn.addEventListener('click', () => {
-                window.location.href = `edit_product.html?id=${product.id}`;
-            });
-            
-            // Set up delete button
-            const deleteBtn = productElement.querySelector('.delete-btn');
-            deleteBtn.addEventListener('click', () => {
-                if (confirm('Are you sure you want to delete this product?')) {
-                    deleteProduct(product.id);
-                }
-            });
-            
-            // Add product ID as data attribute
-            productElement.setAttribute('data-product-id', product.id);
-            
-            // Append to container
-            container.appendChild(productElement);
-        }
+            productsContainer.appendChild(productCard);
+        });
+    }
+    
+    // Function to toggle favorite status
+    function toggleFavorite(btn, productId) {
+        btn.querySelector('i').classList.toggle('far');
+        btn.querySelector('i').classList.toggle('fas');
         
-        // Function to delete a product
-        function deleteProduct(productId) {
-        // Show loading spinner
-            const loadingSpinner = document.getElementById('loadingSpinner');
-            loadingSpinner.style.display = 'flex';
-            
-            // Call delete API
-            fetch(`../../../backend/api/products/delete_product.php`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ product_id: productId })
-            })
-            .then(response => response.json())
-        .then(data => {
-                loadingSpinner.style.display = 'none';
-          
-          if (data.status === 'success') {
-                    // Remove product element from DOM
-                    const productElement = document.querySelector(`[data-product-id="${productId}"]`);
-                    if (productElement) {
-                        productElement.remove();
-                    }
-                    
-                    showAlert('Product deleted successfully!', 'success');
-                    
-                    // If no products left, show message
-                    const productGrid = document.getElementById('productGrid');
-                    if (productGrid.children.length === 0) {
-                        productGrid.innerHTML = '<div class="no-products">No products found. Click "Add New Product" to get started.</div>';
-                    }
-                } else {
-                    showAlert(data.message || 'Error deleting product. Please try again.', 'error');
-                }
-        })
-        .catch(error => {
-                console.error('Error:', error);
-                loadingSpinner.style.display = 'none';
-                showAlert('Error deleting product. Please try again.', 'error');
-            });
-        }
-        
-        // Function to render sample products (for development/demo purposes)
-        function renderSampleProducts(container) {
-            // Clear container
-            container.innerHTML = '';
-            
-            // Sample product data
-            const sampleProducts = [
-                {
-                    id: 1,
-                    title: 'Classic Polo Shirt',
-                    price: 500,
-                    shop_name: 'Your Fashion Hub',
-                    image_url: '../../assets/images/products/polo.jpg'
-                },
-                {
-                    id: 2,
-                    title: 'Denim Jacket',
-                    price: 800,
-                    shop_name: 'Your Fashion Hub',
-                    image_url: '../../assets/images/products/jacket.jpg'
-                },
-                {
-                    id: 3,
-                    title: 'Summer Dress',
-                    price: 600,
-                    shop_name: 'Your Fashion Hub',
-                    image_url: '../../assets/images/products/dress.jpg'
-                }
-            ];
-            
-            // Render each sample product
-            sampleProducts.forEach(product => {
-                renderProduct(product, container);
-            });
+        // In a real app, you'd call an API to update the favorite status
+        console.log(`Toggle favorite for product ${productId}`);
         }
         
         // Function to show alerts
       function showAlert(message, type) {
             const alertContainer = document.getElementById('alertContainer');
+        if (!alertContainer) return;
             
             // Create alert element
             const alert = document.createElement('div');
             alert.className = `alert alert-${type}`;
             alert.textContent = message;
-            alert.style.display = 'block';
             
             // Add to container
             alertContainer.innerHTML = '';
@@ -924,53 +769,11 @@
             
             // Auto-hide after 3 seconds
         setTimeout(() => {
-                alert.style.display = 'none';
+            alert.style.opacity = '0';
+            setTimeout(() => {
+                alertContainer.innerHTML = '';
+            }, 300);
             }, 3000);
-        }
-
-        function createProductCard(product) {
-            const template = document.getElementById('product-template');
-            const productCard = document.importNode(template.content, true);
-            
-            // Set product ID
-            productCard.querySelector('.item').dataset.productId = product.id;
-            
-            // Set product image
-            const productImage = productCard.querySelector('.item-image');
-            productImage.src = product.image || '../../assets/images/products/default.jpg';
-            productImage.alt = product.name;
-            
-            // Add error handling for image loading
-            productImage.onerror = function() {
-                this.src = '../../assets/images/products/default.jpg';
-            };
-            
-            // Set product details
-            productCard.querySelector('.item-title').textContent = product.name;
-            productCard.querySelector('.item-price').textContent = `₹${product.price}/day`;
-            productCard.querySelector('.item-seller').textContent = product.seller || 'Your Shop';
-            
-            // Set view details link
-            const viewDetailsLink = productCard.querySelector('.view-details-btn');
-            viewDetailsLink.href = `product_detail.html?id=${product.id}`;
-            viewDetailsLink.addEventListener('click', function(e) {
-                e.preventDefault();
-                window.location.href = `product_detail.html?id=${product.id}`;
-            });
-            
-            // Set up edit and delete buttons
-            const editBtn = productCard.querySelector('.edit-btn');
-            const deleteBtn = productCard.querySelector('.delete-btn');
-            
-            editBtn.addEventListener('click', function() {
-                editProduct(product.id);
-            });
-            
-            deleteBtn.addEventListener('click', function() {
-                deleteProduct(product.id);
-            });
-            
-            return productCard;
         }
   </script>
 </body>

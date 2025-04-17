@@ -841,230 +841,76 @@
     </main>
   
   <script>
+    // Wait for DOM to be fully loaded
         document.addEventListener('DOMContentLoaded', function() {
-            // Check if user is logged in
-            checkSession();
-            
-            // Profile dropdown toggle
-            const profileSection = document.getElementById('profileSection');
-            const profileDropdown = document.getElementById('profileDropdown');
-            
-            profileSection.addEventListener('click', function(e) {
-                e.stopPropagation();
-                profileDropdown.classList.toggle('active');
+        // Setup event listeners
+        setupEventListeners();
+        
+        // Load profile data
+        loadProfileData();
             });
             
-            document.addEventListener('click', function() {
-                profileDropdown.classList.remove('active');
+    // Function to setup all event listeners
+    function setupEventListeners() {
+        // Handle form submission
+        const profileForm = document.getElementById('profileForm');
+        if (profileForm) {
+            profileForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                updateProfile();
             });
-            
-            // Password change toggle with animation
-            const changePasswordCheckbox = document.getElementById('changePassword');
-            const passwordSection = document.getElementById('passwordSection');
-            
-            changePasswordCheckbox.addEventListener('change', function() {
-                if (this.checked) {
-                    passwordSection.style.display = 'block';
-                    passwordSection.classList.add('animate__animated', 'animate__fadeIn');
-        } else {
-                    passwordSection.classList.add('animate__animated', 'animate__fadeOut');
-                    setTimeout(() => {
-                        passwordSection.style.display = 'none';
-                        passwordSection.classList.remove('animate__animated', 'animate__fadeOut');
-                    }, 500);
-                }
-            });
-            
-            // Password strength meter
-            const passwordInput = document.getElementById('password');
-            const strengthBar = document.getElementById('strengthBar');
-            const passwordHint = document.getElementById('passwordHint');
-            
-            passwordInput.addEventListener('input', function() {
-                const password = this.value;
-                let strength = 0;
-                let color = '';
-                let hint = '';
-                
-                // Calculate password strength
-                if (password.length >= 8) strength += 25;
-                if (password.match(/[a-z]+/)) strength += 25;
-                if (password.match(/[A-Z]+/)) strength += 25;
-                if (password.match(/[0-9]+/) || password.match(/[^a-zA-Z0-9]+/)) strength += 25;
-                
-                // Set bar color based on strength
-                if (strength <= 25) {
-                    color = '#ff3b30'; // weak (red)
-                    hint = 'Weak password. Try adding uppercase letters, numbers, and symbols.';
-                } else if (strength <= 50) {
-                    color = '#ff9500'; // medium (orange)
-                    hint = 'Medium strength. Add more variety of characters for better security.';
-                } else if (strength <= 75) {
-                    color = '#ffcc00'; // good (yellow)
-                    hint = 'Good password. Consider adding more variety for the best security.';
-                } else {
-                    color = '#34c759'; // strong (green)
-                    hint = 'Strong password!';
-                }
-                
-                // Update the UI
-                strengthBar.style.width = strength + '%';
-                strengthBar.style.backgroundColor = color;
-                passwordHint.textContent = hint;
-            });
-            
-            // Cancel button
-            const cancelBtn = document.getElementById('cancelBtn');
-            
-            cancelBtn.addEventListener('click', function() {
-                window.location.href = 'seller_dashboard.html';
-            });
+        }
             
             // Logout button
             const logoutBtn = document.getElementById('logoutBtn');
-            
-            logoutBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                
-                fetch('../../../backend/api/users/logout.php', {
-                    credentials: 'include'
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.status === 'success') {
-                            showSuccess('Logging out...');
-                            setTimeout(() => {
-                                window.location.href = '../../pages/account/login.html';
-                            }, 1000);
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        showError('Failed to logout. Please try again.');
-                    });
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', function() {
+                logout();
             });
+                        }
 
             // Statistics button
             const statisticsBtn = document.getElementById('statisticsBtn');
-            
+        if (statisticsBtn) {
             statisticsBtn.addEventListener('click', function() {
-                window.location.href = 'statistics.html';
+                window.location.href = 'seller_statistics.html';
             });
+        }
             
             // Help button
             const helpBtn = document.getElementById('helpBtn');
-            
+        if (helpBtn) {
             helpBtn.addEventListener('click', function() {
                 window.location.href = '../about/about_us.html';
             });
-            
-            // Form submission
-            const profileForm = document.getElementById('profileForm');
-            
-        profileForm.addEventListener('submit', function(e) {
-          e.preventDefault();
-          
-                const name = document.getElementById('name').value;
-                const email = document.getElementById('email').value;
-                const phone_no = document.getElementById('phone_no').value;
-                const shop_name = document.getElementById('shop_name').value;
-                const shop_address = document.getElementById('shop_address').value;
-                const shop_bio = document.getElementById('shop_bio').value;
-                
-                const formData = {
-                    name: name,
-                    email: email,
-                    phone_no: phone_no,
-                    shop_name: shop_name,
-                    shop_address: shop_address,
-                    shop_bio: shop_bio
-                };
-                
-                // If change password is checked, add password to form data
-                if (changePasswordCheckbox.checked) {
-                    const password = document.getElementById('password').value;
-                    const confirmPassword = document.getElementById('confirm_password').value;
-                    
-                    if (!password) {
-                        showError('Password cannot be empty');
-            return;
-          }
-          
-                    if (password !== confirmPassword) {
-                        showError('Passwords do not match');
-            return;
-          }
-          
-                    formData.password = password;
-                }
-                
-                updateSellerProfile(formData);
-            });
-            
-            // Shop logo preview
-            const shopLogoInput = document.getElementById('shop_logo');
-            const logoPreview = document.getElementById('logoPreview');
-            
-            shopLogoInput.addEventListener('change', function() {
-                const file = this.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        logoPreview.src = e.target.result;
-                        logoPreview.style.display = 'block';
-                        logoPreview.classList.add('animate__animated', 'animate__fadeIn');
-                    }
-                    reader.readAsDataURL(file);
-                }
-            });
-            
-            function checkSession() {
-                // Show loading state
-                document.getElementById('errorAlert').style.display = 'none';
-                document.getElementById('profileLoading').style.display = 'flex';
-                document.getElementById('profileForm').style.display = 'none';
-                document.getElementById('loginPrompt').style.display = 'none';
-                
-                fetch('../../../backend/api/users/check_session.php', { 
-                    credentials: 'include'  // This is important to include cookies
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok: ' + response.statusText);
-                    }
-                    return response.json();
-                })
+        }
+    }
+    
+    // Function to handle logout
+    function logout() {
+        // Call logout API
+        fetch('../../../backend/api/users/logout.php')
+            .then(response => response.json())
                 .then(data => {
-                    console.log('Session check response:', data); // Debug log
-                    
-                    if (data.logged_in && data.user_type === 'seller') {
-                        // Proceed to fetch profile data if logged in
-                        fetchSellerProfile();
+                if (data.status === 'success') {
+                    window.location.href = '../../pages/account/login.html';
                     } else {
-                        // Hide loading spinner and show login prompt
-                        document.getElementById('profileLoading').style.display = 'none';
-                        document.getElementById('loginPrompt').style.display = 'block';
-                        showError('You need to log in as a seller to access your profile');
+                    showAlert('Error logging out. Please try again.', 'error');
                     }
                 })
                 .catch(error => {
-                    console.error('Error checking session:', error);
-                    // Hide loading spinner and show login prompt
-                    document.getElementById('profileLoading').style.display = 'none';
-                    document.getElementById('loginPrompt').style.display = 'block';
-                    showError('Failed to verify login status: ' + error.message);
+                console.error('Error:', error);
+                showAlert('Error logging out. Please try again.', 'error');
                 });
             }
             
-            function fetchSellerProfile() {
-                // Show loading state and hide error message
-                document.getElementById('errorAlert').style.display = 'none';
-                document.getElementById('profileLoading').style.display = 'flex';
-                document.getElementById('profileForm').style.display = 'none';
-                
-                fetch('../../../backend/api/sellers/get_seller_profile.php', {
-                    credentials: 'include'  // This is important to include cookies
-                })
+    // Function to load profile data
+    function loadProfileData() {
+        // Show loading message or spinner
+        showLoadingState(true);
+        
+        // Fetch profile data from backend API
+        fetch('../../../backend/api/sellers/get_seller_profile.php')
           .then(response => {
             if (!response.ok) {
                         throw new Error('Network response was not ok');
@@ -1073,97 +919,84 @@
           })
           .then(data => {
                     // Hide loading state
-                    document.getElementById('profileLoading').style.display = 'none';
-                    document.getElementById('profileForm').style.display = 'block';
+                showLoadingState(false);
                     
             if (data.status === 'success') {
-                        const seller = data.seller;
-                        
-                        // Populate form fields with a typing animation
-                        typeIntoField('name', seller.name);
-                        setTimeout(() => typeIntoField('email', seller.email), 200);
-                        setTimeout(() => typeIntoField('phone_no', seller.phone_no), 400);
-                        setTimeout(() => typeIntoField('shop_name', seller.shop_name), 600);
-                        setTimeout(() => typeIntoField('shop_address', seller.shop_address), 800);
-                        setTimeout(() => typeIntoField('shop_bio', seller.shop_bio), 1000);
-                        
-                        // Format date for display
-                        const createdDate = new Date(seller.created_at);
-                        setTimeout(() => {
-                            document.getElementById('created_at').value = createdDate.toLocaleDateString();
-                        }, 1200);
-                        
-                        // Show logo if exists
-                        if (seller.shop_logo) {
-                            logoPreview.src = seller.shop_logo;
-                            logoPreview.style.display = 'block';
-                            logoPreview.classList.add('animate__animated', 'animate__fadeIn');
-                        }
+                    // Populate form with profile data
+                    populateProfileForm(data.profile);
                     } else {
-                        showError(data.message || 'Failed to load profile data');
+                    showAlert(data.message || 'Error loading profile data', 'error');
             }
           })
           .catch(error => {
-                    // Hide loading state
-                    document.getElementById('profileLoading').style.display = 'none';
-                    document.getElementById('profileForm').style.display = 'block';
-                    
-                    console.error('Error:', error);
-                    showError('An error occurred while loading profile data');
+                console.error('Error fetching profile data:', error);
+                showLoadingState(false);
+                showAlert('Error occurred while loading profile data. Please try again.', 'error');
                 });
             }
             
-            // Function to give typing animation effect to form fields
-            function typeIntoField(fieldId, text) {
-                const field = document.getElementById(fieldId);
-                field.value = '';
-                let i = 0;
-                
-                function typeChar() {
-                    if (i < text.length) {
-                        field.value += text.charAt(i);
-                        i++;
-                        setTimeout(typeChar, 20);
-                    }
-                }
-                
-                typeChar();
+    // Function to show loading state
+    function showLoadingState(isLoading) {
+        const errorContainer = document.querySelector('.error-container');
+        const form = document.getElementById('profileForm');
+        
+        if (isLoading) {
+            // Show loading state
+            if (errorContainer) {
+                errorContainer.style.display = 'none';
             }
-            
-            function updateSellerProfile(formData) {
-                // Show loading state
-                const submitButton = document.querySelector('button[type="submit"]');
-                const originalButtonText = submitButton.textContent;
-                submitButton.disabled = true;
-                submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
-                
-                document.getElementById('errorAlert').style.display = 'none';
-                document.getElementById('successAlert').style.display = 'none';
-                
-                // Handle file upload separately if needed
-                const shopLogoInput = document.getElementById('shop_logo');
-                const file = shopLogoInput.files[0];
-                
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        formData.shop_logo = e.target.result;
-                        sendUpdateRequest(formData, submitButton, originalButtonText);
-                    };
-                    reader.readAsDataURL(file);
-                } else {
-                    sendUpdateRequest(formData, submitButton, originalButtonText);
-                }
+            if (form) {
+                form.querySelectorAll('input, textarea, button').forEach(el => {
+                    el.disabled = true;
+                });
             }
-            
-            function sendUpdateRequest(formData, submitButton, originalButtonText) {
+        } else {
+            // Hide loading state
+            if (form) {
+                form.querySelectorAll('input, textarea, button').forEach(el => {
+                    el.disabled = false;
+                });
+            }
+        }
+    }
+    
+    // Function to populate profile form with data
+    function populateProfileForm(profile) {
+        // Personal Information section
+        document.getElementById('name').value = profile.name || '';
+        document.getElementById('email').value = profile.email || '';
+        document.getElementById('phone_no').value = profile.phone_no || '';
+        
+        // Shop Information section
+        document.getElementById('shop_name').value = profile.shop_name || '';
+        document.getElementById('shop_address').value = profile.shop_address || '';
+        document.getElementById('shop_bio').value = profile.shop_bio || '';
+                
+        // If there's a shop logo, display it
+        if (profile.shop_logo) {
+            document.getElementById('logoPreview').src = profile.shop_logo;
+            document.getElementById('logoPreview').style.display = 'block';
+        }
+        
+        // If there's a created_at date, format and display it
+        if (profile.created_at) {
+            const createdDate = new Date(profile.created_at);
+            document.getElementById('created_at').value = createdDate.toLocaleDateString();
+        }
+    }
+    
+    // Function to update profile
+    function updateProfile() {
+        // Show loading state
+        showLoadingState(true);
+        
+        // Get form data
+        const formData = new FormData(document.getElementById('profileForm'));
+        
+        // Send data to backend API
         fetch('../../../backend/api/sellers/update_seller_profile.php', {
           method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    credentials: 'include', // Add credentials to include cookies
-                    body: JSON.stringify(formData)
+            body: formData
         })
           .then(response => {
             if (!response.ok) {
@@ -1172,156 +1005,61 @@
             return response.json();
           })
           .then(data => {
-                    // Reset button state
-                    submitButton.disabled = false;
-                    submitButton.textContent = originalButtonText;
+            // Hide loading state
+            showLoadingState(false);
             
             if (data.status === 'success') {
-                        showSuccess(data.message);
-                        
-                        // Apply a saved animation to form
-                        const formContainer = document.querySelector('.form-container');
-                        formContainer.classList.add('animate__animated', 'animate__pulse');
-                        setTimeout(() => {
-                            formContainer.classList.remove('animate__animated', 'animate__pulse');
-                        }, 1000);
-                        
-                        // Reset password fields if present
-                        if (changePasswordCheckbox.checked) {
-                            document.getElementById('password').value = '';
-                            document.getElementById('confirm_password').value = '';
-                            changePasswordCheckbox.checked = false;
-                            passwordSection.style.display = 'none';
+                showAlert('Profile updated successfully!', 'success');
+                
+                // If we got updated profile data in response, update the form
+                if (data.profile) {
+                    populateProfileForm(data.profile);
                         }
             } else {
-                        showError(data.message || 'Failed to update profile');
+                showAlert(data.message || 'Error updating profile', 'error');
             }
           })
           .catch(error => {
-                    // Reset button state
-                    submitButton.disabled = false;
-                    submitButton.textContent = originalButtonText;
-                    
-                    console.error('Error:', error);
-                    showError('An error occurred while updating profile');
+            console.error('Error updating profile:', error);
+            showLoadingState(false);
+            showAlert('Error occurred while updating profile. Please try again.', 'error');
                 });
             }
             
-            function showSuccess(message) {
-                const successAlert = document.getElementById('successAlert');
-                successAlert.textContent = message;
-                successAlert.style.display = 'block';
-                successAlert.classList.add('animate__animated', 'animate__fadeIn');
+    // Function to handle image preview for shop logo
+    function handleShopLogoPreview(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.getElementById('logoPreview');
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+            }
+            reader.readAsDataURL(file);
+        }
+    }
+    
+    // Function to show alerts
+    function showAlert(message, type) {
+        const errorContainer = document.querySelector('.error-container');
+        
+        if (errorContainer) {
+            errorContainer.textContent = message;
+            errorContainer.className = `error-container ${type === 'success' ? 'success' : 'error'}`;
+            errorContainer.style.display = 'block';
                 
-                // Scroll to the message
-                successAlert.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                
-                // Hide after 3 seconds
-                setTimeout(function() {
-                    successAlert.classList.add('animate__fadeOut');
-                    setTimeout(() => {
-                        successAlert.style.display = 'none';
-                        successAlert.classList.remove('animate__animated', 'animate__fadeIn', 'animate__fadeOut');
-                    }, 500);
+            // Auto-hide success messages after 3 seconds
+            if (type === 'success') {
+          setTimeout(() => {
+                    errorContainer.style.display = 'none';
                 }, 3000);
             }
-            
-            function showError(message) {
-                const errorAlert = document.getElementById('errorAlert');
-                errorAlert.textContent = message;
-                errorAlert.style.display = 'block';
-                errorAlert.classList.add('animate__animated', 'animate__shakeX');
-                
-                // Scroll to the error
-                errorAlert.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                
-                // Remove animation class after it completes
-          setTimeout(() => {
-                    errorAlert.classList.remove('animate__animated', 'animate__shakeX');
-                }, 1000);
-                
-                // Hide after 5 seconds
-                setTimeout(function() {
-                    errorAlert.classList.add('animate__fadeOut');
-                    setTimeout(() => {
-                        errorAlert.style.display = 'none';
-                        errorAlert.classList.remove('animate__animated', 'animate__fadeOut');
-                    }, 500);
-          }, 5000);
+        }
             }
 
-            // Add login form handler
-            const loginForm = document.getElementById('loginForm');
-            
-            loginForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                const loginEmail = document.getElementById('loginEmail').value;
-                const loginPassword = document.getElementById('loginPassword').value;
-                
-                if (!loginEmail || !loginPassword) {
-                    showError('Please provide both email and password');
-                    return;
-                }
-                
-                // Show loading state
-                const loginButton = loginForm.querySelector('button[type="submit"]');
-                const originalButtonText = loginButton.textContent;
-                loginButton.disabled = true;
-                loginButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
-                
-                // Clear previous errors
-                document.getElementById('errorAlert').style.display = 'none';
-                
-                // Attempt to log in
-                const loginData = {
-                    email: loginEmail,
-                    password: loginPassword
-                };
-                
-                fetch('../../../backend/api/users/login.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    credentials: 'include', // Add credentials to include cookies
-                    body: JSON.stringify(loginData)
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    // Reset button state
-                    loginButton.disabled = false;
-                    loginButton.textContent = originalButtonText;
-                    
-                    if (data.success) {
-                        // Login successful
-                        showSuccess('Login successful! Loading your profile...');
-                        
-                        // Wait a moment for the success message to be visible
-                        setTimeout(function() {
-                            // Check session again to fetch profile
-                            checkSession();
-                        }, 1000);
-          } else {
-                        // Login failed
-                        showError(data.message || 'Login failed. Please check your credentials.');
-                    }
-                })
-                .catch(error => {
-                    // Reset button state
-                    loginButton.disabled = false;
-                    loginButton.textContent = originalButtonText;
-                    
-                    console.error('Error during login:', error);
-                    showError('An error occurred during login. Please try again.');
-                });
-            });
-    });
+    // Add event listeners for image uploads
+    document.getElementById('shop_logo').addEventListener('change', handleShopLogoPreview);
   </script>
 </body>
 </html> 

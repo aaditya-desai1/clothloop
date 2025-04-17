@@ -477,19 +477,35 @@
     /* Alert messages */
     .alert {
         padding: 15px;
-      margin-bottom: 20px;
-        border-radius: 2px;
-      display: none;
+        margin-bottom: 20px;
+        border-radius: 4px;
+        text-align: center;
+        border-left: 4px solid transparent;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+        from {
+            transform: translateY(-10px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
     }
 
     .alert-success {
-        background-color: var(--success-color);
-        color: white;
+        background-color: rgba(52, 199, 89, 0.1);
+        color: var(--success-color);
+        border-left-color: var(--success-color);
     }
 
     .alert-error {
-        background-color: var(--error-color);
-        color: white;
+        background-color: rgba(255, 59, 48, 0.1);
+        color: var(--error-color);
+        border-left-color: var(--error-color);
     }
 
     /* Responsive styles */
@@ -671,49 +687,50 @@
             const loadingSpinner = document.getElementById('loadingSpinner');
             loadingSpinner.style.display = 'flex';
             
+            // Clear any previous error messages
+            const alertContainer = document.getElementById('alertContainer');
+            if (alertContainer) {
+                alertContainer.innerHTML = '';
+            }
+            
             // Fetch dashboard data from backend API
             fetch('../../../backend/api/sellers/dashboard_stats.php')
-          .then(response => {
-            if (!response.ok) {
-              throw new Error('Network response was not ok');
-            }
-            return response.json();
-          })
-          .then(data => {
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
                     // Hide loading spinner
                     loadingSpinner.style.display = 'none';
                     
                     if (data.status === 'success') {
                         // Update dashboard stats
                         updateDashboardStats(data.stats);
-                  } else {
+                    } else {
                         showAlert(data.message || 'Error loading dashboard data', 'error');
-                        // For development, show sample data
-                        updateDashboardStats(getSampleStats());
-            }
-          })
-          .catch(error => {
+                    }
+                })
+                .catch(error => {
                     console.error('Error fetching dashboard data:', error);
                     loadingSpinner.style.display = 'none';
-                    showAlert('Error loading dashboard data', 'error');
-                    
-                    // For development, show sample data
-                    updateDashboardStats(getSampleStats());
+                    showAlert('Error loading dashboard data. Please try again later.', 'error');
                 });
         }
         
         // Function to update dashboard stats
         function updateDashboardStats(stats) {
-            document.getElementById('totalProducts').textContent = stats.total_products || 0;
-            document.getElementById('averageRating').textContent = stats.average_rating || '0.0';
-        }
-        
-        // Function to get sample stats data (for development purposes)
-        function getSampleStats() {
-            return {
-                total_products: 12,
-                average_rating: '4.7'
-            };
+            const totalProductsElement = document.getElementById('totalProducts');
+            const averageRatingElement = document.getElementById('averageRating');
+            
+            if (totalProductsElement) {
+                totalProductsElement.textContent = stats.total_products || 0;
+            }
+            
+            if (averageRatingElement) {
+                averageRatingElement.textContent = stats.average_rating || '0.0';
+            }
         }
         
         // Function to show alerts
