@@ -537,3 +537,265 @@
     [cloth_id] => 2
 )
 
+[2025-04-17 10:37:42] Database connection successful
+[2025-04-17 10:37:42] Starting cloth upload process
+[2025-04-17 10:37:42] POST data: Array
+(
+    [seller_id] => 1
+    [description] => Combo Dress
+    [size] => M
+    [category] => Women
+    [clothTitle] => Dress
+    [contactNo] => 1234569870
+    [whatsappNo] => 1234569870
+    [terms] => Wear and Tear
+    [rentalPrice] => 800
+)
+
+[2025-04-17 10:37:42] FILES data: Array
+(
+    [clothImage] => Array
+        (
+            [name] => p5.jpg
+            [full_path] => p5.jpg
+            [type] => image/jpeg
+            [tmp_name] => C:\xampp\tmp\phpA7C3.tmp
+            [error] => 0
+            [size] => 65824
+        )
+
+)
+
+[2025-04-17 10:37:42] POST request received
+[2025-04-17 10:37:42] Seller ID from POST: 1
+[2025-04-17 10:37:42] Form data parsed: Array
+(
+    [cloth_title] => Dress
+    [size] => M
+    [category] => Women
+    [rental_price] => 800
+)
+
+[2025-04-17 10:37:42] Processing image upload: Array
+(
+    [name] => p5.jpg
+    [full_path] => p5.jpg
+    [type] => image/jpeg
+    [tmp_name] => C:\xampp\tmp\phpA7C3.tmp
+    [error] => 0
+    [size] => 65824
+)
+
+[2025-04-17 10:37:42] Image loaded successfully: Array
+(
+    [size] => 65824
+    [type] => image/jpeg
+)
+
+[2025-04-17 10:37:42] Inserting new cloth item
+[2025-04-17 10:37:42] Executing insert statement
+[2025-04-17 10:37:42] Cloth added successfully: 3
+[2025-04-17 10:37:42] Response: Array
+(
+    [status] => success
+    [message] => Cloth added successfully
+    [cloth_id] => 3
+)
+
+[2025-04-17 10:37:53] Database connection successful
+[2025-04-17 10:37:53] Starting cloth upload process
+[2025-04-17 10:37:53] POST data: Array
+(
+    [id] => 1
+    [seller_id] => 1
+    [description] => White
+    [size] => M
+    [category] => Men
+    [clothTitle] => Sherwani
+    [contactNo] => 1234569870
+    [whatsappNo] => 1234569870
+    [terms] => ABC
+    [rentalPrice] => 1000.00
+)
+
+[2025-04-17 10:37:53] FILES data: Array
+(
+    [clothImage] => Array
+        (
+            [name] => p5.jpg
+            [full_path] => p5.jpg
+            [type] => image/jpeg
+            [tmp_name] => C:\xampp\tmp\phpD210.tmp
+            [error] => 0
+            [size] => 65824
+        )
+
+)
+
+[2025-04-17 10:37:53] POST request received
+[2025-04-17 10:37:53] Seller ID from POST: 1
+[2025-04-17 10:37:53] Form data parsed: Array
+(
+    [cloth_title] => Sherwani
+    [size] => M
+    [category] => Men
+    [rental_price] => 1000.00
+)
+
+[2025-04-17 10:37:53] Processing image upload: Array
+(
+    [name] => p5.jpg
+    [full_path] => p5.jpg
+    [type] => image/jpeg
+    [tmp_name] => C:\xampp\tmp\phpD210.tmp
+    [error] => 0
+    [size] => 65824
+)
+
+[2025-04-17 10:37:53] Image loaded successfully: Array
+(
+    [size] => 65824
+    [type] => image/jpeg
+)
+
+[2025-04-17 10:37:53] Updating existing cloth: 1
+[2025-04-17 10:37:53] Executing update statement
+[2025-04-17 10:37:53] Cloth updated successfully: 1
+[2025-04-17 10:37:53] Response: Array
+(
+    [status] => success
+    [message] => Cloth updated successfully
+    [cloth_id] => 1
+)
+
+[2025-04-17 10:39:14] Database connection successful
+[2025-04-17 10:39:14] Starting cloth upload process
+[2025-04-17 10:39:14] POST data: Array
+(
+    [id] => 1
+    [seller_id] => 1
+    [description] => White
+    [size] => M
+    [category] => Men
+    [clothTitle] => Sherwani
+    [contactNo] => 1234569870
+    [whatsappNo] => 1234569870
+    [terms] => ABC
+    [rentalPrice] => 1000.00
+)
+
+[2025-04-17 10:39:14] FILES data: Array
+(
+    [clothImage] => Array
+        (
+            [name] => p4.jpg
+            [full_path] => p4.jpg
+            [type] => image/jpeg
+            [tmp_name] => C:\xampp\tmp\phpEC7.tmp
+            [error] => 0
+            [size] => 114628
+        )
+
+)
+
+[2025-04-17 10:39:14] POST request received
+[2025-04-17 10:39:14] Seller ID from POST: 1
+[2025-04-17 10:39:14] Form data parsed: Array
+(
+    [cloth_title] => Sherwani
+    [size] => M
+    [category] => Men
+    [rental_price] => 1000.00
+)
+
+[2025-04-17 10:39:14] Processing image upload: Array
+(
+    [name] => p4.jpg
+    [full_path] => p4.jpg
+    [type] => image/jpeg
+    [tmp_name] => C:\xampp\tmp\phpEC7.tmp
+    [error] => 0
+    [size] => 114628
+)
+
+[2025-04-17 10:39:14] Image loaded successfully: Array
+(
+    [size] => 114628
+    [type] => image/jpeg
+)
+
+[2025-04-17 10:39:14] Updating existing cloth: 1
+[2025-04-17 10:39:14] Executing update statement
+[2025-04-17 10:39:14] Cloth updated successfully: 1
+[2025-04-17 10:39:14] Response: Array
+(
+    [status] => success
+    [message] => Cloth updated successfully
+    [cloth_id] => 1
+)
+
+[2025-04-17 10:39:50] Database connection successful
+[2025-04-17 10:39:50] Starting cloth upload process
+[2025-04-17 10:39:50] POST data: Array
+(
+    [seller_id] => 1
+    [description] => Red
+    [size] => XS
+    [category] => Women
+    [clothTitle] => Saree
+    [contactNo] => 1234569870
+    [whatsappNo] => 1234569870
+    [terms] => ABC
+    [rentalPrice] => 700
+)
+
+[2025-04-17 10:39:50] FILES data: Array
+(
+    [clothImage] => Array
+        (
+            [name] => p3.jpg
+            [full_path] => p3.jpg
+            [type] => image/jpeg
+            [tmp_name] => C:\xampp\tmp\php9926.tmp
+            [error] => 0
+            [size] => 63982
+        )
+
+)
+
+[2025-04-17 10:39:50] POST request received
+[2025-04-17 10:39:50] Seller ID from POST: 1
+[2025-04-17 10:39:50] Form data parsed: Array
+(
+    [cloth_title] => Saree
+    [size] => XS
+    [category] => Women
+    [rental_price] => 700
+)
+
+[2025-04-17 10:39:50] Processing image upload: Array
+(
+    [name] => p3.jpg
+    [full_path] => p3.jpg
+    [type] => image/jpeg
+    [tmp_name] => C:\xampp\tmp\php9926.tmp
+    [error] => 0
+    [size] => 63982
+)
+
+[2025-04-17 10:39:50] Image loaded successfully: Array
+(
+    [size] => 63982
+    [type] => image/jpeg
+)
+
+[2025-04-17 10:39:50] Inserting new cloth item
+[2025-04-17 10:39:50] Executing insert statement
+[2025-04-17 10:39:50] Cloth added successfully: 4
+[2025-04-17 10:39:50] Response: Array
+(
+    [status] => success
+    [message] => Cloth added successfully
+    [cloth_id] => 4
+)
+

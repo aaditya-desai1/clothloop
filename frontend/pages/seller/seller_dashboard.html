@@ -1042,6 +1042,10 @@
       const navSellerName = document.getElementById('navSellerName');
       const navProfileImage = document.getElementById('navProfileImage');
       
+      // Fetch products and seller profile data on page load
+      fetchProducts();
+      fetchSellerProfile();
+      
       // Show/hide sidebar 
       if (menuBtn) {
         menuBtn.addEventListener('click', () => {
@@ -1256,83 +1260,6 @@
         }, 5000);
       }
 
-      // Upload form submission
-      if (uploadForm) {
-        uploadForm.addEventListener('submit', function(e) {
-          e.preventDefault();
-          
-          // Get form values
-          const clothTitle = document.getElementById('clothTitle').value;
-          const description = document.getElementById('description').value;
-          const size = document.getElementById('size').value;
-          const category = document.querySelector('input[name="category"]:checked').value;
-          const rentalPrice = document.getElementById('rentalPrice').value;
-          const contactNo = document.getElementById('contactNo').value;
-          const whatsappNo = document.getElementById('whatsappNo').value;
-          const terms = document.getElementById('terms').value;
-          const clothImage = document.getElementById('clothImage').files[0];
-          
-          // Validate form fields
-          if (!clothTitle || !description || !size || !category || !rentalPrice || 
-              !contactNo || !whatsappNo || !terms || !clothImage) {
-            alert('Please fill all fields and upload an image');
-            return;
-          }
-          
-          // Create FormData object to send data
-          const formData = new FormData();
-          formData.append('clothTitle', clothTitle);
-          formData.append('description', description);
-          formData.append('size', size);
-          formData.append('category', category);
-          formData.append('rentalPrice', rentalPrice);
-          formData.append('contactNo', contactNo);
-          formData.append('whatsappNo', whatsappNo);
-          formData.append('terms', terms);
-          formData.append('clothImage', clothImage);
-          
-          // Show loading message
-          const submitBtn = uploadForm.querySelector('button[type="submit"]');
-          const originalBtnText = submitBtn.textContent;
-          submitBtn.textContent = 'Uploading...';
-          submitBtn.disabled = true;
-          
-          // Send data to server
-          fetch('../../../backend/api/sellers/upload_cloth.php', {
-            method: 'POST',
-            body: formData
-          })
-          .then(response => response.json())
-          .then(data => {
-            // Reset button
-            submitBtn.textContent = originalBtnText;
-            submitBtn.disabled = false;
-            
-            if (data.status === 'success') {
-              // Close the popup
-              closeUploadPopup();
-              
-              // Show success message
-              showAlert('Cloth uploaded successfully!', 'success');
-              
-              // Create a new product card and add to the grid
-              addProductToGrid(clothTitle, rentalPrice);
-              
-              // Refresh the products count
-              updateProductCount();
-            } else {
-              showAlert('Error: ' + data.message, 'danger');
-            }
-          })
-          .catch(error => {
-            console.error('Error uploading cloth:', error);
-            submitBtn.textContent = originalBtnText;
-            submitBtn.disabled = false;
-            showAlert('Failed to upload cloth. Please try again.', 'danger');
-          });
-        });
-      }
-      
       // Function to create and add a product card to the grid
       function addProductToGrid(title, price) {
         const productGrid = document.querySelector('.product-grid');
@@ -1363,18 +1290,267 @@
         productGrid.insertBefore(productCard, productGrid.firstChild);
       }
       
-      // Function to update the product count in the stats
-      function updateProductCount() {
-        const productCountElement = document.querySelector('.stat-card:first-child .stat-value');
-        if (productCountElement) {
-          let count = parseInt(productCountElement.textContent) || 0;
-          count++;
-          productCountElement.textContent = count;
+      // Function to fetch products from server and update the product count
+      function fetchProducts() {
+        console.log('Fetching products...');
+        
+        // Initialize popup-related elements
+        initializeUploadElements();
+        
+        fetch('../../../backend/api/sellers/get_seller_clothes.php')
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Network response was not ok');
+            }
+            return response.json();
+          })
+          .then(data => {
+            console.log('Products data received:', data);
+            if (data.status === 'success') {
+              // Update product count
+              const productCountElement = document.querySelector('.stat-card:first-child .stat-value');
+              const changeElement = document.querySelector('.stat-card:first-child .stat-change');
+              
+              if (productCountElement) {
+                const count = data.clothes ? data.clothes.length : 0;
+                productCountElement.textContent = count;
+                
+                if (changeElement) {
+                  if (count === 0) {
+                    changeElement.textContent = 'Add your first product';
+                  } else if (count === 1) {
+                    changeElement.textContent = 'First product added!';
+                  } else {
+                    changeElement.textContent = `${count} products available`;
+                  }
+                }
+              }
+              
+              // Update the recent products grid
+              updateRecentProducts(data.clothes || []);
+            } else {
+              console.error('Error fetching products:', data.message);
+            }
+          })
+          .catch(error => {
+            console.error('Error fetching products:', error);
+          });
+      }
+      
+      // Function to update recent products grid
+      function updateRecentProducts(products) {
+        const productGrid = document.querySelector('.product-grid');
+        if (!productGrid) return;
+        
+        // Clear existing products
+        productGrid.innerHTML = '';
+        
+        // Check if we have products
+        if (products.length === 0) {
+          productGrid.innerHTML = `
+            <div class="empty-state" style="text-align: center; padding: 30px;">
+              <i class="fas fa-box-open" style="font-size: 48px; color: #ccc; margin-bottom: 15px;"></i>
+              <p>No products listed yet.</p>
+              <button id="addFirstProduct" class="btn btn-primary" style="margin-top: 15px; background-color: #4CAF50; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer;">Add Your First Product</button>
+            </div>
+          `;
           
-          const changeElement = document.querySelector('.stat-card:first-child .stat-change');
-          if (changeElement) {
-            changeElement.textContent = count === 1 ? 'First product added!' : `${count} products available`;
+          // Add event listener to the button
+          const addFirstProductBtn = document.getElementById('addFirstProduct');
+          if (addFirstProductBtn) {
+            addFirstProductBtn.addEventListener('click', function() {
+              document.getElementById('addClothBtn').click();
+            });
           }
+          
+          return;
+        }
+        
+        // Add recent products (limit to 4)
+        const recentProducts = products.slice(0, 4);
+        recentProducts.forEach((product, index) => {
+          const productCard = document.createElement('div');
+          productCard.className = 'product-card';
+          
+          // Generate a unique image URL for each product with its ID and index
+          // This ensures different cache params for each image
+          const uniqueParam = `id=${product.id}&index=${index}&t=${new Date().getTime()}`;
+          const imgSrc = `../../../backend/api/sellers/get_cloth_image.php?${uniqueParam}`;
+          
+          productCard.innerHTML = `
+            <div class="product-image">
+              <img src="${imgSrc}" alt="${product.cloth_title}" 
+                   onerror="this.onerror=null; this.src='../../assets/images/placeholder.jpg'; this.style.padding='20px';" />
+            </div>
+            <div class="product-details">
+              <h3>${product.cloth_title}</h3>
+              <div class="price">₹${product.rental_price}/day</div>
+              <div class="stock">Available for rent</div>
+              <div class="product-actions">
+                <button class="edit-product-btn" data-product-id="${product.id}">Edit</button>
+                <button class="view-product-btn" data-product-id="${product.id}">View</button>
+              </div>
+            </div>
+          `;
+          
+          productGrid.appendChild(productCard);
+        });
+        
+        // Add event listeners to buttons
+        document.querySelectorAll('.edit-product-btn').forEach(btn => {
+          btn.addEventListener('click', function() {
+            const productId = this.getAttribute('data-product-id');
+            // Redirect to product edit page
+            window.location.href = `product_listings.html?edit=${productId}`;
+          });
+        });
+        
+        document.querySelectorAll('.view-product-btn').forEach(btn => {
+          btn.addEventListener('click', function() {
+            const productId = this.getAttribute('data-product-id');
+            // Redirect to product details page
+            window.location.href = `product_listings.html?view=${productId}`;
+          });
+        });
+      }
+      
+      // Function to initialize upload popup elements
+      function initializeUploadElements() {
+        const addClothBtn = document.getElementById('addClothBtn');
+        const uploadPopup = document.getElementById('uploadPopup');
+        const closePopupBtn = document.getElementById('closePopup');
+        const cancelUploadBtn = document.getElementById('cancelUpload');
+        const uploadForm = document.getElementById('uploadClothForm');
+        const clothImage = document.getElementById('clothImage');
+        const previewImage = document.getElementById('previewImage');
+        
+        // Close popup function
+        window.closeUploadPopup = function() {
+          if (uploadPopup) {
+            uploadPopup.classList.remove('active');
+            
+            // Reset form if it exists
+            if (uploadForm) {
+              uploadForm.reset();
+              
+              // Hide preview image
+              if (previewImage) {
+                previewImage.style.display = 'none';
+              }
+            }
+          }
+        };
+        
+        if (addClothBtn && uploadPopup) {
+          // Show upload popup when add button is clicked
+          addClothBtn.addEventListener('click', function() {
+            uploadPopup.classList.add('active');
+          });
+        }
+        
+        if (closePopupBtn) {
+          // Close popup when close button is clicked
+          closePopupBtn.addEventListener('click', function() {
+            closeUploadPopup();
+          });
+        }
+        
+        if (cancelUploadBtn) {
+          // Close popup when cancel button is clicked
+          cancelUploadBtn.addEventListener('click', function() {
+            closeUploadPopup();
+          });
+        }
+        
+        if (clothImage && previewImage) {
+          // Show image preview when file is selected
+          clothImage.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+              const reader = new FileReader();
+              reader.onload = function(e) {
+                previewImage.src = e.target.result;
+                previewImage.style.display = 'block';
+              };
+              reader.readAsDataURL(file);
+            }
+          });
+        }
+        
+        // Handle form submission
+        if (uploadForm) {
+          uploadForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form values
+            const clothTitle = document.getElementById('clothTitle').value;
+            const description = document.getElementById('description').value;
+            const size = document.getElementById('size').value;
+            const categoryEl = document.querySelector('input[name="category"]:checked');
+            const category = categoryEl ? categoryEl.value : null;
+            const rentalPrice = document.getElementById('rentalPrice').value;
+            const contactNo = document.getElementById('contactNo').value;
+            const whatsappNo = document.getElementById('whatsappNo').value;
+            const terms = document.getElementById('terms').value;
+            const clothImageInput = document.getElementById('clothImage');
+            const clothImage = clothImageInput.files.length > 0 ? clothImageInput.files[0] : null;
+            
+            // Validate form fields
+            if (!clothTitle || !description || !size || !category || !rentalPrice || 
+                !contactNo || !whatsappNo || !terms || !clothImage) {
+              alert('Please fill all fields and upload an image');
+              return;
+            }
+            
+            // Create FormData object to send data
+            const formData = new FormData();
+            formData.append('clothTitle', clothTitle);
+            formData.append('description', description);
+            formData.append('size', size);
+            formData.append('category', category);
+            formData.append('rentalPrice', rentalPrice);
+            formData.append('contactNo', contactNo);
+            formData.append('whatsappNo', whatsappNo);
+            formData.append('terms', terms);
+            formData.append('clothImage', clothImage);
+            
+            // Show loading message
+            const submitBtn = uploadForm.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.textContent;
+            submitBtn.textContent = 'Uploading...';
+            submitBtn.disabled = true;
+            
+            // Send data to server
+            fetch('../../../backend/api/sellers/upload_cloth.php', {
+              method: 'POST',
+              body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+              // Reset button
+              submitBtn.textContent = originalBtnText;
+              submitBtn.disabled = false;
+              
+              if (data.status === 'success') {
+                // Close the popup
+                closeUploadPopup();
+                
+                // Reload all products to get updated counts
+                fetchProducts();
+                
+                // Show success message
+                alert('Cloth uploaded successfully!');
+              } else {
+                alert('Error: ' + (data.message || 'Unknown error'));
+              }
+            })
+            .catch(error => {
+              console.error('Error uploading cloth:', error);
+              submitBtn.textContent = originalBtnText;
+              submitBtn.disabled = false;
+              alert('Failed to upload cloth. Please try again.');
+            });
+          });
         }
       }
     });

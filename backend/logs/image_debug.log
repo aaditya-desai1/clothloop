@@ -212,3 +212,209 @@
 [2025-04-17 07:59:45] Processing image request: {"id":2}
 [2025-04-17 07:59:45] Query executed: {"rows":1}
 [2025-04-17 07:59:45] Image found, serving with content type: image/jpeg
+[2025-04-17 10:10:58] Starting image request
+[2025-04-17 10:10:58] Processing image request: {"id":1}
+[2025-04-17 10:10:58] Query executed: {"rows":1}
+[2025-04-17 10:10:58] Image found, serving with content type: image/jpeg
+[2025-04-17 10:11:00] Starting image request
+[2025-04-17 10:11:00] Processing image request: {"id":1}
+[2025-04-17 10:11:00] Query executed: {"rows":1}
+[2025-04-17 10:11:00] Image found, serving with content type: image/jpeg
+[2025-04-17 10:11:10] Starting image request
+[2025-04-17 10:11:10] Processing image request: {"id":1}
+[2025-04-17 10:11:10] Query executed: {"rows":1}
+[2025-04-17 10:11:10] Image found, serving with content type: image/jpeg
+[2025-04-17 10:11:34] Starting image request
+[2025-04-17 10:11:34] Processing image request: {"id":1}
+[2025-04-17 10:11:34] Query executed: {"rows":1}
+[2025-04-17 10:11:34] Image found, serving with content type: image/jpeg
+[2025-04-17 10:22:02] Starting image request
+[2025-04-17 10:22:02] Processing image request: {"id":1}
+[2025-04-17 10:22:02] Query executed: {"rows":1}
+[2025-04-17 10:22:02] Image found, serving with content type: image/jpeg
+[2025-04-17 10:26:31] Starting image request
+[2025-04-17 10:26:31] Processing image request: {"id":1}
+[2025-04-17 10:26:31] Query executed: {"rows":1}
+[2025-04-17 10:26:31] Image found, serving with content type: image/jpeg
+[2025-04-17 10:26:34] Starting image request
+[2025-04-17 10:26:34] Processing image request: {"id":1}
+[2025-04-17 10:26:34] Query executed: {"rows":1}
+[2025-04-17 10:26:34] Image found, serving with content type: image/jpeg
+[2025-04-17 10:26:44] Starting image request
+[2025-04-17 10:26:44] Processing image request: {"id":1}
+[2025-04-17 10:26:44] Query executed: {"rows":1}
+[2025-04-17 10:26:44] Image found, serving with content type: image/jpeg
+[2025-04-17 10:36:00] Starting image request
+[2025-04-17 10:36:00] Processing image request: {"id":1}
+[2025-04-17 10:36:00] Query executed: {"rows":1}
+[2025-04-17 10:36:00] Image found, serving with content type: image/jpeg
+[2025-04-17 10:36:14] Starting image request
+[2025-04-17 10:36:14] Processing image request: {"id":1}
+[2025-04-17 10:36:14] Query executed: {"rows":1}
+[2025-04-17 10:36:14] Image found, serving with content type: image/jpeg
+[2025-04-17 10:37:42] Starting image request
+[2025-04-17 10:37:42] Starting image request
+[2025-04-17 10:37:42] Processing image request: {"id":3}
+[2025-04-17 10:37:42] Query executed: {"rows":1}
+[2025-04-17 10:37:42] Image found, serving with content type: image/jpeg
+[2025-04-17 10:37:42] Processing image request: {"id":1}
+[2025-04-17 10:37:42] Query executed: {"rows":1}
+[2025-04-17 10:37:42] Image found, serving with content type: image/jpeg
+[2025-04-17 10:37:48] Starting image request
+[2025-04-17 10:37:48] Processing image request: {"id":1}
+[2025-04-17 10:37:48] Query executed: {"rows":1}
+[2025-04-17 10:37:48] Image found, serving with content type: image/jpeg
+[2025-04-17 10:37:53] Starting image request
+[2025-04-17 10:37:53] Starting image request
+[2025-04-17 10:37:53] Processing image request: {"id":1}
+[2025-04-17 10:37:53] Processing image request: {"id":3}
+[2025-04-17 10:37:53] Query executed: {"rows":1}
+[2025-04-17 10:37:53] Image found, serving with content type: image/jpeg
+[2025-04-17 10:37:53] Query executed: {"rows":1}
+[2025-04-17 10:37:53] Image found, serving with content type: image/jpeg
+[2025-04-17 10:37:57] Starting image request
+[2025-04-17 10:37:57] Starting image request
+[2025-04-17 10:37:57] Processing image request: {"id":3}
+[2025-04-17 10:37:57] Processing image request: {"id":1}
+[2025-04-17 10:37:57] Query executed: {"rows":1}
+[2025-04-17 10:37:57] Image found, serving with content type: image/jpeg
+[2025-04-17 10:37:57] Query executed: {"rows":1}
+[2025-04-17 10:37:57] Image found, serving with content type: image/jpeg
+[2025-04-17 10:37:58] Starting image request
+[2025-04-17 10:37:58] Starting image request
+[2025-04-17 10:37:58] Processing image request: {"id":1}
+[2025-04-17 10:37:58] Processing image request: {"id":3}
+[2025-04-17 10:37:58] Query executed: {"rows":1}
+[2025-04-17 10:37:58] Image found, serving with content type: image/jpeg
+[2025-04-17 10:37:58] Query executed: {"rows":1}
+[2025-04-17 10:37:58] Image found, serving with content type: image/jpeg
+[2025-04-17 10:38:01] Starting image request
+[2025-04-17 10:38:01] Starting image request
+[2025-04-17 10:38:01] Processing image request: {"id":1}
+[2025-04-17 10:38:01] Query executed: {"rows":1}
+[2025-04-17 10:38:01] Image found, serving with content type: image/jpeg
+[2025-04-17 10:38:01] Processing image request: {"id":3}
+[2025-04-17 10:38:01] Query executed: {"rows":1}
+[2025-04-17 10:38:01] Image found, serving with content type: image/jpeg
+[2025-04-17 10:38:01] Starting image request
+[2025-04-17 10:38:01] Starting image request
+[2025-04-17 10:38:01] Processing image request: {"id":3}
+[2025-04-17 10:38:01] Query executed: {"rows":1}
+[2025-04-17 10:38:01] Image found, serving with content type: image/jpeg
+[2025-04-17 10:38:01] Processing image request: {"id":1}
+[2025-04-17 10:38:01] Query executed: {"rows":1}
+[2025-04-17 10:38:01] Image found, serving with content type: image/jpeg
+[2025-04-17 10:38:05] Starting image request
+[2025-04-17 10:38:05] Starting image request
+[2025-04-17 10:38:05] Processing image request: {"id":3}
+[2025-04-17 10:38:05] Query executed: {"rows":1}
+[2025-04-17 10:38:05] Image found, serving with content type: image/jpeg
+[2025-04-17 10:38:05] Processing image request: {"id":1}
+[2025-04-17 10:38:05] Query executed: {"rows":1}
+[2025-04-17 10:38:05] Image found, serving with content type: image/jpeg
+[2025-04-17 10:38:07] Starting image request
+[2025-04-17 10:38:07] Processing image request: {"id":3}
+[2025-04-17 10:38:07] Query executed: {"rows":1}
+[2025-04-17 10:38:07] Image found, serving with content type: image/jpeg
+[2025-04-17 10:38:07] Starting image request
+[2025-04-17 10:38:07] Processing image request: {"id":1}
+[2025-04-17 10:38:07] Query executed: {"rows":1}
+[2025-04-17 10:38:07] Image found, serving with content type: image/jpeg
+[2025-04-17 10:38:10] Starting image request
+[2025-04-17 10:38:10] Processing image request: {"id":1}
+[2025-04-17 10:38:10] Query executed: {"rows":1}
+[2025-04-17 10:38:10] Image found, serving with content type: image/jpeg
+[2025-04-17 10:38:17] Starting image request
+[2025-04-17 10:38:17] Starting image request
+[2025-04-17 10:38:17] Processing image request: {"id":3}
+[2025-04-17 10:38:17] Query executed: {"rows":1}
+[2025-04-17 10:38:17] Image found, serving with content type: image/jpeg
+[2025-04-17 10:38:17] Processing image request: {"id":1}
+[2025-04-17 10:38:17] Query executed: {"rows":1}
+[2025-04-17 10:38:17] Image found, serving with content type: image/jpeg
+[2025-04-17 10:38:58] Starting image request
+[2025-04-17 10:38:58] Processing image request: {"id":3}
+[2025-04-17 10:38:58] Query executed: {"rows":1}
+[2025-04-17 10:38:58] Image found, serving with content type: image/jpeg
+[2025-04-17 10:39:09] Starting image request
+[2025-04-17 10:39:09] Processing image request: {"id":1}
+[2025-04-17 10:39:09] Query executed: {"rows":1}
+[2025-04-17 10:39:09] Image found, serving with content type: image/jpeg
+[2025-04-17 10:39:14] Starting image request
+[2025-04-17 10:39:14] Processing image request: {"id":3}
+[2025-04-17 10:39:14] Starting image request
+[2025-04-17 10:39:14] Query executed: {"rows":1}
+[2025-04-17 10:39:14] Image found, serving with content type: image/jpeg
+[2025-04-17 10:39:14] Processing image request: {"id":1}
+[2025-04-17 10:39:14] Query executed: {"rows":1}
+[2025-04-17 10:39:14] Image found, serving with content type: image/jpeg
+[2025-04-17 10:39:16] Starting image request
+[2025-04-17 10:39:16] Starting image request
+[2025-04-17 10:39:16] Processing image request: {"id":1}
+[2025-04-17 10:39:16] Processing image request: {"id":3}
+[2025-04-17 10:39:16] Query executed: {"rows":1}
+[2025-04-17 10:39:16] Image found, serving with content type: image/jpeg
+[2025-04-17 10:39:16] Image found, serving with content type: image/jpeg
+[2025-04-17 10:39:16] Starting image request
+[2025-04-17 10:39:16] Starting image request
+[2025-04-17 10:39:16] Processing image request: {"id":3}
+[2025-04-17 10:39:16] Query executed: {"rows":1}
+[2025-04-17 10:39:16] Image found, serving with content type: image/jpeg
+[2025-04-17 10:39:16] Processing image request: {"id":1}
+[2025-04-17 10:39:16] Query executed: {"rows":1}
+[2025-04-17 10:39:16] Image found, serving with content type: image/jpeg
+[2025-04-17 10:39:17] Starting image request
+[2025-04-17 10:39:17] Starting image request
+[2025-04-17 10:39:17] Processing image request: {"id":3}
+[2025-04-17 10:39:17] Processing image request: {"id":1}
+[2025-04-17 10:39:17] Query executed: {"rows":1}
+[2025-04-17 10:39:17] Query executed: {"rows":1}
+[2025-04-17 10:39:17] Image found, serving with content type: image/jpeg
+[2025-04-17 10:39:19] Starting image request
+[2025-04-17 10:39:19] Starting image request
+[2025-04-17 10:39:19] Processing image request: {"id":1}
+[2025-04-17 10:39:19] Query executed: {"rows":1}
+[2025-04-17 10:39:19] Image found, serving with content type: image/jpeg
+[2025-04-17 10:39:19] Processing image request: {"id":3}
+[2025-04-17 10:39:19] Query executed: {"rows":1}
+[2025-04-17 10:39:19] Image found, serving with content type: image/jpeg
+[2025-04-17 10:39:20] Starting image request
+[2025-04-17 10:39:20] Starting image request
+[2025-04-17 10:39:20] Processing image request: {"id":3}
+[2025-04-17 10:39:20] Processing image request: {"id":1}
+[2025-04-17 10:39:20] Query executed: {"rows":1}
+[2025-04-17 10:39:20] Image found, serving with content type: image/jpeg
+[2025-04-17 10:39:20] Query executed: {"rows":1}
+[2025-04-17 10:39:20] Image found, serving with content type: image/jpeg
+[2025-04-17 10:39:21] Starting image request
+[2025-04-17 10:39:21] Starting image request
+[2025-04-17 10:39:21] Processing image request: {"id":3}
+[2025-04-17 10:39:21] Query executed: {"rows":1}
+[2025-04-17 10:39:21] Image found, serving with content type: image/jpeg
+[2025-04-17 10:39:21] Processing image request: {"id":1}
+[2025-04-17 10:39:21] Query executed: {"rows":1}
+[2025-04-17 10:39:21] Image found, serving with content type: image/jpeg
+[2025-04-17 10:39:50] Starting image request
+[2025-04-17 10:39:50] Processing image request: {"id":4}
+[2025-04-17 10:39:50] Query executed: {"rows":1}
+[2025-04-17 10:39:50] Image found, serving with content type: image/jpeg
+[2025-04-17 10:39:50] Starting image request
+[2025-04-17 10:39:50] Starting image request
+[2025-04-17 10:39:50] Processing image request: {"id":1}
+[2025-04-17 10:39:50] Query executed: {"rows":1}
+[2025-04-17 10:39:50] Image found, serving with content type: image/jpeg
+[2025-04-17 10:39:50] Processing image request: {"id":3}
+[2025-04-17 10:39:50] Query executed: {"rows":1}
+[2025-04-17 10:39:50] Image found, serving with content type: image/jpeg
+[2025-04-17 10:39:51] Starting image request
+[2025-04-17 10:39:51] Starting image request
+[2025-04-17 10:39:51] Processing image request: {"id":3}
+[2025-04-17 10:39:51] Starting image request
+t: {"id":1}
+[2025-04-17 10:39:51] Query executed: {"rows":1}
+[2025-04-17 10:39:51] Query executed: {"rows":1}
+[2025-04-17 10:39:51] Image found, serving with content type: image/jpeg
+[2025-04-17 10:39:51] Image found, serving with content type: image/jpeg
+[2025-04-17 10:39:51] Processing image request: {"id":4}
+[2025-04-17 10:39:51] Query executed: {"rows":1}
+[2025-04-17 10:39:51] Image found, serving with content type: image/jpeg
