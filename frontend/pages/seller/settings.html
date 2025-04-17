@@ -401,16 +401,9 @@
             
             <div class="header-right">
                 <div class="actions">
-                    <div class="action-item" id="profileSection">
-                        <i class="fas fa-user"></i>
-                        <span>PROFILE</span>
-                        
-                        <!-- Profile dropdown menu -->
-                        <div class="profile-dropdown" id="profileDropdown">
-                            <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
-                            <div class="profile-divider"></div>
-                            <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a>
-                        </div>
+                    <div class="action-item" id="logoutBtn">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>LOGOUT</span>
                     </div>
                     
                     <div class="action-item" id="statisticsBtn">
@@ -500,10 +493,6 @@
       const alertMessage = document.getElementById('alertMessage');
       const navSellerName = document.getElementById('navSellerName');
       const navProfileImage = document.getElementById('navProfileImage');
-      const userProfile = document.querySelector('.user-profile');
-      
-      // Setup profile dropdown
-      setupProfileDropdown();
       
       // Setup header action buttons
       setupHeaderActions();
@@ -588,33 +577,6 @@
         });
       }
       
-      // Function to set up profile dropdown
-      function setupProfileDropdown() {
-        const profileSection = document.getElementById('profileSection');
-        const profileDropdown = document.getElementById('profileDropdown');
-        
-        profileSection.addEventListener('click', function(e) {
-          e.stopPropagation();
-          profileDropdown.classList.toggle('active');
-        });
-        
-        // Close dropdown when clicking elsewhere
-        document.addEventListener('click', function() {
-          profileDropdown.classList.remove('active');
-        });
-        
-        profileDropdown.addEventListener('click', function(e) {
-          e.stopPropagation();
-        });
-        
-        // Logout functionality
-        const logoutBtn = document.getElementById('logoutBtn');
-        logoutBtn.addEventListener('click', function(e) {
-          e.preventDefault();
-          handleLogout();
-        });
-      }
-      
       // Function to setup header action buttons
       function setupHeaderActions() {
         // Statistics button
@@ -627,6 +589,12 @@
         const helpBtn = document.getElementById('helpBtn');
         helpBtn.addEventListener('click', function() {
           window.location.href = '../about.html';
+        });
+        
+        // Logout button
+        const logoutBtn = document.getElementById('logoutBtn');
+        logoutBtn.addEventListener('click', function() {
+          handleLogout();
         });
       }
 

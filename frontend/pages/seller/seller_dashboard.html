@@ -555,16 +555,9 @@
             
             <div class="header-right">
                 <div class="actions">
-                    <div class="action-item" id="profileSection">
-                        <i class="fas fa-user"></i>
-                        <span>PROFILE</span>
-                        
-                        <!-- Profile dropdown menu -->
-                        <div class="profile-dropdown" id="profileDropdown">
-                            <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
-                            <div class="profile-divider"></div>
-                            <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a>
-                        </div>
+                    <div class="action-item" id="logoutBtn">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>LOGOUT</span>
                     </div>
                     
                     <div class="action-item" id="statisticsBtn">
@@ -620,35 +613,12 @@
     <script>
         // Wait for DOM to be fully loaded
         document.addEventListener('DOMContentLoaded', function() {
-            // Toggle profile dropdown
-            setupProfileDropdown();
-            
             // Setup event listeners
             setupEventListeners();
             
             // Load dashboard data
             loadDashboardData();
         });
-        
-        // Function to toggle profile dropdown
-        function setupProfileDropdown() {
-            const profileSection = document.getElementById('profileSection');
-            const profileDropdown = document.getElementById('profileDropdown');
-            
-            profileSection.addEventListener('click', function(e) {
-                e.stopPropagation();
-                profileDropdown.classList.toggle('active');
-            });
-            
-            // Close dropdown when clicking elsewhere
-            document.addEventListener('click', function() {
-                profileDropdown.classList.remove('active');
-            });
-            
-            profileDropdown.addEventListener('click', function(e) {
-                e.stopPropagation();
-            });
-        }
         
         // Function to setup all event listeners
         function setupEventListeners() {
@@ -658,10 +628,9 @@
                 window.location.href = 'cloth_upload.html';
             });
             
-            // Logout button in dropdown
+            // Logout button
             const logoutBtn = document.getElementById('logoutBtn');
-            logoutBtn.addEventListener('click', function(e) {
-                e.preventDefault();
+            logoutBtn.addEventListener('click', function() {
                 logout();
             });
             
