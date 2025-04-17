@@ -56,6 +56,7 @@ function createClothDetailsTable($conn) {
         rental_price DECIMAL(10,2) NOT NULL,
         contact_number VARCHAR(20),
         whatsapp_number VARCHAR(20),
+        shop_address TEXT,
         terms_and_conditions TEXT,
         cloth_photo MEDIUMBLOB,
         photo_type VARCHAR(50),
@@ -66,6 +67,20 @@ function createClothDetailsTable($conn) {
     
     if ($conn->query($sql) === TRUE) {
         echo "Cloth details table created or already exists\n";
+        
+        // Check if the shop_address column exists, and if not, add it
+        $checkColumnsSQL = "SHOW COLUMNS FROM cloth_details LIKE 'shop_address'";
+        $result = $conn->query($checkColumnsSQL);
+        
+        if ($result->num_rows == 0) {
+            // Add shop_address column if it doesn't exist
+            $addColumnSQL = "ALTER TABLE cloth_details ADD COLUMN shop_address TEXT AFTER whatsapp_number";
+            if ($conn->query($addColumnSQL) === TRUE) {
+                echo "Added shop_address column to cloth_details table\n";
+            } else {
+                echo "Error adding shop_address column: " . $conn->error . "\n";
+            }
+        }
         
         // Check if the columns exist, and if not, add them
         $checkColumnsSQL = "SHOW COLUMNS FROM cloth_details LIKE 'cloth_photo'";

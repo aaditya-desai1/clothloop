@@ -1,22 +1,24 @@
 <?php
 // Set headers and start session
 header('Content-Type: application/json');
-// Prevent browser from showing default error dialogs
+// Set permissive CORS headers
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type');
+header('Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With');
+header('Access-Control-Allow-Credentials: true');
 
-// Handle preflight OPTIONS request
+// For preflight requests
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    exit(0);
+    http_response_code(200);
+    exit();
 }
 
-// Start session
-session_start();
+// Include session configuration
+require_once "../../config/session.php";
 
-// Disable error displaying (we'll handle errors ourselves)
+// Enable error reporting for debugging
 error_reporting(E_ALL);
-ini_set('display_errors', 0); // Don't output errors to browser
+ini_set('display_errors', 1); // Enable for debugging
 
 // Set error handler to catch any PHP errors and return them as JSON
 function errorHandler($errno, $errstr, $errfile, $errline) {
@@ -40,11 +42,13 @@ try {
         'success' => false,
         'message' => '',
         'user_id' => null,
-        'user_type' => null
+        'user_type' => null,
+        'debug' => []
     ];
 
     // Get JSON input
     $input = json_decode(file_get_contents('php://input'), true);
+    $response['debug']['input'] = $input;
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Get login credentials
@@ -68,6 +72,7 @@ try {
         if ($buyerResult->num_rows > 0) {
             // User found in buyers table
             $buyer = $buyerResult->fetch_assoc();
+            $response['debug']['buyer_found'] = true;
             
             // Verify password
             if (password_verify($password, $buyer['password'])) {
@@ -77,14 +82,20 @@ try {
                 $response['user_id'] = $buyer['id'];
                 $response['user_type'] = 'buyer';
                 
-                // Start session and store user data
+                // Store user data in session
                 $_SESSION['user_id'] = $buyer['id'];
                 $_SESSION['user_type'] = 'buyer';
                 $_SESSION['user_name'] = $buyer['name'];
                 $_SESSION['user_email'] = $buyer['email'];
+                
+                // Add session debug info
+                $response['debug']['session_id'] = session_id();
+                $response['debug']['session_status'] = session_status();
+                $response['debug']['session_data'] = $_SESSION;
             } else {
                 // Invalid password
                 $response['message'] = 'Invalid email or password';
+                $response['debug']['password_match'] = false;
             }
         } else {
             // Check sellers table
@@ -96,6 +107,7 @@ try {
             if ($sellerResult->num_rows > 0) {
                 // User found in sellers table
                 $seller = $sellerResult->fetch_assoc();
+                $response['debug']['seller_found'] = true;
                 
                 // Verify password
                 if (password_verify($password, $seller['password'])) {
@@ -105,19 +117,26 @@ try {
                     $response['user_id'] = $seller['id'];
                     $response['user_type'] = 'seller';
                     
-                    // Start session and store user data
+                    // Store user data in session
                     $_SESSION['user_id'] = $seller['id'];
                     $_SESSION['user_type'] = 'seller';
                     $_SESSION['user_name'] = $seller['name'];
                     $_SESSION['user_email'] = $seller['email'];
                     $_SESSION['shop_name'] = $seller['shop_name'];
+                    
+                    // Add session debug info
+                    $response['debug']['session_id'] = session_id();
+                    $response['debug']['session_status'] = session_status();
+                    $response['debug']['session_data'] = $_SESSION;
                 } else {
                     // Invalid password
                     $response['message'] = 'Invalid email or password';
+                    $response['debug']['password_match'] = false;
                 }
             } else {
                 // User not found in either table
                 $response['message'] = 'Invalid email or password';
+                $response['debug']['user_found'] = false;
             }
         }
     } else {

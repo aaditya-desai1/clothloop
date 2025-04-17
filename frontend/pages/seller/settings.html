@@ -4,21 +4,22 @@
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
   <title>Account Settings</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
   <style>
     /* Global Variables */
     :root {
-      --primary-color: #666768;
+      --primary-color: #333333;
       --secondary-color: #f7f7f7;
       --text-primary: #212121;
-      --text-secondary: #383737;
+      --text-secondary: #666666;
       --white: #fff;
-      --hover-color: #444;
+      --hover-color: #555555;
       --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
       --shadow-md: 0 5px 15px rgba(0, 0, 0, 0.1);
       --transition: all 0.3s ease;
-      --border-radius: 10px;
-      --accent-color: #4CAF50;
+      --border-radius: 4px;
+      --accent-color: #333333;
     }
     
     /* Global Styles */
@@ -29,7 +30,7 @@
     }
     
     body {
-      font-family: sans-serif;
+      font-family: 'Roboto', sans-serif;
       background-color: var(--white);
       color: var(--text-primary);
       margin: 0;
@@ -50,7 +51,7 @@
       margin-left: auto;
       margin-right: auto;
       max-width: 800px;
-      margin-top: 70px;
+      margin-top: 80px;
     }
 
     .form-group {
@@ -101,22 +102,25 @@
     .form-group input[type="email"],
     .form-group input[type="tel"] {
       width: 100%;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
+      padding: 10px 15px;
+      height: 45px;
+      border: 1px solid #ddd;
+      border-radius: var(--border-radius);
       box-sizing: border-box;
       transition: all 0.3s ease;
+      font-family: 'Roboto', sans-serif;
+      font-size: 14px;
     }
     
     .form-group input:focus {
       border-color: var(--primary-color);
-      box-shadow: 0 0 5px rgba(102, 103, 104, 0.5);
+      box-shadow: 0 0 5px rgba(51, 51, 51, 0.2);
       outline: none;
     }
     
     .save-btn, .back-btn {
       padding: 12px 24px;
-      border-radius: 5px;
+      border-radius: var(--border-radius);
       cursor: pointer;
       transition: var(--transition);
       border: none;
@@ -125,12 +129,12 @@
     }
     
     .save-btn {
-      background-color: var(--accent-color);
+      background-color: var(--primary-color);
       color: white;
     }
     
     .save-btn:hover {
-      background-color: #3e8e41;
+      background-color: var(--hover-color);
       transform: translateY(-3px);
     }
     
@@ -149,11 +153,11 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 10px 20px;
-      background-color: var(--secondary-color);
+      padding: 10px 30px;
+      background-color: var(--white);
       position: fixed;
       width: 100%;
-      height: 70px;
+      height: 80px;
       top: 0;
       left: 0;
       right: 0;
@@ -302,7 +306,7 @@
       height: 100vh;
       position: fixed;
       left: 0;
-      top: 70px;
+      top: 80px;
       box-shadow: var(--shadow-sm);
       padding-top: 20px;
       z-index: 900;
@@ -376,34 +380,51 @@
 </head>
 <body>
   <div class="container">
-    <!-- Header -->
-    <header class="main-header">
-      <div class="header-left">
-        <div class="logo">
-          <img src="../../assets/images/logo.webp" alt="ClothLoop logo" />
-          <div class="brand-name">
-            <h1>ClothLoop</h1>
-            <p>Account Settings</p>
-          </div>
-        </div>
-      </div>
-      <div class="header-right">
-        <div class="account-info">
-          <div class="user-profile">
-            <img id="navProfileImage" src="../../assets/images/shop_logo.png" alt="User Shop logo" />
-            <div class="user-details">
-              <h4 id="navSellerName">Loading...</h4>
-              <p>Seller Account</p>
+    <!-- Header Section -->
+    <header class="header">
+        <div class="header-container">
+            <div class="header-left">
+                <div class="logo">
+                    <span class="logo-name">CLOTHLOOP</span>
+                    <span class="seller-badge">Seller</span>
+                </div>
+                
+                <nav class="nav-container">
+                    <ul class="nav-items">
+                        <li><a href="seller_dashboard.html">Dashboard</a></li>
+                        <li><a href="product_listings.html">Listings</a></li>
+                        <li><a href="seller_profile.html">Profile</a></li>
+                        <li><a href="settings.html" class="active">Settings</a></li>
+                    </ul>
+                </nav>
             </div>
-            <i class="fas fa-chevron-down"></i>
-            <div class="dropdown-menu">
-              <a href="seller_profile.html"><i class="fas fa-store"></i> Shop Profile</a>
-              <a href="settings.html" class="active"><i class="fas fa-cog"></i> Account Settings</a>
-              <a href="../account/login.html" id="logoutLink"><i class="fas fa-sign-out-alt"></i> Log Out</a>
+            
+            <div class="header-right">
+                <div class="actions">
+                    <div class="action-item" id="profileSection">
+                        <i class="fas fa-user"></i>
+                        <span>PROFILE</span>
+                        
+                        <!-- Profile dropdown menu -->
+                        <div class="profile-dropdown" id="profileDropdown">
+                            <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
+                            <div class="profile-divider"></div>
+                            <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                        </div>
+                    </div>
+                    
+                    <div class="action-item" id="statisticsBtn">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>STATS</span>
+                    </div>
+                    
+                    <div class="action-item" id="helpBtn">
+                        <i class="fas fa-question-circle"></i>
+                        <span>ABOUT US</span>
+                    </div>
+                </div>
             </div>
-          </div>
         </div>
-      </div>
     </header>
 
     <!-- Sidebar -->
@@ -481,40 +502,14 @@
       const navProfileImage = document.getElementById('navProfileImage');
       const userProfile = document.querySelector('.user-profile');
       
-      // Profile dropdown functionality
-      if (userProfile) {
-        userProfile.addEventListener('click', function(e) {
-          console.log('Profile clicked');
-          this.classList.toggle('active');
-          e.stopPropagation();
-        });
-        
-        // Close dropdown when clicking outside
-        document.addEventListener('click', function() {
-          userProfile.classList.remove('active');
-        });
-      }
+      // Setup profile dropdown
+      setupProfileDropdown();
       
-      // Show loading message
-      showAlert('Loading account data...', 'info');
+      // Setup header action buttons
+      setupHeaderActions();
       
-      // Fetch seller profile data
-      fetchAccountData();
-      
-      // Handle logout
-      const logoutLink = document.getElementById('logoutLink');
-      if (logoutLink) {
-        logoutLink.addEventListener('click', function(e) {
-          e.preventDefault();
-          // Clear user data
-          localStorage.removeItem('user_id');
-          localStorage.removeItem('userType');
-          localStorage.removeItem('username');
-          sessionStorage.clear();
-          // Redirect to login page
-          window.location.href = '../account/login.html';
-        });
-      }
+      // Load user settings
+      loadUserSettings();
       
       // Form submission
       if (settingsForm) {
@@ -593,8 +588,67 @@
         });
       }
       
-      // Function to fetch account data
-      function fetchAccountData() {
+      // Function to set up profile dropdown
+      function setupProfileDropdown() {
+        const profileSection = document.getElementById('profileSection');
+        const profileDropdown = document.getElementById('profileDropdown');
+        
+        profileSection.addEventListener('click', function(e) {
+          e.stopPropagation();
+          profileDropdown.classList.toggle('active');
+        });
+        
+        // Close dropdown when clicking elsewhere
+        document.addEventListener('click', function() {
+          profileDropdown.classList.remove('active');
+        });
+        
+        profileDropdown.addEventListener('click', function(e) {
+          e.stopPropagation();
+        });
+        
+        // Logout functionality
+        const logoutBtn = document.getElementById('logoutBtn');
+        logoutBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          handleLogout();
+        });
+      }
+      
+      // Function to setup header action buttons
+      function setupHeaderActions() {
+        // Statistics button
+        const statisticsBtn = document.getElementById('statisticsBtn');
+        statisticsBtn.addEventListener('click', function() {
+          window.location.href = 'seller_statistics.html';
+        });
+        
+        // Help button
+        const helpBtn = document.getElementById('helpBtn');
+        helpBtn.addEventListener('click', function() {
+          window.location.href = '../about.html';
+        });
+      }
+
+      // Function to handle logout
+      function handleLogout() {
+        fetch('../../../backend/api/users/logout.php')
+          .then(response => response.json())
+          .then(data => {
+            if (data.status === 'success') {
+              window.location.href = '../../index.html';
+            } else {
+              showAlert('error', 'Error logging out. Please try again.');
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            showAlert('error', 'Error logging out. Please try again.');
+          });
+      }
+      
+      // Function to load user settings
+      function loadUserSettings() {
         // First try to get data from sessionStorage to show immediately
         const cachedData = sessionStorage.getItem('sellerData');
         if (cachedData) {

@@ -799,3 +799,68 @@
     [cloth_id] => 4
 )
 
+[2025-04-17 11:52:02] Database connection successful
+[2025-04-17 11:52:02] Starting cloth upload process
+[2025-04-17 11:52:02] POST data: Array
+(
+    [seller_id] => 1
+    [description] => black
+    [size] => M
+    [category] => Men
+    [clothTitle] => Polo
+    [contactNo] => 1234567890
+    [whatsappNo] => 1234567890
+    [terms] => See
+    [rentalPrice] => 500
+)
+
+[2025-04-17 11:52:02] FILES data: Array
+(
+    [clothImage] => Array
+        (
+            [name] => jiyan-joshi.jpg
+            [full_path] => jiyan-joshi.jpg
+            [type] => image/jpeg
+            [tmp_name] => C:\xampp\tmp\php395E.tmp
+            [error] => 0
+            [size] => 914908
+        )
+
+)
+
+[2025-04-17 11:52:02] POST request received
+[2025-04-17 11:52:02] Seller ID from POST: 1
+[2025-04-17 11:52:02] Form data parsed: Array
+(
+    [cloth_title] => Polo
+    [size] => M
+    [category] => Men
+    [rental_price] => 500
+)
+
+[2025-04-17 11:52:02] Processing image upload: Array
+(
+    [name] => jiyan-joshi.jpg
+    [full_path] => jiyan-joshi.jpg
+    [type] => image/jpeg
+    [tmp_name] => C:\xampp\tmp\php395E.tmp
+    [error] => 0
+    [size] => 914908
+)
+
+[2025-04-17 11:52:02] Image loaded successfully: Array
+(
+    [size] => 914908
+    [type] => image/jpeg
+)
+
+[2025-04-17 11:52:02] Inserting new cloth item
+[2025-04-17 11:52:02] Executing insert statement
+[2025-04-17 11:52:02] Cloth added successfully: 1
+[2025-04-17 11:52:02] Response: Array
+(
+    [status] => success
+    [message] => Cloth added successfully
+    [cloth_id] => 1
+)
+

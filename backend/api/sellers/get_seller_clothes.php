@@ -32,12 +32,14 @@ $response = ['status' => 'error', 'message' => 'Failed to retrieve cloth items']
 
 try {
     // Query to get all cloth items for the seller
-    $sql = "SELECT id, seller_id, cloth_title, description, size, category, rental_price, 
-                   contact_number as contact_no, whatsapp_number as whatsapp_no, 
-                   terms_and_conditions as terms_conditions, is_active
-            FROM cloth_details 
-            WHERE seller_id = ? 
-            ORDER BY created_at DESC";
+    $sql = "SELECT cd.id, cd.seller_id, cd.cloth_title, cd.description, cd.size, cd.category, cd.rental_price, 
+                  cd.contact_number as contact_no, cd.whatsapp_number as whatsapp_no, 
+                  cd.terms_and_conditions as terms_conditions, cd.is_active,
+                  s.shop_address
+           FROM cloth_details cd
+           LEFT JOIN sellers s ON cd.seller_id = s.id
+           WHERE cd.seller_id = ? 
+           ORDER BY cd.created_at DESC";
     
     $stmt = $conn->prepare($sql);
     

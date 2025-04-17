@@ -3,1557 +3,769 @@
 <head>
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-  <title>Seller Dashboard</title>
+  <title>Seller Dashboard | ClothLoop</title>
   
   <!-- Font Awesome CDN -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
   
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
+  
   <!-- Chart.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   
-  <!-- Inline CSS (previously in Seller_Dashboard.css) -->
+  <!-- Inline CSS -->
   <style>
-    /* Global Variables */
+    /* Root variables */
     :root {
-      --primary-color: #666768;
-      --secondary-color: #f7f7f7;
-      --text-primary: #212121;
-      --text-secondary: #383737;
-      --white: #fff;
-      --hover-color: #444;
-      --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
-      --shadow-md: 0 5px 15px rgba(0, 0, 0, 0.1);
-      --transition: all 0.3s ease;
-      --border-radius: 10px;
-      --accent-color: #4CAF50;
+        --background: #FFFFFF;
+        --text-primary: #333333;
+        --text-secondary: #666666;
+        --button-primary: #333333;
+        --button-text: #FFFFFF;
+        --button-hover: #555555;
+        --button-secondary: transparent;
+        --button-secondary-text: #333333;
+        --header-bg: #FFFFFF;
+        --border-color: #EEEEEE;
+        --hover-bg: #F5F5F5;
+        --input-bg: #F9F9F9;
+        --error-color: #FF3B30;
+        --success-color: #34C759;
+        --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+        --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.1);
+        --seller-highlight: #333333;
     }
 
-    /* Global Styles */
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
+    /* Apply colors to elements */
     body {
-      font-family: sans-serif;
-      background-color: var(--white);
-      color: var(--text-primary);
-      margin: 0;
-      padding: 0;
-      min-height: 100vh;
+        background-color: var(--background);
+        color: var(--text-primary);
+        font-family: 'Roboto', sans-serif;
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        letter-spacing: 0.02em;
     }
 
-    h2, h3 {
-      margin-bottom: 20px;
-      color: var(--text-primary);
+    /* Header styles */
+    .header {
+        background-color: var(--header-bg);
+        padding: 0;
+        box-shadow: var(--shadow-sm);
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        height: 80px;
+        display: flex;
+        align-items: center;
     }
 
-    .container {
-      display: flex;
-      width: 100%;
-      min-height: 100vh;
-      background-color: var(--white);
-    }
-
-    /* Header */
-    .main-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 20px;
-      background-color: var(--secondary-color);
-      position: fixed;    
-      width: 100%;
-      height: 70px;
-      top: 0;            
-      left: 0;           
-      right: 0;
-      z-index: 1000;
-      box-shadow: var(--shadow-sm);
+    .header-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 30px;
+        position: relative;
     }
 
     .header-left {
-      display: flex;
-      align-items: center;
-    }
-    
-    .header-left .logo {
-      display: flex;
-      align-items: center;
-      margin-right: 20px;
-      height: 40px;
-      line-height: 1;
-    }
-    
-    .header-left .logo img {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      margin-right: 10px;
-      vertical-align: middle;
-      display: inline-block;
+        display: flex;
+        align-items: center;
+        z-index: 2;
     }
 
-    .brand-name {
-      display: flex;
-      flex-direction: column;
-      line-height: 1.2;
-    }
-
-    .brand-name h1 {
-      font-size: 18px;
-      font-weight: bold;
-      margin: 0;
-      padding: 0;
-      line-height: 1.2;
-      color: var(--text-primary);
-    }
-
-    .brand-name p {
-      font-size: 12px;
-      color: var(--text-secondary);
-      margin: 0;
-      padding: 0;
-      line-height: 1.2;
-    }
-    
     .header-right {
-      display: flex;
-      align-items: center;
-      margin-right: 20px;
+        display: flex;
+        align-items: center;
+        z-index: 2;
+    }
+
+    .logo {
+        display: flex;
+        align-items: center;
+        margin-right: 30px;
+        position: relative;
+    }
+
+    .logo-name {
+        font-size: 24px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 2px;
     }
     
-    .account-info {
-      display: flex;
-      align-items: center;
-      gap: 20px;
+    /* Seller badge */
+    .seller-badge {
+        position: absolute;
+        top: -10px;
+        right: -10px;
+        background-color: var(--seller-highlight);
+        color: white;
+        font-size: 10px;
+        font-weight: bold;
+        padding: 3px 8px;
+        border-radius: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        animation: pulse 2s infinite;
     }
     
-    .notifications {
-      position: relative;
-      cursor: pointer;
+    @keyframes pulse {
+        0% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.1);
+        }
+        100% {
+            transform: scale(1);
+        }
+    }
+
+    /* Navigation styles */
+    .nav-container {
+        display: flex;
+        align-items: center;
+    }
+
+    .nav-items {
+        display: flex;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        height: 100%;
+    }
+
+    .nav-items li {
+        height: 80px;
+        display: flex;
+        align-items: center;
+        margin: 0 15px;
+    }
+
+    .nav-items li a {
+        text-decoration: none;
+        color: var(--text-primary);
+        font-weight: 500;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        position: relative;
+    }
+
+    .nav-items li a:hover {
+        color: var(--button-hover);
     }
     
-    .notifications i {
-      font-size: 20px;
-      color: var(--text-primary);
+    .nav-items li a:hover::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background-color: var(--seller-highlight);
+        transform: scaleX(0);
+        animation: expandLine 0.3s forwards;
     }
     
-    .notification-badge {
-      position: absolute;
-      top: -5px;
-      right: -5px;
-      background-color: #ff6b6b;
-      color: white;
-      width: 20px;
-      height: 20px;
-      font-size: 12px;
-      font-weight: bold;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 50%;
+    @keyframes expandLine {
+        to {
+            transform: scaleX(1);
+        }
+    }
+
+    .nav-items li a.active {
+        font-weight: 700;
+    }
+
+    .nav-items li a.active::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background-color: var(--text-primary);
+    }
+
+    /* User actions */
+    .actions {
+        display: flex;
+        align-items: center;
+    }
+
+    .action-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin: 0 15px;
+        cursor: pointer;
+        position: relative;
+    }
+
+    .action-item i {
+        font-size: 20px;
+        margin-bottom: 4px;
+        color: var(--text-primary);
+    }
+
+    .action-item span {
+        font-size: 12px;
+        color: var(--text-primary);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* Profile dropdown menu styles */
+    .profile-dropdown {
+        position: absolute;
+        top: 100%;
+        right: -20px;
+        width: 200px;
+        background-color: white;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        padding: 10px 0;
+        z-index: 200;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(10px);
+        transition: all 0.3s ease;
+        margin-top: 5px;
     }
     
-    .user-profile {
-      display: flex;
-      align-items: center;
-      cursor: pointer;
-      gap: 10px;
-      position: relative;
-      background-color: var(--white);
-      border-radius: 10px;
-      padding: 5px 10px;
-      box-shadow: var(--shadow-sm);
-      transition: var(--transition);
+    .profile-dropdown.active {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
     }
     
-    .user-profile:hover {
-      box-shadow: var(--shadow-md);
+    .profile-dropdown a {
+        display: flex;
+        align-items: center;
+        padding: 10px 15px;
+        color: var(--text-primary);
+        text-decoration: none;
+        font-size: 13px;
+        letter-spacing: 0.5px;
+        transition: background-color 0.2s ease;
     }
     
-    .user-profile img {
-      width: 35px;
-      height: 35px;
-      border-radius: 50%;
-      object-fit: cover;
-      margin-right: 10px;
+    .profile-dropdown a:hover {
+        background-color: var(--hover-bg);
     }
     
-    .user-details {
-      margin-right: 10px;
+    .profile-dropdown a i {
+        margin-right: 10px;
+        font-size: 16px;
+        width: 20px;
+        text-align: center;
     }
     
-    .user-details h4 {
-      font-size: 14px;
-      font-weight: bold;
-      margin: 0;
+    .profile-divider {
+        height: 1px;
+        background-color: var(--border-color);
+        margin: 5px 0;
     }
-    
-    .user-details p {
-      font-size: 12px;
-      color: var(--text-secondary);
-      margin: 0;
-    }
-    
-    .user-profile i {
-      font-size: 14px;
-      color: var(--text-primary);
-      margin-left: 5px;
-    }
-    
-    .dropdown-menu {
-      position: absolute;
-      top: 100%;
-      right: 0;
-      background-color: white;
-      border-radius: 10px;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-      padding: 10px 0;
-      min-width: 200px;
-      z-index: 1000;
-      display: none;
-    }
-    
-    .dropdown-menu a {
-      display: block;
-      padding: 10px 20px;
-      text-decoration: none;
-      color: var(--text-primary);
-      transition: all 0.3s ease;
-    }
-    
-    .dropdown-menu a i {
-      margin-right: 10px;
-    }
-    
-    .dropdown-menu a:hover {
-      background-color: #f5f5f5;
-    }
-    
-    .user-profile.active .dropdown-menu {
-      display: block;
-    }
-    
-    /* Sidebar */
-    .sidebar {
-      width: 280px;
-      background-color: var(--white);
-      height: 100vh;
-      position: fixed;
-      left: 0;
-      top: 70px;
-      box-shadow: var(--shadow-sm);
-      padding-top: 20px;
-      z-index: 900;
-    }
-    
-    .sidebar-nav {
-      list-style-type: none;
-      padding: 0;
-      margin: 0;
-    }
-    
-    .sidebar-nav li {
-      margin-bottom: 5px;
-    }
-    
-    .sidebar-nav a {
-      display: flex;
-      align-items: center;
-      padding: 15px 20px;
-      text-decoration: none;
-      color: var(--text-primary);
-      transition: var(--transition);
-      border-radius: 10px;
-      margin: 0 10px;
-    }
-    
-    .sidebar-nav a i {
-      margin-right: 15px;
-      font-size: 18px;
-    }
-    
-    .sidebar-nav a.active,
-    .sidebar-nav a:hover {
-      background-color: var(--primary-color);
-      color: var(--white);
-    }
-    
+
     /* Main Content */
     .main-content {
-      flex: 1;
-      padding: 40px;
-      margin-left: 280px;
-      margin-top: 70px;
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 30px;
     }
-    
-    .section {
-      display: none;
+
+    .content-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
     }
-    
-    .section.active {
-      display: block;
+
+    .content-title {
+        font-size: 24px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
     }
-    
-    .welcome-message {
-      background-color: var(--secondary-color);
-      padding: 30px;
-      border-radius: var(--border-radius);
-      margin-bottom: 30px;
-      box-shadow: var(--shadow-sm);
-      transition: var(--transition);
+
+    .action-button {
+        background-color: var(--button-primary);
+        color: var(--button-text);
+        border: none;
+        padding: 10px 20px;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        cursor: pointer;
+        transition: all 0.3s ease;
     }
-    
-    .welcome-message:hover {
-      transform: translateY(-5px);
-      box-shadow: var(--shadow-md);
+
+    .action-button:hover {
+        background-color: var(--button-hover);
     }
-    
-    .welcome-message h2 {
-      font-size: 24px;
-      margin-bottom: 10px;
+
+    .action-button i {
+        margin-right: 10px;
     }
-    
-    .welcome-message p {
-      color: var(--text-secondary);
-      line-height: 1.6;
+
+    /* Dashboard specific styles */
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+        margin-bottom: 30px;
     }
-    
-    /* Dashboard Stats */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-      gap: 20px;
-      margin-bottom: 30px;
-    }
-    
+
     .stat-card {
-      background-color: white;
-      padding: 20px;
-      border-radius: var(--border-radius);
-      box-shadow: var(--shadow-sm);
-      transition: var(--transition);
+        background-color: white;
+        border-radius: 4px;
+        padding: 20px;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--border-color);
+        transition: all 0.3s ease;
     }
-    
+
     .stat-card:hover {
-      transform: translateY(-5px);
-      box-shadow: var(--shadow-md);
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-md);
     }
-    
-    .stat-card h3 {
-      font-size: 16px;
-      margin-bottom: 10px;
-      color: var(--text-secondary);
+
+    .stat-icon {
+        margin-bottom: 10px;
+        font-size: 24px;
+        color: var(--text-primary);
     }
-    
-    .stat-card .stat-value {
-      font-size: 32px;
-      font-weight: bold;
-      margin-bottom: 5px;
-      color: var(--text-primary);
+
+    .stat-number {
+        font-size: 36px;
+        font-weight: 700;
+        margin-bottom: 5px;
     }
-    
-    .stat-card .stat-change {
-      font-size: 14px;
-      color: #2ecc71;
+
+    .stat-label {
+        font-size: 14px;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 1px;
     }
-    
-    .stat-card .stat-change.negative {
-      color: #e74c3c;
+
+    .dashboard-section {
+        margin-bottom: 30px;
     }
-    
-    /* Recent Products */
-    .recent-products {
-      background-color: white;
-      padding: 20px;
-      border-radius: var(--border-radius);
-      margin-bottom: 30px;
-      box-shadow: var(--shadow-sm);
+
+    .section-title {
+        font-size: 18px;
+        font-weight: 700;
+        margin-bottom: 20px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
     }
-    
-    .product-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-      gap: 20px;
-    }
-    
-    .product-card {
-      background-color: var(--secondary-color);
-      border-radius: var(--border-radius);
-      overflow: hidden;
-      transition: var(--transition);
-    }
-    
-    .product-card:hover {
-      transform: translateY(-5px);
-      box-shadow: var(--shadow-md);
-    }
-    
-    .product-image {
-      height: 200px;
-      overflow: hidden;
-    }
-    
-    .product-image img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transition: var(--transition);
-    }
-    
-    .product-card:hover .product-image img {
-      transform: scale(1.05);
-    }
-    
-    .product-details {
-      padding: 15px;
-    }
-    
-    .product-details h3 {
-      font-size: 16px;
-      margin-bottom: 5px;
-    }
-    
-    .product-details .price {
-      font-weight: bold;
-      font-size: 18px;
-      margin-bottom: 10px;
-      color: var(--primary-color);
-    }
-    
-    .product-details .stock {
-      font-size: 14px;
-      color: var(--text-secondary);
-      margin-bottom: 15px;
-    }
-    
-    .product-actions {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 10px;
-    }
-    
-    .product-actions button {
-      padding: 8px 15px;
-      background-color: var(--primary-color);
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: var(--transition);
-    }
-    
-    .product-actions button:hover {
-      background-color: var(--hover-color);
-    }
-    
-    /* Analytics */
+
+    /* Charts section */
     .charts-container {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-      gap: 30px;
-      margin-bottom: 30px;
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 20px;
+        margin-bottom: 30px;
     }
-    
+
     .chart-card {
-      background-color: white;
-      padding: 20px;
-      border-radius: var(--border-radius);
-      box-shadow: var(--shadow-sm);
+        background-color: white;
+        border-radius: 4px;
+        padding: 20px;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--border-color);
     }
-    
+
     .chart-card h3 {
-      margin-bottom: 20px;
-      font-size: 18px;
-    }
-    
-    .chart-wrapper {
-      position: relative;
-      height: 300px;
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 20px;
     }
 
-    /* Comments Section */
-    .comment-card {
-      background-color: white;
-      border-radius: var(--border-radius);
-      padding: 20px;
-      margin-bottom: 20px;
-      box-shadow: var(--shadow-sm);
-      transition: var(--transition);
-    }
-    
-    .comment-card:hover {
-      box-shadow: var(--shadow-md);
-    }
-    
-    .comment-header {
-      display: flex;
-      align-items: center;
-      margin-bottom: 15px;
-    }
-    
-    .comment-header img {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      margin-right: 15px;
-    }
-    
-    .comment-header .user-info h4 {
-      margin: 0;
-      font-size: 16px;
-    }
-    
-    .comment-header .user-info p {
-      margin: 5px 0 0;
-      font-size: 14px;
-      color: var(--text-secondary);
-    }
-    
-    .comment-body p {
-      font-size: 16px;
-      line-height: 1.6;
-      margin-bottom: 15px;
-    }
-    
-    .comment-product {
-      display: flex;
-      align-items: center;
-      background-color: var(--secondary-color);
-      padding: 10px;
-      border-radius: 5px;
-      margin-bottom: 15px;
-    }
-    
-    .comment-product img {
-      width: 60px;
-      height: 60px;
-      object-fit: cover;
-      border-radius: 5px;
-      margin-right: 15px;
-    }
-    
-    .comment-product-info h5 {
-      margin: 0;
-      font-size: 14px;
-    }
-    
-    .comment-product-info p {
-      margin: 5px 0 0;
-      font-size: 12px;
-      color: var(--primary-color);
-    }
-    
-    .comment-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-    }
-    
-    .comment-actions button {
-      padding: 8px 15px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: var(--transition);
-      font-size: 14px;
-    }
-    
-    .reply-btn {
-      background-color: var(--primary-color);
-      color: white;
-    }
-    
-    .reply-btn:hover {
-      background-color: var(--hover-color);
-    }
-    
-    .delete-btn {
-      background-color: #f8f9fa;
-      color: #e74c3c;
-    }
-    
-    .delete-btn:hover {
-      background-color: #e74c3c;
-      color: white;
+    .chart-placeholder {
+        height: 250px;
+        width: 100%;
+        background-color: #f9f9f9;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: var(--text-secondary);
+        border: 1px dashed #ddd;
     }
 
-    /* Add Cloth Button */
-    .add-cloth-btn {
-      position: fixed;
-      bottom: 30px;
-      right: 30px;
-      width: 60px;
-      height: 60px;
-      background-color: var(--accent-color);
-      color: white;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: var(--shadow-md);
-      cursor: pointer;
-      z-index: 1000;
-      transition: var(--transition);
+    /* Recent orders table */
+    .orders-table {
+        width: 100%;
+        border-collapse: collapse;
     }
 
-    .add-cloth-btn i {
-      font-size: 24px;
+    .orders-table th,
+    .orders-table td {
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid var(--border-color);
     }
 
-    .add-cloth-btn:hover {
-      transform: scale(1.1);
+    .orders-table th {
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 12px;
+        letter-spacing: 1px;
+        color: var(--text-secondary);
     }
 
-    /* Upload Cloth Popup */
-    .popup-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.5);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 2000;
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.3s ease;
+    .orders-table tbody tr:hover {
+        background-color: var(--hover-bg);
     }
 
-    .popup-overlay.active {
-      opacity: 1;
-      visibility: visible;
+    .status-badge {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 500;
     }
 
-    .popup-container {
-      background-color: white;
-      width: 100%;
-      max-width: 800px;
-      border-radius: var(--border-radius);
-      box-shadow: var(--shadow-md);
-      display: flex;
-      overflow: hidden;
-      max-height: 90vh;
+    .status-completed {
+        background-color: rgba(52, 199, 89, 0.1);
+        color: #34C759;
     }
 
-    .popup-image-upload {
-      width: 40%;
-      padding: 20px;
-      background-color: var(--secondary-color);
-      display: flex;
-      flex-direction: column;
+    .status-pending {
+        background-color: rgba(255, 149, 0, 0.1);
+        color: #FF9500;
     }
 
-    .image-upload-area {
-      flex: 1;
-      border: 2px dashed var(--primary-color);
-      border-radius: var(--border-radius);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      position: relative;
-      overflow: hidden;
-      margin-bottom: 20px;
+    .status-cancelled {
+        background-color: rgba(255, 59, 48, 0.1);
+        color: #FF3B30;
     }
 
-    .image-upload-area i {
-      font-size: 48px;
-      color: var(--primary-color);
-      margin-bottom: 15px;
+    /* Loading spinner */
+    .loading-spinner {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100px;
     }
 
-    .image-upload-area p {
-      text-align: center;
-      color: var(--text-secondary);
-      margin-bottom: 10px;
+    .spinner {
+        border: 4px solid rgba(0, 0, 0, 0.1);
+        border-radius: 50%;
+        border-top: 4px solid var(--text-primary);
+        width: 30px;
+        height: 30px;
+        animation: spin 1s linear infinite;
     }
 
-    .image-upload-area input[type="file"] {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      top: 0;
-      left: 0;
-      opacity: 0;
-      cursor: pointer;
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
     }
 
-    .preview-image {
-      max-width: 100%;
-      max-height: 200px;
-      display: none;
-      margin-top: 10px;
-      border-radius: 5px;
+    /* Alert messages */
+    .alert {
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 2px;
+        display: none;
     }
 
-    .popup-form {
-      width: 60%;
-      padding: 30px;
-      max-height: 90vh;
-      overflow-y: auto;
+    .alert-success {
+        background-color: var(--success-color);
+        color: white;
     }
 
-    .popup-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
+    .alert-error {
+        background-color: var(--error-color);
+        color: white;
     }
 
-    .popup-header h2 {
-      margin: 0;
+    /* Responsive styles */
+    @media (max-width: 992px) {
+        .dashboard-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .charts-container {
+            grid-template-columns: 1fr;
+        }
     }
 
-    .close-popup {
-      background: none;
-      border: none;
-      font-size: 24px;
-      cursor: pointer;
-      color: var(--text-primary);
+    @media (max-width: 768px) {
+        .header-container {
+            padding: 0 15px;
+        }
+
+        .content-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .action-button {
+            margin-top: 15px;
+        }
     }
 
-    .form-group {
-      margin-bottom: 20px;
-    }
+    @media (max-width: 576px) {
+        .dashboard-grid {
+            grid-template-columns: 1fr;
+        }
 
-    .form-group label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: bold;
-      color: var(--text-primary);
-    }
+        .orders-table {
+            font-size: 12px;
+        }
 
-    .form-group input[type="text"],
-    .form-group input[type="number"],
-    .form-group input[type="tel"],
-    .form-group textarea {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      transition: border-color 0.3s;
-    }
-
-    .form-group input:focus,
-    .form-group textarea:focus {
-      border-color: var(--accent-color);
-      outline: none;
-    }
-
-    .form-group textarea {
-      min-height: 100px;
-      resize: vertical;
-    }
-
-    .radio-group {
-      display: flex;
-      gap: 20px;
-    }
-
-    .radio-option {
-      display: flex;
-      align-items: center;
-    }
-
-    .radio-option input[type="radio"] {
-      margin-right: 8px;
-    }
-
-    .form-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-      margin-top: 20px;
-    }
-
-    .btn {
-      padding: 12px 24px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-weight: bold;
-      transition: var(--transition);
-    }
-
-    .btn-primary {
-      background-color: var(--accent-color);
-      color: white;
-    }
-
-    .btn-primary:hover {
-      background-color: #3e8e41;
-    }
-
-    .btn-secondary {
-      background-color: #f1f1f1;
-      color: var(--text-primary);
-    }
-
-    .btn-secondary:hover {
-      background-color: #ddd;
+        .orders-table th,
+        .orders-table td {
+            padding: 8px 10px;
+        }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <!-- Header -->
-    <header class="main-header">
-      <div class="header-left">
-        <div class="logo">
-          <img src="../../assets/images/logo.webp" alt="ClothLoop logo" />
-          <div class="brand-name">
-            <h1>ClothLoop</h1>
-            <p>Seller Dashboard</p>
-          </div>
-        </div>
-      </div>
-      <div class="header-right">
-        <div class="account-info">
-          <div class="user-profile">
-            <img id="navProfileImage" src="../../assets/images/shop_logo.png" alt="Shop Logo" />
-            <div class="user-details">
-              <h4 id="navSellerName">Loading...</h4>
-              <p>Seller Account</p>
+    <!-- Header Section -->
+    <header class="header">
+        <div class="header-container">
+            <div class="header-left">
+                <div class="logo">
+                    <span class="logo-name">CLOTHLOOP</span>
+                    <span class="seller-badge">Seller</span>
+                </div>
+                
+                <nav class="nav-container">
+                    <ul class="nav-items">
+                        <li><a href="seller_dashboard.html" class="active">Dashboard</a></li>
+                        <li><a href="product_listings.html">Listings</a></li>
+                        <li><a href="seller_profile.html">Profile</a></li>
+                    </ul>
+                </nav>
             </div>
-            <i class="fas fa-chevron-down"></i>
-            <div class="dropdown-menu">
-              <a href="seller_profile.html"><i class="fas fa-store"></i> Shop Profile</a>
-              <a href="settings.html"><i class="fas fa-cog"></i> Account Settings</a>
-              <a href="../account/login.html" id="logoutLink"><i class="fas fa-sign-out-alt"></i> Log Out</a>
+            
+            <div class="header-right">
+                <div class="actions">
+                    <div class="action-item" id="profileSection">
+                        <i class="fas fa-user"></i>
+                        <span>PROFILE</span>
+                        
+                        <!-- Profile dropdown menu -->
+                        <div class="profile-dropdown" id="profileDropdown">
+                            <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
+                            <div class="profile-divider"></div>
+                            <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                        </div>
+                    </div>
+                    
+                    <div class="action-item" id="statisticsBtn">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>STATS</span>
+                    </div>
+                    
+                    <div class="action-item" id="helpBtn">
+                        <i class="fas fa-question-circle"></i>
+                        <span>ABOUT US</span>
+                    </div>
+                </div>
             </div>
-          </div>
         </div>
-      </div>
     </header>
-
-    <!-- Sidebar -->
-    <aside class="sidebar">
-      <ul class="sidebar-nav">
-        <li><a href="#dashboard" class="active" data-section="dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-        <li><a href="product_listings.html"><i class="fas fa-list"></i> Product Listings</a></li>
-        <li><a href="#analysis" data-section="analysis"><i class="fas fa-chart-line"></i> Analysis</a></li>
-        <li><a href="#comments" data-section="comments"><i class="fas fa-comments"></i> Comments</a></li>
-      </ul>
-    </aside>
 
     <!-- Main Content -->
     <main class="main-content">
-      <!-- Dashboard Section -->
-      <section id="dashboard" class="section active">
-        <div class="welcome-message">
-          <h2>Welcome to Seller Dashboard</h2>
-          <p>Manage your products, track sales, and analyze your performance.</p>
+        <div class="content-header">
+            <h1 class="content-title">Seller Dashboard</h1>
+            <button class="action-button" id="addProductBtn">
+                <i class="fas fa-plus"></i> Add New Product
+            </button>
+        </div>
+
+        <div id="alertContainer"></div>
+        
+        <!-- Stats Overview Section -->
+        <div class="dashboard-grid">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-shopping-bag"></i>
+                </div>
+                <div class="stat-number" id="totalProducts">0</div>
+                <div class="stat-label">Total Products</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-star"></i>
+                </div>
+                <div class="stat-number" id="averageRating">0.0</div>
+                <div class="stat-label">Avg. Rating</div>
+            </div>
         </div>
         
-        <div class="stats-grid">
-          <div class="stat-card">
-            <h3>Products</h3>
-            <div class="stat-value">0</div>
-            <div class="stat-change">Add your first product</div>
-          </div>
-          <div class="stat-card">
-            <h3>Customer Reviews</h3>
-            <div class="stat-value">4.8</div>
-            <div class="stat-change">+0.2 from last month</div>
-          </div>
+        <div id="loadingSpinner" class="loading-spinner" style="display: none;">
+            <div class="spinner"></div>
         </div>
-        
-        <div class="recent-products">
-          <h2>Recent Products</h2>
-          <div class="product-grid">
-            <!-- Products will be added here dynamically -->
-          </div>
-        </div>
-      </section>
-
-      <!-- Analysis Section -->
-      <section id="analysis" class="section">
-        <h2>Sales Analysis</h2>
-        <div class="charts-container">
-          <div class="chart-card">
-            <h3>Product Sales</h3>
-            <div class="chart-wrapper">
-              <canvas id="barChart"></canvas>
-            </div>
-          </div>
-          <div class="chart-card">
-            <h3>Revenue Views</h3>
-            <div class="chart-wrapper">
-              <canvas id="lineChart"></canvas>
-            </div>
-          </div>
-          <div class="chart-card">
-            <h3>Customer Engagement</h3>
-            <div class="chart-wrapper">
-              <canvas id="pieChart"></canvas>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Comments Section -->
-      <section id="comments" class="section">
-        <h2>Recent Comments</h2>
-        <div class="comment-card">
-          <div class="comment-header">
-            <img src="../../assets/images/user.png" alt="User avatar" />
-            <div class="user-info">
-              <h4>Sarah Johnson</h4>
-              <p>Posted 2 days ago</p>
-            </div>
-          </div>
-          <div class="comment-body">
-            <p>I absolutely love this shirt! The quality is amazing and it fits perfectly. Would definitely buy from this seller again.</p>
-            <div class="comment-product">
-              <img src="../../assets/images/black shirt.jpeg" alt="Black T-Shirt" />
-              <div class="comment-product-info">
-                <h5>Black T-Shirt</h5>
-                <p>$24.99</p>
-              </div>
-            </div>
-          </div>
-          <div class="comment-actions">
-            <button class="reply-btn">Reply</button>
-            <button class="delete-btn">Delete</button>
-          </div>
-        </div>
-        <div class="comment-card">
-          <div class="comment-header">
-            <img src="../../assets/images/user.png" alt="User avatar" />
-            <div class="user-info">
-              <h4>Mike Peters</h4>
-              <p>Posted 5 days ago</p>
-            </div>
-          </div>
-          <div class="comment-body">
-            <p>The Bomber Jacket I received was slightly different from the one in the picture. The zipper seems a bit flimsy too. Can I get more details on the materials used?</p>
-            <div class="comment-product">
-              <img src="../../assets/images/bomber jacket.jpeg" alt="Bomber Jacket" />
-              <div class="comment-product-info">
-                <h5>Bomber Jacket</h5>
-                <p>$89.99</p>
-              </div>
-            </div>
-          </div>
-          <div class="comment-actions">
-            <button class="reply-btn">Reply</button>
-            <button class="delete-btn">Delete</button>
-          </div>
-        </div>
-      </section>
     </main>
-  </div>
 
-  <!-- Add Cloth Button -->
-  <div class="add-cloth-btn" id="addClothBtn">
-    <i class="fas fa-plus"></i>
-  </div>
-
-  <!-- Upload Cloth Popup -->
-  <div class="popup-overlay" id="uploadPopup">
-    <div class="popup-container">
-      <div class="popup-image-upload">
-        <div class="image-upload-area" id="dropArea">
-          <i class="fas fa-cloud-upload-alt"></i>
-          <p>Drag & drop an image here</p>
-          <p>or</p>
-          <p><strong>Click to browse</strong></p>
-          <input type="file" id="clothImage" accept="image/*">
-          <img id="previewImage" class="preview-image" src="" alt="Preview">
-        </div>
-      </div>
-      <div class="popup-form">
-        <div class="popup-header">
-          <h2>Upload New Cloth</h2>
-          <button class="close-popup" id="closePopup">&times;</button>
-        </div>
-        <form id="uploadClothForm">
-          <div class="form-group">
-            <label for="clothTitle">Cloth Title</label>
-            <input type="text" id="clothTitle" required>
-          </div>
-          <div class="form-group">
-            <label for="description">Description</label>
-            <textarea id="description" required></textarea>
-          </div>
-          <div class="form-group">
-            <label for="size">Size</label>
-            <input type="text" id="size" required>
-          </div>
-          <div class="form-group">
-            <label>Category</label>
-            <div class="radio-group">
-              <div class="radio-option">
-                <input type="radio" id="men" name="category" value="Men" required>
-                <label for="men">Men</label>
-              </div>
-              <div class="radio-option">
-                <input type="radio" id="women" name="category" value="Women">
-                <label for="women">Women</label>
-              </div>
-              <div class="radio-option">
-                <input type="radio" id="kids" name="category" value="Kids">
-                <label for="kids">Kids</label>
-              </div>
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="rentalPrice">Rental Price (₹/day)</label>
-            <input type="number" id="rentalPrice" min="0" step="1" required>
-          </div>
-          <div class="form-group">
-            <label for="contactNo">Contact No.</label>
-            <input type="tel" id="contactNo" required>
-          </div>
-          <div class="form-group">
-            <label for="whatsappNo">WhatsApp No.</label>
-            <input type="tel" id="whatsappNo" required>
-          </div>
-          <div class="form-group">
-            <label for="terms">Terms and Conditions</label>
-            <textarea id="terms" required></textarea>
-          </div>
-          <div class="form-actions">
-            <button type="button" class="btn btn-secondary" id="cancelUpload">Cancel</button>
-            <button type="submit" class="btn btn-primary">Upload Cloth</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      // DOM Elements
-      const sideMenu = document.querySelector('aside');
-      const menuBtn = document.getElementById('menu-btn');
-      const closeBtn = document.getElementById('close-btn');
-      const sections = document.querySelectorAll('main > section');
-      const navLinks = document.querySelectorAll('aside .sidebar a');
-      const themeToggler = document.querySelector('.theme-toggler');
-      const userProfile = document.querySelector('.user-profile');
-      const alertMessage = document.getElementById('alertMessage');
-      const navSellerName = document.getElementById('navSellerName');
-      const navProfileImage = document.getElementById('navProfileImage');
-      
-      // Fetch products and seller profile data on page load
-      fetchProducts();
-      fetchSellerProfile();
-      
-      // Show/hide sidebar 
-      if (menuBtn) {
-        menuBtn.addEventListener('click', () => {
-          sideMenu.style.display = 'block';
-        });
-      }
-      
-      if (closeBtn) {
-        closeBtn.addEventListener('click', () => {
-          sideMenu.style.display = 'none';
-        });
-      }
-      
-      // Change theme
-      if (themeToggler) {
-        themeToggler.addEventListener('click', () => {
-          document.body.classList.toggle('dark-theme-variables');
-          
-          themeToggler.querySelector('span:nth-child(1)').classList.toggle('active');
-          themeToggler.querySelector('span:nth-child(2)').classList.toggle('active');
-          
-          // Save theme preference
-          const isDarkMode = document.body.classList.contains('dark-theme-variables');
-          localStorage.setItem('darkMode', isDarkMode);
-        });
-      }
-      
-      // Toggle user profile dropdown
-      if (userProfile) {
-        userProfile.addEventListener('click', function(e) {
-          console.log('Profile clicked');
-          this.classList.toggle('active');
-          e.stopPropagation();
-        });
-        
-        // Close dropdown when clicking outside
-        document.addEventListener('click', function() {
-          userProfile.classList.remove('active');
-        });
-      }
-      
-      // Profile fetch and display
-      fetchSellerProfile();
-      
-      // Handle logout
-      const logoutLink = document.getElementById('logoutLink');
-      if (logoutLink) {
-        logoutLink.addEventListener('click', function(e) {
-          e.preventDefault();
-          // Clear user data
-          localStorage.removeItem('user_id');
-          localStorage.removeItem('userType');
-          localStorage.removeItem('username');
-          sessionStorage.clear();
-          // Redirect to login page
-          window.location.href = '../account/login.html';
-        });
-      }
-      
-      // Handle navigation
-      navLinks.forEach(link => {
-        link.addEventListener('click', function(e) {
-          e.preventDefault();
-          
-          // Remove active class from all links
-          navLinks.forEach(link => link.classList.remove('active'));
-          
-          // Add active class to clicked link
-          this.classList.add('active');
-          
-          // Get target section id
-          const targetId = this.getAttribute('data-section');
-          
-          // Hide all sections
-          sections.forEach(section => section.style.display = 'none');
-          
-          // Show target section
-          const targetSection = document.getElementById(targetId);
-          if (targetSection) {
-            targetSection.style.display = 'block';
+    <!-- JavaScript code for functionality -->
+    <script>
+        // Wait for DOM to be fully loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Toggle profile dropdown
+            setupProfileDropdown();
             
-            // If orders section is displayed, fetch orders
-            if (targetId === 'orders') {
-              fetchOrders();
-            }
-            // If products section is displayed, fetch products
-            else if (targetId === 'products') {
-              fetchProducts();
-            }
-          }
-        });
-      });
-      
-      // Set active section on page load
-      function setActiveSectionFromHash() {
-        const hash = window.location.hash || '#dashboard';
-        const targetLink = document.querySelector(`aside .sidebar a[href="${hash}"]`);
-        
-        if (targetLink) {
-          // Set active class
-          navLinks.forEach(link => link.classList.remove('active'));
-          targetLink.classList.add('active');
-          
-          // Show target section
-          const targetId = hash.substring(1);
-          sections.forEach(section => section.style.display = 'none');
-          
-          const targetSection = document.getElementById(targetId);
-          if (targetSection) {
-            targetSection.style.display = 'block';
+            // Setup event listeners
+            setupEventListeners();
             
-            // If orders section is displayed, fetch orders
-            if (targetId === 'orders') {
-              fetchOrders();
-            }
-            // If products section is displayed, fetch products
-            else if (targetId === 'products') {
-              fetchProducts();
-            }
-          }
-        }
-      }
-      
-      // Set active section on page load and when hash changes
-      setActiveSectionFromHash();
-      window.addEventListener('hashchange', setActiveSectionFromHash);
-      
-      // Init theme preference
-      const savedDarkMode = localStorage.getItem('darkMode') === 'true';
-      if (savedDarkMode) {
-        document.body.classList.add('dark-theme-variables');
+            // Load dashboard data
+            loadDashboardData();
+        });
         
-        if (themeToggler) {
-          themeToggler.querySelector('span:nth-child(1)').classList.remove('active');
-          themeToggler.querySelector('span:nth-child(2)').classList.add('active');
-        }
-      }
-      
-      // Function to fetch seller profile from database
-      function fetchSellerProfile() {
-        // Get data from session storage if available
-        const cachedData = sessionStorage.getItem('sellerData');
-        if (cachedData) {
-          try {
-            const sellerData = JSON.parse(cachedData);
-            updateNavProfileElements(sellerData);
-          } catch (e) {
-            console.error('Error parsing cached data:', e);
-          }
-        }
-        
-        // Then fetch fresh data from server
-        fetch('../../../backend/api/sellers/get_seller_profile.php')
-          .then(response => {
-            if (!response.ok) {
-              throw new Error('Server returned status: ' + response.status);
-            }
-            return response.json();
-          })
-          .then(data => {
-            console.log('Profile data received:', data);
-            if (data.status === 'success') {
-              // Update sessionStorage with fresh data
-              sessionStorage.setItem('sellerData', JSON.stringify(data.seller));
-              
-              // Update navigation profile elements
-              updateNavProfileElements(data.seller);
-            } else {
-              console.error('Error from server:', data);
-              
-              // If unauthorized, redirect to login
-              if (data.message && (data.message.includes('Unauthorized') || data.message.includes('login'))) {
-                window.location.href = '../account/login.html';
-              }
-            }
-          })
-          .catch(error => {
-            console.error('Error fetching profile:', error);
-          });
-      }
-      
-      // Function to update navigation profile elements
-      function updateNavProfileElements(sellerData) {
-        if (!sellerData) return;
-        
-        // Update seller name in nav
-        if (navSellerName) {
-          navSellerName.textContent = sellerData.username || 'Seller';
-        }
-        
-        // Update profile image if available - use shop_logo instead of profile_image
-        if (sellerData.shop_logo && navProfileImage) {
-          console.log('Setting shop logo in nav:', sellerData.shop_logo.substring(0, 30) + '...');
-          navProfileImage.src = sellerData.shop_logo;
-        }
-      }
-      
-      // Function to display alert messages
-      function showAlert(message, type) {
-        if (!alertMessage) return;
-        
-        alertMessage.textContent = message;
-        alertMessage.className = 'alert alert-' + type;
-        alertMessage.style.display = 'block';
-        
-        // Scroll to top to see the message
-        window.scrollTo(0, 0);
-        
-        // Hide the alert after 5 seconds
-        setTimeout(() => {
-          alertMessage.style.display = 'none';
-        }, 5000);
-      }
-
-      // Function to create and add a product card to the grid
-      function addProductToGrid(title, price) {
-        const productGrid = document.querySelector('.product-grid');
-        if (!productGrid) return;
-        
-        const productCard = document.createElement('div');
-        productCard.className = 'product-card';
-        
-        // Get the image source from the preview or use placeholder
-        const imgSrc = previewImage.src || '../../assets/images/placeholder.jpg';
-        
-        productCard.innerHTML = `
-          <div class="product-image">
-            <img src="${imgSrc}" alt="${title}" />
-          </div>
-          <div class="product-details">
-            <h3>${title}</h3>
-            <div class="price">₹${price}/day</div>
-            <div class="stock">Available for rent</div>
-            <div class="product-actions">
-              <button>Edit</button>
-              <button>View</button>
-            </div>
-          </div>
-        `;
-        
-        // Add the new product to the grid
-        productGrid.insertBefore(productCard, productGrid.firstChild);
-      }
-      
-      // Function to fetch products from server and update the product count
-      function fetchProducts() {
-        console.log('Fetching products...');
-        
-        // Initialize popup-related elements
-        initializeUploadElements();
-        
-        fetch('../../../backend/api/sellers/get_seller_clothes.php')
-          .then(response => {
-            if (!response.ok) {
-              throw new Error('Network response was not ok');
-            }
-            return response.json();
-          })
-          .then(data => {
-            console.log('Products data received:', data);
-            if (data.status === 'success') {
-              // Update product count
-              const productCountElement = document.querySelector('.stat-card:first-child .stat-value');
-              const changeElement = document.querySelector('.stat-card:first-child .stat-change');
-              
-              if (productCountElement) {
-                const count = data.clothes ? data.clothes.length : 0;
-                productCountElement.textContent = count;
-                
-                if (changeElement) {
-                  if (count === 0) {
-                    changeElement.textContent = 'Add your first product';
-                  } else if (count === 1) {
-                    changeElement.textContent = 'First product added!';
-                  } else {
-                    changeElement.textContent = `${count} products available`;
-                  }
-                }
-              }
-              
-              // Update the recent products grid
-              updateRecentProducts(data.clothes || []);
-            } else {
-              console.error('Error fetching products:', data.message);
-            }
-          })
-          .catch(error => {
-            console.error('Error fetching products:', error);
-          });
-      }
-      
-      // Function to update recent products grid
-      function updateRecentProducts(products) {
-        const productGrid = document.querySelector('.product-grid');
-        if (!productGrid) return;
-        
-        // Clear existing products
-        productGrid.innerHTML = '';
-        
-        // Check if we have products
-        if (products.length === 0) {
-          productGrid.innerHTML = `
-            <div class="empty-state" style="text-align: center; padding: 30px;">
-              <i class="fas fa-box-open" style="font-size: 48px; color: #ccc; margin-bottom: 15px;"></i>
-              <p>No products listed yet.</p>
-              <button id="addFirstProduct" class="btn btn-primary" style="margin-top: 15px; background-color: #4CAF50; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer;">Add Your First Product</button>
-            </div>
-          `;
-          
-          // Add event listener to the button
-          const addFirstProductBtn = document.getElementById('addFirstProduct');
-          if (addFirstProductBtn) {
-            addFirstProductBtn.addEventListener('click', function() {
-              document.getElementById('addClothBtn').click();
+        // Function to toggle profile dropdown
+        function setupProfileDropdown() {
+            const profileSection = document.getElementById('profileSection');
+            const profileDropdown = document.getElementById('profileDropdown');
+            
+            profileSection.addEventListener('click', function(e) {
+                e.stopPropagation();
+                profileDropdown.classList.toggle('active');
             });
-          }
-          
-          return;
-        }
-        
-        // Add recent products (limit to 4)
-        const recentProducts = products.slice(0, 4);
-        recentProducts.forEach((product, index) => {
-          const productCard = document.createElement('div');
-          productCard.className = 'product-card';
-          
-          // Generate a unique image URL for each product with its ID and index
-          // This ensures different cache params for each image
-          const uniqueParam = `id=${product.id}&index=${index}&t=${new Date().getTime()}`;
-          const imgSrc = `../../../backend/api/sellers/get_cloth_image.php?${uniqueParam}`;
-          
-          productCard.innerHTML = `
-            <div class="product-image">
-              <img src="${imgSrc}" alt="${product.cloth_title}" 
-                   onerror="this.onerror=null; this.src='../../assets/images/placeholder.jpg'; this.style.padding='20px';" />
-            </div>
-            <div class="product-details">
-              <h3>${product.cloth_title}</h3>
-              <div class="price">₹${product.rental_price}/day</div>
-              <div class="stock">Available for rent</div>
-              <div class="product-actions">
-                <button class="edit-product-btn" data-product-id="${product.id}">Edit</button>
-                <button class="view-product-btn" data-product-id="${product.id}">View</button>
-              </div>
-            </div>
-          `;
-          
-          productGrid.appendChild(productCard);
-        });
-        
-        // Add event listeners to buttons
-        document.querySelectorAll('.edit-product-btn').forEach(btn => {
-          btn.addEventListener('click', function() {
-            const productId = this.getAttribute('data-product-id');
-            // Redirect to product edit page
-            window.location.href = `product_listings.html?edit=${productId}`;
-          });
-        });
-        
-        document.querySelectorAll('.view-product-btn').forEach(btn => {
-          btn.addEventListener('click', function() {
-            const productId = this.getAttribute('data-product-id');
-            // Redirect to product details page
-            window.location.href = `product_listings.html?view=${productId}`;
-          });
-        });
-      }
-      
-      // Function to initialize upload popup elements
-      function initializeUploadElements() {
-        const addClothBtn = document.getElementById('addClothBtn');
-        const uploadPopup = document.getElementById('uploadPopup');
-        const closePopupBtn = document.getElementById('closePopup');
-        const cancelUploadBtn = document.getElementById('cancelUpload');
-        const uploadForm = document.getElementById('uploadClothForm');
-        const clothImage = document.getElementById('clothImage');
-        const previewImage = document.getElementById('previewImage');
-        
-        // Close popup function
-        window.closeUploadPopup = function() {
-          if (uploadPopup) {
-            uploadPopup.classList.remove('active');
             
-            // Reset form if it exists
-            if (uploadForm) {
-              uploadForm.reset();
-              
-              // Hide preview image
-              if (previewImage) {
-                previewImage.style.display = 'none';
-              }
-            }
-          }
-        };
-        
-        if (addClothBtn && uploadPopup) {
-          // Show upload popup when add button is clicked
-          addClothBtn.addEventListener('click', function() {
-            uploadPopup.classList.add('active');
-          });
-        }
-        
-        if (closePopupBtn) {
-          // Close popup when close button is clicked
-          closePopupBtn.addEventListener('click', function() {
-            closeUploadPopup();
-          });
-        }
-        
-        if (cancelUploadBtn) {
-          // Close popup when cancel button is clicked
-          cancelUploadBtn.addEventListener('click', function() {
-            closeUploadPopup();
-          });
-        }
-        
-        if (clothImage && previewImage) {
-          // Show image preview when file is selected
-          clothImage.addEventListener('change', function() {
-            const file = this.files[0];
-            if (file) {
-              const reader = new FileReader();
-              reader.onload = function(e) {
-                previewImage.src = e.target.result;
-                previewImage.style.display = 'block';
-              };
-              reader.readAsDataURL(file);
-            }
-          });
-        }
-        
-        // Handle form submission
-        if (uploadForm) {
-          uploadForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Get form values
-            const clothTitle = document.getElementById('clothTitle').value;
-            const description = document.getElementById('description').value;
-            const size = document.getElementById('size').value;
-            const categoryEl = document.querySelector('input[name="category"]:checked');
-            const category = categoryEl ? categoryEl.value : null;
-            const rentalPrice = document.getElementById('rentalPrice').value;
-            const contactNo = document.getElementById('contactNo').value;
-            const whatsappNo = document.getElementById('whatsappNo').value;
-            const terms = document.getElementById('terms').value;
-            const clothImageInput = document.getElementById('clothImage');
-            const clothImage = clothImageInput.files.length > 0 ? clothImageInput.files[0] : null;
-            
-            // Validate form fields
-            if (!clothTitle || !description || !size || !category || !rentalPrice || 
-                !contactNo || !whatsappNo || !terms || !clothImage) {
-              alert('Please fill all fields and upload an image');
-              return;
-            }
-            
-            // Create FormData object to send data
-            const formData = new FormData();
-            formData.append('clothTitle', clothTitle);
-            formData.append('description', description);
-            formData.append('size', size);
-            formData.append('category', category);
-            formData.append('rentalPrice', rentalPrice);
-            formData.append('contactNo', contactNo);
-            formData.append('whatsappNo', whatsappNo);
-            formData.append('terms', terms);
-            formData.append('clothImage', clothImage);
-            
-            // Show loading message
-            const submitBtn = uploadForm.querySelector('button[type="submit"]');
-            const originalBtnText = submitBtn.textContent;
-            submitBtn.textContent = 'Uploading...';
-            submitBtn.disabled = true;
-            
-            // Send data to server
-            fetch('../../../backend/api/sellers/upload_cloth.php', {
-              method: 'POST',
-              body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-              // Reset button
-              submitBtn.textContent = originalBtnText;
-              submitBtn.disabled = false;
-              
-              if (data.status === 'success') {
-                // Close the popup
-                closeUploadPopup();
-                
-                // Reload all products to get updated counts
-                fetchProducts();
-                
-                // Show success message
-                alert('Cloth uploaded successfully!');
-              } else {
-                alert('Error: ' + (data.message || 'Unknown error'));
-              }
-            })
-            .catch(error => {
-              console.error('Error uploading cloth:', error);
-              submitBtn.textContent = originalBtnText;
-              submitBtn.disabled = false;
-              alert('Failed to upload cloth. Please try again.');
+            // Close dropdown when clicking elsewhere
+            document.addEventListener('click', function() {
+                profileDropdown.classList.remove('active');
             });
-          });
+            
+            profileDropdown.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
         }
-      }
-    });
-  </script>
+        
+        // Function to setup all event listeners
+        function setupEventListeners() {
+            // Add Product button
+            const addProductBtn = document.getElementById('addProductBtn');
+            addProductBtn.addEventListener('click', function() {
+                window.location.href = 'cloth_upload.html';
+            });
+            
+            // Logout button in dropdown
+            const logoutBtn = document.getElementById('logoutBtn');
+            logoutBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                logout();
+            });
+            
+            // Statistics button
+            const statisticsBtn = document.getElementById('statisticsBtn');
+            statisticsBtn.addEventListener('click', function() {
+                window.location.href = 'seller_statistics.html';
+            });
+            
+            // Help button
+            const helpBtn = document.getElementById('helpBtn');
+            helpBtn.addEventListener('click', function() {
+                window.location.href = '../about.html';
+            });
+        }
+        
+        // Function to handle logout
+        function logout() {
+            // Call logout API
+            fetch('../../../backend/api/users/logout.php')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        window.location.href = '../../index.html';
+                    } else {
+                        showAlert('Error logging out. Please try again.', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showAlert('Error logging out. Please try again.', 'error');
+                });
+        }
+        
+        // Function to load dashboard data
+        function loadDashboardData() {
+            // Show loading spinner
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            loadingSpinner.style.display = 'flex';
+            
+            // Fetch dashboard data from backend API
+            fetch('../../../backend/api/sellers/dashboard_stats.php')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Hide loading spinner
+                    loadingSpinner.style.display = 'none';
+                    
+                    if (data.status === 'success') {
+                        // Update dashboard stats
+                        updateDashboardStats(data.stats);
+                    } else {
+                        showAlert(data.message || 'Error loading dashboard data', 'error');
+                        // For development, show sample data
+                        updateDashboardStats(getSampleStats());
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching dashboard data:', error);
+                    loadingSpinner.style.display = 'none';
+                    showAlert('Error loading dashboard data', 'error');
+                    
+                    // For development, show sample data
+                    updateDashboardStats(getSampleStats());
+                });
+        }
+        
+        // Function to update dashboard stats
+        function updateDashboardStats(stats) {
+            document.getElementById('totalProducts').textContent = stats.total_products || 0;
+            document.getElementById('averageRating').textContent = stats.average_rating || '0.0';
+        }
+        
+        // Function to get sample stats data (for development purposes)
+        function getSampleStats() {
+            return {
+                total_products: 12,
+                average_rating: '4.7'
+            };
+        }
+        
+        // Function to show alerts
+        function showAlert(message, type) {
+            const alertContainer = document.getElementById('alertContainer');
+            
+            // Create alert element
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            alert.style.display = 'block';
+            
+            // Add to container
+            alertContainer.innerHTML = '';
+            alertContainer.appendChild(alert);
+            
+            // Auto-hide after 3 seconds
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 3000);
+        }
+    </script>
 </body>
 </html>

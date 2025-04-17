@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile | ClothLoop</title>
+    <!-- Font Awesome for Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
+
+    <style>
+        /* Root variables */
+        :root {
+            --background: #FFFFFF;
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --button-primary: #333333;
+            --button-text: #FFFFFF;
+            --button-hover: #555555;
+            --button-secondary: transparent;
+            --button-secondary-text: #333333;
+            --header-bg: #FFFFFF;
+            --border-color: #EEEEEE;
+            --hover-bg: #F5F5F5;
+            --input-bg: #F9F9F9;
+            --error-color: #FF3B30;
+            --success-color: #34C759;
+        }
+
+        /* Apply colors to elements */
+        body {
+            background-color: var(--background);
+            color: var(--text-primary);
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            letter-spacing: 0.02em;
+        }
+
+        /* Header styles */
+        .header {
+            background-color: var(--header-bg);
+            padding: 0;
+            box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            height: 80px;
+            display: flex;
+            align-items: center;
+        }
+
+        .header-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 30px;
+            position: relative;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            z-index: 2;
+        }
+
+        .header-center {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            z-index: 2;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            margin-right: 30px;
+        }
+
+        .logo-name {
+            font-size: 24px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* Navigation styles */
+        .nav-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-items {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
+
+        .nav-items li {
+            height: 80px;
+            display: flex;
+            align-items: center;
+            margin: 0 15px;
+        }
+
+        .nav-items li a {
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 500;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+
+        .nav-items li a:hover {
+            color: var(--button-hover);
+        }
+
+        .nav-items li a.active {
+            font-weight: 700;
+        }
+
+        .nav-items li a.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background-color: var(--text-primary);
+        }
+
+        /* User actions */
+        .actions {
+            display: flex;
+            align-items: center;
+        }
+
+        .action-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 0 15px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .action-item i {
+            font-size: 20px;
+            margin-bottom: 4px;
+            color: var(--text-primary);
+        }
+
+        .action-item span {
+            font-size: 12px;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Profile dropdown menu styles */
+        .profile-dropdown {
+            position: absolute;
+            top: 100%;
+            right: -20px;
+            width: 200px;
+            background-color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 10px 0;
+            z-index: 200;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+            margin-top: 5px;
+        }
+        
+        .profile-dropdown.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .profile-dropdown a {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+            transition: background-color 0.2s ease;
+        }
+        
+        .profile-dropdown a:hover {
+            background-color: var(--hover-bg);
+        }
+        
+        .profile-dropdown a i {
+            margin-right: 10px;
+            font-size: 16px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .profile-divider {
+            height: 1px;
+            background-color: var(--border-color);
+            margin: 5px 0;
+        }
+
+        /* Profile Content */
+        .profile-container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 0 20px;
+        }
+
+        .profile-header {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .profile-title {
+            font-size: 24px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .profile-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        .form-container {
+            background-color: #FFFFFF;
+            border: 1px solid var(--border-color);
+            padding: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-input {
+            width: 100%;
+            height: 50px;
+            border: 1px solid var(--border-color);
+            background-color: var(--input-bg);
+            padding: 0 15px;
+            font-size: 16px;
+            color: var(--text-primary);
+            transition: border-color 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--text-primary);
+        }
+
+        .form-input:disabled {
+            background-color: #f0f0f0;
+            cursor: not-allowed;
+        }
+
+        .btn {
+            height: 50px;
+            padding: 0 30px;
+            border: none;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background-color: var(--button-primary);
+            color: var(--button-text);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--button-hover);
+        }
+
+        .btn-secondary {
+            background-color: var(--button-secondary);
+            color: var(--button-secondary-text);
+            border: 1px solid var(--text-primary);
+            margin-right: 15px;
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--text-primary);
+            color: white;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-top: 30px;
+        }
+
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            font-size: 14px;
+            display: none;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto 20px;
+            text-align: center;
+        }
+
+        .alert-success {
+            background-color: var(--success-color);
+            color: white;
+            border: 1px solid #2a9f47;
+        }
+
+        .alert-error {
+            background-color: var(--error-color);
+            color: white;
+            border: 1px solid #d62d22;
+        }
+
+        .password-toggle {
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        .password-toggle input {
+            margin-right: 8px;
+        }
+
+        .password-section {
+            margin-top: 20px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 20px;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .form-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .btn-secondary {
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+        }
+
+        .loading-spinner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+            font-size: 16px;
+            color: var(--text-secondary);
+        }
+        
+        .loading-spinner i {
+            margin-right: 10px;
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Section -->
+    <header class="header">
+        <div class="header-container">
+            <div class="header-left">
+                <div class="logo">
+                    <span class="logo-name">CLOTHLOOP</span>
+                </div>
+                
+                <nav class="nav-container">
+                    <ul class="nav-items">
+                        <li><a href="buyer_dashboard.html" id="menCategory">MEN</a></li>
+                        <li><a href="buyer_dashboard.html" id="womenCategory">WOMEN</a></li>
+                        <li><a href="buyer_dashboard.html" id="kidsCategory">KIDS</a></li>
+                    </ul>
+                </nav>
+            </div>
+            
+            <div class="header-right">
+                <div class="actions">
+                    <div class="action-item" id="profileSection">
+                        <i class="fas fa-user"></i>
+                        <span>PROFILE</span>
+                        
+                        <!-- Profile dropdown menu -->
+                        <div class="profile-dropdown" id="profileDropdown">
+                            <a href="#" id="userProfile" class="active"><i class="fas fa-user-circle"></i> My Profile</a>
+                            <div class="profile-divider"></div>
+                            <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                        </div>
+                    </div>
+                    
+                    <div class="action-item" id="wishlistBtn">
+                        <i class="far fa-heart"></i>
+                        <span>WISHLIST</span>
+                    </div>
+                    
+                    <div class="action-item" id="aboutBtn">
+                        <i class="fas fa-info-circle"></i>
+                        <span>ABOUT</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Profile Content -->
+    <main class="profile-container">
+        <div class="profile-header">
+            <h1 class="profile-title">My Profile</h1>
+            <p class="profile-subtitle">Update your personal information</p>
+        </div>
+
+        <div class="alert alert-success" id="successAlert"></div>
+        <div class="alert alert-error" id="errorAlert"></div>
+
+        <div id="loginPrompt" style="display: none; text-align: center; margin: 30px auto;">
+            <p style="margin-bottom: 20px;">You need to be logged in to view your profile.</p>
+            
+            <div style="max-width: 400px; margin: 0 auto; padding: 20px; border: 1px solid var(--border-color); background-color: #f9f9f9;">
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="loginEmail" class="form-label">Email</label>
+                        <input type="email" id="loginEmail" name="loginEmail" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword" class="form-label">Password</label>
+                        <input type="password" id="loginPassword" name="loginPassword" class="form-input" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
+                </form>
+                <div style="margin-top: 15px; text-align: center;">
+                    <a href="../../../index.html" style="color: var(--text-primary); text-decoration: none;">Return to Home</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-container">
+            <div id="profileLoading" class="loading-spinner" style="display: none;">
+                <i class="fas fa-spinner fa-spin"></i> Loading profile information...
+            </div>
+            <form id="profileForm" style="display: none;">
+                <div class="form-group">
+                    <label for="name" class="form-label">Full Name</label>
+                    <input type="text" id="name" name="name" class="form-input" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" id="email" name="email" class="form-input" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone_no" class="form-label">Phone Number</label>
+                    <input type="tel" id="phone_no" name="phone_no" class="form-input" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="created_at" class="form-label">Account Created</label>
+                    <input type="text" id="created_at" name="created_at" class="form-input" disabled>
+                </div>
+
+                <div class="password-toggle">
+                    <input type="checkbox" id="changePassword">
+                    <label for="changePassword">Change Password</label>
+                </div>
+
+                <div id="passwordSection" class="password-section">
+                    <div class="form-group">
+                        <label for="password" class="form-label">New Password</label>
+                        <input type="password" id="password" name="password" class="form-input">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirm_password" class="form-label">Confirm New Password</label>
+                        <input type="password" id="confirm_password" name="confirm_password" class="form-input">
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is logged in
+            checkSession();
+            
+            // Profile dropdown toggle
+            const profileSection = document.getElementById('profileSection');
+            const profileDropdown = document.getElementById('profileDropdown');
+            
+            profileSection.addEventListener('click', function(e) {
+                e.stopPropagation();
+                profileDropdown.classList.toggle('active');
+            });
+            
+            document.addEventListener('click', function() {
+                profileDropdown.classList.remove('active');
+            });
+            
+            // Password change toggle
+            const changePasswordCheckbox = document.getElementById('changePassword');
+            const passwordSection = document.getElementById('passwordSection');
+            
+            changePasswordCheckbox.addEventListener('change', function() {
+                passwordSection.style.display = this.checked ? 'block' : 'none';
+            });
+            
+            // Cancel button
+            const cancelBtn = document.getElementById('cancelBtn');
+            
+            cancelBtn.addEventListener('click', function() {
+                window.location.href = 'buyer_dashboard.html';
+            });
+            
+            // Logout button
+            const logoutBtn = document.getElementById('logoutBtn');
+            
+            logoutBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                fetch('../../../backend/api/users/logout.php')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            window.location.href = '../../index.html';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            });
+
+            // Wishlist button
+            const wishlistBtn = document.getElementById('wishlistBtn');
+            
+            wishlistBtn.addEventListener('click', function() {
+                window.location.href = 'wish.html';
+            });
+            
+            // About button
+            const aboutBtn = document.getElementById('aboutBtn');
+            
+            aboutBtn.addEventListener('click', function() {
+                // Redirect to about page
+            });
+            
+            // Form submission
+            const profileForm = document.getElementById('profileForm');
+            
+            profileForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const name = document.getElementById('name').value;
+                const email = document.getElementById('email').value;
+                const phone_no = document.getElementById('phone_no').value;
+                
+                const formData = {
+                    name: name,
+                    email: email,
+                    phone_no: phone_no
+                };
+                
+                // If change password is checked, add password to form data
+                if (changePasswordCheckbox.checked) {
+                    const password = document.getElementById('password').value;
+                    const confirmPassword = document.getElementById('confirm_password').value;
+                    
+                    if (!password) {
+                        showError('Password cannot be empty');
+                        return;
+                    }
+                    
+                    if (password !== confirmPassword) {
+                        showError('Passwords do not match');
+                        return;
+                    }
+                    
+                    formData.password = password;
+                }
+                
+                updateUserProfile(formData);
+            });
+            
+            function checkSession() {
+                // Show loading state
+                document.getElementById('errorAlert').style.display = 'none';
+                document.getElementById('profileLoading').style.display = 'flex';
+                document.getElementById('profileForm').style.display = 'none';
+                document.getElementById('loginPrompt').style.display = 'none';
+                
+                fetch('../../../backend/api/users/check_session.php', { 
+                    credentials: 'include'  // This is important to include cookies
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok: ' + response.statusText);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Session check response:', data); // Debug log
+                    
+                    if (data.logged_in && data.user_type === 'buyer') {
+                        // Proceed to fetch profile data if logged in
+                        fetchUserProfile();
+                    } else {
+                        // Hide loading spinner and show login prompt
+                        document.getElementById('profileLoading').style.display = 'none';
+                        document.getElementById('loginPrompt').style.display = 'block';
+                        showError('You need to log in to access your profile');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error checking session:', error);
+                    // Hide loading spinner and show login prompt
+                    document.getElementById('profileLoading').style.display = 'none';
+                    document.getElementById('loginPrompt').style.display = 'block';
+                    showError('Failed to verify login status: ' + error.message);
+                });
+            }
+            
+            function fetchUserProfile() {
+                // Show loading state and hide error message
+                document.getElementById('errorAlert').style.display = 'none';
+                document.getElementById('profileLoading').style.display = 'flex';
+                document.getElementById('profileForm').style.display = 'none';
+                
+                fetch('../../../backend/api/buyers/get_buyer_profile.php', {
+                    credentials: 'include'  // This is important to include cookies
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Hide loading state
+                    document.getElementById('profileLoading').style.display = 'none';
+                    document.getElementById('profileForm').style.display = 'block';
+                    
+                    if (data.status === 'success') {
+                        const buyer = data.buyer;
+                        
+                        document.getElementById('name').value = buyer.name;
+                        document.getElementById('email').value = buyer.email;
+                        document.getElementById('phone_no').value = buyer.phone_no;
+                        
+                        // Format date for display
+                        const createdDate = new Date(buyer.created_at);
+                        document.getElementById('created_at').value = createdDate.toLocaleDateString();
+                    } else {
+                        showError(data.message || 'Failed to load profile data');
+                    }
+                })
+                .catch(error => {
+                    // Hide loading state
+                    document.getElementById('profileLoading').style.display = 'none';
+                    document.getElementById('profileForm').style.display = 'block';
+                    
+                    console.error('Error:', error);
+                    showError('An error occurred while loading profile data');
+                });
+            }
+            
+            function updateUserProfile(formData) {
+                // Show loading state
+                const submitButton = document.querySelector('button[type="submit"]');
+                const originalButtonText = submitButton.textContent;
+                submitButton.disabled = true;
+                submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+                
+                document.getElementById('errorAlert').style.display = 'none';
+                document.getElementById('successAlert').style.display = 'none';
+                
+                fetch('../../../backend/api/buyers/update_buyer_profile.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include', // Add credentials to include cookies
+                    body: JSON.stringify(formData)
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Reset button state
+                        submitButton.disabled = false;
+                        submitButton.textContent = originalButtonText;
+                        
+                        if (data.status === 'success') {
+                            showSuccess(data.message);
+                            
+                            // Reset password fields if present
+                            if (changePasswordCheckbox.checked) {
+                                document.getElementById('password').value = '';
+                                document.getElementById('confirm_password').value = '';
+                                changePasswordCheckbox.checked = false;
+                                passwordSection.style.display = 'none';
+                            }
+                            
+                            // No need to refresh profile data immediately since we just updated it
+                        } else {
+                            showError(data.message || 'Failed to update profile');
+                        }
+                    })
+                    .catch(error => {
+                        // Reset button state
+                        submitButton.disabled = false;
+                        submitButton.textContent = originalButtonText;
+                        
+                        console.error('Error:', error);
+                        showError('An error occurred while updating profile');
+                    });
+            }
+            
+            function showSuccess(message) {
+                const successAlert = document.getElementById('successAlert');
+                successAlert.textContent = message;
+                successAlert.style.display = 'block';
+                
+                // Scroll to the message
+                successAlert.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                // Hide after 3 seconds
+                setTimeout(function() {
+                    successAlert.style.display = 'none';
+                }, 3000);
+            }
+            
+            function showError(message) {
+                const errorAlert = document.getElementById('errorAlert');
+                errorAlert.textContent = message;
+                errorAlert.style.display = 'block';
+                
+                // Scroll to the error
+                errorAlert.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                // Hide after 5 seconds
+                setTimeout(function() {
+                    errorAlert.style.display = 'none';
+                }, 5000);
+            }
+
+            // Add login form handler
+            const loginForm = document.getElementById('loginForm');
+            
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const loginEmail = document.getElementById('loginEmail').value;
+                const loginPassword = document.getElementById('loginPassword').value;
+                
+                if (!loginEmail || !loginPassword) {
+                    showError('Please provide both email and password');
+                    return;
+                }
+                
+                // Show loading state
+                const loginButton = loginForm.querySelector('button[type="submit"]');
+                const originalButtonText = loginButton.textContent;
+                loginButton.disabled = true;
+                loginButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
+                
+                // Clear previous errors
+                document.getElementById('errorAlert').style.display = 'none';
+                
+                // Attempt to log in
+                const loginData = {
+                    email: loginEmail,
+                    password: loginPassword
+                };
+                
+                fetch('../../../backend/api/users/login.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include', // Add credentials to include cookies
+                    body: JSON.stringify(loginData)
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Reset button state
+                        loginButton.disabled = false;
+                        loginButton.textContent = originalButtonText;
+                        
+                        if (data.success) {
+                            // Login successful
+                            showSuccess('Login successful! Loading your profile...');
+                            
+                            // Wait a moment for the success message to be visible
+                            setTimeout(function() {
+                                // Check session again to fetch profile
+                                checkSession();
+                            }, 1000);
+                        } else {
+                            // Login failed
+                            showError(data.message || 'Login failed. Please check your credentials.');
+                        }
+                    })
+                    .catch(error => {
+                        // Reset button state
+                        loginButton.disabled = false;
+                        loginButton.textContent = originalButtonText;
+                        
+                        console.error('Error during login:', error);
+                        showError('An error occurred during login. Please try again.');
+                    });
+            });
+        });
+    </script>
+</body>
+</html> 

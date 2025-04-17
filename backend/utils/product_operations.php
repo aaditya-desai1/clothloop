@@ -105,15 +105,19 @@ function fetchProducts() {
             
             // Get seller's shop name
             $shop_name = 'ClothLoop Seller'; // Default name
-            $shop_query = "SELECT shop_name FROM sellers WHERE id = ? LIMIT 1";
+            $shop_query = "SELECT shop_name, shop_address FROM sellers WHERE id = ? LIMIT 1";
             $shop_stmt = $conn->prepare($shop_query);
             $shop_stmt->bind_param("i", $row['seller_id']);
             $shop_stmt->execute();
             $shop_result = $shop_stmt->get_result();
             
+            $shop_address = '';
             if ($shop_row = $shop_result->fetch_assoc()) {
                 if (!empty($shop_row['shop_name'])) {
                     $shop_name = $shop_row['shop_name'];
+                }
+                if (!empty($shop_row['shop_address'])) {
+                    $shop_address = $shop_row['shop_address'];
                 }
             }
             $shop_stmt->close();
@@ -132,6 +136,7 @@ function fetchProducts() {
                 'created_at' => $row['created_at'],
                 'image' => $image_data,
                 'shop_name' => $shop_name,
+                'shop_address' => $shop_address,
                 'seller_id' => $row['seller_id'] // Include seller ID for debugging
             ];
             
@@ -300,6 +305,7 @@ function fetchAllProducts() {
                     'created_at' => $row['created_at'] ?? date('Y-m-d H:i:s'),
                     'seller_id' => $row['seller_id'] ?? 0,
                     'shop_name' => $shop_name,
+                    'shop_address' => $row['shop_address'] ?? '',  // Include shop_address from the JOIN
                     'shop_location' => $shop_location ?? '',
                     'image' => $image_data,
                     'cloth_photo' => !empty($row['cloth_photo']) ? true : false,

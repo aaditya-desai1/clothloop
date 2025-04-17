@@ -1,996 +1,1333 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-  <title>Shop Profile</title>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seller Profile | ClothLoop</title>
+    <!-- Font Awesome for Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
+    <!-- Animation Library -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
   <style>
-    /* Global Variables */
+        /* Root variables */
     :root {
-      --primary-color: #666768;
-      --secondary-color: #f7f7f7;
-      --text-primary: #212121;
-      --text-secondary: #383737;
-      --white: #fff;
-      --hover-color: #444;
-      --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
-      --shadow-md: 0 5px 15px rgba(0, 0, 0, 0.1);
-      --transition: all 0.3s ease;
-      --border-radius: 10px;
-      --accent-color: #4CAF50;
-      --danger-color: #e74c3c;
-    }
-    
-    /* Global Styles */
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-    
-    body {
-      font-family: sans-serif;
-      background-color: var(--white);
-      color: var(--text-primary);
-      margin: 0;
-      padding: 0;
-      min-height: 100vh;
-    }
-    
-    .container {
-      display: flex;
-      width: 100%;
-      min-height: 100vh;
-      background-color: var(--white);
-    }
-    
-    .main-content {
-      flex: 1;
-      padding: 40px;
-      margin-left: auto;
-      margin-right: auto;
-      max-width: 800px;
-      margin-top: 70px;
-    }
+            --background: #FFFFFF;
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --button-primary: #333333;
+            --button-text: #FFFFFF;
+            --button-hover: #555555;
+            --button-secondary: transparent;
+            --button-secondary-text: #333333;
+            --header-bg: #FFFFFF;
+            --border-color: #EEEEEE;
+            --hover-bg: #F5F5F5;
+            --input-bg: #F9F9F9;
+            --error-color: #FF3B30;
+            --success-color: #34C759;
+            --accent-color: #333333;
+            --seller-highlight: #333333;
+        }
 
-    .form-group {
-      margin-bottom: 30px;
-      width: 100%;
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
-      background-color: var(--secondary-color);
-      padding: 20px;
-      border-radius: var(--border-radius);
-      transition: var(--transition);
-    }
-    
-    .form-group:hover {
-      box-shadow: var(--shadow-md);
-    }
+        /* Apply colors to elements */
+        body {
+            background-color: var(--background);
+            color: var(--text-primary);
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            letter-spacing: 0.02em;
+            overflow-x: hidden;
+        }
 
-    .form-group label {
-      display: block;
-      font-weight: bold;
-      margin-bottom: 10px;
-      text-align: left;
-      font-size: 16px;
-      color: var(--text-primary);
-    }
+        /* Header styles */
+        .header {
+            background-color: var(--header-bg);
+            padding: 0;
+            box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            height: 80px;
+            display: flex;
+            align-items: center;
+        }
 
-    .main-content h1 {
-      text-align: center;
-      margin-bottom: 40px;
-      font-size: 28px;
-      color: var(--text-primary);
-    }
+        .header-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 30px;
+            position: relative;
+        }
 
-    .button-group {
-      display: flex;
-      gap: 15px;
-      justify-content: center;
-      margin-top: 40px;
-      width: 100%;
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    
-    .form-group input[type="text"],
-    .form-group input[type="email"],
-    .form-group input[type="tel"],
-    .form-group input[type="password"],
-    .form-group input[type="file"],
-    .form-group textarea {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      box-sizing: border-box;
-      transition: all 0.3s ease;
-    }
-    
-    .form-group input:focus,
-    .form-group textarea:focus {
-      border-color: var(--primary-color);
-      box-shadow: 0 0 5px rgba(102, 103, 104, 0.5);
-      outline: none;
-    }
-    
-    .form-group textarea {
-      height: 100px;
-    }
-    
-    .save-btn, .back-btn {
-      padding: 12px 24px;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: var(--transition);
-      border: none;
-      font-size: 16px;
-      font-weight: bold;
-    }
-    
-    .save-btn {
-      background-color: var(--accent-color);
-      color: white;
-    }
-    
-    .save-btn:hover {
-      background-color: #3e8e41;
-      transform: translateY(-3px);
-    }
-    
-    .back-btn {
-      background-color: var(--secondary-color);
-      color: var(--text-primary);
-    }
-    
-    .back-btn:hover {
-      background-color: #eee;
-      transform: translateY(-3px);
-    }
-    
-    /* Header */
-    .main-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 20px;
-      background-color: var(--secondary-color);
-      position: fixed;
-      width: 100%;
-      height: 70px;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 1000;
-      box-shadow: var(--shadow-sm);
-    }
-    
-    .header-left {
-      display: flex;
-      align-items: center;
-    }
-    
-    .header-left .logo {
-      display: flex;
-      align-items: center;
-      margin-right: 20px;
-      height: 40px;
-      line-height: 1;
-    }
-    
-    .header-left .logo img {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      margin-right: 10px;
-      vertical-align: middle;
-      display: inline-block;
-    }
-    
-    .brand-name {
-      display: flex;
-      flex-direction: column;
-      line-height: 1.2;
-    }
-    
-    .brand-name h1 {
-      font-size: 18px;
-      font-weight: bold;
-      margin-bottom: 0;
-      color: var(--text-primary);
-      line-height: 1.2;
-    }
-    
-    .brand-name p {
-      font-size: 12px;
-      color: var(--text-secondary);
-      margin-top: 3px;
-      line-height: 1.2;
-    }
-    
-    .header-right {
-      display: flex;
-      align-items: center;
-      margin-right: 20px;
-    }
-    
-    .account-info {
-      display: flex;
-      align-items: center;
-    }
-    
-    .user-profile {
-      display: flex;
-      align-items: center;
-      cursor: pointer;
-      gap: 10px;
+        .header-left {
+            display: flex;
+            align-items: center;
+            z-index: 2;
+        }
+
+        .header-center {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            z-index: 2;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            margin-right: 30px;
+            position: relative;
+        }
+
+        .logo-name {
+            font-size: 24px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        /* Seller badge */
+        .seller-badge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background-color: var(--seller-highlight);
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+            padding: 3px 8px;
+            border-radius: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* Navigation styles */
+        .nav-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-items {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
+
+        .nav-items li {
+            height: 80px;
+            display: flex;
+            align-items: center;
+            margin: 0 15px;
+            position: relative;
+        }
+
+        .nav-items li a {
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 500;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        .nav-items li a:hover {
+            color: var(--seller-highlight);
+        }
+        
+        .nav-items li a:hover::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background-color: var(--seller-highlight);
+            transform: scaleX(0);
+            animation: expandLine 0.3s forwards;
+        }
+        
+        @keyframes expandLine {
+            to {
+                transform: scaleX(1);
+            }
+        }
+
+        .nav-items li a.active {
+            font-weight: 700;
+            color: var(--seller-highlight);
+        }
+
+        .nav-items li a.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background-color: var(--seller-highlight);
+        }
+        
+        /* User actions */
+        .actions {
+            display: flex;
+            align-items: center;
+        }
+        
+        .action-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 0 15px;
+            cursor: pointer;
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+        
+        .action-item:hover {
+            transform: translateY(-3px);
+        }
+
+        .action-item i {
+            font-size: 20px;
+            margin-bottom: 4px;
+            color: var(--text-primary);
+        }
+
+        .action-item span {
+            font-size: 12px;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Profile dropdown menu styles */
+        .profile-dropdown {
+            position: absolute;
+            top: 100%;
+            right: -20px;
+            width: 200px;
+            background-color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 10px 0;
+            z-index: 200;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+            margin-top: 5px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .profile-dropdown.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+            animation: dropdownFadeIn 0.3s ease;
+        }
+        
+        @keyframes dropdownFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .profile-dropdown a {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+            transition: all 0.2s ease;
+        }
+        
+        .profile-dropdown a:hover {
+            background-color: var(--hover-bg);
+            transform: translateX(5px);
+        }
+        
+        .profile-dropdown a i {
+            margin-right: 10px;
+            font-size: 16px;
+            width: 20px;
+            text-align: center;
+            color: var(--seller-highlight);
+        }
+        
+        .profile-divider {
+            height: 1px;
+            background-color: var(--border-color);
+            margin: 5px 0;
+        }
+
+        /* Profile Content */
+        .profile-container {
+            max-width: 900px;
+            width: 95%;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        .profile-header {
+            margin-bottom: 30px;
+            text-align: center;
+            animation: fadeInDown 0.6s ease both;
+        }
+
+        .profile-title {
+            font-size: 24px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--seller-highlight);
+        }
+
+        .profile-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        .form-container {
+            background-color: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding: 30px;
+            margin-top: 20px;
+            width: 100%;
+            box-sizing: border-box;
+            transition: box-shadow 0.3s ease, transform 0.3s ease;
+        }
+        
+        .form-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .form-input {
+            width: 100%;
+            height: 45px;
+            padding: 10px 15px;
+            font-size: 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background-color: var(--input-bg);
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--seller-highlight);
+            box-shadow: 0 0 0 1px rgba(51, 51, 51, 0.1);
+        }
+
+        .form-input:disabled {
+            background-color: #f0f0f0;
+            cursor: not-allowed;
+        }
+        
+        textarea.form-input {
+            min-height: 100px;
+            padding: 15px;
+            resize: vertical;
+            overflow: auto;
+            font-family: 'Roboto', sans-serif;
+            line-height: 1.5;
+            box-sizing: border-box;
+        }
+        
+        .file-input {
+            padding: 10px;
+            height: auto;
+            background-color: transparent;
+            border: 1px dashed var(--border-color);
+        }
+        
+        .logo-preview-container {
+            margin-bottom: 10px;
       position: relative;
-      background-color: var(--white);
-      border-radius: 10px;
-      padding: 5px 10px;
-      box-shadow: var(--shadow-sm);
-      transition: var(--transition);
-    }
-    
-    .user-profile:hover {
-      box-shadow: var(--shadow-md);
-    }
-    
-    .user-profile img {
-      width: 35px;
-      height: 35px;
-      border-radius: 50%;
-      object-fit: cover;
-    }
-    
-    .user-details {
-      margin-right: 10px;
-    }
-    
-    .user-details h4 {
-      font-size: 14px;
-      font-weight: bold;
-      margin: 0;
-    }
-    
-    .user-details p {
-      font-size: 12px;
-      color: var(--text-secondary);
-      margin: 0;
-    }
-    
-    .user-profile i {
-      font-size: 14px;
-      color: var(--text-primary);
-      margin-left: 5px;
-    }
-    
-    .dropdown-menu {
-      position: absolute;
-      top: 100%;
-      right: 0;
-      background-color: white;
-      border-radius: 10px;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-      padding: 10px 0;
-      min-width: 200px;
-      z-index: 1000;
-      display: none;
-    }
-    
-    .dropdown-menu a {
-      display: block;
-      padding: 10px 20px;
-      text-decoration: none;
-      color: var(--text-primary);
-      transition: all 0.3s ease;
-    }
-    
-    .dropdown-menu a i {
-      margin-right: 10px;
-    }
-    
-    .dropdown-menu a:hover {
-      background-color: #f5f5f5;
-    }
-    
-    .user-profile.active .dropdown-menu {
-      display: block;
-    }
-
-    /* Sidebar */
-    .sidebar {
-      width: 280px;
-      background-color: var(--white);
-      height: 100vh;
-      position: fixed;
-      left: 0;
-      top: 70px;
-      box-shadow: var(--shadow-sm);
-      padding-top: 20px;
-      z-index: 900;
-    }
-    
-    .sidebar-nav {
-      list-style-type: none;
-      padding: 0;
-      margin: 0;
-    }
-    
-    .sidebar-nav li {
-      margin-bottom: 5px;
-    }
-    
-    .sidebar-nav a {
-      display: flex;
-      align-items: center;
-      padding: 15px 20px;
-      text-decoration: none;
-      color: var(--text-primary);
-      transition: var(--transition);
-      border-radius: 10px;
-      margin: 0 10px;
-    }
-    
-    .sidebar-nav a i {
-      margin-right: 15px;
-      font-size: 18px;
-    }
-    
-    .sidebar-nav a.active,
-    .sidebar-nav a:hover {
-      background-color: var(--primary-color);
-      color: var(--white);
-    }
-
-    .profile-image-preview {
-      width: 150px;
-      height: 150px;
-      border-radius: 50%;
-      object-fit: cover;
-      margin: 0 auto 20px;
-      display: block;
-      border: 5px solid var(--white);
-      box-shadow: var(--shadow-sm);
-    }
-
-    .upload-btn-wrapper {
-      position: relative;
-      overflow: hidden;
       display: inline-block;
-      margin-top: 10px;
-    }
+        }
+        
+        .logo-preview {
+            border-radius: 4px;
+            border: 2px solid var(--border-color);
+            transition: transform 0.3s ease;
+        }
+        
+        .logo-preview:hover {
+            transform: scale(1.05);
+        }
 
-    .upload-btn {
-      border: 2px solid var(--primary-color);
-      color: var(--primary-color);
-      background-color: white;
-      padding: 8px 15px;
-      border-radius: 5px;
-      font-size: 14px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    .upload-btn:hover {
-      background-color: var(--primary-color);
-      color: white;
-    }
-
-    .upload-btn-wrapper input[type=file] {
-      font-size: 100px;
-      position: absolute;
-      left: 0;
-      top: 0;
+        .btn {
+            height: 50px;
+            padding: 0 30px;
+            border: none;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            border-radius: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.5);
+            opacity: 0;
+            border-radius: 100%;
+            transform: scale(1, 1) translate(-50%, -50%);
+            transform-origin: 50% 50%;
+        }
+        
+        .btn:focus:not(:active)::after {
+            animation: ripple 1s ease-out;
+        }
+        
+        @keyframes ripple {
+            0% {
+                transform: scale(0, 0);
+                opacity: 1;
+            }
+            20% {
+                transform: scale(25, 25);
+                opacity: 1;
+            }
+            100% {
       opacity: 0;
-      cursor: pointer;
+                transform: scale(40, 40);
+            }
+        }
+
+        .btn-primary {
+            background-color: var(--button-primary);
+            color: var(--button-text);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--button-hover);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background-color: var(--button-secondary);
+            color: var(--button-secondary-text);
+            border: 1px solid var(--text-primary);
+            margin-right: 15px;
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--text-primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-top: 30px;
     }
 
     .alert {
       padding: 15px;
-      border-radius: 5px;
       margin-bottom: 20px;
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
+            border-radius: 4px;
+            font-size: 14px;
       display: none;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .alert::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 5px;
     }
 
     .alert-success {
-      background-color: #d4edda;
-      color: #155724;
-      border: 1px solid #c3e6cb;
-    }
+            background-color: rgba(52, 199, 89, 0.1);
+            color: var(--success-color);
+            border: 1px solid var(--success-color);
+        }
+        
+        .alert-success::before {
+            background-color: var(--success-color);
+        }
 
-    .alert-danger {
-      background-color: #f8d7da;
-      color: #721c24;
-      border: 1px solid #f5c6cb;
-    }
+        .alert-error {
+            background-color: rgba(255, 59, 48, 0.1);
+            color: var(--error-color);
+            border: 1px solid var(--error-color);
+        }
+        
+        .alert-error::before {
+            background-color: var(--error-color);
+        }
 
-    .text-center {
-      text-align: center;
-    }
+        .password-toggle {
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+        }
 
-    .image-upload-container {
-      text-align: center;
-    }
+        .password-toggle input {
+            margin-right: 8px;
+        }
 
-    .form-group .help-text {
-      font-size: 12px;
-      color: #666;
+        .password-section {
+            margin-top: 20px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 20px;
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .password-strength-meter {
+            height: 5px;
+            background-color: #eee;
       margin-top: 5px;
-      font-style: italic;
-    }
-
-    .form-group textarea#shopBio {
-      resize: vertical;
-      min-height: 100px;
-      font-family: sans-serif;
-      line-height: 1.5;
-    }
-
-    .character-count {
-      text-align: right;
-      font-size: 12px;
-      color: #666;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .strength-bar {
+            height: 100%;
+            width: 0;
+            transition: width 0.3s ease, background-color 0.3s ease;
+        }
+        
+        .form-hint {
+            display: block;
       margin-top: 5px;
+            font-size: 12px;
+            color: var(--text-secondary);
     }
 
-    .location-input-group {
+        .loading-spinner {
       display: flex;
-      gap: 10px;
-      width: 100%;
-      flex-direction: column;
-    }
-    
-    .coordinate-inputs {
-      display: flex;
-      gap: 15px;
-      width: 100%;
-    }
-    
-    .coordinate-input {
-      flex: 1;
-    }
-    
-    .coordinate-input label {
-      font-size: 14px;
-      font-weight: normal;
-      margin-bottom: 5px;
-    }
-    
-    .location-btn {
-      background-color: var(--accent-color);
-      color: white;
-      border: none;
-      border-radius: 5px;
-      padding: 10px 15px;
-      cursor: pointer;
-      transition: var(--transition);
-      font-size: 14px;
-      align-self: flex-start;
-    }
-    
-    .location-btn:hover {
-      background-color: #3e8e41;
-    }
-    
-    .location-btn i {
-      margin-right: 5px;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+            font-size: 16px;
+            color: var(--text-secondary);
+        }
+        
+        .loading-spinner i {
+            margin-right: 10px;
+            font-size: 24px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .form-section {
+            margin-bottom: 40px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 20px;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            color: var(--seller-highlight);
+        }
+        
+        .section-title i {
+            margin-right: 10px;
+            font-size: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .form-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .btn-secondary {
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+        }
+        
+        /* Animated input focus effect */
+        .form-group {
+            position: relative;
+        }
+        
+        .form-group::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background-color: var(--seller-highlight);
+            transition: width 0.3s ease, left 0.3s ease;
+            transform: translateY(25px);
+        }
+        
+        .form-group:focus-within::after {
+            width: 100%;
+            left: 0;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <!-- Header -->
-    <header class="main-header">
+    <!-- Header Section -->
+    <header class="header">
+        <div class="header-container">
       <div class="header-left">
         <div class="logo">
-          <img src="../../assets/images/logo.webp" alt="ClothLoop logo" />
-          <div class="brand-name">
-            <h1>ClothLoop</h1>
-            <p>Shop Profile</p>
+                    <span class="logo-name">CLOTHLOOP</span>
+                    <span class="seller-badge">Seller</span>
           </div>
+                
+                <nav class="nav-container">
+                    <ul class="nav-items">
+                        <li><a href="seller_dashboard.html">Dashboard</a></li>
+                        <li><a href="product_listings.html">Listings</a></li>
+                        <li><a href="seller_profile.html" class="active">Profile</a></li>
+                    </ul>
+                </nav>
         </div>
-      </div>
+            
       <div class="header-right">
-        <div class="account-info">
-          <div class="user-profile">
-            <img id="navProfileImage" src="../../assets/images/shop_logo.png" alt="User Shop logo" />
-            <div class="user-details">
-              <h4 id="navSellerName">Loading...</h4>
-              <p>Seller Account</p>
-            </div>
-            <i class="fas fa-chevron-down"></i>
-            <div class="dropdown-menu">
-              <a href="seller_profile.html" class="active"><i class="fas fa-store"></i> Shop Profile</a>
-              <a href="settings.html"><i class="fas fa-cog"></i> Account Settings</a>
-              <a href="../account/login.html" id="logoutLink"><i class="fas fa-sign-out-alt"></i> Log Out</a>
-            </div>
+                <div class="actions">
+                    <div class="action-item" id="profileSection">
+                        <i class="fas fa-user"></i>
+                        <span>PROFILE</span>
+                        
+                        <!-- Profile dropdown menu -->
+                        <div class="profile-dropdown" id="profileDropdown">
+                            <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
+                            <div class="profile-divider"></div>
+                            <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                        </div>
+                    </div>
+                    
+                    <div class="action-item" id="statisticsBtn">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>STATS</span>
+                    </div>
+                    
+                    <div class="action-item" id="helpBtn">
+                        <i class="fas fa-question-circle"></i>
+                        <span>ABOUT US</span>
+                    </div>
           </div>
         </div>
       </div>
     </header>
 
-    <!-- Sidebar -->
-    <aside class="sidebar">
-      <ul class="sidebar-nav">
-        <li><a href="seller_dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-        <li><a href="product_listings.html"><i class="fas fa-list"></i> Product Listings</a></li>
-        <li><a href="seller_dashboard.html#analysis"><i class="fas fa-chart-line"></i> Analysis</a></li>
-        <li><a href="seller_dashboard.html#comments"><i class="fas fa-comments"></i> Comments</a></li>
-      </ul>
-    </aside>
+    <!-- Profile Content -->
+    <main class="profile-container">
+        <div class="profile-header">
+            <h1 class="profile-title">Seller Profile</h1>
+            <p class="profile-subtitle">Manage your shop and personal information</p>
+        </div>
 
-    <!-- Main Content -->
-    <main class="main-content">
-      <h1>Shop Profile</h1>
-      
-      <div id="alertMessage" class="alert">
-        <!-- Alert messages will appear here -->
+        <div class="alert alert-success" id="successAlert"></div>
+        <div class="alert alert-error" id="errorAlert"></div>
+
+        <div id="loginPrompt" style="display: none; text-align: center; margin: 30px auto;">
+            <p style="margin-bottom: 20px;">You need to be logged in to view your profile.</p>
+            
+            <div style="max-width: 400px; margin: 0 auto; padding: 20px; border: 1px solid var(--border-color); background-color: #f9f9f9;">
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="loginEmail" class="form-label">Email</label>
+                        <input type="email" id="loginEmail" name="loginEmail" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword" class="form-label">Password</label>
+                        <input type="password" id="loginPassword" name="loginPassword" class="form-input" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
+                </form>
+                <div style="margin-top: 15px; text-align: center;">
+                    <a href="../../../index.html" style="color: var(--text-primary); text-decoration: none;">Return to Home</a>
+                </div>
+            </div>
       </div>
       
-      <form id="profileForm">
-        <div class="form-group">
-          <div class="image-upload-container">
-            <img id="profileImagePreview" class="profile-image-preview" src="../../assets/images/shop_logo.png" alt="Shop Logo">
-            <div class="upload-btn-wrapper">
-              <button type="button" class="upload-btn">Upload Shop Logo</button>
-              <input type="file" id="profilePicture" name="shop_logo" accept="image/*" onchange="previewImage(event)">
+        <div class="form-container">
+            <div id="profileLoading" class="loading-spinner" style="display: none;">
+                <i class="fas fa-spinner fa-spin"></i> Loading profile information...
             </div>
+            <form id="profileForm" style="display: block;">
+                <!-- Personal Information Section -->
+                <div class="form-section animate__animated animate__fadeIn">
+                    <h2 class="section-title"><i class="fas fa-user-circle"></i> Personal Information</h2>
+                    
+        <div class="form-group">
+                        <label for="name" class="form-label">Full Name</label>
+                        <input type="text" id="name" name="name" class="form-input" required>
+            </div>
+
+                    <div class="form-group">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" id="email" name="email" class="form-input" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone_no" class="form-label">Phone Number</label>
+                        <input type="tel" id="phone_no" name="phone_no" class="form-input" required>
           </div>
         </div>
+                
+                <!-- Shop Information Section -->
+                <div class="form-section animate__animated animate__fadeIn" style="animation-delay: 0.2s;">
+                    <h2 class="section-title"><i class="fas fa-store"></i> Shop Information</h2>
         
         <div class="form-group">
-          <label for="shopName">Shop Name:</label>
-          <input type="text" id="shopName" name="shop_name" required>
+                        <label for="shop_name" class="form-label">Shop Name</label>
+                        <input type="text" id="shop_name" name="shop_name" class="form-input" required>
         </div>
         
         <div class="form-group">
-          <label for="shopBio">Shop Bio:</label>
-          <textarea id="shopBio" name="shop_bio" rows="4" placeholder="Tell customers about your shop..." maxlength="500" onkeyup="updateCharCount()"></textarea>
-          <div class="character-count"><span id="bioCharCount">0</span>/500 characters</div>
-          <div class="help-text">Describe your shop, services, and specialty.</div>
+                        <label for="shop_address" class="form-label">Shop Address</label>
+                        <input type="text" id="shop_address" name="shop_address" class="form-input" required>
         </div>
         
         <div class="form-group">
-          <label for="shopAddress">Shop Address:</label>
-          <textarea id="shopAddress" name="shop_address" required></textarea>
+                        <label for="shop_bio" class="form-label">Shop Description</label>
+                        <textarea id="shop_bio" name="shop_bio" class="form-input" rows="4"></textarea>
         </div>
         
         <div class="form-group">
-          <label for="shopLocation">Shop Location:</label>
-          <div class="location-input-group">
-            <div class="coordinate-inputs">
-              <div class="coordinate-input">
-                <label for="shopLatitude">Latitude:</label>
-                <input type="number" id="shopLatitude" name="shop_latitude" placeholder="e.g. 40.7128" step="0.0001" min="-90" max="90" required>
+                        <label for="shop_logo" class="form-label">Shop Logo</label>
+                        <div class="logo-preview-container">
+                            <img id="logoPreview" src="#" alt="Shop Logo Preview" class="logo-preview" style="display: none; max-width: 150px; max-height: 150px; margin-bottom: 10px;">
               </div>
-              <div class="coordinate-input">
-                <label for="shopLongitude">Longitude:</label>
-                <input type="number" id="shopLongitude" name="shop_longitude" placeholder="e.g. -74.0060" step="0.0001" min="-180" max="180" required>
+                        <input type="file" id="shop_logo" name="shop_logo" class="form-input file-input" accept="image/*">
               </div>
             </div>
-            <button type="button" id="getLocationBtn" class="location-btn"><i class="fas fa-map-marker-alt"></i> Get Location</button>
+
+                <!-- Account Information Section -->
+                <div class="form-section animate__animated animate__fadeIn" style="animation-delay: 0.4s;">
+                    <h2 class="section-title"><i class="fas fa-shield-alt"></i> Account Information</h2>
+                    
+                    <div class="form-group">
+                        <label for="created_at" class="form-label">Account Created</label>
+                        <input type="text" id="created_at" name="created_at" class="form-input" disabled>
           </div>
-          <div class="help-text">Enter coordinates manually or use the button to get your current location.</div>
+
+                    <div class="password-toggle">
+                        <input type="checkbox" id="changePassword">
+                        <label for="changePassword">Change Password</label>
         </div>
         
-        <div class="button-group">
-          <button type="button" class="back-btn" onclick="window.location.href='seller_dashboard.html'">Back to Dashboard</button>
-          <button type="submit" class="save-btn">Update Shop Profile</button>
+                    <div id="passwordSection" class="password-section" style="display: none;">
+                        <div class="form-group">
+                            <label for="password" class="form-label">New Password</label>
+                            <input type="password" id="password" name="password" class="form-input">
+                            <div class="password-strength-meter">
+                                <div class="strength-bar" id="strengthBar"></div>
+                            </div>
+                            <small id="passwordHint" class="form-hint">Use 8+ characters with letters, numbers & symbols</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="confirm_password" class="form-label">Confirm New Password</label>
+                            <input type="password" id="confirm_password" name="confirm_password" class="form-input">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
         </div>
       </form>
-    </main>
   </div>
+    </main>
   
   <script>
-    // Ensure updateCharCount is available in global scope
-    function updateCharCount() {
-      const shopBio = document.getElementById('shopBio');
-      const charCount = document.getElementById('bioCharCount');
-      if (shopBio && charCount) {
-        const count = shopBio.value.length;
-        
-        charCount.textContent = count;
-        
-        // Add visual indication when approaching limit
-        if (count > 450) {
-          charCount.style.color = '#e74c3c';
-        } else if (count > 400) {
-          charCount.style.color = '#f39c12';
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is logged in
+            checkSession();
+            
+            // Profile dropdown toggle
+            const profileSection = document.getElementById('profileSection');
+            const profileDropdown = document.getElementById('profileDropdown');
+            
+            profileSection.addEventListener('click', function(e) {
+                e.stopPropagation();
+                profileDropdown.classList.toggle('active');
+            });
+            
+            document.addEventListener('click', function() {
+                profileDropdown.classList.remove('active');
+            });
+            
+            // Password change toggle with animation
+            const changePasswordCheckbox = document.getElementById('changePassword');
+            const passwordSection = document.getElementById('passwordSection');
+            
+            changePasswordCheckbox.addEventListener('change', function() {
+                if (this.checked) {
+                    passwordSection.style.display = 'block';
+                    passwordSection.classList.add('animate__animated', 'animate__fadeIn');
         } else {
-          charCount.style.color = '#666';
-        }
-      }
-    }
-    
-    // Function to preview profile image
-    function previewImage(event) {
-      const file = event.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          document.getElementById('profileImagePreview').src = e.target.result;
-        };
-        reader.readAsDataURL(file);
-      }
-    }
-    
-    document.addEventListener('DOMContentLoaded', function() {
-      // DOM Elements
-      const profileForm = document.getElementById('profileForm');
-      const alertMessage = document.getElementById('alertMessage');
-      const navSellerName = document.getElementById('navSellerName');
-      const navProfileImage = document.getElementById('navProfileImage');
-      const userProfile = document.querySelector('.user-profile');
-      
-      // Profile dropdown functionality
-      if (userProfile) {
-        userProfile.addEventListener('click', function(e) {
-          console.log('Profile clicked');
-          this.classList.toggle('active');
-          e.stopPropagation();
-        });
-        
-        // Close dropdown when clicking outside
-        document.addEventListener('click', function() {
-          userProfile.classList.remove('active');
-        });
-      }
-      
-      // Show loading message
-      showAlert('Loading shop data...', 'info');
-      
-      // Fetch seller profile data
-      fetchSellerProfile();
-      
-      // Handle logout
-      const logoutLink = document.getElementById('logoutLink');
-      if (logoutLink) {
-        logoutLink.addEventListener('click', function(e) {
-          e.preventDefault();
-          // Clear user data
-          localStorage.removeItem('user_id');
-          localStorage.removeItem('userType');
-          localStorage.removeItem('username');
-          sessionStorage.clear();
-          // Redirect to login page
-          window.location.href = '../account/login.html';
-        });
-      }
-      
-      // Update the form submission to combine latitude and longitude
-      if (profileForm) {
+                    passwordSection.classList.add('animate__animated', 'animate__fadeOut');
+                    setTimeout(() => {
+                        passwordSection.style.display = 'none';
+                        passwordSection.classList.remove('animate__animated', 'animate__fadeOut');
+                    }, 500);
+                }
+            });
+            
+            // Password strength meter
+            const passwordInput = document.getElementById('password');
+            const strengthBar = document.getElementById('strengthBar');
+            const passwordHint = document.getElementById('passwordHint');
+            
+            passwordInput.addEventListener('input', function() {
+                const password = this.value;
+                let strength = 0;
+                let color = '';
+                let hint = '';
+                
+                // Calculate password strength
+                if (password.length >= 8) strength += 25;
+                if (password.match(/[a-z]+/)) strength += 25;
+                if (password.match(/[A-Z]+/)) strength += 25;
+                if (password.match(/[0-9]+/) || password.match(/[^a-zA-Z0-9]+/)) strength += 25;
+                
+                // Set bar color based on strength
+                if (strength <= 25) {
+                    color = '#ff3b30'; // weak (red)
+                    hint = 'Weak password. Try adding uppercase letters, numbers, and symbols.';
+                } else if (strength <= 50) {
+                    color = '#ff9500'; // medium (orange)
+                    hint = 'Medium strength. Add more variety of characters for better security.';
+                } else if (strength <= 75) {
+                    color = '#ffcc00'; // good (yellow)
+                    hint = 'Good password. Consider adding more variety for the best security.';
+                } else {
+                    color = '#34c759'; // strong (green)
+                    hint = 'Strong password!';
+                }
+                
+                // Update the UI
+                strengthBar.style.width = strength + '%';
+                strengthBar.style.backgroundColor = color;
+                passwordHint.textContent = hint;
+            });
+            
+            // Cancel button
+            const cancelBtn = document.getElementById('cancelBtn');
+            
+            cancelBtn.addEventListener('click', function() {
+                window.location.href = 'seller_dashboard.html';
+            });
+            
+            // Logout button
+            const logoutBtn = document.getElementById('logoutBtn');
+            
+            logoutBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                fetch('../../../backend/api/users/logout.php', {
+                    credentials: 'include'
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            showSuccess('Logging out...');
+                            setTimeout(() => {
+                                window.location.href = '../../../index.html';
+                            }, 1000);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showError('Failed to logout. Please try again.');
+                    });
+            });
+
+            // Statistics button
+            const statisticsBtn = document.getElementById('statisticsBtn');
+            
+            statisticsBtn.addEventListener('click', function() {
+                window.location.href = 'statistics.html';
+            });
+            
+            // Help button
+            const helpBtn = document.getElementById('helpBtn');
+            
+            helpBtn.addEventListener('click', function() {
+                window.location.href = '../about.html';
+            });
+            
+            // Form submission
+            const profileForm = document.getElementById('profileForm');
+            
         profileForm.addEventListener('submit', function(e) {
           e.preventDefault();
           
-          // Validate shop bio length
-          const shopBio = document.getElementById('shopBio').value;
-          if (shopBio && shopBio.length > 500) {
-            showAlert('Shop bio should be less than 500 characters.', 'danger');
+                const name = document.getElementById('name').value;
+                const email = document.getElementById('email').value;
+                const phone_no = document.getElementById('phone_no').value;
+                const shop_name = document.getElementById('shop_name').value;
+                const shop_address = document.getElementById('shop_address').value;
+                const shop_bio = document.getElementById('shop_bio').value;
+                
+                const formData = {
+                    name: name,
+                    email: email,
+                    phone_no: phone_no,
+                    shop_name: shop_name,
+                    shop_address: shop_address,
+                    shop_bio: shop_bio
+                };
+                
+                // If change password is checked, add password to form data
+                if (changePasswordCheckbox.checked) {
+                    const password = document.getElementById('password').value;
+                    const confirmPassword = document.getElementById('confirm_password').value;
+                    
+                    if (!password) {
+                        showError('Password cannot be empty');
             return;
           }
           
-          // Get values from form
-          const shopName = document.getElementById('shopName').value;
-          const shopAddress = document.getElementById('shopAddress').value;
-          
-          // Check required fields
-          if (!shopName || !shopAddress) {
-            showAlert('Shop Name and Shop Address are required fields.', 'danger');
+                    if (password !== confirmPassword) {
+                        showError('Passwords do not match');
             return;
           }
           
-          // Get latitude and longitude values
-          const latitude = document.getElementById('shopLatitude').value;
-          const longitude = document.getElementById('shopLongitude').value;
-          
-          // Create form data
-          const formData = new FormData();
-          formData.append('shop_name', shopName);
-          formData.append('shop_address', shopAddress);
-          formData.append('shop_bio', shopBio);
-          
-          // Combine latitude and longitude for the shop_location
-          if (latitude && longitude) {
-            const combinedLocation = `${latitude},${longitude}`;
-            formData.append('shop_location', combinedLocation);
-          } else {
-            // Add a default or empty value to ensure the field is included
-            formData.append('shop_location', '');
-          }
-          
-          // Append profile picture if selected
-          const profilePicInput = document.getElementById('profilePicture');
-          if (profilePicInput.files.length > 0) {
-            formData.append('shop_logo', profilePicInput.files[0]);
-          }
-          
-          // Debug: Log form data
-          console.log('Submitting form data:');
-          for (let pair of formData.entries()) {
-            console.log(pair[0] + ': ' + pair[1]);
-          }
-          
-          // Show loading message
-          showAlert('Updating shop profile...', 'info');
-          
-          // Update profile in database
-          updateProfile(formData);
-        });
-      }
-      
-      // Function to fetch seller profile from database
-      function fetchSellerProfile() {
-        // First try to get data from sessionStorage to show immediately
-        const cachedData = sessionStorage.getItem('sellerData');
-        if (cachedData) {
-          try {
-            const sellerData = JSON.parse(cachedData);
-            populateFormWithData(sellerData);
-          } catch (e) {
-            console.error('Error parsing cached data:', e);
-          }
-        }
-        
-        // Then fetch fresh data from server
-        fetch('../../../backend/api/sellers/get_seller_profile.php')
+                    formData.password = password;
+                }
+                
+                updateSellerProfile(formData);
+            });
+            
+            // Shop logo preview
+            const shopLogoInput = document.getElementById('shop_logo');
+            const logoPreview = document.getElementById('logoPreview');
+            
+            shopLogoInput.addEventListener('change', function() {
+                const file = this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        logoPreview.src = e.target.result;
+                        logoPreview.style.display = 'block';
+                        logoPreview.classList.add('animate__animated', 'animate__fadeIn');
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+            
+            function checkSession() {
+                // Show loading state
+                document.getElementById('errorAlert').style.display = 'none';
+                document.getElementById('profileLoading').style.display = 'flex';
+                document.getElementById('profileForm').style.display = 'none';
+                document.getElementById('loginPrompt').style.display = 'none';
+                
+                fetch('../../../backend/api/users/check_session.php', { 
+                    credentials: 'include'  // This is important to include cookies
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok: ' + response.statusText);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Session check response:', data); // Debug log
+                    
+                    if (data.logged_in && data.user_type === 'seller') {
+                        // Proceed to fetch profile data if logged in
+                        fetchSellerProfile();
+                    } else {
+                        // Hide loading spinner and show login prompt
+                        document.getElementById('profileLoading').style.display = 'none';
+                        document.getElementById('loginPrompt').style.display = 'block';
+                        showError('You need to log in as a seller to access your profile');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error checking session:', error);
+                    // Hide loading spinner and show login prompt
+                    document.getElementById('profileLoading').style.display = 'none';
+                    document.getElementById('loginPrompt').style.display = 'block';
+                    showError('Failed to verify login status: ' + error.message);
+                });
+            }
+            
+            function fetchSellerProfile() {
+                // Show loading state and hide error message
+                document.getElementById('errorAlert').style.display = 'none';
+                document.getElementById('profileLoading').style.display = 'flex';
+                document.getElementById('profileForm').style.display = 'none';
+                
+                fetch('../../../backend/api/sellers/get_seller_profile.php', {
+                    credentials: 'include'  // This is important to include cookies
+                })
           .then(response => {
             if (!response.ok) {
-              throw new Error('Server returned status: ' + response.status);
+                        throw new Error('Network response was not ok');
             }
             return response.json();
           })
           .then(data => {
-            console.log('Profile data received:', data);
+                    // Hide loading state
+                    document.getElementById('profileLoading').style.display = 'none';
+                    document.getElementById('profileForm').style.display = 'block';
+                    
             if (data.status === 'success') {
-              // Clear alert
-              alertMessage.style.display = 'none';
-              
-              // Update sessionStorage with fresh data
-              sessionStorage.setItem('sellerData', JSON.stringify(data.seller));
-              
-              // Fill form with seller data
-              populateFormWithData(data.seller);
-            } else {
-              showAlert('Error loading profile data: ' + (data.message || 'Unknown error'), 'danger');
-              console.error('Error from server:', data);
-              
-              // If unauthorized, redirect to login
-              if (data.message && (data.message.includes('Unauthorized') || data.message.includes('login'))) {
-                window.location.href = '../account/login.html';
-              }
+                        const seller = data.seller;
+                        
+                        // Populate form fields with a typing animation
+                        typeIntoField('name', seller.name);
+                        setTimeout(() => typeIntoField('email', seller.email), 200);
+                        setTimeout(() => typeIntoField('phone_no', seller.phone_no), 400);
+                        setTimeout(() => typeIntoField('shop_name', seller.shop_name), 600);
+                        setTimeout(() => typeIntoField('shop_address', seller.shop_address), 800);
+                        setTimeout(() => typeIntoField('shop_bio', seller.shop_bio), 1000);
+                        
+                        // Format date for display
+                        const createdDate = new Date(seller.created_at);
+                        setTimeout(() => {
+                            document.getElementById('created_at').value = createdDate.toLocaleDateString();
+                        }, 1200);
+                        
+                        // Show logo if exists
+                        if (seller.shop_logo) {
+                            logoPreview.src = seller.shop_logo;
+                            logoPreview.style.display = 'block';
+                            logoPreview.classList.add('animate__animated', 'animate__fadeIn');
+                        }
+                    } else {
+                        showError(data.message || 'Failed to load profile data');
             }
           })
           .catch(error => {
-            console.error('Error fetching profile:', error);
-            showAlert('Failed to load profile data: ' + error.message, 'danger');
-          });
-      }
-      
-      // Modify the populateFormWithData function to split location into latitude and longitude
-      function populateFormWithData(sellerData) {
-        if (!sellerData) return;
-        
-        if (document.getElementById('shopName')) 
-          document.getElementById('shopName').value = sellerData.shop_name || '';
-        if (document.getElementById('shopAddress')) 
-          document.getElementById('shopAddress').value = sellerData.shop_address || '';
-        if (document.getElementById('shopBio')) {
-          document.getElementById('shopBio').value = sellerData.shop_bio || '';
-          updateCharCount(); // Update character count after setting shop bio
-        }
-        
-        // Handle shop location splitting
-        if (sellerData.shop_location) {
-          const locationParts = sellerData.shop_location.split(',');
-          if (locationParts.length === 2) {
-            if (document.getElementById('shopLatitude')) {
-              document.getElementById('shopLatitude').value = locationParts[0].trim();
+                    // Hide loading state
+                    document.getElementById('profileLoading').style.display = 'none';
+                    document.getElementById('profileForm').style.display = 'block';
+                    
+                    console.error('Error:', error);
+                    showError('An error occurred while loading profile data');
+                });
             }
-            if (document.getElementById('shopLongitude')) {
-              document.getElementById('shopLongitude').value = locationParts[1].trim();
+            
+            // Function to give typing animation effect to form fields
+            function typeIntoField(fieldId, text) {
+                const field = document.getElementById(fieldId);
+                field.value = '';
+                let i = 0;
+                
+                function typeChar() {
+                    if (i < text.length) {
+                        field.value += text.charAt(i);
+                        i++;
+                        setTimeout(typeChar, 20);
+                    }
+                }
+                
+                typeChar();
             }
-          }
-        }
-        
-        // Update navigation elements
-        if (navSellerName) {
-          navSellerName.textContent = sellerData.username || 'Seller';
-        }
-        
-        // Update profile images if available
-        if (sellerData.shop_logo) {
-          console.log('Setting shop logo:', sellerData.shop_logo.substring(0, 30) + '...');
-          if (document.getElementById('profileImagePreview')) {
-            document.getElementById('profileImagePreview').src = sellerData.shop_logo;
-          }
-          if (navProfileImage) {
-            navProfileImage.src = sellerData.shop_logo;
-          }
-        }
-      }
-      
-      // Function to update profile in database
-      function updateProfile(formData) {
-        // Debug log
-        console.log('Sending request to: ../../../backend/api/sellers/update_seller_profile.php');
-        
-        // Add credentials to fetch to include cookies/session
+            
+            function updateSellerProfile(formData) {
+                // Show loading state
+                const submitButton = document.querySelector('button[type="submit"]');
+                const originalButtonText = submitButton.textContent;
+                submitButton.disabled = true;
+                submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+                
+                document.getElementById('errorAlert').style.display = 'none';
+                document.getElementById('successAlert').style.display = 'none';
+                
+                // Handle file upload separately if needed
+                const shopLogoInput = document.getElementById('shop_logo');
+                const file = shopLogoInput.files[0];
+                
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        formData.shop_logo = e.target.result;
+                        sendUpdateRequest(formData, submitButton, originalButtonText);
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    sendUpdateRequest(formData, submitButton, originalButtonText);
+                }
+            }
+            
+            function sendUpdateRequest(formData, submitButton, originalButtonText) {
         fetch('../../../backend/api/sellers/update_seller_profile.php', {
           method: 'POST',
-          body: formData,
-          credentials: 'include' // Include cookies for session
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include', // Add credentials to include cookies
+                    body: JSON.stringify(formData)
         })
           .then(response => {
-            // Check if response is ok
             if (!response.ok) {
-              console.error('HTTP error:', response.status, response.statusText);
-              throw new Error('Server returned status: ' + response.status);
+                        throw new Error('Network response was not ok');
             }
             return response.json();
           })
           .then(data => {
-            console.log('Server response:', data);
+                    // Reset button state
+                    submitButton.disabled = false;
+                    submitButton.textContent = originalButtonText;
             
             if (data.status === 'success') {
-              showAlert('Shop profile updated successfully!', 'success');
-              
-              // Update navigation elements with new data
-              if (data.shop_name && navSellerName) {
-                navSellerName.textContent = data.shop_name;
-              }
-              
-              // Update profile image if it was provided
-              if (data.shopLogoUrl) {
-                const profileImage = document.getElementById('profileImagePreview').src;
-                if (navProfileImage) {
-                  navProfileImage.src = profileImage;
-                }
-              }
-              
-              // Update session storage with new data
-              const cachedData = sessionStorage.getItem('sellerData');
-              if (cachedData) {
-                try {
-                  const sellerData = JSON.parse(cachedData);
-                  sellerData.shop_name = formData.get('shop_name');
-                  sellerData.shop_address = formData.get('shop_address');
-                  sellerData.shop_bio = formData.get('shop_bio');
-                  sellerData.shop_location = formData.get('shop_location');
-                  
-                  if (data.shopLogoUrl) {
-                    sellerData.shop_logo = document.getElementById('profileImagePreview').src;
-                  }
-                  
-                  sessionStorage.setItem('sellerData', JSON.stringify(sellerData));
-                } catch (e) {
-                  console.error('Error updating session storage:', e);
-                }
-              }
-              
-              // Reload page to show updated data
-              setTimeout(() => {
-                window.location.reload();
-              }, 2000);
+                        showSuccess(data.message);
+                        
+                        // Apply a saved animation to form
+                        const formContainer = document.querySelector('.form-container');
+                        formContainer.classList.add('animate__animated', 'animate__pulse');
+                        setTimeout(() => {
+                            formContainer.classList.remove('animate__animated', 'animate__pulse');
+                        }, 1000);
+                        
+                        // Reset password fields if present
+                        if (changePasswordCheckbox.checked) {
+                            document.getElementById('password').value = '';
+                            document.getElementById('confirm_password').value = '';
+                            changePasswordCheckbox.checked = false;
+                            passwordSection.style.display = 'none';
+                        }
             } else {
-              showAlert('Error updating shop profile: ' + (data.message || 'Unknown error'), 'danger');
-              console.error('Server response:', data);
+                        showError(data.message || 'Failed to update profile');
             }
           })
           .catch(error => {
-            console.error('Error updating profile:', error);
-            showAlert('Failed to update shop profile. Please try again later.', 'danger');
-          });
-      }
-      
-      // Function to show alert messages
-      function showAlert(message, type) {
-        if (!alertMessage) return;
-        
-        alertMessage.textContent = message;
-        alertMessage.className = 'alert alert-' + type;
-        alertMessage.style.display = 'block';
-        
-        // Add specific colors based on type
-        if (type === 'danger') {
-          alertMessage.style.backgroundColor = '#f8d7da';
-          alertMessage.style.color = '#721c24';
-          alertMessage.style.border = '1px solid #f5c6cb';
-        } else if (type === 'success') {
-          alertMessage.style.backgroundColor = '#d4edda';
-          alertMessage.style.color = '#155724';
-          alertMessage.style.border = '1px solid #c3e6cb';
-        } else if (type === 'info') {
-          alertMessage.style.backgroundColor = '#d1ecf1';
-          alertMessage.style.color = '#0c5460';
-          alertMessage.style.border = '1px solid #bee5eb';
-        }
-        
-        // Scroll to top to see the message
-        window.scrollTo(0, 0);
-        
-        // Hide the alert after 5 seconds if it's a success message
-        if (type === 'success') {
-          setTimeout(() => {
-            alertMessage.style.display = 'none';
-          }, 5000);
-        }
-      }
-      
-      // Initialize character counter
-      updateCharCount();
-
-      // Get location button functionality
-      const getLocationBtn = document.getElementById('getLocationBtn');
-      if (getLocationBtn) {
-        getLocationBtn.addEventListener('click', function() {
-          if (navigator.geolocation) {
-            // Show a loading state
-            getLocationBtn.disabled = true;
-            getLocationBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Getting location...';
+                    // Reset button state
+                    submitButton.disabled = false;
+                    submitButton.textContent = originalButtonText;
+                    
+                    console.error('Error:', error);
+                    showError('An error occurred while updating profile');
+                });
+            }
             
-            navigator.geolocation.getCurrentPosition(
-              // Success callback
-              function(position) {
-                const latitude = position.coords.latitude;
-                const longitude = position.coords.longitude;
+            function showSuccess(message) {
+                const successAlert = document.getElementById('successAlert');
+                successAlert.textContent = message;
+                successAlert.style.display = 'block';
+                successAlert.classList.add('animate__animated', 'animate__fadeIn');
                 
-                // Update the latitude and longitude fields
-                document.getElementById('shopLatitude').value = latitude.toFixed(4);
-                document.getElementById('shopLongitude').value = longitude.toFixed(4);
+                // Scroll to the message
+                successAlert.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 
-                // Reset button state
-                getLocationBtn.disabled = false;
-                getLocationBtn.innerHTML = '<i class="fas fa-map-marker-alt"></i> Get Location';
+                // Hide after 3 seconds
+                setTimeout(function() {
+                    successAlert.classList.add('animate__fadeOut');
+                    setTimeout(() => {
+                        successAlert.style.display = 'none';
+                        successAlert.classList.remove('animate__animated', 'animate__fadeIn', 'animate__fadeOut');
+                    }, 500);
+                }, 3000);
+            }
+            
+            function showError(message) {
+                const errorAlert = document.getElementById('errorAlert');
+                errorAlert.textContent = message;
+                errorAlert.style.display = 'block';
+                errorAlert.classList.add('animate__animated', 'animate__shakeX');
                 
-                // Show success message
-                showAlert('Current location fetched successfully!', 'success');
-              },
-              // Error callback
-              function(error) {
-                let errorMessage = 'Unable to retrieve your location. ';
+                // Scroll to the error
+                errorAlert.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 
-                switch(error.code) {
-                  case error.PERMISSION_DENIED:
-                    errorMessage += 'You denied the request for geolocation.';
-                    break;
-                  case error.POSITION_UNAVAILABLE:
-                    errorMessage += 'Location information is unavailable.';
-                    break;
-                  case error.TIMEOUT:
-                    errorMessage += 'The request to get user location timed out.';
-                    break;
-                  case error.UNKNOWN_ERROR:
-                    errorMessage += 'An unknown error occurred.';
-                    break;
+                // Remove animation class after it completes
+          setTimeout(() => {
+                    errorAlert.classList.remove('animate__animated', 'animate__shakeX');
+                }, 1000);
+                
+                // Hide after 5 seconds
+                setTimeout(function() {
+                    errorAlert.classList.add('animate__fadeOut');
+                    setTimeout(() => {
+                        errorAlert.style.display = 'none';
+                        errorAlert.classList.remove('animate__animated', 'animate__fadeOut');
+                    }, 500);
+          }, 5000);
+            }
+
+            // Add login form handler
+            const loginForm = document.getElementById('loginForm');
+            
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const loginEmail = document.getElementById('loginEmail').value;
+                const loginPassword = document.getElementById('loginPassword').value;
+                
+                if (!loginEmail || !loginPassword) {
+                    showError('Please provide both email and password');
+                    return;
                 }
                 
-                // Show error message
-                showAlert(errorMessage, 'danger');
+                // Show loading state
+                const loginButton = loginForm.querySelector('button[type="submit"]');
+                const originalButtonText = loginButton.textContent;
+                loginButton.disabled = true;
+                loginButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
                 
-                // Reset button state
-                getLocationBtn.disabled = false;
-                getLocationBtn.innerHTML = '<i class="fas fa-map-marker-alt"></i> Get Location';
-              },
-              // Options
-              {
-                enableHighAccuracy: true,
-                timeout: 10000,
-                maximumAge: 0
-              }
-            );
+                // Clear previous errors
+                document.getElementById('errorAlert').style.display = 'none';
+                
+                // Attempt to log in
+                const loginData = {
+                    email: loginEmail,
+                    password: loginPassword
+                };
+                
+                fetch('../../../backend/api/users/login.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include', // Add credentials to include cookies
+                    body: JSON.stringify(loginData)
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Reset button state
+                    loginButton.disabled = false;
+                    loginButton.textContent = originalButtonText;
+                    
+                    if (data.success) {
+                        // Login successful
+                        showSuccess('Login successful! Loading your profile...');
+                        
+                        // Wait a moment for the success message to be visible
+                        setTimeout(function() {
+                            // Check session again to fetch profile
+                            checkSession();
+                        }, 1000);
           } else {
-            showAlert('Geolocation is not supported by this browser.', 'danger');
-          }
-        });
-      }
+                        // Login failed
+                        showError(data.message || 'Login failed. Please check your credentials.');
+                    }
+                })
+                .catch(error => {
+                    // Reset button state
+                    loginButton.disabled = false;
+                    loginButton.textContent = originalButtonText;
+                    
+                    console.error('Error during login:', error);
+                    showError('An error occurred during login. Please try again.');
+                });
+            });
     });
   </script>
 </body>

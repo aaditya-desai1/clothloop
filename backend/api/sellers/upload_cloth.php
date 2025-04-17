@@ -72,6 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $rental_price = $_POST['rentalPrice'] ?? 0;
     $contact_no = $_POST['contactNo'] ?? '';
     $whatsapp_no = $_POST['whatsappNo'] ?? '';
+    $shop_address = $_POST['shopAddress'] ?? '';
     $terms_conditions = $_POST['terms'] ?? '';
     
     debug_log("Form data parsed", [
@@ -151,7 +152,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $sql = "UPDATE cloth_details SET 
                         cloth_title = ?, description = ?, size = ?, category = ?, 
                         rental_price = ?, contact_number = ?, whatsapp_number = ?, 
-                        terms_and_conditions = ?, cloth_photo = ?, photo_type = ? 
+                        shop_address = ?, terms_and_conditions = ?, cloth_photo = ?, photo_type = ? 
                         WHERE id = ? AND seller_id = ?";
                         
                 $stmt = $conn->prepare($sql);
@@ -168,7 +169,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $category, 
                     $rental_price, 
                     $contact_no, 
-                    $whatsapp_no, 
+                    $whatsapp_no,
+                    $shop_address,
                     $terms_conditions, 
                     $image_data,
                     $image_type,
@@ -180,7 +182,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $sql = "UPDATE cloth_details SET 
                         cloth_title = ?, description = ?, size = ?, category = ?, 
                         rental_price = ?, contact_number = ?, whatsapp_number = ?, 
-                        terms_and_conditions = ? 
+                        shop_address = ?, terms_and_conditions = ? 
                         WHERE id = ? AND seller_id = ?";
                         
                 $stmt = $conn->prepare($sql);
@@ -197,7 +199,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $category, 
                     $rental_price, 
                     $contact_no, 
-                    $whatsapp_no, 
+                    $whatsapp_no,
+                    $shop_address,
                     $terms_conditions, 
                     $cloth_id,
                     $seller_id
@@ -227,8 +230,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             
             $sql = "INSERT INTO cloth_details (seller_id, cloth_title, description, size, category, 
-                    rental_price, contact_number, whatsapp_number, terms_and_conditions, cloth_photo, photo_type) 
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                    rental_price, contact_number, whatsapp_number, shop_address, terms_and_conditions, cloth_photo, photo_type) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             
             $stmt = $conn->prepare($sql);
             
@@ -237,7 +240,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 throw new Exception("SQL prepare failed: " . $conn->error);
             }
             
-            $stmt->bind_param("issssdsssss", 
+            $stmt->bind_param("issssdssssss", 
                 $seller_id, 
                 $cloth_title, 
                 $description, 
@@ -245,7 +248,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $category, 
                 $rental_price, 
                 $contact_no, 
-                $whatsapp_no, 
+                $whatsapp_no,
+                $shop_address,
                 $terms_conditions, 
                 $image_data,
                 $image_type

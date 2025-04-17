@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Product Details</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
     <style>
         /* General Styles */
@@ -14,6 +14,7 @@
             padding: 0;
             box-sizing: border-box;
             background-color: #f5f5f5;
+            color: #333;
         }
 
         /* Modal Styles */
@@ -23,7 +24,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
+            background-color: rgba(255, 255, 255, 0.95);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -33,13 +34,12 @@
         .modal-content {
             background-color: white;
             width: 95%;
-            max-width: 800px;
+            max-width: 1200px;
             max-height: 90vh;
-            border-radius: 8px;
-            overflow: hidden;
             display: flex;
             flex-direction: column;
             position: relative;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
         }
 
         .modal-header {
@@ -52,7 +52,10 @@
 
         .modal-header h2 {
             margin: 0;
-            font-size: 24px;
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 500;
         }
 
         .close-btn {
@@ -60,126 +63,163 @@
             border: none;
             font-size: 24px;
             cursor: pointer;
+            color: #333;
         }
 
         .modal-body {
             display: flex;
             overflow-y: auto;
             padding: 0;
+            height: 80vh;
         }
 
         .image-section {
             flex: 1;
-            padding: 20px;
+            background-color: #f9f9f9;
             display: flex;
             justify-content: center;
             align-items: center;
+            overflow: hidden;
         }
 
         .image-section img {
-            max-width: 100%;
-            max-height: 400px;
+            width: 100%;
+            height: 100%;
             object-fit: contain;
-            border-radius: 4px;
         }
 
         .info-section {
             flex: 1;
-            padding: 20px;
+            padding: 40px;
             overflow-y: auto;
+            display: flex;
+            flex-direction: column;
         }
 
         .product-title {
-            font-size: 28px;
-            font-weight: 700;
-            margin-top: 0;
-            margin-bottom: 15px;
-            color: #333;
+            font-size: 24px;
+            font-weight: 600;
+            margin: 0 0 20px 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .product-price {
             font-size: 24px;
-            color: #00aa5b;
-            margin-bottom: 20px;
-            font-weight: 700;
+            color: #333;
+            margin-bottom: 30px;
+            font-weight: 400;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 20px;
         }
 
-        .info-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .info-item i {
-            margin-right: 10px;
-            width: 20px;
-            text-align: center;
+        .product-description {
+            font-size: 14px;
+            line-height: 1.6;
             color: #666;
+            margin-bottom: 30px;
         }
 
-        .section-title {
-            font-size: 18px;
-            font-weight: 700;
-            margin: 20px 0 10px;
-            padding-bottom: 5px;
-            border-bottom: 1px solid #eee;
-        }
-
-        .description-text, .terms-text {
-            color: #555;
+        .model-info {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 30px;
             line-height: 1.6;
         }
 
-        .modal-footer {
-            padding: 15px 20px;
-            border-top: 1px solid #eee;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .location-button {
-            background-color: #4285F4;
+        .wishlist-button {
+            background-color: #333;
             color: white;
             border: none;
-            padding: 10px 20px;
-            border-radius: 4px;
+            padding: 15px;
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 1px;
             cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            margin-top: 20px;
+            margin-bottom: 30px;
+        }
+
+        .wishlist-button:hover {
+            background-color: #555;
+        }
+
+        .shop-info-section {
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .shop-info-title {
             font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .shop-info-item {
             display: flex;
             align-items: center;
+            margin-bottom: 10px;
+            color: #666;
         }
 
-        .location-button i {
-            margin-right: 8px;
-        }
-
-        .location-button:hover {
-            background-color: #3367D6;
-        }
-
-        .close-button {
-            background-color: #f0f0f0;
+        .shop-info-item i {
+            margin-right: 15px;
+            width: 16px;
+            text-align: center;
             color: #333;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
         }
 
-        .close-button:hover {
-            background-color: #e0e0e0;
+        .contact-link {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .contact-link:hover {
+            text-decoration: underline;
+        }
+
+        .view-map-button {
+            display: inline-block;
+            background-color: transparent;
+            color: #333;
+            border: 1px solid #333;
+            padding: 10px 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-top: 20px;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        .view-map-button:hover {
+            background-color: #333;
+            color: white;
         }
 
         /* Responsive Styling */
-        @media (max-width: 768px) {
+        @media (max-width: 992px) {
             .modal-body {
                 flex-direction: column;
+                height: auto;
             }
             
             .image-section, .info-section {
                 flex: none;
                 width: 100%;
+            }
+
+            .image-section {
+                height: 50vh;
+            }
+
+            .info-section {
+                padding: 20px;
             }
         }
     </style>
@@ -193,53 +233,63 @@
                 <button class="close-btn" onclick="closeModal()">&times;</button>
             </div>
             <div class="modal-body">
-        <div class="image-section">
-                    <img src="" alt="Product Image" id="clothImage">
-        </div>
-        <div class="info-section">
+                <div class="image-section">
+                    <img id="clothImage" src="" alt="Product Image">
+                </div>
+                <div class="info-section">
                     <h1 class="product-title" id="clothTitle">Product Title</h1>
                     <div class="product-price">₹<span id="clothPrice">0.00</span>/day</div>
                     
-                    <div class="product-specs">
-                        <div class="info-item">
-                            <i class="fas fa-tshirt"></i>
-                            <span id="clothSize">M</span>
+                    <div class="product-description" id="clothDescription">
+                        Product description will appear here.
+                    </div>
+                    
+                    <div class="model-info">
+                        <div>
+                            <span id="clothSize">Size: M</span> | 
+                            <span id="clothCategory">Category: Men</span>
                         </div>
-                        <div class="info-item">
-                            <i class="fas fa-tag"></i>
-                            <span id="clothCategory">Men</span>
+                    </div>
+                    
+                    <button class="wishlist-button" onclick="addToWishlist()">
+                        ADD TO WISHLIST
+                    </button>
+                    
+                    <div class="shop-info-section">
+                        <div class="shop-info-title">Shop Information</div>
+                        <div class="shop-info-item">
+                            <i class="fas fa-store"></i>
+                            <span id="shopName">Shop Name</span>
                         </div>
-                        <div class="info-item">
+                        <div class="shop-info-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span id="shopAddress">Shop Address</span>
+                        </div>
+                        <div class="shop-info-item">
                             <i class="fas fa-phone"></i>
-                            <span id="contactNumber">1234567890</span>
+                            <a href="tel:" id="contactNumberLink" class="contact-link">
+                                <span id="contactNumber">1234567890</span>
+                            </a>
                         </div>
-                        <div class="info-item">
+                        <div class="shop-info-item">
                             <i class="fab fa-whatsapp"></i>
-                            <span id="whatsappNumber">1234567890</span>
+                            <a href="https://wa.me/" id="whatsappNumberLink" class="contact-link">
+                                <span id="whatsappNumber">1234567890</span>
+                            </a>
                         </div>
+                        
+                        <a href="#" class="view-map-button" id="locationBtn" onclick="openLocation()">
+                            <i class="fas fa-map-marker-alt"></i> View on Map
+                        </a>
                     </div>
                     
-                    <h3 class="section-title">Description</h3>
-                    <p class="description-text" id="clothDescription">Product description will appear here.</p>
-                    
-                    <h3 class="section-title">Terms & Conditions</h3>
-                    <p class="terms-text" id="termsConditions">Terms and conditions will appear here.</p>
-                    
-                    <div class="info-item" style="display: none;">
-                        <i class="fas fa-store"></i>
-                        <span id="shopName">Shop Name</span>
-                    </div>
-                    <div class="info-item" style="display: none;">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <span id="shopAddress">Shop Address</span>
+                    <div class="terms-section">
+                        <div class="shop-info-title">Terms & Conditions</div>
+                        <div class="product-description" id="termsConditions">
+                            Terms and conditions will appear here.
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button class="location-button" id="locationBtn" onclick="openLocation()">
-                    <i class="fas fa-map-marker-alt"></i> View on Map
-                </button>
-                <button class="close-button" onclick="closeModal()">Close</button>
             </div>
         </div>
     </div>
@@ -274,19 +324,36 @@
             window.history.back();
         }
 
+        // Add to wishlist function
+        function addToWishlist() {
+            const productId = getQueryParams().id;
+            alert(`Product added to wishlist!`);
+            // Here you would implement actual wishlist functionality
+        }
+
         // Function to open Google Maps with seller's location
         function openLocation() {
             // Get stored latitude and longitude
             const latitude = window.sellerLatitude || 0;
             const longitude = window.sellerLongitude || 0;
+            const shopAddress = document.getElementById('shopAddress').textContent || '';
             
-            console.log('Opening location with coordinates:', latitude, longitude);
+            console.log('Opening location with:', {
+                coordinates: `${latitude},${longitude}`,
+                address: shopAddress
+            });
             
-            if (latitude && longitude) {
+            if (latitude && longitude && latitude != 0 && longitude != 0) {
                 // Open Google Maps with the coordinates
                 window.open(`https://www.google.com/maps?q=${latitude},${longitude}`, '_blank');
+                console.log('Using coordinates for map');
+            } else if (shopAddress && shopAddress !== 'Address not specified' && shopAddress !== 'Not provided') {
+                // Fallback to address search if we have an address but no coordinates
+                window.open(`https://www.google.com/maps?q=${encodeURIComponent(shopAddress)}`, '_blank');
+                console.log('Using address for location:', shopAddress);
             } else {
                 alert('Location information is not available for this seller.');
+                console.log('No location data available');
             }
         }
 
@@ -323,6 +390,7 @@
                 }
                 
                 const data = await response.json();
+                console.log('API Response:', data);
                 
                 if (data.status === 'success' && data.products && data.products.length > 0) {
                     // Find the exact product in the response
@@ -333,12 +401,16 @@
                         // Check both string and numeric equality
                         if (data.products[i].id == productId) {
                             product = data.products[i];
+                            console.log('Found product with matching ID:', product);
                             break;
                         }
                     }
                     
                     // If we found a matching product, use it
                     if (product) {
+                        // Log shop address specifically to see if it's present
+                        console.log('Shop address in product data:', product.shop_address);
+                        
                         populateProductDetails(product);
                         
                         // Fetch seller location if we have a seller_id
@@ -347,6 +419,9 @@
                         }
                     } else if (data.products.length > 0) {
                         // Fallback: use the first product if no exact match
+                        console.log('No exact match, using first product:', data.products[0]);
+                        console.log('Shop address in first product:', data.products[0].shop_address);
+                        
                         populateProductDetails(data.products[0]);
                         
                         // Fetch seller location if we have a seller_id
@@ -408,13 +483,49 @@
             // Set text content
             document.getElementById('clothTitle').textContent = product.title || product.cloth_title || 'Product';
             document.getElementById('clothDescription').textContent = product.description || 'No description available';
-            document.getElementById('clothSize').textContent = product.size || 'Not specified';
-            document.getElementById('clothCategory').textContent = product.category || 'Not specified';
+            document.getElementById('clothSize').textContent = `Size: ${product.size || 'Not specified'}`;
+            document.getElementById('clothCategory').textContent = `Category: ${product.category || 'Not specified'}`;
             document.getElementById('clothPrice').textContent = product.rental_price || product.rentalPrice || '0';
-            document.getElementById('contactNumber').textContent = product.contact_number || product.contactNo || 'Not provided';
-            document.getElementById('whatsappNumber').textContent = product.whatsapp_number || product.whatsappNo || 'Not provided';
+
+            // Shop name - look for it in multiple possible properties
             document.getElementById('shopName').textContent = product.shop_name || 'ClothLoop Shop';
-            document.getElementById('shopAddress').textContent = product.shop_address || 'Address not specified';
+            
+            // Handle shop address - checking multiple properties and log for debugging
+            console.log('Shop address from product:', product.shop_address);
+            
+            // Try to get shop_address from different possible property names, with fallback
+            const shopAddress = product.shop_address || product.address || 'Address not specified';
+            document.getElementById('shopAddress').textContent = shopAddress;
+            
+            // Enable the location button if we have a valid address (not the fallback text)
+            if (shopAddress !== 'Address not specified') {
+                const locationBtn = document.getElementById('locationBtn');
+                if (locationBtn) {
+                    locationBtn.disabled = false;
+                }
+            }
+            
+            // Set contact number and create clickable link
+            const contactNumber = product.contact_number || product.contactNo || 'Not provided';
+            document.getElementById('contactNumber').textContent = contactNumber;
+            
+            // Set WhatsApp number and create clickable link
+            const whatsappNumber = product.whatsapp_number || product.whatsappNo || 'Not provided';
+            document.getElementById('whatsappNumber').textContent = whatsappNumber;
+            
+            // Update href attributes for phone and WhatsApp links
+            if (contactNumber && contactNumber !== 'Not provided') {
+                document.getElementById('contactNumberLink').href = 'tel:' + contactNumber.replace(/\s+/g, '');
+            } else {
+                document.getElementById('contactNumberLink').removeAttribute('href');
+            }
+            
+            if (whatsappNumber && whatsappNumber !== 'Not provided') {
+                document.getElementById('whatsappNumberLink').href = 'https://wa.me/' + whatsappNumber.replace(/\s+/g, '');
+            } else {
+                document.getElementById('whatsappNumberLink').removeAttribute('href');
+            }
+            
             document.getElementById('termsConditions').textContent = product.terms_and_conditions || product.terms || 'No specific terms';
             
             // Check for shop_location in the product data
@@ -527,19 +638,55 @@
             
             document.getElementById('clothTitle').textContent = params.title || 'Product';
             document.getElementById('clothDescription').textContent = params.description || 'No description available';
-            document.getElementById('clothSize').textContent = params.size || 'Not specified';
-            document.getElementById('clothCategory').textContent = params.category || 'Not specified';
+            document.getElementById('clothSize').textContent = `Size: ${params.size || 'Not specified'}`;
+            document.getElementById('clothCategory').textContent = `Category: ${params.category || 'Not specified'}`;
             document.getElementById('clothPrice').textContent = params.price || '0';
-            document.getElementById('contactNumber').textContent = params.contact || 'Not provided';
-            document.getElementById('whatsappNumber').textContent = params.whatsapp || 'Not provided';
+
+            // Shop name - look for it in multiple possible properties
             document.getElementById('shopName').textContent = params.shop || 'ClothLoop Shop';
-            document.getElementById('shopAddress').textContent = params.address || 'Address not specified';
+            
+            // Handle shop address - checking multiple properties and log for debugging
+            console.log('Shop address from product:', params.address);
+            
+            // Try to get shop_address from different possible property names, with fallback
+            const shopAddress = params.address || 'Address not specified';
+            document.getElementById('shopAddress').textContent = shopAddress;
+            
+            // Enable the location button if we have a valid address (not the fallback text)
+            if (shopAddress !== 'Address not specified') {
+                const locationBtn = document.getElementById('locationBtn');
+                if (locationBtn) {
+                    locationBtn.disabled = false;
+                }
+            }
+            
             document.getElementById('termsConditions').textContent = params.terms || 'No specific terms';
             
             // Store location data from URL params if available
             if (params.latitude && params.longitude) {
                 window.sellerLatitude = params.latitude;
                 window.sellerLongitude = params.longitude;
+            }
+
+            // Set contact number and create clickable link
+            const contactNumber = params.contact || 'Not provided';
+            document.getElementById('contactNumber').textContent = contactNumber;
+            
+            // Set WhatsApp number and create clickable link
+            const whatsappNumber = params.whatsapp || 'Not provided';
+            document.getElementById('whatsappNumber').textContent = whatsappNumber;
+            
+            // Update href attributes for phone and WhatsApp links
+            if (contactNumber && contactNumber !== 'Not provided') {
+                document.getElementById('contactNumberLink').href = 'tel:' + contactNumber.replace(/\s+/g, '');
+            } else {
+                document.getElementById('contactNumberLink').removeAttribute('href');
+            }
+            
+            if (whatsappNumber && whatsappNumber !== 'Not provided') {
+                document.getElementById('whatsappNumberLink').href = 'https://wa.me/' + whatsappNumber.replace(/\s+/g, '');
+            } else {
+                document.getElementById('whatsappNumberLink').removeAttribute('href');
             }
         }
 
