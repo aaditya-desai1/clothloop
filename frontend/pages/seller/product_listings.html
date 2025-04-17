@@ -37,10 +37,10 @@
     /* Apply colors to elements */
     body {
         background-color: var(--background);
-        color: var(--text-primary);
+      color: var(--text-primary);
         font-family: 'Roboto', sans-serif;
-        margin: 0;
-        padding: 0;
+      margin: 0;
+      padding: 0;
         box-sizing: border-box;
         letter-spacing: 0.02em;
     }
@@ -54,15 +54,15 @@
         top: 0;
         z-index: 1000;
         height: 80px;
-        display: flex;
+      display: flex;
         align-items: center;
     }
 
     .header-container {
-        display: flex;
-        align-items: center;
+      display: flex;
+      align-items: center;
         justify-content: space-between;
-        width: 100%;
+      width: 100%;
         max-width: 1400px;
         margin: 0 auto;
         padding: 0 30px;
@@ -70,22 +70,22 @@
     }
 
     .header-left {
-        display: flex;
-        align-items: center;
+      display: flex;
+      align-items: center;
         z-index: 2;
     }
-
+    
     .header-right {
-        display: flex;
-        align-items: center;
+      display: flex;
+      align-items: center;
         z-index: 2;
     }
-
+    
     .logo {
-        display: flex;
-        align-items: center;
+      display: flex;
+      align-items: center;
         margin-right: 30px;
-        position: relative;
+      position: relative;
     }
 
     .logo-name {
@@ -97,7 +97,7 @@
     
     /* Seller badge */
     .seller-badge {
-        position: absolute;
+      position: absolute;
         top: -10px;
         right: -10px;
         background-color: var(--seller-highlight);
@@ -105,7 +105,7 @@
         font-size: 10px;
         font-weight: bold;
         padding: 3px 8px;
-        border-radius: 10px;
+      border-radius: 10px;
         text-transform: uppercase;
         letter-spacing: 0.5px;
         box-shadow: 0 2px 5px rgba(0,0,0,0.2);
@@ -126,22 +126,22 @@
 
     /* Navigation styles */
     .nav-container {
-        display: flex;
-        align-items: center;
+      display: flex;
+      align-items: center;
     }
 
     .nav-items {
-        display: flex;
+      display: flex;
         list-style: none;
         margin: 0;
         padding: 0;
-        height: 100%;
+      height: 100%;
     }
 
     .nav-items li {
         height: 80px;
-        display: flex;
-        align-items: center;
+      display: flex;
+      align-items: center;
         margin: 0 15px;
     }
 
@@ -152,8 +152,8 @@
         font-size: 14px;
         text-transform: uppercase;
         letter-spacing: 1px;
-        height: 100%;
-        display: flex;
+      height: 100%;
+      display: flex;
         align-items: center;
         position: relative;
     }
@@ -208,7 +208,7 @@
         padding: 12px 15px;
         padding-left: 40px;
         font-size: 14px;
-        color: var(--text-primary);
+      color: var(--text-primary);
     }
 
     .search-input:focus {
@@ -245,7 +245,7 @@
 
     .sort-button:hover {
         background-color: var(--text-primary);
-        color: white;
+      color: white;
     }
 
     /* User actions */
@@ -255,12 +255,12 @@
     }
 
     .action-item {
-        display: flex;
+      display: flex;
         flex-direction: column;
-        align-items: center;
-        justify-content: center;
+      align-items: center;
+      justify-content: center;
         margin: 0 15px;
-        cursor: pointer;
+      cursor: pointer;
         position: relative;
     }
 
@@ -287,22 +287,22 @@
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         padding: 10px 0;
         z-index: 200;
-        opacity: 0;
-        visibility: hidden;
+      opacity: 0;
+      visibility: hidden;
         transform: translateY(10px);
-        transition: all 0.3s ease;
+      transition: all 0.3s ease;
         margin-top: 5px;
     }
-    
+
     .profile-dropdown.active {
-        opacity: 1;
-        visibility: visible;
+      opacity: 1;
+      visibility: visible;
         transform: translateY(0);
     }
     
     .profile-dropdown a {
-        display: flex;
-        align-items: center;
+      display: flex;
+      align-items: center;
         padding: 10px 15px;
         color: var(--text-primary);
         text-decoration: none;
@@ -319,7 +319,7 @@
         margin-right: 10px;
         font-size: 16px;
         width: 20px;
-        text-align: center;
+      text-align: center;
     }
     
     .profile-divider {
@@ -332,18 +332,18 @@
     .main-content {
         max-width: 1400px;
         margin: 0 auto;
-        padding: 30px;
+      padding: 30px;
     }
 
     .content-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
         margin-bottom: 30px;
     }
 
     .content-title {
-        font-size: 24px;
+      font-size: 24px;
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 1px;
@@ -352,12 +352,12 @@
     .action-button {
         background-color: var(--button-primary);
         color: var(--button-text);
-        border: none;
+      border: none;
         padding: 10px 20px;
         font-size: 14px;
         text-transform: uppercase;
         letter-spacing: 1px;
-        cursor: pointer;
+      cursor: pointer;
         transition: all 0.3s ease;
     }
 
@@ -384,7 +384,7 @@
         border: 1px solid #eaeaea;
         border-radius: 2px;
         box-shadow: none;
-        transition: all 0.3s ease;
+      transition: all 0.3s ease;
     }
 
     .item:hover {
@@ -394,14 +394,14 @@
     }
 
     .item-image {
-        width: 100%;
+      width: 100%;
         height: 300px;
         object-fit: cover;
         display: block;
     }
 
     .item-details {
-        padding: 15px;
+      padding: 15px;
         border-top: 1px solid rgba(0, 0, 0, 0.05);
     }
 
@@ -417,7 +417,7 @@
         font-size: 16px;
         font-weight: 400;
         margin-top: 5px;
-        color: var(--text-primary);
+      color: var(--text-primary);
     }
 
     .item-seller {
@@ -427,13 +427,13 @@
     }
 
     .item-actions {
-        display: flex;
+      display: flex;
         margin-top: 15px;
     }
 
     .view-details-btn {
         background-color: transparent;
-        color: var(--text-primary);
+      color: var(--text-primary);
         border: 1px solid var(--text-primary);
         padding: 8px 20px;
         font-size: 12px;
@@ -458,9 +458,9 @@
         padding: 8px;
         color: var(--text-primary);
         font-size: 20px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
         transition: color 0.3s;
     }
 
@@ -508,7 +508,7 @@
         }
 
         .content-header {
-            flex-direction: column;
+      flex-direction: column;
             align-items: flex-start;
         }
 
@@ -524,8 +524,8 @@
 
     /* Loading spinner */
     .loading-spinner {
-        display: flex;
-        justify-content: center;
+      display: flex;
+      justify-content: center;
         align-items: center;
         height: 100px;
     }
@@ -549,9 +549,9 @@
         padding: 15px;
         margin-bottom: 20px;
         border-radius: 2px;
-        display: none;
+      display: none;
     }
-
+    
     .alert-success {
         background-color: var(--success-color);
         color: white;
@@ -567,11 +567,11 @@
     <!-- Header Section -->
     <header class="header">
         <div class="header-container">
-            <div class="header-left">
-                <div class="logo">
+      <div class="header-left">
+        <div class="logo">
                     <span class="logo-name">CLOTHLOOP</span>
                     <span class="seller-badge">Seller</span>
-                </div>
+          </div>
                 
                 <nav class="nav-container">
                     <ul class="nav-items">
@@ -580,14 +580,14 @@
                         <li><a href="seller_profile.html">Profile</a></li>
                     </ul>
                 </nav>
-            </div>
+        </div>
             
-            <div class="header-right">
+      <div class="header-right">
                 <div class="actions">
                     <div class="action-item" id="logoutBtn">
                         <i class="fas fa-sign-out-alt"></i>
                         <span>LOGOUT</span>
-                    </div>
+            </div>
                     
                     <div class="action-item" id="statisticsBtn">
                         <i class="fas fa-chart-bar"></i>
@@ -597,10 +597,10 @@
                     <div class="action-item" id="helpBtn">
                         <i class="fas fa-question-circle"></i>
                         <span>ABOUT US</span>
-                    </div>
-                </div>
             </div>
+          </div>
         </div>
+      </div>
     </header>
 
     <!-- Main Content -->
@@ -610,29 +610,29 @@
             <button class="action-button" id="addProductBtn">
                 <i class="fas fa-plus"></i> Add New Product
             </button>
-        </div>
-
+      </div>
+      
         <div id="alertContainer"></div>
 
         <div id="productGrid" class="grid">
             <!-- Products will be loaded here dynamically -->
-            <div class="item">
+            <div class="item" data-product-id="sample">
                 <img src="../../assets/images/products/polo.jpg" alt="Product" class="item-image">
                 <div class="item-details">
                     <h3 class="item-title">POLO</h3>
                     <div class="item-price">₹500/day</div>
                     <div class="item-seller">Seller Hub</div>
                     <div class="item-actions">
-                        <a href="#" class="view-details-btn">VIEW DETAILS</a>
+                        <a href="product_detail.html?id=sample" class="view-details-btn">VIEW DETAILS</a>
                         <button class="heart-btn"><i class="far fa-heart"></i></button>
-                    </div>
-                </div>
-            </div>
-        </div>
+  </div>
+      </div>
+    </div>
+  </div>
 
         <div id="loadingSpinner" class="loading-spinner" style="display: none;">
             <div class="spinner"></div>
-        </div>
+      </div>
     </main>
 
     <!-- Product Card Template -->
@@ -647,20 +647,29 @@
                     <a href="#" class="view-details-btn">VIEW DETAILS</a>
                     <button class="edit-btn" title="Edit Product"><i class="fas fa-edit"></i></button>
                     <button class="delete-btn" title="Delete Product"><i class="fas fa-trash"></i></button>
-                </div>
-            </div>
-        </div>
+      </div>
+      </div>
+      </div>
     </template>
 
     <!-- JavaScript code for functionality -->
-    <script>
+  <script>
         // Wait for DOM to be fully loaded
-        document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function() {
             // Setup event listeners
             setupEventListeners();
             
             // Load products
             loadProducts();
+            
+            // Setup static sample product view details link
+            const staticViewDetailsBtn = document.querySelector('.item[data-product-id="sample"] .view-details-btn');
+            if (staticViewDetailsBtn) {
+                staticViewDetailsBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    window.location.href = 'product_detail.html?id=sample';
+                });
+            }
         });
         
         // Function to setup all event listeners
@@ -677,14 +686,14 @@
                 // Call logout API
                 fetch('../../../backend/api/users/logout.php')
                     .then(response => response.json())
-                    .then(data => {
-                        if (data.status === 'success') {
-                            window.location.href = '../../index.html';
-                        } else {
+          .then(data => {
+            if (data.status === 'success') {
+                            window.location.href = '../../pages/account/login.html';
+            } else {
                             showAlert('Error logging out. Please try again.', 'error');
-                        }
-                    })
-                    .catch(error => {
+            }
+          })
+          .catch(error => {
                         console.error('Error:', error);
                         showAlert('Error logging out. Please try again.', 'error');
                     });
@@ -730,7 +739,7 @@
         
         // Function to load products
         function loadProducts(category = null, searchTerm = null, sortOrder = null) {
-            // Show loading spinner
+        // Show loading spinner
             const loadingSpinner = document.getElementById('loadingSpinner');
             loadingSpinner.style.display = 'flex';
             
@@ -744,13 +753,13 @@
             
             // Fetch products from backend API
             fetch(`../../../backend/api/products/seller_products.php?${queryParams.toString()}`)
-                .then(response => {
-                    if (!response.ok) {
+        .then(response => {
+          if (!response.ok) {
                         throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
+          }
+          return response.json();
+        })
+        .then(data => {
                     // Hide loading spinner
                     loadingSpinner.style.display = 'none';
                     
@@ -762,12 +771,12 @@
                         data.products.forEach(product => {
                             renderProduct(product, productGrid);
                         });
-                    } else {
+            } else {
                         // No products found
                         productGrid.innerHTML = '<div class="no-products">No products found. Click "Add New Product" to get started.</div>';
-                    }
-                })
-                .catch(error => {
+            }
+          })
+          .catch(error => {
                     console.error('Error fetching products:', error);
                     loadingSpinner.style.display = 'none';
                     showAlert('Error loading products. Please try again later.', 'error');
@@ -822,7 +831,7 @@
         
         // Function to delete a product
         function deleteProduct(productId) {
-            // Show loading spinner
+        // Show loading spinner
             const loadingSpinner = document.getElementById('loadingSpinner');
             loadingSpinner.style.display = 'flex';
             
@@ -835,10 +844,10 @@
                 body: JSON.stringify({ product_id: productId })
             })
             .then(response => response.json())
-            .then(data => {
+        .then(data => {
                 loadingSpinner.style.display = 'none';
-                
-                if (data.status === 'success') {
+          
+          if (data.status === 'success') {
                     // Remove product element from DOM
                     const productElement = document.querySelector(`[data-product-id="${productId}"]`);
                     if (productElement) {
@@ -855,8 +864,8 @@
                 } else {
                     showAlert(data.message || 'Error deleting product. Please try again.', 'error');
                 }
-            })
-            .catch(error => {
+        })
+        .catch(error => {
                 console.error('Error:', error);
                 loadingSpinner.style.display = 'none';
                 showAlert('Error deleting product. Please try again.', 'error');
@@ -918,6 +927,51 @@
                 alert.style.display = 'none';
             }, 3000);
         }
-    </script>
+
+        function createProductCard(product) {
+            const template = document.getElementById('product-template');
+            const productCard = document.importNode(template.content, true);
+            
+            // Set product ID
+            productCard.querySelector('.item').dataset.productId = product.id;
+            
+            // Set product image
+            const productImage = productCard.querySelector('.item-image');
+            productImage.src = product.image || '../../assets/images/products/default.jpg';
+            productImage.alt = product.name;
+            
+            // Add error handling for image loading
+            productImage.onerror = function() {
+                this.src = '../../assets/images/products/default.jpg';
+            };
+            
+            // Set product details
+            productCard.querySelector('.item-title').textContent = product.name;
+            productCard.querySelector('.item-price').textContent = `₹${product.price}/day`;
+            productCard.querySelector('.item-seller').textContent = product.seller || 'Your Shop';
+            
+            // Set view details link
+            const viewDetailsLink = productCard.querySelector('.view-details-btn');
+            viewDetailsLink.href = `product_detail.html?id=${product.id}`;
+            viewDetailsLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                window.location.href = `product_detail.html?id=${product.id}`;
+            });
+            
+            // Set up edit and delete buttons
+            const editBtn = productCard.querySelector('.edit-btn');
+            const deleteBtn = productCard.querySelector('.delete-btn');
+            
+            editBtn.addEventListener('click', function() {
+                editProduct(product.id);
+            });
+            
+            deleteBtn.addEventListener('click', function() {
+                deleteProduct(product.id);
+            });
+            
+            return productCard;
+        }
+  </script>
 </body>
 </html> 

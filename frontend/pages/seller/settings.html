@@ -604,14 +604,14 @@
           .then(response => response.json())
           .then(data => {
             if (data.status === 'success') {
-              window.location.href = '../../index.html';
+              window.location.href = '../../pages/account/login.html';
             } else {
-              showAlert('error', 'Error logging out. Please try again.');
+              showAlert('Error logging out. Please try again.', 'danger');
             }
           })
           .catch(error => {
             console.error('Error:', error);
-            showAlert('error', 'Error logging out. Please try again.');
+            showAlert('Error logging out. Please try again.', 'danger');
           });
       }
       
