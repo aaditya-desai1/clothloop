@@ -527,11 +527,24 @@
         
         // Function to handle logout
         function handleLogout() {
-            // Clear any stored user data
-            localStorage.clear();
-            sessionStorage.clear();
+            // Get the current wishlist and user ID before clearing
+            const userId = localStorage.getItem('userId') || localStorage.getItem('user_id');
+            const wishlistKey = userId ? `wishlist_${userId}` : 'wishlist';
+            const currentWishlist = JSON.parse(localStorage.getItem(wishlistKey) || '[]');
+            
+            // Clear user data from localStorage
+            localStorage.removeItem('userId');
+            localStorage.removeItem('user_id');
+            localStorage.removeItem('userType');
+            localStorage.removeItem('username');
+            
+            // Keep the wishlist data in the generic wishlist key for guest users
+            if (currentWishlist.length > 0) {
+                localStorage.setItem('wishlist', JSON.stringify(currentWishlist));
+            }
+            
             // Redirect to login page
-            window.location.href = '../../Account/login.html';
+            window.location.href = '../account/login.html';
         }
     </script>
 </body>

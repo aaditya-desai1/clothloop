@@ -314,9 +314,48 @@
                 console.log('Login response:', data);
                 
                 if (data.success) {
-                    // Store user ID in localStorage for persistence
+                    // First completely clear ALL localStorage to prevent any data leakage between users
+                    const guestWishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
+                    
+                    // Save only essential non-user settings
+                    const preservedSettings = {};
+                    if (localStorage.getItem('clothloopSortPreference')) {
+                        preservedSettings.sortPreference = localStorage.getItem('clothloopSortPreference');
+                    }
+                    if (localStorage.getItem('clothloopCategoryPreference')) {
+                        preservedSettings.categoryPreference = localStorage.getItem('clothloopCategoryPreference');
+                    }
+                    
+                    // Force a complete localStorage cleanup - this is critical to prevent data leakage
+                    for (let key in localStorage) {
+                        localStorage.removeItem(key);
+                    }
+                    
+                    // Restore preserved settings
+                    if (preservedSettings.sortPreference) {
+                        localStorage.setItem('clothloopSortPreference', preservedSettings.sortPreference);
+                    }
+                    if (preservedSettings.categoryPreference) {
+                        localStorage.setItem('clothloopCategoryPreference', preservedSettings.categoryPreference);
+                    }
+                    
+                    // Store current user details only - completely fresh
                     if (data.user_id) {
+                        // For clarity and consistency, only use 'user_id' going forward
                         localStorage.setItem('user_id', data.user_id);
+                        
+                        // Only restore wishlist data for this specific user from guest state
+                        if (guestWishlist.length > 0) {
+                            localStorage.setItem(`wishlist_${data.user_id}`, JSON.stringify(guestWishlist));
+                        }
+                        
+                        if (data.user_type) {
+                            localStorage.setItem('userType', data.user_type);
+                        }
+                        
+                        // For verification and debugging
+                        console.log(`Logged in as user ID: ${data.user_id}, user type: ${data.user_type}`);
+                        console.log('LocalStorage after login:', Object.keys(localStorage));
                     }
                     
                     // Redirect based on user type and destination

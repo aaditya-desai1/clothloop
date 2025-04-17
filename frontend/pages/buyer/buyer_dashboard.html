@@ -978,33 +978,91 @@
         
         // Function to check if a product is in the wishlist
         function isInWishlist(productId) {
-            const wishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
-            return wishlist.includes(productId);
+            try {
+                // Get the current user ID - only use user_id
+                const userId = localStorage.getItem('user_id');
+                if (!userId) {
+                    console.log(`isInWishlist: No user ID found, checking generic wishlist`);
+                    // For guests, use the generic wishlist
+                    const wishlist = JSON.parse(localStorage.getItem('wishlist') || '[]')
+                        .map(id => id.toString());
+                    return wishlist.includes(productId.toString());
+                }
+                
+                // For logged-in users, use their specific wishlist key
+                const wishlistKey = `wishlist_${userId}`;
+                
+                console.log(`isInWishlist: Checking for product ${productId} in wishlist for user ${userId}`);
+                
+                let wishlist = [];
+                try {
+                    wishlist = JSON.parse(localStorage.getItem(wishlistKey) || '[]');
+                    // Convert all wishlist items to strings for consistent comparison
+                    wishlist = wishlist.map(id => id.toString());
+                } catch (e) {
+                    console.error('Error parsing wishlist from localStorage:', e);
+                    return false;
+                }
+                
+                const productIdStr = productId.toString();
+                const result = wishlist.includes(productIdStr);
+                
+                console.log(`isInWishlist result: ${result} for product ${productIdStr}`);
+                return result;
+            } catch (e) {
+                console.error('Error in isInWishlist:', e);
+                return false;
+            }
         }
         
         // Function to toggle wishlist status
         function toggleWishlist(productId, button) {
-            let wishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
-            
-            if (isInWishlist(productId)) {
-                // Remove from wishlist
-                wishlist = wishlist.filter(id => id !== productId);
-                button.classList.remove('in-wishlist');
-                button.innerHTML = '<i class="far fa-heart"></i> Add to Wishlist';
-            } else {
-                // Add to wishlist
-                wishlist.push(productId);
-                button.classList.add('in-wishlist');
-                button.innerHTML = '<i class="fas fa-heart"></i> Remove from Wishlist';
-            }
-            
-            localStorage.setItem('wishlist', JSON.stringify(wishlist));
-            
-            // Optional: Send wishlist update to server
-            const userId = localStorage.getItem('userId');
-            if (userId) {
-                // Here you would add code to update the wishlist on the server
-                console.log(`Updated wishlist for user ${userId}`);
+            try {
+                // Get the current user ID - only use user_id
+                const userId = localStorage.getItem('user_id');
+                const wishlistKey = userId ? `wishlist_${userId}` : 'wishlist';
+                
+                console.log(`toggleWishlist: Using key ${wishlistKey} for user ${userId || 'guest'}`);
+                
+                let wishlist = [];
+                try {
+                    wishlist = JSON.parse(localStorage.getItem(wishlistKey) || '[]');
+                    // Ensure all IDs are strings
+                    wishlist = wishlist.map(id => id.toString());
+                } catch (e) {
+                    console.error(`Error parsing wishlist: ${e.message}`);
+                    wishlist = [];
+                }
+                
+                const productIdStr = productId.toString();
+                
+                if (isInWishlist(productId)) {
+                    // Remove from wishlist
+                    wishlist = wishlist.filter(id => id !== productIdStr);
+                    button.classList.remove('in-wishlist');
+                    button.innerHTML = '<i class="far fa-heart"></i> Add';
+                    console.log(`toggleWishlist: Removed product ${productIdStr}`);
+                } else {
+                    // Add to wishlist
+                    wishlist.push(productIdStr);
+                    button.classList.add('in-wishlist');
+                    button.innerHTML = '<i class="fas fa-heart"></i> Remove';
+                    console.log(`toggleWishlist: Added product ${productIdStr}`);
+                }
+                
+                localStorage.setItem(wishlistKey, JSON.stringify(wishlist));
+                console.log(`toggleWishlist: Updated wishlist now has ${wishlist.length} items`);
+                
+                // Check if we need to update URL display
+                const isWishlistPage = window.location.href.includes('wish.html');
+                if (isWishlistPage && !isInWishlist(productId)) {
+                    // If we removed an item from the wishlist page, reload to update display
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 300);
+                }
+            } catch (e) {
+                console.error(`toggleWishlist error: ${e.message}`);
             }
         }
         
@@ -1087,11 +1145,38 @@
         
         // Function to handle logout
         function handleLogout() {
-            // Clear any user data from localStorage
-            localStorage.removeItem('userId');
-            localStorage.removeItem('userType');
-            localStorage.removeItem('username');
-            // Optional: Keep wishlist data for guest users
+            // Get the current user ID
+            const userId = localStorage.getItem('user_id');
+            if (!userId) {
+                console.log('handleLogout: No user ID found, nothing to do');
+                window.location.href = '../account/login.html';
+                return;
+            }
+            
+            const wishlistKey = `wishlist_${userId}`;
+            console.log(`handleLogout: Processing logout for user ID: ${userId}`);
+            
+            try {
+                // If user had a wishlist, save it to the generic wishlist for guest mode
+                const userWishlist = JSON.parse(localStorage.getItem(wishlistKey) || '[]');
+                if (userWishlist.length > 0) {
+                    localStorage.setItem('wishlist', JSON.stringify(userWishlist));
+                    console.log(`handleLogout: Saved ${userWishlist.length} items to generic wishlist`);
+                }
+                
+                // Clear all localStorage items for complete cleanup
+                for (let key in localStorage) {
+                    if (key.startsWith('wishlist_') || key === 'user_id' || key === 'userId' || 
+                        key === 'userType' || key === 'username') {
+                        localStorage.removeItem(key);
+                    }
+                }
+                
+                console.log('handleLogout: User data cleared from localStorage');
+            } catch (e) {
+                console.error(`handleLogout error: ${e.message}`);
+            }
+            
             // Redirect to login page
             window.location.href = '../account/login.html';
         }
