@@ -418,3 +418,15 @@ t: {"id":1}
 [2025-04-17 10:39:51] Processing image request: {"id":4}
 [2025-04-17 10:39:51] Query executed: {"rows":1}
 [2025-04-17 10:39:51] Image found, serving with content type: image/jpeg
+[2025-04-17 10:40:39] Starting image request
+[2025-04-17 10:40:39] Processing image request: {"id":4}
+[2025-04-17 10:40:39] Query executed: {"rows":1}
+[2025-04-17 10:40:39] Image found, serving with content type: image/jpeg
+[2025-04-17 10:40:39] Starting image request
+[2025-04-17 10:40:39] Starting image request
+[2025-04-17 10:40:39] Processing image request: {"id":3}
+[2025-04-17 10:40:39] Query executed: {"rows":1}
+[2025-04-17 10:40:39] Image found, serving with content type: image/jpeg
+[2025-04-17 10:40:39] Processing image request: {"id":1}
+[2025-04-17 10:40:39] Query executed: {"rows":1}
+[2025-04-17 10:40:39] Image found, serving with content type: image/jpeg

@@ -372,7 +372,7 @@
             
             // Add timestamp to prevent caching
             const timestamp = new Date().getTime();
-            const apiUrl = `/ClothLoop/backend/utils/product_operations.php?operation=fetch_all&timestamp=${timestamp}`;
+            const apiUrl = `/ClothLoop/backend/utils/product_operations.php?operation=fetch_all&user_type=buyer&timestamp=${timestamp}`;
             
             // Get all products from the API with cache-busting
             fetch(apiUrl, {

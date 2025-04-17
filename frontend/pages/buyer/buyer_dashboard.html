@@ -852,36 +852,27 @@
             filteredProducts = [];
             
             // Get user info from localStorage if available
-            const userId = localStorage.getItem('userId');
+            const userId = localStorage.getItem('user_id');
             const userType = localStorage.getItem('userType');
             
-            // Build URL with the correct path
-            // Try different paths to handle various server configurations
-            const possiblePaths = [
-                '/ClothLoop/backend/utils/product_operations.php',   // For standard XAMPP setup
-                '../../../backend/utils/product_operations.php',     // Relative path option 1
-                '../../backend/utils/product_operations.php',        // Relative path option 2
-                '/backend/utils/product_operations.php'              // Direct from root
-            ];
-            
-            // Always use fetch_all operation and explicitly set user_type to 'buyer'
-            // This ensures we always get all products regardless of session state
-            let url = possiblePaths[0] + '?operation=fetch_all&user_type=buyer';
+            // Build the correct URL to ensure we're retrieving ALL products 
+            const url = '/ClothLoop/backend/utils/product_operations.php?operation=fetch_all&user_type=buyer';
             
             // Add price filter parameters if available
             const minPrice = document.getElementById('minPriceFilter').value;
             const maxPrice = document.getElementById('maxPriceFilter').value;
             
-            if (minPrice) url += `&min_price=${minPrice}`;
-            if (maxPrice) url += `&max_price=${maxPrice}`;
+            let apiUrl = url;
+            if (minPrice) apiUrl += `&min_price=${minPrice}`;
+            if (maxPrice) apiUrl += `&max_price=${maxPrice}`;
             
-            // Add timestamp to prevent caching - this is crucial to avoid cached responses
-            url += `&timestamp=${new Date().getTime()}`;
+            // Add timestamp to prevent caching
+            apiUrl += `&timestamp=${new Date().getTime()}`;
             
-            console.log('Attempting to fetch products from:', url);
+            console.log('Fetching products from:', apiUrl);
             
             // Fetch products from backend with no-cache headers
-            fetch(url, {
+            fetch(apiUrl, {
                 method: 'GET',
                 headers: {
                     'Cache-Control': 'no-cache, no-store, must-revalidate',
@@ -905,7 +896,7 @@
                     
                     if (data.status === 'success') {
                         // Map the data from cloth_details table to a consistent format
-                        allProducts = (data.products || []).map(product => {
+                        allProducts = (data.products || []).map((product, index) => {
                             // Use cloth_photo directly from cloth_details table
                             let imagePath = '../../assets/images/placeholder.png';
                             
@@ -933,7 +924,7 @@
                                 image: imagePath,
                                 size: product.size || '',
                                 // Store the original index to maintain original order if needed
-                                originalIndex: allProducts.length
+                                originalIndex: index
                             };
                         });
                         
@@ -1022,7 +1013,7 @@
                 const userId = localStorage.getItem('user_id');
                 const wishlistKey = userId ? `wishlist_${userId}` : 'wishlist';
                 
-                console.log(`toggleWishlist: Using key ${wishlistKey} for user ${userId || 'guest'}`);
+                console.log(`toggleWishlist: Processing product ID ${productId} for wishlist key ${wishlistKey}`);
                 
                 let wishlist = [];
                 try {
@@ -1041,17 +1032,17 @@
                     wishlist = wishlist.filter(id => id !== productIdStr);
                     button.classList.remove('in-wishlist');
                     button.innerHTML = '<i class="far fa-heart"></i> Add';
-                    console.log(`toggleWishlist: Removed product ${productIdStr}`);
+                    console.log(`toggleWishlist: Removed product ${productIdStr} from wishlist`);
                 } else {
                     // Add to wishlist
                     wishlist.push(productIdStr);
                     button.classList.add('in-wishlist');
                     button.innerHTML = '<i class="fas fa-heart"></i> Remove';
-                    console.log(`toggleWishlist: Added product ${productIdStr}`);
+                    console.log(`toggleWishlist: Added product ${productIdStr} to wishlist`);
                 }
                 
                 localStorage.setItem(wishlistKey, JSON.stringify(wishlist));
-                console.log(`toggleWishlist: Updated wishlist now has ${wishlist.length} items`);
+                console.log(`toggleWishlist: Updated wishlist now has ${wishlist.length} items:`, wishlist);
                 
                 // Check if we need to update URL display
                 const isWishlistPage = window.location.href.includes('wish.html');
