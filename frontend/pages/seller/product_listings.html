@@ -708,7 +708,7 @@
             // Help button
             const helpBtn = document.getElementById('helpBtn');
             helpBtn.addEventListener('click', function() {
-                window.location.href = '../about.html';
+                window.location.href = '../about/about_us.html';
             });
             
             // Search input
@@ -909,7 +909,7 @@
         }
         
         // Function to show alerts
-        function showAlert(message, type) {
+      function showAlert(message, type) {
             const alertContainer = document.getElementById('alertContainer');
             
             // Create alert element
@@ -923,7 +923,7 @@
             alertContainer.appendChild(alert);
             
             // Auto-hide after 3 seconds
-            setTimeout(() => {
+        setTimeout(() => {
                 alert.style.display = 'none';
             }, 3000);
         }
