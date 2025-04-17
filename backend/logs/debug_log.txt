@@ -1155,3 +1155,710 @@
     [message] => Error: Unknown column 'shop_address' in 'field list'
 )
 
+[2025-04-17 20:14:03] Database connection successful
+[2025-04-17 20:14:03] Starting cloth upload process
+[2025-04-17 20:14:03] POST data: Array
+(
+    [title] => shervani
+    [description] => White and red
+    [size] => XL
+    [category] => Men
+    [occasion] => Wedding
+    [rental_price] => 5000
+    [terms] => FAte to paisa 10gana
+)
+
+[2025-04-17 20:14:03] FILES data: Array
+(
+    [images] => Array
+        (
+            [name] => Array
+                (
+                    [0] => p4.jpg
+                )
+
+            [full_path] => Array
+                (
+                    [0] => p4.jpg
+                )
+
+            [type] => Array
+                (
+                    [0] => image/jpeg
+                )
+
+            [tmp_name] => Array
+                (
+                    [0] => C:\xampp\tmp\php508F.tmp
+                )
+
+            [error] => Array
+                (
+                    [0] => 0
+                )
+
+            [size] => Array
+                (
+                    [0] => 114628
+                )
+
+        )
+
+    [clothImage] => Array
+        (
+            [name] => p4.jpg
+            [full_path] => p4.jpg
+            [type] => image/jpeg
+            [tmp_name] => C:\xampp\tmp\php5090.tmp
+            [error] => 0
+            [size] => 114628
+        )
+
+)
+
+[2025-04-17 20:14:03] Product ID from POST: Not provided
+[2025-04-17 20:14:03] POST request received
+[2025-04-17 20:14:03] Seller ID from session: 1
+[2025-04-17 20:14:03] Form data parsed: Array
+(
+    [cloth_title] => shervani
+    [size] => XL
+    [category] => Men
+    [occasion] => Wedding
+    [rental_price] => 5000
+)
+
+[2025-04-17 20:14:03] Missing required fields: Array
+(
+)
+
+[2025-04-17 20:14:03] Processing image upload: Array
+(
+    [name] => p4.jpg
+    [full_path] => p4.jpg
+    [type] => image/jpeg
+    [tmp_name] => C:\xampp\tmp\php5090.tmp
+    [error] => 0
+    [size] => 114628
+)
+
+[2025-04-17 20:14:03] Image loaded successfully: Array
+(
+    [size] => 114628
+    [type] => image/jpeg
+)
+
+[2025-04-17 20:14:03] Inserting new cloth item
+[2025-04-17 20:14:03] Exception caught: Unknown column 'shop_address' in 'field list'
+[2025-04-17 20:14:03] Response: Array
+(
+    [status] => error
+    [message] => Error: Unknown column 'shop_address' in 'field list'
+)
+
+[2025-04-17 20:14:06] Database connection successful
+[2025-04-17 20:14:06] Starting cloth upload process
+[2025-04-17 20:14:06] POST data: Array
+(
+    [title] => shervani
+    [description] => White and red
+    [size] => XL
+    [category] => Men
+    [occasion] => Wedding
+    [rental_price] => 5000
+    [terms] => FAte to paisa 10gana
+)
+
+[2025-04-17 20:14:06] FILES data: Array
+(
+    [images] => Array
+        (
+            [name] => Array
+                (
+                    [0] => p4.jpg
+                )
+
+            [full_path] => Array
+                (
+                    [0] => p4.jpg
+                )
+
+            [type] => Array
+                (
+                    [0] => image/jpeg
+                )
+
+            [tmp_name] => Array
+                (
+                    [0] => C:\xampp\tmp\php5BAD.tmp
+                )
+
+            [error] => Array
+                (
+                    [0] => 0
+                )
+
+            [size] => Array
+                (
+                    [0] => 114628
+                )
+
+        )
+
+    [clothImage] => Array
+        (
+            [name] => p4.jpg
+            [full_path] => p4.jpg
+            [type] => image/jpeg
+            [tmp_name] => C:\xampp\tmp\php5BAE.tmp
+            [error] => 0
+            [size] => 114628
+        )
+
+)
+
+[2025-04-17 20:14:06] Product ID from POST: Not provided
+[2025-04-17 20:14:06] POST request received
+[2025-04-17 20:14:06] Seller ID from session: 1
+[2025-04-17 20:14:06] Form data parsed: Array
+(
+    [cloth_title] => shervani
+    [size] => XL
+    [category] => Men
+    [occasion] => Wedding
+    [rental_price] => 5000
+)
+
+[2025-04-17 20:14:06] Missing required fields: Array
+(
+)
+
+[2025-04-17 20:14:06] Processing image upload: Array
+(
+    [name] => p4.jpg
+    [full_path] => p4.jpg
+    [type] => image/jpeg
+    [tmp_name] => C:\xampp\tmp\php5BAE.tmp
+    [error] => 0
+    [size] => 114628
+)
+
+[2025-04-17 20:14:06] Image loaded successfully: Array
+(
+    [size] => 114628
+    [type] => image/jpeg
+)
+
+[2025-04-17 20:14:06] Inserting new cloth item
+[2025-04-17 20:14:06] Exception caught: Unknown column 'shop_address' in 'field list'
+[2025-04-17 20:14:06] Response: Array
+(
+    [status] => error
+    [message] => Error: Unknown column 'shop_address' in 'field list'
+)
+
+[2025-04-17 20:14:07] Database connection successful
+[2025-04-17 20:14:07] Starting cloth upload process
+[2025-04-17 20:14:07] POST data: Array
+(
+    [title] => shervani
+    [description] => White and red
+    [size] => XL
+    [category] => Men
+    [occasion] => Wedding
+    [rental_price] => 5000
+    [terms] => FAte to paisa 10gana
+)
+
+[2025-04-17 20:14:07] FILES data: Array
+(
+    [images] => Array
+        (
+            [name] => Array
+                (
+                    [0] => p4.jpg
+                )
+
+            [full_path] => Array
+                (
+                    [0] => p4.jpg
+                )
+
+            [type] => Array
+                (
+                    [0] => image/jpeg
+                )
+
+            [tmp_name] => Array
+                (
+                    [0] => C:\xampp\tmp\php5EEB.tmp
+                )
+
+            [error] => Array
+                (
+                    [0] => 0
+                )
+
+            [size] => Array
+                (
+                    [0] => 114628
+                )
+
+        )
+
+    [clothImage] => Array
+        (
+            [name] => p4.jpg
+            [full_path] => p4.jpg
+            [type] => image/jpeg
+            [tmp_name] => C:\xampp\tmp\php5EEC.tmp
+            [error] => 0
+            [size] => 114628
+        )
+
+)
+
+[2025-04-17 20:14:07] Product ID from POST: Not provided
+[2025-04-17 20:14:07] POST request received
+[2025-04-17 20:14:07] Seller ID from session: 1
+[2025-04-17 20:14:07] Form data parsed: Array
+(
+    [cloth_title] => shervani
+    [size] => XL
+    [category] => Men
+    [occasion] => Wedding
+    [rental_price] => 5000
+)
+
+[2025-04-17 20:14:07] Missing required fields: Array
+(
+)
+
+[2025-04-17 20:14:07] Processing image upload: Array
+(
+    [name] => p4.jpg
+    [full_path] => p4.jpg
+    [type] => image/jpeg
+    [tmp_name] => C:\xampp\tmp\php5EEC.tmp
+    [error] => 0
+    [size] => 114628
+)
+
+[2025-04-17 20:14:07] Image loaded successfully: Array
+(
+    [size] => 114628
+    [type] => image/jpeg
+)
+
+[2025-04-17 20:14:07] Inserting new cloth item
+[2025-04-17 20:14:07] Exception caught: Unknown column 'shop_address' in 'field list'
+[2025-04-17 20:14:07] Response: Array
+(
+    [status] => error
+    [message] => Error: Unknown column 'shop_address' in 'field list'
+)
+
+[2025-04-17 20:14:07] Database connection successful
+[2025-04-17 20:14:07] Starting cloth upload process
+[2025-04-17 20:14:07] POST data: Array
+(
+    [title] => shervani
+    [description] => White and red
+    [size] => XL
+    [category] => Men
+    [occasion] => Wedding
+    [rental_price] => 5000
+    [terms] => FAte to paisa 10gana
+)
+
+[2025-04-17 20:14:07] FILES data: Array
+(
+    [images] => Array
+        (
+            [name] => Array
+                (
+                    [0] => p4.jpg
+                )
+
+            [full_path] => Array
+                (
+                    [0] => p4.jpg
+                )
+
+            [type] => Array
+                (
+                    [0] => image/jpeg
+                )
+
+            [tmp_name] => Array
+                (
+                    [0] => C:\xampp\tmp\php5FB8.tmp
+                )
+
+            [error] => Array
+                (
+                    [0] => 0
+                )
+
+            [size] => Array
+                (
+                    [0] => 114628
+                )
+
+        )
+
+    [clothImage] => Array
+        (
+            [name] => p4.jpg
+            [full_path] => p4.jpg
+            [type] => image/jpeg
+            [tmp_name] => C:\xampp\tmp\php5FB9.tmp
+            [error] => 0
+            [size] => 114628
+        )
+
+)
+
+[2025-04-17 20:14:07] Product ID from POST: Not provided
+[2025-04-17 20:14:07] POST request received
+[2025-04-17 20:14:07] Seller ID from session: 1
+[2025-04-17 20:14:07] Form data parsed: Array
+(
+    [cloth_title] => shervani
+    [size] => XL
+    [category] => Men
+    [occasion] => Wedding
+    [rental_price] => 5000
+)
+
+[2025-04-17 20:14:07] Missing required fields: Array
+(
+)
+
+[2025-04-17 20:14:07] Processing image upload: Array
+(
+    [name] => p4.jpg
+    [full_path] => p4.jpg
+    [type] => image/jpeg
+    [tmp_name] => C:\xampp\tmp\php5FB9.tmp
+    [error] => 0
+    [size] => 114628
+)
+
+[2025-04-17 20:14:07] Image loaded successfully: Array
+(
+    [size] => 114628
+    [type] => image/jpeg
+)
+
+[2025-04-17 20:14:07] Inserting new cloth item
+[2025-04-17 20:14:07] Exception caught: Unknown column 'shop_address' in 'field list'
+[2025-04-17 20:14:07] Response: Array
+(
+    [status] => error
+    [message] => Error: Unknown column 'shop_address' in 'field list'
+)
+
+[2025-04-17 20:14:08] Database connection successful
+[2025-04-17 20:14:08] Starting cloth upload process
+[2025-04-17 20:14:08] POST data: Array
+(
+    [title] => shervani
+    [description] => White and red
+    [size] => XL
+    [category] => Men
+    [occasion] => Wedding
+    [rental_price] => 5000
+    [terms] => FAte to paisa 10gana
+)
+
+[2025-04-17 20:14:08] FILES data: Array
+(
+    [images] => Array
+        (
+            [name] => Array
+                (
+                    [0] => p4.jpg
+                )
+
+            [full_path] => Array
+                (
+                    [0] => p4.jpg
+                )
+
+            [type] => Array
+                (
+                    [0] => image/jpeg
+                )
+
+            [tmp_name] => Array
+                (
+                    [0] => C:\xampp\tmp\php6373.tmp
+                )
+
+            [error] => Array
+                (
+                    [0] => 0
+                )
+
+            [size] => Array
+                (
+                    [0] => 114628
+                )
+
+        )
+
+    [clothImage] => Array
+        (
+            [name] => p4.jpg
+            [full_path] => p4.jpg
+            [type] => image/jpeg
+            [tmp_name] => C:\xampp\tmp\php6374.tmp
+            [error] => 0
+            [size] => 114628
+        )
+
+)
+
+[2025-04-17 20:14:08] Product ID from POST: Not provided
+[2025-04-17 20:14:08] POST request received
+[2025-04-17 20:14:08] Seller ID from session: 1
+[2025-04-17 20:14:08] Form data parsed: Array
+(
+    [cloth_title] => shervani
+    [size] => XL
+    [category] => Men
+    [occasion] => Wedding
+    [rental_price] => 5000
+)
+
+[2025-04-17 20:14:08] Missing required fields: Array
+(
+)
+
+[2025-04-17 20:14:08] Processing image upload: Array
+(
+    [name] => p4.jpg
+    [full_path] => p4.jpg
+    [type] => image/jpeg
+    [tmp_name] => C:\xampp\tmp\php6374.tmp
+    [error] => 0
+    [size] => 114628
+)
+
+[2025-04-17 20:14:08] Image loaded successfully: Array
+(
+    [size] => 114628
+    [type] => image/jpeg
+)
+
+[2025-04-17 20:14:08] Inserting new cloth item
+[2025-04-17 20:14:08] Exception caught: Unknown column 'shop_address' in 'field list'
+[2025-04-17 20:14:08] Response: Array
+(
+    [status] => error
+    [message] => Error: Unknown column 'shop_address' in 'field list'
+)
+
+[2025-04-17 20:14:08] Database connection successful
+[2025-04-17 20:14:08] Starting cloth upload process
+[2025-04-17 20:14:08] POST data: Array
+(
+    [title] => shervani
+    [description] => White and red
+    [size] => XL
+    [category] => Men
+    [occasion] => Wedding
+    [rental_price] => 5000
+    [terms] => FAte to paisa 10gana
+)
+
+[2025-04-17 20:14:08] FILES data: Array
+(
+    [images] => Array
+        (
+            [name] => Array
+                (
+                    [0] => p4.jpg
+                )
+
+            [full_path] => Array
+                (
+                    [0] => p4.jpg
+                )
+
+            [type] => Array
+                (
+                    [0] => image/jpeg
+                )
+
+            [tmp_name] => Array
+                (
+                    [0] => C:\xampp\tmp\php6450.tmp
+                )
+
+            [error] => Array
+                (
+                    [0] => 0
+                )
+
+            [size] => Array
+                (
+                    [0] => 114628
+                )
+
+        )
+
+    [clothImage] => Array
+        (
+            [name] => p4.jpg
+            [full_path] => p4.jpg
+            [type] => image/jpeg
+            [tmp_name] => C:\xampp\tmp\php6451.tmp
+            [error] => 0
+            [size] => 114628
+        )
+
+)
+
+[2025-04-17 20:14:08] Product ID from POST: Not provided
+[2025-04-17 20:14:08] POST request received
+[2025-04-17 20:14:08] Seller ID from session: 1
+[2025-04-17 20:14:08] Form data parsed: Array
+(
+    [cloth_title] => shervani
+    [size] => XL
+    [category] => Men
+    [occasion] => Wedding
+    [rental_price] => 5000
+)
+
+[2025-04-17 20:14:08] Missing required fields: Array
+(
+)
+
+[2025-04-17 20:14:08] Processing image upload: Array
+(
+    [name] => p4.jpg
+    [full_path] => p4.jpg
+    [type] => image/jpeg
+    [tmp_name] => C:\xampp\tmp\php6451.tmp
+    [error] => 0
+    [size] => 114628
+)
+
+[2025-04-17 20:14:08] Image loaded successfully: Array
+(
+    [size] => 114628
+    [type] => image/jpeg
+)
+
+[2025-04-17 20:14:08] Inserting new cloth item
+[2025-04-17 20:14:08] Exception caught: Unknown column 'shop_address' in 'field list'
+[2025-04-17 20:14:08] Response: Array
+(
+    [status] => error
+    [message] => Error: Unknown column 'shop_address' in 'field list'
+)
+
+[2025-04-17 20:14:17] Database connection successful
+[2025-04-17 20:14:17] Starting cloth upload process
+[2025-04-17 20:14:17] POST data: Array
+(
+    [title] => shervani
+    [description] => White and red
+    [size] => XL
+    [category] => Men
+    [occasion] => Wedding
+    [rental_price] => 5000
+    [terms] => FAte to paisa 10gana
+)
+
+[2025-04-17 20:14:17] FILES data: Array
+(
+    [images] => Array
+        (
+            [name] => Array
+                (
+                    [0] => p4.jpg
+                )
+
+            [full_path] => Array
+                (
+                    [0] => p4.jpg
+                )
+
+            [type] => Array
+                (
+                    [0] => image/jpeg
+                )
+
+            [tmp_name] => Array
+                (
+                    [0] => C:\xampp\tmp\php876A.tmp
+                )
+
+            [error] => Array
+                (
+                    [0] => 0
+                )
+
+            [size] => Array
+                (
+                    [0] => 114628
+                )
+
+        )
+
+    [clothImage] => Array
+        (
+            [name] => p4.jpg
+            [full_path] => p4.jpg
+            [type] => image/jpeg
+            [tmp_name] => C:\xampp\tmp\php876B.tmp
+            [error] => 0
+            [size] => 114628
+        )
+
+)
+
+[2025-04-17 20:14:17] Product ID from POST: Not provided
+[2025-04-17 20:14:17] POST request received
+[2025-04-17 20:14:17] Seller ID from session: 1
+[2025-04-17 20:14:17] Form data parsed: Array
+(
+    [cloth_title] => shervani
+    [size] => XL
+    [category] => Men
+    [occasion] => Wedding
+    [rental_price] => 5000
+)
+
+[2025-04-17 20:14:17] Missing required fields: Array
+(
+)
+
+[2025-04-17 20:14:17] Processing image upload: Array
+(
+    [name] => p4.jpg
+    [full_path] => p4.jpg
+    [type] => image/jpeg
+    [tmp_name] => C:\xampp\tmp\php876B.tmp
+    [error] => 0
+    [size] => 114628
+)
+
+[2025-04-17 20:14:17] Image loaded successfully: Array
+(
+    [size] => 114628
+    [type] => image/jpeg
+)
+
+[2025-04-17 20:14:17] Inserting new cloth item
+[2025-04-17 20:14:17] Exception caught: Unknown column 'shop_address' in 'field list'
+[2025-04-17 20:14:17] Response: Array
+(
+    [status] => error
+    [message] => Error: Unknown column 'shop_address' in 'field list'
+)
+

@@ -4,100 +4,204 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wishlist - ClothLoop</title>
-    <!-- Font Awesome for Icons -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
-    <!-- Google Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        /* General Styling */
-        body {
-            font-family: 'Roboto', sans-serif;
+        /* Theme Variables */
+        :root {
+            /* Dark Theme (Default) */
+            --primary-color: #000000;
+            --secondary-color: #333333;
+            --accent-color: #ffffff;
+            --text-color: #ffffff;
+            --light-bg: #111111;
+            --card-bg: #1a1a1a;
+            --footer-bg: #000000;
+            --footer-text: #cccccc;
+            --border-radius: 0;
+            --box-shadow: 0 5px 10px rgba(0, 0, 0, 0.8);
+            --button-color: #ffffff;
+            --button-text: #000000;
+            --button-hover: #cccccc;
+            --card-border: 1px solid #333333;
+        }
+
+        /* Light Theme Variables */
+        .light-theme {
+            --primary-color: #ffffff;
+            --secondary-color: #000000;
+            --accent-color: #000000;
+            --text-color: #000000;
+            --light-bg: #f5f5f5;
+            --card-bg: #ffffff;
+            --footer-bg: #f5f5f5;
+            --footer-text: #000000;
+            --border-radius: 0;
+            --box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+            --button-color: #000000;
+            --button-text: #ffffff;
+            --button-hover: #333333;
+            --card-border: 1px solid #e0e0e0;
+        }
+
+        * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            background-color: #f5f5f6;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.7;
+            color: var(--text-color);
+            background-color: var(--light-bg);
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Theme Switcher */
+        .theme-switcher {
+            background: var(--primary-color);
+            border: 2px solid var(--accent-color);
+            color: var(--accent-color);
+            width: 40px;
+            height: 40px;
+            border-radius: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            margin-left: 20px;
+            transition: all 0.2s linear;
         }
         
-        /* Header Section */
-        .header {
-            background-color: white;
-            padding: 10px;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        .theme-switcher:hover {
+            transform: skewX(-5deg);
+            box-shadow: 3px 3px 0 rgba(128, 128, 128, 0.3);
+        }
+
+        /* Navigation */
+        nav {
+            background-color: var(--primary-color);
+            padding: 1.2rem 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            box-shadow: 0 1px 3px rgba(255, 255, 255, 0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
         }
-          
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            width: 100%;
+
+        nav .logo {
+            color: var(--accent-color);
+            font-size: 1.8rem;
+            font-weight: 700;
+            text-decoration: none;
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            letter-spacing: 3px;
+            text-transform: uppercase;
         }
-          
-        .logo {
-            height: 50px;
+
+        nav .logo i {
             margin-right: 10px;
         }
-          
-        .header-buttons {
+
+        nav ul {
             display: flex;
-            gap: 10px;
+            list-style: none;
         }
-          
-        .header-button {
-            background-color: #ff3e6c;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.3s ease;
+
+        nav ul li {
+            margin-left: 1.5rem;
+        }
+
+        nav ul li a {
+            color: var(--accent-color);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0;
+            transition: all 0.2s linear;
             font-weight: 500;
+            border-bottom: 2px solid transparent;
         }
-          
-        .header-button:hover {
-            background-color: #e83e65;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        
-        /* Wishlist Main Section */
-        main {
-            padding: 20px;
+
+        nav ul li a:hover, nav ul li a.active {
+            background-color: transparent;
+            color: var(--accent-color);
+            border-bottom: 2px solid var(--accent-color);
         }
         
-        h2 {
-            font-size: 24px;
-            text-align: center;
-            margin: 20px 0;
-            color: #282c3f;
+        /* Main Content Section */
+        .main-container {
+            max-width: 1200px;
+            margin: 100px auto 50px;
+            padding: 0 20px;
         }
         
+        .section-title {
+            position: relative;
+            display: inline-block;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: var(--accent-color);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            animation: fadeIn 1s ease-out;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -10px;
+            width: 80px;
+            height: 4px;
+            background-color: var(--accent-color);
+            transform: skewX(-20deg);
+        }
+        
+        /* Wishlist Grid */
         .wishlist-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-            padding: 20px;
-            max-width: 1200px;
-            margin: 0 auto;
+            gap: 25px;
+            animation: fadeIn 1.5s ease-out;
         }
         
         .wishlist-item {
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background-color: var(--card-bg);
+            box-shadow: var(--box-shadow);
             overflow: hidden;
-            transition: transform 0.3s, box-shadow 0.3s;
+            transition: all 0.3s ease;
             position: relative;
+            border: var(--card-border);
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        .wishlist-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background-color: var(--accent-color);
         }
         
         .wishlist-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            transform: translateY(-10px) skewX(-3deg);
+            box-shadow: 5px 5px 0 rgba(255, 255, 255, 0.1);
+        }
+        
+        .light-theme .wishlist-item:hover {
+            box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.1);
         }
         
         .wishlist-img {
@@ -105,107 +209,127 @@
             height: 280px;
             object-fit: cover;
             display: block;
+            transition: transform 0.3s ease;
+            border-bottom: 4px solid var(--accent-color);
+        }
+        
+        .wishlist-item:hover .wishlist-img {
+            transform: scale(1.05);
         }
         
         .wishlist-details {
-            padding: 15px;
+            padding: 20px;
         }
         
         .wishlist-title {
-            font-size: 16px;
-            font-weight: 500;
-            margin-bottom: 8px;
-            color: #282c3f;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--accent-color);
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         
         .wishlist-price {
-            color: #ff3e6c;
+            font-size: 1.1rem;
             font-weight: 500;
-            font-size: 16px;
-            margin-bottom: 5px;
+            margin-bottom: 10px;
+            color: var(--accent-color);
         }
         
         .wishlist-seller {
-            color: #535766;
-            font-size: 12px;
-            margin-bottom: 15px;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            color: var(--text-color);
+            opacity: 0.8;
         }
         
         .wishlist-actions {
             display: flex;
             justify-content: space-between;
+            gap: 10px;
         }
         
         .view-btn, .remove-btn {
-            padding: 8px 0;
-            border: none;
-            border-radius: 4px;
+            background-color: transparent;
+            color: var(--accent-color);
+            border: 2px solid var(--accent-color);
+            padding: 10px 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
             cursor: pointer;
-            font-weight: 500;
-            font-size: 14px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.2s linear;
             flex: 1;
             text-align: center;
-        }
-        
-        .view-btn {
-            background-color: #ff3e6c;
-            color: white;
-            margin-right: 8px;
             text-decoration: none;
-            display: inline-block;
         }
         
-        .view-btn:hover {
-            background-color: #e83e65;
+        .view-btn:hover, .remove-btn:hover {
+            transform: translateY(-3px) skewX(-5deg);
+            background-color: var(--accent-color);
+            color: var(--primary-color);
+            box-shadow: 5px 5px 0 rgba(255, 255, 255, 0.1);
         }
         
-        .remove-btn {
-            background-color: white;
-            color: #282c3f;
-            border: 1px solid #d4d5d9;
+        .light-theme .view-btn:hover, 
+        .light-theme .remove-btn:hover {
+            box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.1);
         }
         
-        .remove-btn:hover {
-            background-color: #f5f5f6;
-        }
-        
+        /* Empty Wishlist */
         .empty-wishlist {
             text-align: center;
-            padding: 40px 20px;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            padding: 60px 20px;
+            background-color: var(--card-bg);
+            box-shadow: var(--box-shadow);
+            border: var(--card-border);
             max-width: 600px;
             margin: 0 auto;
+            animation: fadeIn 1s ease-out;
         }
         
         .empty-wishlist i {
-            font-size: 48px;
-            color: #95a5a6;
-            margin-bottom: 20px;
+            font-size: 4rem;
+            color: var(--accent-color);
+            margin-bottom: 30px;
+            opacity: 0.5;
         }
         
         .empty-wishlist p {
-            margin-bottom: 20px;
-            color: #535766;
+            margin-bottom: 30px;
+            color: var(--text-color);
+            font-size: 1.2rem;
         }
         
         .browse-btn {
             display: inline-block;
-            background-color: #ff3e6c;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 4px;
+            background-color: transparent;
+            color: var(--accent-color);
+            border: 2px solid var(--accent-color);
+            padding: 12px 25px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
             text-decoration: none;
-            font-weight: 500;
-            transition: background-color 0.2s;
+            transition: all 0.2s linear;
         }
         
         .browse-btn:hover {
-            background-color: #e83e65;
+            transform: translateY(-3px) skewX(-5deg);
+            background-color: var(--accent-color);
+            color: var(--primary-color);
+            box-shadow: 5px 5px 0 rgba(255, 255, 255, 0.1);
         }
         
-        /* Animation Keyframes */
+        .light-theme .browse-btn:hover {
+            box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        /* Animations */
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -217,60 +341,133 @@
             }
         }
         
-        .wishlist-item {
-            animation: fadeIn 0.5s ease-out;
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateY(20px);
+            }
         }
-        
-        /* Responsive */
+
+        /* Responsive Styling */
+        @media (max-width: 992px) {
+            .section-title {
+                font-size: 2rem;
+            }
+            
+            .wishlist-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+        }
+
         @media (max-width: 768px) {
             .wishlist-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
             
-            .header-buttons {
-                flex-direction: column;
+            nav {
+                padding: 1rem;
             }
         }
-        
-        @media (max-width: 480px) {
+
+        @media (max-width: 576px) {
             .wishlist-grid {
                 grid-template-columns: 1fr;
             }
             
-            .container {
-                flex-direction: column;
-                align-items: center;
-                text-align: center;
+            nav ul li {
+                margin-left: 0.5rem;
             }
             
-            .header-buttons {
-                margin-top: 15px;
+            nav ul li a {
+                padding: 0.5rem 0.8rem;
+                font-size: 0.9rem;
+            }
+            
+            .section-title {
+                font-size: 1.8rem;
             }
         }
     </style>
-
 </head>
 <body>
-    <!-- Header Section -->
-    <header class="header">
-        <div class="container">
-            <a href="buyer_dashboard.html">
-                <img src="../../assets/images/logo.webp" alt="ClothLoop Logo" class="logo">
-            </a>
-            <div class="header-buttons">
-                <button class="header-button" onclick="window.location.href='buyer_dashboard.html'">Back to Home</button>
-                <button class="header-button" onclick="handleLogout()">Logout</button>
-            </div>
+    <!-- Navigation -->
+    <nav>
+        <a href="../../home.html" class="logo">
+            <i class="fas fa-recycle"></i> ClothLoop
+        </a>
+        <div style="display: flex; align-items: center;">
+            <ul>
+                <li><a href="buyer_dashboard.html">Dashboard</a></li>
+                <li><a href="javascript:handleLogout()">Logout</a></li>
+            </ul>
+            <button class="theme-switcher" id="theme-toggle" aria-label="Toggle theme">
+                <i class="fas fa-sun"></i>
+            </button>
         </div>
-    </header>
+    </nav>
 
-    <!-- Wishlist Main Content -->
-    <main>
-        <h2>Your Wishlist</h2>
+    <!-- Main Content -->
+    <div class="main-container">
+        <h2 class="section-title">Your Wishlist</h2>
 
         <div id="wishlist-container">
             <div class="wishlist-grid" id="wishlist-grid">
-                <!-- Wishlist items will be dynamically loaded here -->
+                <!-- Static placeholder wishlist items -->
+                <div class="wishlist-item" style="animation-delay: 0.1s;">
+                    <img src="../../assets/images/product1.jpg" alt="Denim Jacket" class="wishlist-img" onerror="this.src='../../assets/images/placeholder.png';">
+                    <div class="wishlist-details">
+                        <h3 class="wishlist-title">Denim Jacket</h3>
+                        <p class="wishlist-price">₹150 / day</p>
+                        <p class="wishlist-seller">Urban Styles</p>
+                        <div class="wishlist-actions">
+                            <a href="#" class="view-btn">View Details</a>
+                            <button class="remove-btn" data-product-id="static1">Remove</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="wishlist-item" style="animation-delay: 0.2s;">
+                    <img src="../../assets/images/product2.jpg" alt="Floral Dress" class="wishlist-img" onerror="this.src='../../assets/images/placeholder.png';">
+                    <div class="wishlist-details">
+                        <h3 class="wishlist-title">Floral Dress</h3>
+                        <p class="wishlist-price">₹120 / day</p>
+                        <p class="wishlist-seller">Fashion Forward</p>
+                        <div class="wishlist-actions">
+                            <a href="#" class="view-btn">View Details</a>
+                            <button class="remove-btn" data-product-id="static2">Remove</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="wishlist-item" style="animation-delay: 0.3s;">
+                    <img src="../../assets/images/product3.jpg" alt="Formal Suit" class="wishlist-img" onerror="this.src='../../assets/images/placeholder.png';">
+                    <div class="wishlist-details">
+                        <h3 class="wishlist-title">Formal Suit</h3>
+                        <p class="wishlist-price">₹300 / day</p>
+                        <p class="wishlist-seller">Elite Rentals</p>
+                        <div class="wishlist-actions">
+                            <a href="#" class="view-btn">View Details</a>
+                            <button class="remove-btn" data-product-id="static3">Remove</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="wishlist-item" style="animation-delay: 0.4s;">
+                    <img src="../../assets/images/product4.jpg" alt="Summer Collection" class="wishlist-img" onerror="this.src='../../assets/images/placeholder.png';">
+                    <div class="wishlist-details">
+                        <h3 class="wishlist-title">Summer Collection</h3>
+                        <p class="wishlist-price">₹180 / day</p>
+                        <p class="wishlist-seller">Seasonal Trends</p>
+                        <div class="wishlist-actions">
+                            <a href="#" class="view-btn">View Details</a>
+                            <button class="remove-btn" data-product-id="static4">Remove</button>
+                        </div>
+                    </div>
+                </div>
             </div>
             
             <!-- Empty wishlist message (hidden by default) -->
@@ -280,9 +477,37 @@
                 <a href="buyer_dashboard.html" class="browse-btn">Browse Products</a>
             </div>
         </div>
-    </main>
+    </div>
 
     <script>
+        // Theme switcher functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = themeToggle.querySelector('i');
+        
+        // Check for saved theme preference or use default
+        const savedTheme = localStorage.getItem('clothloop-theme');
+        if (savedTheme === 'light') {
+            document.body.classList.add('light-theme');
+            themeIcon.classList.remove('fa-sun');
+            themeIcon.classList.add('fa-moon');
+        }
+        
+        // Toggle theme
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('light-theme');
+            
+            // Update icon
+            if (document.body.classList.contains('light-theme')) {
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+                localStorage.setItem('clothloop-theme', 'light');
+            } else {
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+                localStorage.setItem('clothloop-theme', 'dark');
+            }
+        });
+
         // Function to get wishlist items from localStorage (user-specific)
         function getWishlistItems() {
             try {
@@ -356,11 +581,37 @@
             const wishlistIds = getWishlistItems();
             console.log(`loadWishlistItems: Found ${wishlistIds.length} items in wishlist:`, wishlistIds);
             
-            // Clear current items
-            wishlistGrid.innerHTML = '';
+            // Add event listeners to static items' remove buttons
+            const staticRemoveButtons = document.querySelectorAll('.wishlist-item .remove-btn[data-product-id^="static"]');
+            staticRemoveButtons.forEach(button => {
+                if (!button.hasAttribute('listener')) {
+                    button.setAttribute('listener', 'true');
+                    button.addEventListener('click', function() {
+                        const item = this.closest('.wishlist-item');
+                        item.style.animation = 'fadeOut 0.3s forwards';
+                        setTimeout(() => {
+                            item.remove();
+                            // Check if grid is empty after removal
+                            if (wishlistGrid.children.length === 0) {
+                                wishlistGrid.style.display = 'none';
+                                emptyWishlist.style.display = 'block';
+                            }
+                        }, 300);
+                    });
+                }
+            });
             
+            // If there are no saved wishlist items and no dynamic content to load,
+            // leave the static items as placeholders
             if (wishlistIds.length === 0) {
-                // Show empty wishlist message
+                // If there are static items already displayed, keep them
+                if (staticRemoveButtons.length > 0) {
+                    wishlistGrid.style.display = 'grid';
+                    emptyWishlist.style.display = 'none';
+                    return;
+                }
+                
+                // Otherwise show empty wishlist message
                 wishlistGrid.style.display = 'none';
                 emptyWishlist.style.display = 'block';
                 return;
@@ -391,6 +642,9 @@
                 })
                 .then(data => {
                     if (data.status === 'success') {
+                        // Clear the static placeholder items before adding dynamic content
+                        wishlistGrid.innerHTML = '';
+                        
                         const products = data.products || [];
                         
                         // Filter products to only include those in the wishlist
@@ -405,7 +659,7 @@
                         }
                         
                         // Display each wishlist product
-                        wishlistProducts.forEach(product => {
+                        wishlistProducts.forEach((product, index) => {
                             // Map product properties for consistency
                             const mappedProduct = {
                                 id: product.id,
@@ -421,7 +675,7 @@
                             // Create wishlist item element
                             const wishlistItem = document.createElement('div');
                             wishlistItem.className = 'wishlist-item';
-                            wishlistItem.style.animationDelay = '0.1s';
+                            wishlistItem.style.animationDelay = `${0.1 * index}s`;
                             
                             // Create URL params for details page
                             const queryParams = new URLSearchParams({
@@ -454,7 +708,7 @@
                                 const productId = this.getAttribute('data-product-id');
                                 
                                 // Add animation before removing
-                                wishlistItem.style.animation = 'fadeIn 0.3s reverse forwards';
+                                wishlistItem.style.animation = 'fadeOut 0.3s forwards';
                                 
                                 // Remove from wishlist after animation
                                 setTimeout(() => {
@@ -464,43 +718,51 @@
                         });
                     } else {
                         console.error('Error fetching products:', data.message);
-                        wishlistGrid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: #e74c3c;">Error loading wishlist items</p>`;
+                        wishlistGrid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: var(--accent-color);">Error loading wishlist items</p>`;
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    wishlistGrid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: #e74c3c;">Error loading wishlist items. Please try again later.</p>`;
+                    // Don't clear static items when API fails, just show the error message
+                    wishlistGrid.innerHTML = `
+                        ${wishlistGrid.innerHTML}
+                        <p style="grid-column: 1/-1; text-align: center; color: var(--accent-color); padding: 20px;">
+                            Error loading your wishlist items. Please try again later.
+                        </p>
+                    `;
                     
-                    // Try an alternative method if the API fails
-                    try {
-                        // Display wishlist items from localStorage only as a fallback
-                        const wishlistIds = getWishlistItems();
-                        if (wishlistIds.length > 0) {
-                            wishlistIds.forEach(id => {
-                                const wishlistItem = document.createElement('div');
-                                wishlistItem.className = 'wishlist-item';
-                                wishlistItem.innerHTML = `
-                                    <div class="wishlist-details">
-                                        <h3 class="wishlist-title">Wishlist Item #${id}</h3>
-                                        <p class="wishlist-seller">Item details unavailable</p>
-                                        <div class="wishlist-actions">
-                                            <button class="remove-btn" data-product-id="${id}">Remove</button>
+                    // If there are no static items, try an alternative method
+                    if (document.querySelectorAll('.wishlist-item').length === 0) {
+                        try {
+                            // Display wishlist items from localStorage only as a fallback
+                            const wishlistIds = getWishlistItems();
+                            if (wishlistIds.length > 0) {
+                                wishlistIds.forEach(id => {
+                                    const wishlistItem = document.createElement('div');
+                                    wishlistItem.className = 'wishlist-item';
+                                    wishlistItem.innerHTML = `
+                                        <div class="wishlist-details">
+                                            <h3 class="wishlist-title">Wishlist Item #${id}</h3>
+                                            <p class="wishlist-seller">Item details unavailable</p>
+                                            <div class="wishlist-actions">
+                                                <button class="remove-btn" data-product-id="${id}">Remove</button>
+                                            </div>
                                         </div>
-                                    </div>
-                                `;
-                                wishlistGrid.appendChild(wishlistItem);
-                                
-                                // Add event listener to remove button
-                                const removeBtn = wishlistItem.querySelector('.remove-btn');
-                                removeBtn.addEventListener('click', function() {
-                                    removeFromWishlist(id);
+                                    `;
+                                    wishlistGrid.appendChild(wishlistItem);
+                                    
+                                    // Add event listener to remove button
+                                    const removeBtn = wishlistItem.querySelector('.remove-btn');
+                                    removeBtn.addEventListener('click', function() {
+                                        removeFromWishlist(id);
+                                    });
                                 });
-                            });
-                            wishlistGrid.style.display = 'grid';
-                            emptyWishlist.style.display = 'none';
+                                wishlistGrid.style.display = 'grid';
+                                emptyWishlist.style.display = 'none';
+                            }
+                        } catch (fallbackError) {
+                            console.error('Fallback error:', fallbackError);
                         }
-                    } catch (fallbackError) {
-                        console.error('Fallback error:', fallbackError);
                     }
                 });
         }
@@ -545,6 +807,32 @@
         
         // Load wishlist items when the page loads
         document.addEventListener('DOMContentLoaded', function() {
+            // Add event listeners to static items first
+            const staticRemoveButtons = document.querySelectorAll('.wishlist-item .remove-btn[data-product-id^="static"]');
+            staticRemoveButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const item = this.closest('.wishlist-item');
+                    item.style.animation = 'fadeOut 0.3s forwards';
+                    setTimeout(() => {
+                        item.remove();
+                        // Check if grid is empty after removal
+                        const wishlistGrid = document.getElementById('wishlist-grid');
+                        const emptyWishlist = document.getElementById('empty-wishlist');
+                        if (wishlistGrid.children.length === 0) {
+                            wishlistGrid.style.display = 'none';
+                            emptyWishlist.style.display = 'block';
+                        }
+                    }, 300);
+                });
+            });
+            
+            // Initialize View Details links for static items
+            const staticViewButtons = document.querySelectorAll('.wishlist-item .view-btn');
+            staticViewButtons.forEach((button, index) => {
+                button.href = `details.html?id=static${index+1}&title=${encodeURIComponent(button.closest('.wishlist-item').querySelector('.wishlist-title').textContent)}&price=${encodeURIComponent(button.closest('.wishlist-item').querySelector('.wishlist-price').textContent.replace('₹', '').replace(' / day', ''))}&shop=${encodeURIComponent(button.closest('.wishlist-item').querySelector('.wishlist-seller').textContent)}`;
+            });
+            
+            // Then load dynamic wishlist items
             loadWishlistItems();
         });
     </script>

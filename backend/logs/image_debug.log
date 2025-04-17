@@ -2953,3 +2953,78 @@ ontent type: image/jpeg
 [2025-04-17 19:51:31] Image found, serving with content type: image/jpeg
 [2025-04-17 19:51:31] Query executed: {"rows":1}
 [2025-04-17 19:51:31] Image found, serving with content type: image/jpeg
+[2025-04-17 20:14:34] Starting image request
+[2025-04-17 20:14:34] Starting image request
+[2025-04-17 20:14:34] Processing image request: {"id":1}
+[2025-04-17 20:14:34] Query executed: {"rows":0}
+[2025-04-17 20:14:34] No cloth record found for ID: 1
+[2025-04-17 20:14:34] Sending fallback image - reason: no record found
+[2025-04-17 20:14:34] Processing image request: {"id":2}
+[2025-04-17 20:14:34] Query executed: {"rows":0}
+[2025-04-17 20:14:34] No cloth record found for ID: 2
+[2025-04-17 20:14:34] Sending fallback image - reason: no record found
+[2025-04-17 20:14:38] Starting image request
+[2025-04-17 20:14:38] Starting image request
+[2025-04-17 20:14:38] Processing image request: {"id":2}
+[2025-04-17 20:14:38] Processing image request: {"id":1}
+[2025-04-17 20:14:38] Query executed: {"rows":0}
+[2025-04-17 20:14:38] Query executed: {"rows":0}
+[2025-04-17 20:14:38] No cloth record found for ID: 2
+[2025-04-17 20:14:38] No cloth record found for ID: 1
+[2025-04-17 20:14:38] Sending fallback image - reason: no record found
+[2025-04-17 20:14:38] Sending fallback image - reason: no record found
+[2025-04-17 20:14:46] Starting image request
+[2025-04-17 20:14:46] Processing image request: {"id":2}
+[2025-04-17 20:14:46] Processing image request: {"id":1}
+[2025-04-17 20:14:46] Query executed: {"rows":0}
+[2025-04-17 20:14:46] No cloth record found for ID: 1
+[2025-04-17 20:14:46] Sending fallback image - reason: no record found
+[2025-04-17 20:18:36] Starting image request
+[2025-04-17 20:18:36] Processing image request: {"id":1}
+[2025-04-17 20:18:36] Query executed: {"rows":0}
+[2025-04-17 20:18:36] No cloth record found for ID: 1
+[2025-04-17 20:18:36] Sending fallback image - reason: no record found
+[2025-04-17 20:18:36] Processing image request: {"id":2}
+[2025-04-17 20:18:36] Query executed: {"rows":0}
+[2025-04-17 20:18:36] No cloth record found for ID: 2
+[2025-04-17 20:18:36] Sending fallback image - reason: no record found
+[2025-04-17 20:18:51] Starting image request
+[2025-04-17 20:18:51] Processing image request: {"id":1}
+[2025-04-17 20:18:51] Query executed: {"rows":0}
+[2025-04-17 20:18:51] No cloth record found for ID: 1
+[2025-04-17 20:18:51] No cloth record found for ID: 2
+[2025-04-17 20:18:51] Sending fallback image - reason: no record found
+[2025-04-17 20:18:51] Sending fallback image - reason: no record found
+[2025-04-17 20:18:53] Starting image request
+[2025-04-17 20:18:53] Starting image request
+[2025-04-17 20:18:53] Processing image request: {"id":1}
+[2025-04-17 20:18:53] Query executed: {"rows":0}
+[2025-04-17 20:18:53] No cloth record found for ID: 1
+[2025-04-17 20:18:53] Sending fallback image - reason: no record found
+[2025-04-17 20:19:00] Starting image request
+[2025-04-17 20:19:00] Starting image request
+[2025-04-17 20:19:00] Processing image request: {"id":2}
+[2025-04-17 20:19:00] Query executed: {"rows":0}
+[2025-04-17 20:19:00] No cloth record found for ID: 2
+[2025-04-17 20:19:00] No cloth record found for ID: 1
+[2025-04-17 20:19:00] Sending fallback image - reason: no record found
+[2025-04-17 20:19:00] Sending fallback image - reason: no record found
+[2025-04-17 20:20:26] Starting image request
+[2025-04-17 20:20:26] Starting image request
+[2025-04-17 20:20:26] Processing image request: {"id":1}
+[2025-04-17 20:20:26] Processing image request: {"id":2}
+[2025-04-17 20:20:26] Query executed: {"rows":0}
+[2025-04-17 20:20:26] No cloth record found for ID: 2
+[2025-04-17 20:20:26] No cloth record found for ID: 1
+[2025-04-17 20:20:26] Sending fallback image - reason: no record found
+[2025-04-17 20:20:26] Sending fallback image - reason: no record found
+[2025-04-17 20:21:32] Starting image request
+[2025-04-17 20:21:32] Starting image request
+[2025-04-17 20:21:32] Processing image request: {"id":1}
+[2025-04-17 20:21:32] Query executed: {"rows":0}
+[2025-04-17 20:21:32] No cloth record found for ID: 1
+[2025-04-17 20:21:32] Sending fallback image - reason: no record found
+[2025-04-17 20:21:32] Processing image request: {"id":2}
+[2025-04-17 20:21:32] Query executed: {"rows":0}
+[2025-04-17 20:21:32] No cloth record found for ID: 2
+[2025-04-17 20:21:32] Sending fallback image - reason: no record found
