@@ -258,30 +258,19 @@ function fetchAllProducts() {
         
         if ($result->num_rows > 0) {
             while ($row = $result->fetch_assoc()) {
-                // Get product image (if available)
+                // Get product image directly from cloth_details table
                 $image_data = '../../assets/images/placeholder.png'; // Default image
                 
-                // Try to get image from cloth_images table
-                $img_query = "SELECT * FROM cloth_images WHERE cloth_id = {$row['id']} LIMIT 1";
-                $img_result = $conn->query($img_query);
-                
-                if ($img_result && $img_result->num_rows > 0) {
-                    $img_row = $img_result->fetch_assoc();
-                    
-                    // Check if we have image_data field (BLOB)
-                    if (isset($img_row['image_data'])) {
-                        $image_type = $img_row['image_type'] ?? 'jpeg';
-                        $image_data = 'data:image/' . $image_type . ';base64,' . base64_encode($img_row['image_data']);
-                    }
-                }
-                
-                // If no image in cloth_images, try the direct cloth_photo field
-                if ($image_data == '../../assets/images/placeholder.png' && !empty($row['cloth_photo'])) {
+                // Use cloth_photo directly if available
+                if (!empty($row['cloth_photo'])) {
                     $image_type = $row['photo_type'] ?? 'jpeg';
                     $image_data = 'data:image/' . $image_type . ';base64,' . base64_encode($row['cloth_photo']);
                 }
                 
                 // Try to get shop name from sellers table
+                $shop_name = 'ClothLoop Seller'; // Default name
+                $shop_location = '';
+                
                 if ($row['seller_id'] > 0) {
                     $seller_query = "SELECT shop_name, shop_location FROM sellers WHERE id = {$row['seller_id']} LIMIT 1";
                     $seller_result = $conn->query($seller_query);
@@ -312,7 +301,9 @@ function fetchAllProducts() {
                     'seller_id' => $row['seller_id'] ?? 0,
                     'shop_name' => $shop_name,
                     'shop_location' => $shop_location ?? '',
-                    'image' => $image_data
+                    'image' => $image_data,
+                    'cloth_photo' => !empty($row['cloth_photo']) ? true : false,
+                    'photo_type' => $row['photo_type'] ?? 'jpeg'
                 ];
             }
         }
@@ -388,38 +379,89 @@ function addProduct() {
     $conn->begin_transaction();
     
     try {
-        // Prepare SQL statement for cloth_details table
-        $sql = "INSERT INTO cloth_details (
-                seller_id, 
-                cloth_title, 
-                description, 
-                size, 
-                category, 
-                rental_price, 
-                contact_number, 
-                whatsapp_number, 
-                terms_and_conditions, 
-                status
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'active')";
-            
-        $stmt = $conn->prepare($sql);
+        // Handle image upload
+        $image_data = null;
+        $image_type = null;
         
-        if (!$stmt) {
-            throw new Exception("Error preparing statement: " . $conn->error);
+        if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
+            $image_tmp = $_FILES['image']['tmp_name'];
+            $image_type = $_FILES['image']['type']; // Use MIME type directly
+            
+            // Read image data
+            $image_data = file_get_contents($image_tmp);
         }
         
-        $stmt->bind_param(
-            "issssdsss", 
-            $seller_id,
-            $title,
-            $description,
-            $size,
-            $category,
-            $rental_price,
-            $contact_number,
-            $whatsapp_number,
-            $terms_and_conditions
-        );
+        // If we have image data, include it in the INSERT statement
+        if ($image_data !== null) {
+            $sql = "INSERT INTO cloth_details (
+                    seller_id, 
+                    cloth_title, 
+                    description, 
+                    size, 
+                    category, 
+                    rental_price, 
+                    contact_number, 
+                    whatsapp_number, 
+                    terms_and_conditions,
+                    cloth_photo,
+                    photo_type,
+                    status
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active')";
+                
+            $stmt = $conn->prepare($sql);
+            
+            if (!$stmt) {
+                throw new Exception("Error preparing statement: " . $conn->error);
+            }
+            
+            $stmt->bind_param(
+                "issssdsssss", 
+                $seller_id,
+                $title,
+                $description,
+                $size,
+                $category,
+                $rental_price,
+                $contact_number,
+                $whatsapp_number,
+                $terms_and_conditions,
+                $image_data,
+                $image_type
+            );
+        } else {
+            // No image data, proceed without it
+            $sql = "INSERT INTO cloth_details (
+                    seller_id, 
+                    cloth_title, 
+                    description, 
+                    size, 
+                    category, 
+                    rental_price, 
+                    contact_number, 
+                    whatsapp_number, 
+                    terms_and_conditions, 
+                    status
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'active')";
+                
+            $stmt = $conn->prepare($sql);
+            
+            if (!$stmt) {
+                throw new Exception("Error preparing statement: " . $conn->error);
+            }
+            
+            $stmt->bind_param(
+                "issssdsss", 
+                $seller_id,
+                $title,
+                $description,
+                $size,
+                $category,
+                $rental_price,
+                $contact_number,
+                $whatsapp_number,
+                $terms_and_conditions
+            );
+        }
         
         if (!$stmt->execute()) {
             throw new Exception("Error executing statement: " . $stmt->error);
@@ -427,45 +469,17 @@ function addProduct() {
         
         $cloth_id = $conn->insert_id;
         
-        // Handle image upload
-        if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
-            $image_tmp = $_FILES['image']['tmp_name'];
-            $image_type = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
-            
-            // Read image data
-            $image_data = file_get_contents($image_tmp);
-            
-            // Insert image into cloth_images table
-            $img_sql = "INSERT INTO cloth_images (cloth_id, image_data, image_type) VALUES (?, ?, ?)";
-            $img_stmt = $conn->prepare($img_sql);
-            
-            if (!$img_stmt) {
-                throw new Exception("Error preparing image statement: " . $conn->error);
-            }
-            
-            $img_stmt->bind_param("iss", $cloth_id, $image_data, $image_type);
-            
-            if (!$img_stmt->execute()) {
-                throw new Exception("Error uploading image: " . $img_stmt->error);
-            }
-            
-            $img_stmt->close();
-        }
-        
-        $stmt->close();
+        // Commit transaction
         $conn->commit();
         
-        echo json_encode([
-            'status' => 'success', 
-            'message' => 'Product added successfully',
-            'id' => $cloth_id
-        ]);
+        // Return success response
+        echo json_encode(['status' => 'success', 'message' => 'Product added successfully', 'id' => $cloth_id]);
     } catch (Exception $e) {
+        // Roll back transaction
         $conn->rollback();
-        echo json_encode([
-            'status' => 'error', 
-            'message' => $e->getMessage()
-        ]);
+        
+        // Return error response
+        echo json_encode(['status' => 'error', 'message' => 'Error adding product: ' . $e->getMessage()]);
     }
 }
 

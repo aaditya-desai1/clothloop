@@ -57,6 +57,8 @@ function createClothDetailsTable($conn) {
         contact_number VARCHAR(20),
         whatsapp_number VARCHAR(20),
         terms_and_conditions TEXT,
+        cloth_photo MEDIUMBLOB,
+        photo_type VARCHAR(50),
         status VARCHAR(20) DEFAULT 'active',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -64,6 +66,35 @@ function createClothDetailsTable($conn) {
     
     if ($conn->query($sql) === TRUE) {
         echo "Cloth details table created or already exists\n";
+        
+        // Check if the columns exist, and if not, add them
+        $checkColumnsSQL = "SHOW COLUMNS FROM cloth_details LIKE 'cloth_photo'";
+        $result = $conn->query($checkColumnsSQL);
+        
+        if ($result->num_rows == 0) {
+            // Add cloth_photo column if it doesn't exist
+            $addColumnSQL = "ALTER TABLE cloth_details ADD COLUMN cloth_photo MEDIUMBLOB";
+            if ($conn->query($addColumnSQL) === TRUE) {
+                echo "Added cloth_photo column to cloth_details table\n";
+            } else {
+                echo "Error adding cloth_photo column: " . $conn->error . "\n";
+            }
+        }
+        
+        // Check if photo_type column exists
+        $checkColumnsSQL = "SHOW COLUMNS FROM cloth_details LIKE 'photo_type'";
+        $result = $conn->query($checkColumnsSQL);
+        
+        if ($result->num_rows == 0) {
+            // Add photo_type column if it doesn't exist
+            $addColumnSQL = "ALTER TABLE cloth_details ADD COLUMN photo_type VARCHAR(50)";
+            if ($conn->query($addColumnSQL) === TRUE) {
+                echo "Added photo_type column to cloth_details table\n";
+            } else {
+                echo "Error adding photo_type column: " . $conn->error . "\n";
+            }
+        }
+        
         return true;
     } else {
         echo "Error creating cloth_details table: " . $conn->error . "\n";

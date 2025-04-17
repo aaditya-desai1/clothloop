@@ -608,12 +608,12 @@
         <!-- Error message -->
         <div id="error-message" class="error-message" style="display: none;">
             <i class="fas fa-exclamation-circle"></i>
-            <p>Oops! Something went wrong while loading products.</p>
+            <p>Error fetching products: We&apos;ve updated our database structure. Please try again.</p>
             <div class="fallback-actions">
                 <button class="try-again-btn" onclick="reloadPage()">Try Again</button>
                 <button class="try-again-btn" onclick="loadPlaceholderProducts()">Show Demo Products</button>
             </div>
-            </div>
+        </div>
         
         <!-- Empty state -->
         <div id="empty-state" class="empty-state" style="display: none;">
@@ -633,6 +633,8 @@
         let filteredProducts = [];
         let currentSort = '';
         let selectedCategories = [];
+        let currentMinPrice = 0;
+        let currentMaxPrice = Number.MAX_SAFE_INTEGER;
         
         // DOM elements
         const sortButton = document.getElementById('sortButton');
@@ -904,26 +906,17 @@
                     if (data.status === 'success') {
                         // Map the data from cloth_details table to a consistent format
                         allProducts = (data.products || []).map(product => {
-                            // Handle image data from the database
-                            // Images from DB will typically be in base64 format like: data:image/jpeg;base64,...
-                            let imagePath = product.image || '../../assets/images/placeholder.png';
+                            // Use cloth_photo directly from cloth_details table
+                            let imagePath = '../../assets/images/placeholder.png';
                             
-                            // Check if this is just a product ID without image data
-                            // In that case, get the image directly from the image API
-                            if (product.id && (!imagePath || imagePath.includes('placeholder.png'))) {
-                                // Add timestamp to prevent caching
+                            // Check if cloth_photo exists in the product data
+                            if (product.cloth_photo === true) {
+                                // Use the image field directly, which already contains the base64 data
+                                imagePath = product.image;
+                            } else if (product.id) {
+                                // If cloth_photo is not available or usable, create a direct URL to the image
                                 imagePath = `/ClothLoop/backend/api/image_display.php?type=cloth&id=${product.id}&t=${new Date().getTime()}`;
                                 console.log(`Using image API URL for product ${product.id}`);
-                            }
-                            // No path conversion needed for base64 images or full URLs
-                            // Only fix paths for relative file references that aren't base64 or URLs
-                            else if (!imagePath.startsWith('data:image/') && 
-                                !imagePath.startsWith('http://') && 
-                                !imagePath.startsWith('https://') && 
-                                !imagePath.startsWith('../../') &&
-                                !imagePath.startsWith('/ClothLoop/')) {
-                                // Convert backend path to frontend path
-                                imagePath = '../../' + imagePath;
                             }
                             
                             return {
@@ -975,7 +968,7 @@
                     
                     // Make error message more informative
                     document.querySelector('#error-message p').textContent = 
-                        'Error: Network response was not ok. Check the console for more details.';
+                        "Error fetching products: We&apos;ve updated our database structure. Please try again.";
                     
                     // Automatically show demo products instead of waiting for user to click
                     console.log("Loading demo products automatically due to fetch error");
@@ -1120,6 +1113,9 @@
             
             // Show loading indicator
             loadingIndicator.style.display = 'block';
+            
+            // Hide error message
+            errorMessage.style.display = 'none';
         }
         
         // Function to load placeholder products if the backend fails
@@ -1330,6 +1326,10 @@
             const minPrice = parseFloat(document.getElementById('minPriceFilter').value) || 0;
             const maxPrice = parseFloat(document.getElementById('maxPriceFilter').value) || Infinity;
             
+            // Update global price filter variables
+            currentMinPrice = minPrice;
+            currentMaxPrice = maxPrice;
+            
             filteredProducts = allProducts.filter(product => {
                 const price = parseFloat(product.rental_price);
                 return price >= minPrice && price <= maxPrice;
@@ -1393,6 +1393,23 @@
             
             // Default to the original with proper casing
             return category.charAt(0).toUpperCase() + category.slice(1).toLowerCase();
+        }
+
+        // Function to update selected categories from UI
+        function updateSelectedCategories() {
+            selectedCategories = [];
+            
+            if (menCategory.classList.contains('active')) {
+                selectedCategories.push('Men');
+            }
+            
+            if (womenCategory.classList.contains('active')) {
+                selectedCategories.push('Women');
+            }
+            
+            if (kidsCategory.classList.contains('active')) {
+                selectedCategories.push('Kids');
+            }
         }
 
         function filterProducts() {
