@@ -2907,3 +2907,49 @@ ontent type: image/jpeg
 [2025-04-17 19:13:30] Image found, serving with content type: image/jpeg
 [2025-04-17 19:13:30] Query executed: {"rows":1}
 [2025-04-17 19:13:30] Image found, serving with content type: image/jpeg
+[2025-04-17 19:15:33] Starting image request
+[2025-04-17 19:15:33] Starting image request
+[2025-04-17 19:15:33] Processing image request: {"id":1}
+[2025-04-17 19:15:33] Processing image request: {"id":2}
+[2025-04-17 19:15:33] Query executed: {"rows":1}
+[2025-04-17 19:15:33] Image found, serving with content type: image/jpeg
+[2025-04-17 19:15:33] Query executed: {"rows":1}
+[2025-04-17 19:15:33] Image found, serving with content type: image/jpeg
+[2025-04-17 19:46:54] Starting image request
+[2025-04-17 19:46:54] Starting image request
+[2025-04-17 19:46:54] Processing image request: {"id":1}
+[2025-04-17 19:46:54] Query executed: {"rows":1}
+[2025-04-17 19:46:54] Image found, serving with content type: image/jpeg
+[2025-04-17 19:46:54] Processing image request: {"id":2}
+[2025-04-17 19:46:54] Query executed: {"rows":1}
+[2025-04-17 19:46:54] Image found, serving with content type: image/jpeg
+[2025-04-17 19:46:56] Starting image request
+[2025-04-17 19:46:56] Processing image request: {"id":2}
+[2025-04-17 19:46:56] Query executed: {"rows":1}
+[2025-04-17 19:46:56] Image found, serving with content type: image/jpeg
+[2025-04-17 19:46:56] Query executed: {"rows":1}
+[2025-04-17 19:46:56] Image found, serving with content type: image/jpeg
+[2025-04-17 19:46:59] Starting image request
+[2025-04-17 19:46:59] Starting image request
+[2025-04-17 19:46:59] Processing image request: {"id":1}
+[2025-04-17 19:46:59] Query executed: {"rows":1}
+[2025-04-17 19:46:59] Image found, serving with content type: image/jpeg
+[2025-04-17 19:46:59] Processing image request: {"id":2}
+[2025-04-17 19:46:59] Query executed: {"rows":1}
+[2025-04-17 19:46:59] Image found, serving with content type: image/jpeg
+[2025-04-17 19:51:14] Starting image request
+[2025-04-17 19:51:14] Starting image request
+[2025-04-17 19:51:14] Processing image request: {"id":1}
+[2025-04-17 19:51:14] Processing image request: {"id":2}
+[2025-04-17 19:51:14] Query executed: {"rows":1}
+[2025-04-17 19:51:14] Image found, serving with content type: image/jpeg
+[2025-04-17 19:51:14] Query executed: {"rows":1}
+[2025-04-17 19:51:14] Image found, serving with content type: image/jpeg
+[2025-04-17 19:51:31] Starting image request
+[2025-04-17 19:51:31] Starting image request
+[2025-04-17 19:51:31] Processing image request: {"id":1}
+[2025-04-17 19:51:31] Processing image request: {"id":2}
+[2025-04-17 19:51:31] Query executed: {"rows":1}
+[2025-04-17 19:51:31] Image found, serving with content type: image/jpeg
+[2025-04-17 19:51:31] Query executed: {"rows":1}
+[2025-04-17 19:51:31] Image found, serving with content type: image/jpeg

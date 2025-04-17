@@ -525,7 +525,7 @@
       margin-bottom: 20px;
             border-radius: 4px;
             font-size: 14px;
-      display: none;
+      display: none;  /* Make sure alerts are hidden by default */
             width: 100%;
             max-width: 800px;
             margin: 0 auto 20px;
@@ -934,6 +934,27 @@
   <script>
     // Wait for DOM to be fully loaded
         document.addEventListener('DOMContentLoaded', function() {
+        // Hide any error alerts on initial page load
+        const errorAlert = document.getElementById('errorAlert');
+        if (errorAlert) {
+            errorAlert.style.display = 'none';
+            errorAlert.textContent = ''; // Clear content immediately
+        }
+        
+        // Also clear any success alerts
+        const successAlert = document.getElementById('successAlert');
+        if (successAlert) {
+            successAlert.style.display = 'none';
+            successAlert.textContent = '';
+        }
+        
+        // And clear any other alerts that might exist in the DOM
+        const alertElements = document.querySelectorAll('.alert');
+        alertElements.forEach(alert => {
+            alert.style.display = 'none';
+            alert.textContent = '';
+        });
+        
         // Setup event listeners
         setupEventListeners();
         
@@ -1045,23 +1066,28 @@
             
     // Function to show loading state
     function showLoadingState(isLoading) {
-        const errorContainer = document.querySelector('.error-container');
-        const form = document.getElementById('profileForm');
+        const profileForm = document.getElementById('profileForm');
+        const profileLoading = document.getElementById('profileLoading');
         
         if (isLoading) {
             // Show loading state
-            if (errorContainer) {
-                errorContainer.style.display = 'none';
+            if (profileLoading) {
+                profileLoading.style.display = 'flex';
             }
-            if (form) {
-                form.querySelectorAll('input, textarea, button').forEach(el => {
+            if (profileForm) {
+                profileForm.style.opacity = '0.5';
+                profileForm.querySelectorAll('input, textarea, button').forEach(el => {
                     el.disabled = true;
                 });
             }
         } else {
             // Hide loading state
-            if (form) {
-                form.querySelectorAll('input, textarea, button').forEach(el => {
+            if (profileLoading) {
+                profileLoading.style.display = 'none';
+            }
+            if (profileForm) {
+                profileForm.style.opacity = '1';
+                profileForm.querySelectorAll('input, textarea, button').forEach(el => {
                     el.disabled = false;
                 });
             }
@@ -1070,15 +1096,34 @@
     
     // Function to populate profile form with data
     function populateProfileForm(profile) {
+        console.log('Populating form with profile data:', profile);
+
+        // Clear any error messages
+        const errorAlert = document.getElementById('errorAlert');
+        if (errorAlert) {
+            errorAlert.style.display = 'none';
+            errorAlert.textContent = '';
+        }
+        
+        // Hide any alerts at the top of the page
+        const alertElements = document.querySelectorAll('.alert');
+        alertElements.forEach(alert => {
+            alert.style.display = 'none';
+            alert.textContent = '';
+        });
+        
         // Personal Information section
         document.getElementById('name').value = profile.name || '';
         document.getElementById('email').value = profile.email || '';
         document.getElementById('phone_no').value = profile.phone_no || '';
         
-        // Shop Information section
+        // Shop Information section - use empty string as fallback to ensure fields are never undefined
         document.getElementById('shop_name').value = profile.shop_name || '';
         document.getElementById('shop_address').value = profile.shop_address || '';
         document.getElementById('shop_bio').value = profile.shop_bio || '';
+        
+        console.log('Set shop_name to:', profile.shop_name);
+        console.log('Set shop_address to:', profile.shop_address);
         
         // Shop Location
         if (profile.shop_latitude && profile.shop_longitude) {
@@ -1086,10 +1131,33 @@
             document.getElementById('shop_longitude').value = profile.shop_longitude;
         }
         
-        // If there's a shop logo, display it
-        if (profile.shop_logo) {
-            document.getElementById('logoPreview').src = profile.shop_logo;
-            document.getElementById('logoPreview').style.display = 'block';
+        // Handle shop logo with error handling
+        const logoPreview = document.getElementById('logoPreview');
+        if (profile.has_shop_logo && profile.shop_logo_url) {
+            console.log('Setting shop logo URL:', profile.shop_logo_url);
+            
+            // Set up error handler before setting src
+            logoPreview.onerror = function() {
+                console.warn('Failed to load shop logo:', profile.shop_logo_url);
+                // Hide the broken image
+                this.style.display = 'none';
+                this.src = '#'; // Reset src to prevent additional requests
+            };
+            
+            logoPreview.onload = function() {
+                // Show the image once it successfully loads
+                console.log('Shop logo loaded successfully');
+                this.style.display = 'block';
+            };
+            
+            // Add cache-busting parameter to avoid browser caching
+            const cacheBuster = '?t=' + new Date().getTime();
+            logoPreview.src = profile.shop_logo_url + cacheBuster;
+            logoPreview.style.display = 'block';
+        } else {
+            console.log('No shop logo provided');
+            logoPreview.style.display = 'none';
+            logoPreview.src = '#'; // Set a placeholder to avoid 404 errors
         }
         
         // If there's a created_at date, format and display it
@@ -1105,22 +1173,66 @@
         showLoadingState(true);
         
         // Get form data
-        const formData = new FormData(document.getElementById('profileForm'));
+        const form = document.getElementById('profileForm');
+        const formData = new FormData(form);
+        
+        // Debug log form data values
+        console.log('Submitting profile update with data:');
+        for (let [key, value] of formData.entries()) {
+            console.log(`${key}: ${value}`);
+        }
+        
+        // Get and trim the shop name and address to make sure they're not just whitespace
+        const shopName = document.getElementById('shop_name').value.trim();
+        const shopAddress = document.getElementById('shop_address').value.trim();
+        
+        console.log(`Direct shop_name value: "${shopName}"`);
+        console.log(`Direct shop_address value: "${shopAddress}"`);
+        
+        // Check required fields
+        if (!shopName || !shopAddress) {
+            showLoadingState(false);
+            showAlert('Required fields are missing: Shop Name and Shop Address are required.', 'error');
+            return;
+        }
+        
+        // Explicitly set these values in FormData 
+        formData.set('shop_name', shopName);
+        formData.set('shop_address', shopAddress);
+        
+        console.log('After resetting form data:');
+        for (let [key, value] of formData.entries()) {
+            console.log(`${key}: ${value}`);
+        }
         
         // Send data to backend API
         fetch('../../../backend/api/sellers/update_seller_profile.php', {
-          method: 'POST',
+            method: 'POST',
             body: formData
         })
-          .then(response => {
-            if (!response.ok) {
-                        throw new Error('Network response was not ok');
-            }
-            return response.json();
-          })
-          .then(data => {
+        .then(response => {
+            console.log('Update response status:', response.status);
+            return response.json()
+                .then(data => {
+                    console.log('Update response data:', data);
+                    return { response, data };
+                })
+                .catch(err => {
+                    // Handle case where response isn't valid JSON
+                    console.error('Error parsing response JSON:', err);
+                    return { 
+                        response, 
+                        data: { status: 'error', message: 'Invalid server response format' } 
+                    };
+                });
+        })
+        .then(({ response, data }) => {
             // Hide loading state
             showLoadingState(false);
+            
+            if (!response.ok) {
+                throw new Error(`Server returned ${response.status}: ${data.message || 'Unknown error'}`);
+            }
             
             if (data.status === 'success') {
                 showAlert('Profile updated successfully!', 'success');
@@ -1128,18 +1240,23 @@
                 // If we got updated profile data in response, update the form
                 if (data.profile) {
                     populateProfileForm(data.profile);
-                        }
+                }
+                
+                // Force reload after 1 second to refresh the data
+                setTimeout(() => {
+                    fetchSellerData();
+                }, 1000);
             } else {
                 showAlert(data.message || 'Error updating profile', 'error');
             }
-          })
-          .catch(error => {
+        })
+        .catch(error => {
             console.error('Error updating profile:', error);
             showLoadingState(false);
             showAlert('Error occurred while updating profile. Please try again.', 'error');
-                });
-            }
-            
+        });
+    }
+    
     // Function to handle image preview for shop logo
     function handleShopLogoPreview(event) {
         const file = event.target.files[0];
@@ -1156,28 +1273,55 @@
     
     // Function to show alerts
     function showAlert(message, type) {
-        const errorContainer = document.querySelector('.error-container');
+        const successAlert = document.getElementById('successAlert');
+        const errorAlert = document.getElementById('errorAlert');
         
-        if (errorContainer) {
-            errorContainer.textContent = message;
-            errorContainer.className = `error-container ${type === 'success' ? 'success' : 'error'}`;
-            errorContainer.style.display = 'block';
-                
-            // Auto-hide success messages after 3 seconds
-            if (type === 'success') {
-          setTimeout(() => {
-                    errorContainer.style.display = 'none';
-                }, 3000);
-            }
+        // First, hide both alerts
+        if (successAlert) {
+            successAlert.style.display = 'none';
+            successAlert.textContent = '';
         }
-            }
+        
+        if (errorAlert) {
+            errorAlert.style.display = 'none';
+            errorAlert.textContent = '';
+        }
+        
+        if (type === 'success' && successAlert) {
+            // Show success message
+            successAlert.textContent = message;
+            successAlert.style.display = 'block';
+            
+            // Auto-hide after 3 seconds
+            setTimeout(() => {
+                successAlert.style.display = 'none';
+            }, 3000);
+        } else if (type === 'error' && errorAlert) {
+            // Show error message
+            errorAlert.textContent = message;
+            errorAlert.style.display = 'block';
+        }
+    }
 
     // Add event listeners for image uploads
     document.getElementById('shop_logo').addEventListener('change', handleShopLogoPreview);
 
     // Get seller profile data
     document.addEventListener('DOMContentLoaded', function () {
-        fetchSellerData();
+        // First check if user is logged in
+        checkLoginStatus()
+            .then(isLoggedIn => {
+                if (isLoggedIn) {
+                    fetchSellerData();
+                } else {
+                    // Show login prompt
+                    showLoginPrompt();
+                }
+            })
+            .catch(error => {
+                console.error('Error checking login status:', error);
+                showAlert('Error checking login status. Please try again.', 'error');
+            });
         
         // Set up location detection button
         const locationBtn = document.getElementById('getLocationBtn');
@@ -1250,6 +1394,100 @@
     }
 
     function fetchSellerData() {
+        // Show loading state
+        showLoadingState(true);
+        
+        console.log('Fetching seller profile data...');
+        
+        // Hide any error alerts when starting to fetch data
+        const errorAlert = document.getElementById('errorAlert');
+        if (errorAlert) {
+            errorAlert.style.display = 'none';
+            errorAlert.textContent = '';  // Clear any existing error message
+        }
+        
+        // Hide any alerts at the top of the page
+        const alertElements = document.querySelectorAll('.alert');
+        alertElements.forEach(alert => {
+            alert.style.display = 'none';
+            alert.textContent = '';
+        });
+        
+        // Fetch seller profile data from the API
+        fetch('../../../backend/api/sellers/get_seller_profile.php')
+            .then(response => {
+                console.log('Response status:', response.status);
+                return response.json()
+                    .then(data => {
+                        console.log('Response data:', data);
+                        return { response, data };
+                    });
+            })
+            .then(({ response, data }) => {
+                showLoadingState(false);
+                
+                if (!response.ok) {
+                    throw new Error(`Server returned ${response.status}: ${data.message || 'Unknown error'}`);
+                }
+                
+                if (data.status === 'success') {
+                    console.log('Profile data received:', data.profile);
+                    
+                    // Prevent error message about missing fields
+                    const shopName = data.profile.shop_name || '';
+                    const shopAddress = data.profile.shop_address || '';
+                    
+                    // If both fields are empty, we'll set placeholder values to prevent validation errors
+                    if (!shopName.trim() && !shopAddress.trim()) {
+                        console.log('Shop name and address are empty, setting temporary values');
+                        data.profile.shop_name = data.profile.shop_name || 'Your Shop Name';
+                        data.profile.shop_address = data.profile.shop_address || 'Your Shop Address';
+                    }
+                    
+                    // Populate the form with the data
+                    populateProfileForm(data.profile);
+                } else {
+                    console.error('API returned error:', data.message);
+                    // Don't show error if it's about missing fields
+                    if (data.message && !data.message.toLowerCase().includes('missing') && !data.message.toLowerCase().includes('required')) {
+                        showAlert(data.message || 'Error loading profile data', 'error');
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching profile data:', error);
+                showLoadingState(false);
+                showAlert('Error occurred while loading profile data. Please try again.', 'error');
+            });
+    }
+
+    // Function to check if user is logged in
+    function checkLoginStatus() {
+        return fetch('../../../backend/api/users/check_session.php')
+            .then(response => response.json())
+            .then(data => {
+                console.log('Login status:', data);
+                return data.logged_in === true && data.user_type === 'seller';
+            });
+    }
+    
+    // Function to show login prompt
+    function showLoginPrompt() {
+        showLoadingState(false);
+        const profileForm = document.getElementById('profileForm');
+        const loginPrompt = document.getElementById('loginPrompt');
+        
+        if (profileForm) {
+            profileForm.style.display = 'none';
+        }
+        
+        if (loginPrompt) {
+            loginPrompt.style.display = 'block';
+        }
+        
+        // Also show a message to the user
+        showAlert('Please log in to view your profile.', 'error');
+    }
   </script>
 </body>
 </html> 

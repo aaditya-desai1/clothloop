@@ -21,8 +21,9 @@ $response = [
 ];
 
 // Debug session info
-error_log("Session user_id: " . (isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 'Not set'));
-error_log("Session user_type: " . (isset($_SESSION['user_type']) ? $_SESSION['user_type'] : 'Not set'));
+error_log("Session user_id in update_seller_profile.php: " . (isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 'Not set'));
+error_log("Session user_type in update_seller_profile.php: " . (isset($_SESSION['user_type']) ? $_SESSION['user_type'] : 'Not set'));
+error_log("Session data: " . json_encode($_SESSION));
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] !== 'seller') {
@@ -59,27 +60,24 @@ try {
         throw new Exception("Required fields are missing: Shop Name and Shop Address are required.");
     }
 
-    // Create upload directory if it doesn't exist
-    $uploadDir = "../../uploads/sellers/";
-    if (!is_dir($uploadDir)) {
-        mkdir($uploadDir, 0777, true);
-    }
-
     // Handle file upload for shop logo
-    $shopLogoPath = null;
+    $shopLogoData = null;
+    $shopLogoType = null;
     if (isset($_FILES['shop_logo']) && $_FILES['shop_logo']['error'] === UPLOAD_ERR_OK) {
+        // Get file data
         $tmpName = $_FILES['shop_logo']['tmp_name'];
-        $fileName = basename($_FILES['shop_logo']['name']);
-        $extension = pathinfo($fileName, PATHINFO_EXTENSION);
-        $newFileName = 'shop_' . $sellerId . '_' . time() . '.' . $extension;
-        $uploadPath = $uploadDir . $newFileName;
+        $fileType = $_FILES['shop_logo']['type'];
         
-        if (move_uploaded_file($tmpName, $uploadPath)) {
-            $shopLogoPath = 'uploads/sellers/' . $newFileName;
-        } else {
-            error_log("Failed to move uploaded file: " . error_get_last()['message']);
-            throw new Exception('Failed to upload shop logo. Please try again.');
+        // Read file contents
+        $shopLogoData = file_get_contents($tmpName);
+        $shopLogoType = $fileType;
+        
+        if (!$shopLogoData) {
+            error_log("Failed to read uploaded file: " . error_get_last()['message']);
+            throw new Exception('Failed to process shop logo. Please try again.');
         }
+        
+        error_log("Shop logo uploaded, size: " . strlen($shopLogoData) . " bytes, type: " . $shopLogoType);
     }
 
     // Debug update info
@@ -88,16 +86,17 @@ try {
     error_log("Shop Address: $shopAddress");
     error_log("Shop Bio: $shopBio");
     error_log("Shop Location: $shopLocation");
-    error_log("Shop Logo Path: " . ($shopLogoPath ? $shopLogoPath : "No new logo"));
+    error_log("Shop Logo Data: " . ($shopLogoData ? 'Data exists' : 'No data'));
+    error_log("Shop Logo Type: " . ($shopLogoType ? $shopLogoType : 'No type'));
 
     // Begin transaction
     $conn->begin_transaction();
 
     // Prepare update query
-    if ($shopLogoPath) {
+    if ($shopLogoData) {
         // Update with new logo
         $stmt = $conn->prepare("UPDATE sellers SET shop_name = ?, shop_address = ?, shop_bio = ?, shop_location = ?, shop_logo = ? WHERE id = ?");
-        $stmt->bind_param("sssssi", $shopName, $shopAddress, $shopBio, $shopLocation, $shopLogoPath, $sellerId);
+        $stmt->bind_param("ssssbi", $shopName, $shopAddress, $shopBio, $shopLocation, $shopLogoData, $sellerId);
     } else {
         // Update without changing logo
         $stmt = $conn->prepare("UPDATE sellers SET shop_name = ?, shop_address = ?, shop_bio = ?, shop_location = ? WHERE id = ?");
@@ -119,9 +118,10 @@ try {
         $response['message'] = 'Shop profile updated successfully.';
         $response['shop_name'] = $shopName;
         
-        // Include shop logo URL if updated
-        if ($shopLogoPath) {
-            $response['shopLogoUrl'] = $shopLogoPath;
+        // Include shop logo type info if updated
+        if ($shopLogoData) {
+            $response['shopLogoUpdated'] = true;
+            $response['shopLogoType'] = $shopLogoType;
         }
     } else {
         throw new Exception('No changes were made to the profile.');
@@ -130,11 +130,6 @@ try {
     // Rollback transaction if started
     if (isset($conn) && $conn->ping()) {
         $conn->rollback();
-    }
-
-    // Delete uploaded file if exists
-    if (isset($shopLogoPath) && isset($uploadPath) && file_exists($uploadPath)) {
-        unlink($uploadPath);
     }
 
     $response['message'] = $e->getMessage();
