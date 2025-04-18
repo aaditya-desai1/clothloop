@@ -835,72 +835,6 @@
         .customer-info:hover .customer-avatar {
             transform: scale(1.2) rotate(10deg);
         }
-
-        /* Function to animate counter */
-        function animateCounter(elementId, targetValue, isDecimal = false) {
-            const element = document.getElementById(elementId);
-            if (!element) return;
-            
-            // Set initial value
-            let startValue = 0;
-            let increment = targetValue > 100 ? 1 : 0.1;
-            
-            // Adjust for decimal values
-            if (isDecimal) {
-                increment = 0.1;
-            }
-            
-            // Ensure we don't exceed the target
-            increment = Math.min(increment, targetValue / 10);
-            
-            // Set animation duration between 1-2 seconds based on target value
-            const duration = Math.min(Math.max(1000, targetValue * 100), 2000);
-            const framesPerSecond = 60;
-            const totalFrames = Math.ceil(duration / (1000 / framesPerSecond));
-            const incrementPerFrame = targetValue / totalFrames;
-            
-            let currentValue = startValue;
-            let frame = 0;
-            
-            // Clear any existing animation
-            if (window[`counter_${elementId}`]) {
-                clearInterval(window[`counter_${elementId}`]);
-            }
-            
-            // Start animation
-            window[`counter_${elementId}`] = setInterval(() => {
-                frame++;
-                
-                // Calculate current value using easing
-                currentValue = startValue + incrementPerFrame * frame;
-                
-                // Ensure we don't exceed the target
-                if (currentValue >= targetValue) {
-                    currentValue = targetValue;
-                    clearInterval(window[`counter_${elementId}`]);
-                }
-                
-                // Update UI
-                if (isDecimal) {
-                    element.textContent = currentValue.toFixed(1);
-                } else {
-                    element.textContent = Math.floor(currentValue);
-                }
-                
-            }, 1000 / framesPerSecond);
-        }
-        
-        // Function to update dashboard stats
-        function updateDashboardStats(data) {
-            // Animate total products counter
-            animateCounter('totalProducts', data.total_products || 8);
-            
-            // Animate interested customers counter
-            animateCounter('interestedCustomers', data.interested_customers || 3);
-            
-            // Animate average rating counter
-            animateCounter('averageRating', data.average_rating || 4.7, true);
-        }
     </style>
 </head>
 <body>
@@ -917,7 +851,7 @@
                 <li><a href="seller_reviews.html">Reviews</a></li>
                 <li><a href="seller_profile.html">Profile</a></li>
                 <li><a href="../about/about_us.html">About</a></li>
-                <li><a href="../account/login.html">Logout</a></li>
+                <li><a href="javascript:void(0);" onclick="logout()">Logout</a></li>
             </ul>
             <button class="theme-switcher" id="theme-toggle" aria-label="Toggle theme">
                 <i class="fas fa-sun"></i>
@@ -943,7 +877,7 @@
                     <i class="fas fa-store"></i>
                 </div>
                 <div class="welcome-text">
-                    <h2>Welcome Back, <span id="sellerName">Bridal Elegance</span></h2>
+                    <h2>Welcome Back, <span id="sellerName">...</span></h2>
                     <p>Manage your listings and track customer interest from your dashboard</p>
                 </div>
             </div>
@@ -982,7 +916,7 @@
             </div>
         </div>
         
-        <div id="loadingSpinner" class="loading-spinner" style="display: none;">
+        <div id="loadingSpinner" class="loading-spinner">
             <div class="spinner"></div>
         </div>
 
@@ -1002,60 +936,11 @@
                         </tr>
                     </thead>
                     <tbody id="customersTableBody">
-                        <tr>
-                            <td>
-                                <div class="customer-info">
-                                    <div class="customer-avatar">RS</div>
-                                    <div class="customer-name">Rahul Sharma</div>
-                                </div>
-                            </td>
-                            <td>Formal Blazer</td>
-                            <td>May 28, 2024</td>
-                            <td>
-                                <div class="contact-links">
-                                    <a href="tel:9876543210" class="contact-link"><i class="fas fa-phone"></i></a>
-                                    <a href="https://wa.me/919876543210" class="contact-link"><i class="fab fa-whatsapp"></i></a>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="customer-info">
-                                    <div class="customer-avatar">AP</div>
-                                    <div class="customer-name">Anjali Patel</div>
-                                </div>
-                            </td>
-                            <td>Designer Saree</td>
-                            <td>May 27, 2024</td>
-                            <td>
-                                <div class="contact-links">
-                                    <a href="tel:9898765432" class="contact-link"><i class="fas fa-phone"></i></a>
-                                    <a href="https://wa.me/919898765432" class="contact-link"><i class="fab fa-whatsapp"></i></a>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="customer-info">
-                                    <div class="customer-avatar">VK</div>
-                                    <div class="customer-name">Vikram Kumar</div>
-                                </div>
-                            </td>
-                            <td>Men's Traditional Kurta</td>
-                            <td>May 25, 2024</td>
-                            <td>
-                                <div class="contact-links">
-                                    <a href="tel:9786543210" class="contact-link"><i class="fas fa-phone"></i></a>
-                                    <a href="https://wa.me/919786543210" class="contact-link"><i class="fab fa-whatsapp"></i></a>
-                                </div>
-                            </td>
-                        </tr>
+                        <!-- Dynamic content will be loaded here -->
                     </tbody>
                 </table>
             </div>
         </div>
-        
-        <!-- Recently Added Products section removed -->
     </main>
 
     <!-- Footer -->
@@ -1124,24 +1009,6 @@
             });
         }
         
-        // Function to handle logout
-        function logout() {
-            // Call logout API
-            fetch('../../../backend/api/users/logout.php')
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 'success') {
-                        window.location.href = '../../pages/account/login.html';
-                    } else {
-                        showAlert('Error logging out. Please try again.', 'error');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    showAlert('Error logging out. Please try again.', 'error');
-                });
-        }
-        
         // Function to load dashboard data
         function loadDashboardData() {
             // Show loading spinner
@@ -1154,33 +1021,38 @@
                 alertContainer.innerHTML = '';
             }
             
-            // For testing: Use static data
-            setTimeout(() => {
-                // Hide loading spinner
-                loadingSpinner.style.display = 'none';
-                
-                // Update dashboard stats with static data
-                updateDashboardStats({
-                    total_products: 8,
-                    interested_customers: 3,
-                    average_rating: 4.7
-                });
-                
-                // Show success message
-                showAlert('Dashboard data loaded successfully!', 'success');
-            }, 1000);
-            
-            // Actual API call (commented out for testing)
-            /*
+            // Fetch dashboard data from API
             fetch('../../../backend/api/sellers/dashboard_stats.php')
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        if (response.status === 401 || response.status === 403) {
+                            // Unauthorized or forbidden - redirect to login
+                            window.location.href = '../account/login.html';
+                            throw new Error('Authentication required');
+                        }
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     // Hide loading spinner
                     loadingSpinner.style.display = 'none';
                     
                     if (data.status === 'success') {
                         // Update dashboard stats
-                        updateDashboardStats(data);
+                        updateDashboardStats(data.data);
+                        
+                        // Update seller name
+                        if (data.data.seller_name) {
+                            document.getElementById('sellerName').textContent = data.data.seller_name;
+                        }
+                        
+                        // Load interested customers
+                        if (data.data.interested_customers_list) {
+                            loadInterestedCustomers(data.data.interested_customers_list);
+                        }
+                        
+                        // Remove success message to reduce clutter
+                        // showAlert('Dashboard data loaded successfully', 'success');
                     } else {
                         // Show error message
                         showAlert(data.message || 'Error loading dashboard data', 'error');
@@ -1191,21 +1063,10 @@
                     loadingSpinner.style.display = 'none';
                     
                     console.error('Error:', error);
-                    showAlert('Error loading dashboard data. Please try again.', 'error');
+                    if (error.message !== 'Authentication required') {
+                        showAlert('Error loading dashboard data. Please try again.', 'error');
+                    }
                 });
-            */
-        }
-        
-        // Function to update dashboard stats
-        function updateDashboardStats(data) {
-            // Animate total products counter
-            animateCounter('totalProducts', data.total_products || 8);
-            
-            // Animate interested customers counter
-            animateCounter('interestedCustomers', data.interested_customers || 3);
-            
-            // Animate average rating counter
-            animateCounter('averageRating', data.average_rating || 4.7, true);
         }
         
         // Function to show alerts
@@ -1231,6 +1092,145 @@
                     alertContainer.innerHTML = '';
                 }, 500);
             }, 3000);
+        }
+
+        /* Function to animate counter */
+        function animateCounter(elementId, targetValue, isDecimal = false) {
+            const element = document.getElementById(elementId);
+            if (!element) return;
+            
+            // Set initial value
+            let startValue = 0;
+            let increment = targetValue > 100 ? 1 : 0.1;
+            
+            // Adjust for decimal values
+            if (isDecimal) {
+                increment = 0.1;
+            }
+            
+            // Ensure we don't exceed the target
+            increment = Math.min(increment, targetValue / 10);
+            
+            // Set animation duration between 1-2 seconds based on target value
+            const duration = Math.min(Math.max(1000, targetValue * 100), 2000);
+            const framesPerSecond = 60;
+            const totalFrames = Math.ceil(duration / (1000 / framesPerSecond));
+            const incrementPerFrame = targetValue / totalFrames;
+            
+            let currentValue = startValue;
+            let frame = 0;
+            
+            // Clear any existing animation
+            if (window[`counter_${elementId}`]) {
+                clearInterval(window[`counter_${elementId}`]);
+            }
+            
+            // Start animation
+            window[`counter_${elementId}`] = setInterval(() => {
+                frame++;
+                
+                // Calculate current value using easing
+                currentValue = startValue + incrementPerFrame * frame;
+                
+                // Ensure we don't exceed the target
+                if (currentValue >= targetValue) {
+                    currentValue = targetValue;
+                    clearInterval(window[`counter_${elementId}`]);
+                }
+                
+                // Update UI
+                if (isDecimal) {
+                    element.textContent = currentValue.toFixed(1);
+                } else {
+                    element.textContent = Math.floor(currentValue);
+                }
+                
+            }, 1000 / framesPerSecond);
+        }
+        
+        // Function to update dashboard stats
+        function updateDashboardStats(data) {
+            // Simply update the text content directly
+            document.getElementById('totalProducts').textContent = data.total_products || 0;
+            document.getElementById('interestedCustomers').textContent = data.interested_customers || 0;
+            document.getElementById('averageRating').textContent = data.average_rating ? data.average_rating.toFixed(1) : '0.0';
+        }
+        
+        // Function to load interested customers data
+        function loadInterestedCustomers(customers) {
+            const tableBody = document.getElementById('customersTableBody');
+            if (!tableBody) return;
+            
+            // Clear existing rows
+            tableBody.innerHTML = '';
+            
+            if (!customers || customers.length === 0) {
+                // No customers - show empty message
+                const emptyRow = document.createElement('tr');
+                emptyRow.innerHTML = `
+                    <td colspan="4" style="text-align: center; padding: 30px;">
+                        <i class="fas fa-users" style="font-size: 24px; margin-bottom: 10px; color: var(--accent-color);"></i>
+                        <p>No interested customers yet</p>
+                    </td>
+                `;
+                tableBody.appendChild(emptyRow);
+                return;
+            }
+            
+            // Add customers to table
+            customers.forEach(customer => {
+                const row = document.createElement('tr');
+                
+                // Create initials for avatar
+                const nameParts = customer.customer_name.split(' ');
+                let initials = '';
+                if (nameParts.length > 0) {
+                    initials += nameParts[0].charAt(0).toUpperCase();
+                    if (nameParts.length > 1) {
+                        initials += nameParts[nameParts.length - 1].charAt(0).toUpperCase();
+                    }
+                }
+                
+                row.innerHTML = `
+                    <td>
+                        <div class="customer-info">
+                            <div class="customer-avatar">${initials}</div>
+                            <div class="customer-name">${customer.customer_name}</div>
+                        </div>
+                    </td>
+                    <td>${customer.product_name}</td>
+                    <td>${new Date(customer.interest_date).toLocaleDateString('en-IN', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    })}</td>
+                    <td>
+                        <div class="contact-links">
+                            <a href="tel:${customer.phone_no}" class="contact-link"><i class="fas fa-phone"></i></a>
+                            <a href="https://wa.me/91${customer.phone_no}" class="contact-link"><i class="fab fa-whatsapp"></i></a>
+                        </div>
+                    </td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+        }
+        
+        // Function to handle logout
+        function logout() {
+            fetch('../../../backend/api/users/logout.php')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        window.location.href = '../account/login.html';
+                    } else {
+                        showAlert('Error logging out. Please try again.', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showAlert('Error logging out. Please try again.', 'error');
+                });
         }
     </script>
 </body>

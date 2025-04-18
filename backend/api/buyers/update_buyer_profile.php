@@ -1,110 +1,147 @@
 <?php
-// Enable CORS
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: POST, OPTIONS");
-header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
-header("Access-Control-Allow-Credentials: true");
+/**
+ * Update Buyer Profile API
+ * Allows buyers to update their profile information
+ */
 
-// For preflight requests
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(200);
-    exit();
+// Headers
+header('Access-Control-Allow-Origin: *');
+header('Content-Type: application/json');
+header('Access-Control-Allow-Methods: POST');
+header('Access-Control-Allow-Headers: Access-Control-Allow-Headers, Content-Type, Access-Control-Allow-Methods, Authorization, X-Requested-With');
+
+// Required files
+require_once __DIR__ . '/../../config/database.php';
+require_once __DIR__ . '/../../utils/auth.php';
+require_once __DIR__ . '/../../utils/response.php';
+require_once __DIR__ . '/../../utils/validate.php';
+
+// Process only POST requests
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    Response::error('Method not allowed', null, 405);
 }
 
-// Include session configuration
-require_once "../../config/session.php";
+// Require authentication
+Auth::requireAuth();
 
-// Include database connection
-include_once "../../config/db_connect.php";
+// Get current user
+$user = Auth::getCurrentUser();
 
-// Check if user is logged in
-if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] !== 'buyer') {
-    echo json_encode([
-        'status' => 'error',
-        'message' => 'Unauthorized access',
-        'debug' => [
-            'session_id' => session_id(),
-            'session_data' => $_SESSION
-        ]
-    ]);
-    exit;
+// Ensure the user is a buyer
+if ($user['role'] !== 'buyer') {
+    Response::error('Access denied. This endpoint is for buyers only.', null, 403);
 }
 
-// Get the buyer ID from the session
-$buyer_id = $_SESSION['user_id'];
+// Get posted data
+$data = json_decode(file_get_contents('php://input'), true);
 
-// Get POST data
-$data = json_decode(file_get_contents("php://input"));
-
-// Validate input data
-if (
-    !isset($data->name) || empty(trim($data->name)) ||
-    !isset($data->email) || empty(trim($data->email)) ||
-    !isset($data->phone_no) || empty(trim($data->phone_no))
-) {
-    echo json_encode([
-        'status' => 'error',
-        'message' => 'Please provide all required information'
-    ]);
-    exit;
+// If no data provided
+if (!$data) {
+    Response::error('No data provided');
 }
 
-// Sanitize input data
-$name = htmlspecialchars(strip_tags(trim($data->name)));
-$email = htmlspecialchars(strip_tags(trim($data->email)));
-$phone_no = htmlspecialchars(strip_tags(trim($data->phone_no)));
-$password = isset($data->password) && !empty(trim($data->password)) ? 
-            htmlspecialchars(strip_tags(trim($data->password))) : null;
+// Validate input
+Validate::reset();
+Validate::required('name', $data['name'] ?? '');
+Validate::required('email', $data['email'] ?? '');
+Validate::email('email', $data['email'] ?? '');
+Validate::required('phone_no', $data['phone_no'] ?? '');
 
-// Check if email is already taken by another user
-$checkEmail = $conn->prepare("SELECT id FROM buyers WHERE email = ? AND id != ?");
-$checkEmail->bind_param("si", $email, $buyer_id);
-$checkEmail->execute();
-$emailResult = $checkEmail->get_result();
-
-if ($emailResult->num_rows > 0) {
-    echo json_encode([
-        'status' => 'error',
-        'message' => 'Email is already used by another user'
-    ]);
-    exit;
+// Optional password change
+if (isset($data['password']) && !empty($data['password'])) {
+    Validate::minLength('password', $data['password'], 6);
 }
 
-// Update buyer profile
-if ($password) {
-    // If password is provided, update it as well
-    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-    $stmt = $conn->prepare("UPDATE buyers SET name = ?, email = ?, phone_no = ?, password = ? WHERE id = ?");
-    $stmt->bind_param("ssssi", $name, $email, $phone_no, $hashedPassword, $buyer_id);
-} else {
-    // Otherwise, update only the basic info
-    $stmt = $conn->prepare("UPDATE buyers SET name = ?, email = ?, phone_no = ? WHERE id = ?");
-    $stmt->bind_param("sssi", $name, $email, $phone_no, $buyer_id);
+if (Validate::hasErrors()) {
+    Response::error('Validation failed', Validate::getErrors());
 }
 
-if ($stmt->execute()) {
-    // Update session data with new values
-    $_SESSION['user_name'] = $name;
-    $_SESSION['user_email'] = $email;
+try {
+    // Database connection
+    $database = new Database();
+    $db = $database->getConnection();
     
-    echo json_encode([
-        'status' => 'success',
-        'message' => 'Profile updated successfully',
-        'buyer' => [
-            'id' => $buyer_id,
-            'name' => $name,
-            'email' => $email,
-            'phone_no' => $phone_no
-        ]
+    // Start transaction
+    $db->beginTransaction();
+    
+    // Check if email is already in use by another user
+    if ($data['email'] !== $user['email']) {
+        $stmt = $db->prepare("SELECT id FROM users WHERE email = :email AND id != :id");
+        $stmt->bindParam(':email', $data['email']);
+        $stmt->bindParam(':id', $user['id']);
+        $stmt->execute();
+        
+        if ($stmt->rowCount() > 0) {
+            Response::error('Email is already in use by another account.');
+        }
+    }
+    
+    // Update user basic info
+    $query = "UPDATE users SET name = :name, email = :email, phone_no = :phone_no";
+    $params = [
+        ':name' => $data['name'],
+        ':email' => $data['email'],
+        ':phone_no' => $data['phone_no'],
+        ':id' => $user['id']
+    ];
+    
+    // Add password to update if provided
+    if (isset($data['password']) && !empty($data['password'])) {
+        $query .= ", password = :password";
+        $params[':password'] = Auth::hashPassword($data['password']);
+    }
+    
+    $query .= " WHERE id = :id";
+    
+    $stmt = $db->prepare($query);
+    foreach ($params as $key => $value) {
+        $stmt->bindParam($key, $value);
+    }
+    $stmt->execute();
+    
+    // Update buyer-specific info if provided
+    if (isset($data['latitude']) && isset($data['longitude'])) {
+        $stmt = $db->prepare("
+            UPDATE buyers 
+            SET latitude = :latitude, longitude = :longitude
+            WHERE id = :id
+        ");
+        
+        $stmt->bindParam(':latitude', $data['latitude']);
+        $stmt->bindParam(':longitude', $data['longitude']);
+        $stmt->bindParam(':id', $user['id']);
+        $stmt->execute();
+    }
+    
+    // Commit transaction
+    $db->commit();
+    
+    // Fetch updated user data
+    $stmt = $db->prepare("
+        SELECT u.*, b.address, b.latitude, b.longitude
+        FROM users u
+        JOIN buyers b ON u.id = b.id
+        WHERE u.id = :id
+    ");
+    
+    $stmt->bindParam(':id', $user['id']);
+    $stmt->execute();
+    $updatedUser = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    // Remove sensitive information
+    unset($updatedUser['password']);
+    
+    // Update session with new user data
+    Auth::startSession($updatedUser);
+    
+    Response::success('Profile updated successfully', [
+        'buyer' => $updatedUser
     ]);
-} else {
-    echo json_encode([
-        'status' => 'error',
-        'message' => 'Failed to update profile: ' . $conn->error
-    ]);
-}
-
-$stmt->close();
-$conn->close();
-?> 
+} catch (Exception $e) {
+    // Rollback transaction on error
+    if (isset($db) && $db->inTransaction()) {
+        $db->rollBack();
+    }
+    
+    Response::error('Failed to update profile: ' . $e->getMessage());
+} 

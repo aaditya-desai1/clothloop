@@ -1,39 +1,54 @@
 <?php
-// API Endpoint: Check Session Status
-// This endpoint returns information about the current user session
+/**
+ * Check Session API
+ * Verifies if user is authenticated and returns basic session info
+ */
 
-// Set the response header to JSON
+// Headers
+header('Access-Control-Allow-Origin: *');
 header('Content-Type: application/json');
+header('Access-Control-Allow-Methods: GET');
+header('Access-Control-Allow-Headers: Access-Control-Allow-Headers, Content-Type, Access-Control-Allow-Methods, Authorization, X-Requested-With');
 
-// Debug information
-$debug = [];
+// Required files
+require_once __DIR__ . '/../../utils/auth.php';
+require_once __DIR__ . '/../../utils/response.php';
 
 // Start session if not already started
-if (session_status() === PHP_SESSION_NONE) {
+if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
-// Debug info about session
-$debug['session_id'] = session_id();
-$debug['session_status'] = session_status();
-$debug['session_data'] = $_SESSION;
+// Check if session exists first
+$sessionExists = isset($_SESSION) && !empty($_SESSION) && isset($_SESSION['user']);
 
-// Check if user is authenticated
-$isAuthenticated = isset($_SESSION['user_id']) && !empty($_SESSION['user_id']);
-$userType = isset($_SESSION['user_type']) ? $_SESSION['user_type'] : null;
-$userId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
-$userName = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : null;
+// Check authentication through Auth class
+$isAuthenticated = Auth::checkSession();
+$user = null;
 
-// Prepare response
-$response = [
-    'status' => 'success',
-    'logged_in' => $isAuthenticated,
-    'user_type' => $userType,
-    'user_id' => $userId,
-    'username' => $userName,
-    'debug' => $debug
-];
-
-// Return JSON response
-echo json_encode($response);
-?> 
+if ($isAuthenticated) {
+    $user = Auth::getCurrentUser();
+    
+    // Return basic user info without sensitive data
+    $userInfo = [
+        'id' => $user['id'],
+        'name' => $user['name'],
+        'email' => $user['email'],
+        'role' => $user['role']
+    ];
+    
+    Response::success('User is authenticated', [
+        'authenticated' => true,
+        'user' => $userInfo,
+        'session_id' => session_id(),
+        'session_exists' => $sessionExists
+    ]);
+} else {
+    // User is not authenticated
+    Response::success('User is not authenticated', [
+        'authenticated' => false,
+        'user' => null,
+        'session_id' => session_id(),
+        'session_exists' => $sessionExists
+    ]);
+} 

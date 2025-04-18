@@ -1241,29 +1241,30 @@
                 imageEl.src = product.image;
                 console.log('Using base64 image data from response');
             } 
-            // If no valid image or placeholder, use direct API URL
-            else if (!product.image || product.image.includes('placeholder.png')) {
+            // If no valid image or placeholder, use direct API URL with new endpoint
+            else {
                 imageEl.src = `/ClothLoop/backend/api/image_display.php?type=cloth&id=${product.id}`;
                 console.log('Using direct image API URL');
-            }
-            // Otherwise use whatever image path we got
-            else {
-                imageEl.src = product.image;
-                console.log('Using image path from response:', product.image.substring(0, 50) + '...');
             }
             
             // Add error handling for image loading with retry
             imageEl.onerror = function() {
-                console.error('Failed to load image, trying direct API as fallback');
-                // Try direct API URL as fallback
-                this.src = `/ClothLoop/backend/api/image_display.php?type=cloth&id=${product.id}`;
-                
-                // If that fails too, use placeholder
-                this.onerror = function() {
-                    console.error('API fallback failed too, using placeholder');
+                console.error('Failed to load image, trying fallback');
+                // Try legacy endpoint as fallback
+                if (product.image && !product.image.startsWith('data:image/')) {
+                    this.src = product.image;
+                    console.log('Using image path from response as fallback');
+                    
+                    // If that fails too, use placeholder
+                    this.onerror = function() {
+                        console.error('All fallbacks failed, using placeholder');
+                        this.src = '../../assets/images/placeholder.png';
+                        this.onerror = null; // Prevent infinite error handling
+                    };
+                } else {
                     this.src = '../../assets/images/placeholder.png';
                     this.onerror = null; // Prevent infinite error handling
-                };
+                }
             };
             
             // Set text content
@@ -1404,22 +1405,10 @@
             
             // Add error handling for image loading
             imageEl.onerror = function() {
-                console.error('Failed to load image from URL params, trying direct API');
-                
-                // If we have an ID, try the API
-                if (params.id) {
-                    this.src = `/ClothLoop/backend/api/image_display.php?type=cloth&id=${params.id}`;
-                    
-                    // If API also fails, use placeholder
-                    this.onerror = function() {
-                        console.error('API fallback failed too, using placeholder');
-                        this.src = '../../assets/images/placeholder.png';
-                        this.onerror = null; // Prevent infinite error handling
-                    };
-                } else {
-                    // No ID, just use placeholder
-                    this.src = '../../assets/images/placeholder.png';
-                }
+                console.error('Failed to load image from URL params or API');
+                // Just use placeholder if loading fails
+                this.src = '../../assets/images/placeholder.png';
+                this.onerror = null; // Prevent infinite error handling
             };
             
             document.getElementById('clothTitle').textContent = params.title || 'Product';

@@ -1,56 +1,39 @@
 <?php
+/**
+ * Database Configuration File
+ * Contains connection parameters and methods for database operations
+ */
+
 class Database {
+    // Database credentials
     private $host = "localhost";
+    private $db_name = "clothloop";
     private $username = "root";
     private $password = "";
-    private $database = "clothloop";
     private $conn;
 
-    public function __construct() {
-        $this->conn = null;
-        try {
-            $this->conn = new mysqli($this->host, $this->username, $this->password, $this->database);
-            if ($this->conn->connect_error) {
-                throw new Exception("Connection failed: " . $this->conn->connect_error);
-            }
-            // Set character set
-            $this->conn->set_charset("utf8");
-        } catch (Exception $e) {
-            die("Database connection error: " . $e->getMessage());
-        }
-    }
-
+    /**
+     * Connect to the database
+     * @return PDO Database connection object
+     */
     public function getConnection() {
+        $this->conn = null;
+
+        try {
+            $this->conn = new PDO(
+                "mysql:host=" . $this->host . ";dbname=" . $this->db_name,
+                $this->username,
+                $this->password
+            );
+            $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $this->conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+            $this->conn->exec("set names utf8");
+        } catch(PDOException $e) {
+            // Log this error - but don't expose database credentials in response
+            error_log("Database Connection Error: " . $e->getMessage());
+            throw new Exception("Database connection failed. Please try again later.");
+        }
+
         return $this->conn;
     }
-}
-
-/**
- * Get a PDO database connection
- * @return PDO PDO database connection
- */
-function getDbConnection() {
-    $host = "localhost";
-    $username = "root";
-    $password = "";
-    $database = "clothloop";
-    
-    try {
-        $conn = new PDO("mysql:host=$host;dbname=$database", $username, $password);
-        // Set the PDO error mode to exception
-        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-        return $conn;
-    } catch(PDOException $e) {
-        // Log the error
-        error_log("Database connection error: " . $e->getMessage());
-        // Return error response
-        header('Content-Type: application/json');
-        echo json_encode([
-            'status' => 'error',
-            'message' => 'Database connection failed. Please try again later.'
-        ]);
-        exit;
-    }
-}
-?> 
+} 

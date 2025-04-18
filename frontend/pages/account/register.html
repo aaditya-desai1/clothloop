@@ -429,10 +429,10 @@
             
             <div id="success-message" class="success-message"></div>
             
-            <form id="signup-form" action="../../../backend/api/users/signup_process.php" method="POST" enctype="multipart/form-data" class="fade-in-delay-1">
+            <form id="signup-form" method="POST" enctype="multipart/form-data" class="fade-in-delay-1">
                 <div class="form-group">
                     <label for="username">Username:</label>
-                    <input type="text" id="username" name="username" required>
+                    <input type="text" id="username" name="name" required>
                     <div id="username-error" class="error-message"></div>
                 </div>
                 
@@ -463,7 +463,7 @@
                 
                 <div class="form-group">
                     <label for="phone">Phone Number:</label>
-                    <input type="tel" id="phone" name="phone" required>
+                    <input type="tel" id="phone" name="phone_no" required>
                     <div id="phone-error" class="error-message"></div>
                 </div>
                 
@@ -950,6 +950,14 @@
                     // Create form data
                     const formData = new FormData(this);
                     
+                    // Ensure field names match what backend expects
+                    // No need to set/delete 'name' and 'phone_no' as the form fields are already correctly named
+                    
+                    // Seller specific fields
+                    if (userType === 'seller') {
+                        formData.set('address', formData.get('shop_address'));
+                    }
+                    
                     // Send data to the server
                     fetch('../../../backend/api/users/signup_process.php', {
                         method: 'POST',
@@ -957,8 +965,11 @@
                     })
                     .then(response => response.text())
                     .then(data => {
+                        // Log the response for debugging
+                        console.log('Server response:', data);
+                        
                         // Check if response contains success message
-                        if (data.includes('Registration successful')) {
+                        if (data.includes('Account created successfully')) {
                             // Redirect directly to login page
                             window.location.href = "login.html";
                         } else {

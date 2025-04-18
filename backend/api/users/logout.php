@@ -1,21 +1,29 @@
 <?php
-// API Endpoint: User Logout
-// This endpoint destroys the user session and logs out the user
+/**
+ * User Logout API
+ * Ends user session and logs them out
+ */
 
-// Set the response header to JSON
+// Headers
+header('Access-Control-Allow-Origin: *');
 header('Content-Type: application/json');
+header('Access-Control-Allow-Methods: POST');
+header('Access-Control-Allow-Headers: Access-Control-Allow-Headers, Content-Type, Access-Control-Allow-Methods, Authorization, X-Requested-With');
 
-// Start session if not already started
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
+// Required files
+require_once __DIR__ . '/../../utils/auth.php';
+require_once __DIR__ . '/../../utils/response.php';
+
+// Process only POST requests
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    // Allow GET for browsers redirecting to logout page
+    if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+        Response::error('Method not allowed', null, 405);
+    }
 }
 
-// Destroy the session
-session_destroy();
+// End the session
+Auth::endSession();
 
-// Return success response
-echo json_encode([
-    'status' => 'success',
-    'message' => 'Logged out successfully'
-]);
-?> 
+// Send success response
+Response::success('Logout successful'); 

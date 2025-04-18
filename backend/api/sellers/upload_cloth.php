@@ -1,280 +1,206 @@
 <?php
-session_start();
-require_once '../../config/db_connect.php';
+/**
+ * Upload/Edit Cloth API
+ * Allows sellers to upload new clothing items or edit existing ones
+ */
 
-// Enable error reporting for debugging
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
-// Log function for debugging
-function debug_log($message, $data = null) {
-    // Create a logs directory if it doesn't exist
-    $logs_dir = '../../logs';
-    if (!file_exists($logs_dir)) {
-        mkdir($logs_dir, 0777, true);
-    }
-    
-    $log_file = '../../logs/debug_log.txt';
-    $timestamp = date('Y-m-d H:i:s');
-    $log_message = "[{$timestamp}] {$message}";
-    
-    if ($data !== null) {
-        $log_message .= ": " . print_r($data, true);
-    }
-    
-    file_put_contents($log_file, $log_message . PHP_EOL, FILE_APPEND);
-}
-
-// Check database connection to ensure it's working
-if ($conn->connect_error) {
-    debug_log("Database connection failed", $conn->connect_error);
-    echo json_encode(['status' => 'error', 'message' => 'Database connection error: ' . $conn->connect_error]);
-    exit;
-}
-
-debug_log("Database connection successful");
-debug_log("Starting cloth upload process");
-
-// Debug POST data
-debug_log("POST data", $_POST);
-debug_log("FILES data", isset($_FILES) ? $_FILES : 'No files uploaded');
-debug_log("Product ID from POST", isset($_POST['id']) ? $_POST['id'] : 'Not provided');
-
-$response = ['status' => 'error', 'message' => 'Unknown error occurred'];
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    debug_log("POST request received");
-    
-    // Get seller ID from various sources
-    $seller_id = null;
-    
-    // First try from POST data
-    if (isset($_POST['seller_id'])) {
-        $seller_id = $_POST['seller_id'];
-        debug_log("Seller ID from POST", $seller_id);
-    } 
-    // Then from session
-    else if (isset($_SESSION['user_id'])) {
-        $seller_id = $_SESSION['user_id'];
-        debug_log("Seller ID from session", $seller_id);
-    }
-    
-    // If still no seller ID, use a fallback for testing
-    if (!$seller_id) {
-        $seller_id = 1; // Fallback for testing
-        debug_log("Using fallback seller ID for testing", $seller_id);
-    }
-    
-    // Get form data
-    $cloth_title = $_POST['title'] ?? '';
-    $description = $_POST['description'] ?? '';
-    $size = $_POST['size'] ?? '';
-    $category = $_POST['category'] ?? '';
-    $occasion = $_POST['occasion'] ?? '';
-    $rental_price = $_POST['rental_price'] ?? 0;
-    $shop_address = $_POST['shopAddress'] ?? '';
-    $terms_conditions = $_POST['terms'] ?? '';
-    
-    debug_log("Form data parsed", [
-        'cloth_title' => $cloth_title,
-        'size' => $size,
-        'category' => $category,
-        'occasion' => $occasion,
-        'rental_price' => $rental_price
-    ]);
-    
-    // Check for required fields
-    $missing_fields = [];
-    if (empty($cloth_title)) $missing_fields[] = 'title';
-    if (empty($description)) $missing_fields[] = 'description';
-    if (empty($size)) $missing_fields[] = 'size';
-    if (empty($category)) $missing_fields[] = 'category';
-    if (empty($occasion)) $missing_fields[] = 'occasion';
-    if (empty($rental_price)) $missing_fields[] = 'rental_price';
-    if (empty($terms_conditions)) $missing_fields[] = 'terms';
-
-    debug_log("Missing required fields", $missing_fields);
-    if (!empty($missing_fields)) {
-        echo json_encode(['status' => 'error', 'message' => 'All fields are required. Missing: ' . implode(', ', $missing_fields)]);
-        exit;
-    }
-    
-    try {
-        // Handle image upload
-        $image_data = null;
-        $image_type = null;
-        
-        if (isset($_FILES['clothImage']) && $_FILES['clothImage']['error'] == 0) {
-            debug_log("Processing image upload", $_FILES['clothImage']);
-            
-            // Get image data
-            $image_tmp_name = $_FILES['clothImage']['tmp_name'];
-            $image_type = $_FILES['clothImage']['type'];
-            
-            // Validate image type
-            $allowed_types = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
-            if (!in_array($image_type, $allowed_types)) {
-                debug_log("Invalid image type", $image_type);
-                throw new Exception('Invalid image type. Only JPEG, PNG and GIF are allowed.');
-            }
-            
-            // Read image data directly
-            $image_data = file_get_contents($image_tmp_name);
-            
-            if (!$image_data) {
-                debug_log("Failed to read image data");
-                throw new Exception('Failed to process image');
-            }
-            
-            // Ensure we're storing binary data properly
-            debug_log("Image loaded successfully", [
-                'size' => strlen($image_data),
-                'type' => $image_type
-            ]);
-        } else {
-            debug_log("No new image provided or error in upload", isset($_FILES['clothImage']) ? $_FILES['clothImage']['error'] : 'No image uploaded');
-            
-            // If this is a new item (not an update), image is required
-            if (!isset($_POST['id'])) {
-                throw new Exception('Image upload is required for new items');
-            }
-        }
-        
-        // Check if this is an update or a new insertion
-        if (isset($_POST['id']) && !empty($_POST['id'])) {
-            $cloth_id = $_POST['id'];
-            debug_log("Updating existing cloth", $cloth_id);
-            
-            // If image data is provided, update it too
-            if ($image_data && $image_type) {
-                $sql = "UPDATE cloth_details SET 
-                        cloth_title = ?, description = ?, size = ?, category = ?, occasion = ?,
-                        rental_price = ?, shop_address = ?, terms_and_conditions = ?, cloth_photo = ?, photo_type = ? 
-                        WHERE id = ? AND seller_id = ?";
-                        
-                $stmt = $conn->prepare($sql);
-                
-                if ($stmt === false) {
-                    debug_log("SQL prepare failed", $conn->error);
-                    throw new Exception("SQL prepare failed: " . $conn->error);
-                }
-                
-                $stmt->bind_param("sssssdsssssis", 
-                    $cloth_title, 
-                    $description, 
-                    $size, 
-                    $category,
-                    $occasion,
-                    $rental_price, 
-                    $shop_address,
-                    $terms_conditions, 
-                    $image_data,
-                    $image_type,
-                    $cloth_id,
-                    $seller_id
-                );
-            } else {
-                // Update without changing the image
-                $sql = "UPDATE cloth_details SET 
-                        cloth_title = ?, description = ?, size = ?, category = ?, occasion = ?,
-                        rental_price = ?, shop_address = ?, terms_and_conditions = ? 
-                        WHERE id = ? AND seller_id = ?";
-                        
-                $stmt = $conn->prepare($sql);
-                
-                if ($stmt === false) {
-                    debug_log("SQL prepare failed", $conn->error);
-                    throw new Exception("SQL prepare failed: " . $conn->error);
-                }
-                
-                $stmt->bind_param("sssssdssis", 
-                    $cloth_title, 
-                    $description, 
-                    $size, 
-                    $category,
-                    $occasion,
-                    $rental_price, 
-                    $shop_address,
-                    $terms_conditions, 
-                    $cloth_id,
-                    $seller_id
-                );
-            }
-            
-            debug_log("Executing update statement");
-            if ($stmt->execute()) {
-                debug_log("Cloth updated successfully", $cloth_id);
-                $response = [
-                    'status' => 'success', 
-                    'message' => 'Cloth updated successfully',
-                    'cloth_id' => $cloth_id
-                ];
-            } else {
-                debug_log("Database error on update", $stmt->error);
-                $response = ['status' => 'error', 'message' => 'Database error: ' . $stmt->error];
-            }
-        } else {
-            // Insert new cloth item
-            debug_log("Inserting new cloth item");
-            
-            // Verify image data is present for new insertions
-            if (!$image_data || !$image_type) {
-                debug_log("Missing image data for new insertion");
-                throw new Exception('Image is required for new cloth items');
-            }
-            
-            $sql = "INSERT INTO cloth_details (seller_id, cloth_title, description, size, category, occasion,
-                    rental_price, shop_address, terms_and_conditions, cloth_photo, photo_type) 
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            
-            $stmt = $conn->prepare($sql);
-            
-            if ($stmt === false) {
-                debug_log("SQL prepare failed", $conn->error);
-                throw new Exception("SQL prepare failed: " . $conn->error);
-            }
-            
-            $stmt->bind_param("isssssdssssss", 
-                $seller_id, 
-                $cloth_title, 
-                $description, 
-                $size, 
-                $category,
-                $occasion,
-                $rental_price, 
-                $shop_address,
-                $terms_conditions, 
-                $image_data,
-                $image_type
-            );
-            
-            debug_log("Executing insert statement");
-            if ($stmt->execute()) {
-                $cloth_id = $stmt->insert_id;
-                debug_log("Cloth added successfully", $cloth_id);
-                $response = [
-                    'status' => 'success', 
-                    'message' => 'Cloth added successfully',
-                    'cloth_id' => $cloth_id
-                ];
-            } else {
-                debug_log("Database error on insert", $stmt->error);
-                $response = ['status' => 'error', 'message' => 'Database error: ' . $stmt->error];
-            }
-        }
-        
-        $stmt->close();
-    } catch (Exception $e) {
-        debug_log("Exception caught", $e->getMessage());
-        $response = ['status' => 'error', 'message' => 'Error: ' . $e->getMessage()];
-    }
-} else {
-    debug_log("Invalid request method", $_SERVER['REQUEST_METHOD']);
-    $response = ['status' => 'error', 'message' => 'Invalid request method'];
-}
-
-// Set content type to JSON
+// Headers
+header('Access-Control-Allow-Origin: *');
 header('Content-Type: application/json');
-debug_log("Response", $response);
-echo json_encode($response);
-?> 
+header('Access-Control-Allow-Methods: POST');
+header('Access-Control-Allow-Headers: Access-Control-Allow-Headers, Content-Type, Access-Control-Allow-Methods, Authorization, X-Requested-With');
+
+// Required files
+require_once __DIR__ . '/../../config/database.php';
+require_once __DIR__ . '/../../config/constants.php';
+require_once __DIR__ . '/../../utils/auth.php';
+require_once __DIR__ . '/../../utils/response.php';
+require_once __DIR__ . '/../../utils/validate.php';
+
+// Process only POST requests
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    Response::error('Method not allowed', null, 405);
+}
+
+// Require authentication
+Auth::requireAuth();
+
+// Get current user
+$user = Auth::getCurrentUser();
+
+// Ensure the user is a seller
+if ($user['role'] !== 'seller') {
+    Response::error('Access denied. This endpoint is for sellers only.', null, 403);
+}
+
+// Get posted data (form data)
+$data = $_POST;
+
+// Validate inputs
+Validate::reset();
+Validate::required('title', $data['title'] ?? '');
+Validate::required('description', $data['description'] ?? '');
+Validate::required('size', $data['size'] ?? '');
+Validate::required('category', $data['category'] ?? '');
+Validate::required('rental_price', $data['rental_price'] ?? '');
+Validate::numeric('rental_price', $data['rental_price'] ?? '');
+
+// Check if this is an edit or a new upload
+$isEdit = isset($data['id']) && !empty($data['id']);
+
+// If new upload, require at least one image
+if (!$isEdit && (!isset($_FILES['images']) || count($_FILES['images']['name']) === 0)) {
+    Validate::addError('images', 'At least one product image is required');
+}
+
+if (Validate::hasErrors()) {
+    Response::error('Validation failed', Validate::getErrors());
+}
+
+try {
+    // Database connection
+    $database = new Database();
+    $db = $database->getConnection();
+    
+    // Start transaction
+    $db->beginTransaction();
+    
+    // If editing, verify the product belongs to the seller
+    if ($isEdit) {
+        $stmt = $db->prepare("
+            SELECT id FROM products 
+            WHERE id = :id AND seller_id = :seller_id
+        ");
+        
+        $stmt->bindParam(':id', $data['id']);
+        $stmt->bindParam(':seller_id', $user['id']);
+        $stmt->execute();
+        
+        if ($stmt->rowCount() === 0) {
+            Response::error('You do not have permission to edit this product', null, 403);
+        }
+    }
+    
+    // Get category ID from name
+    $categoryId = null;
+    if (!empty($data['category'])) {
+        $stmt = $db->prepare("SELECT id FROM categories WHERE name = :name");
+        $stmt->bindParam(':name', $data['category']);
+        $stmt->execute();
+        
+        if ($stmt->rowCount() > 0) {
+            $category = $stmt->fetch(PDO::FETCH_ASSOC);
+            $categoryId = $category['id'];
+        }
+    }
+    
+    if ($isEdit) {
+        // Update existing product
+        $stmt = $db->prepare("
+            UPDATE products 
+            SET title = :title, 
+                description = :description,
+                size = :size,
+                category_id = :category_id,
+                occasion = :occasion,
+                rental_price = :rental_price,
+                terms = :terms,
+                updated_at = NOW()
+            WHERE id = :id AND seller_id = :seller_id
+        ");
+        
+        $stmt->bindParam(':title', $data['title']);
+        $stmt->bindParam(':description', $data['description']);
+        $stmt->bindParam(':size', $data['size']);
+        $stmt->bindParam(':category_id', $categoryId);
+        $stmt->bindParam(':occasion', $data['occasion']);
+        $stmt->bindParam(':rental_price', $data['rental_price']);
+        $stmt->bindParam(':terms', $data['terms']);
+        $stmt->bindParam(':id', $data['id']);
+        $stmt->bindParam(':seller_id', $user['id']);
+        
+        $stmt->execute();
+        $productId = $data['id'];
+    } else {
+        // Insert new product
+        $stmt = $db->prepare("
+            INSERT INTO products (
+                seller_id, title, description, size, category_id, 
+                occasion, rental_price, status, terms
+            )
+            VALUES (
+                :seller_id, :title, :description, :size, :category_id,
+                :occasion, :rental_price, 'available', :terms
+            )
+        ");
+        
+        $stmt->bindParam(':seller_id', $user['id']);
+        $stmt->bindParam(':title', $data['title']);
+        $stmt->bindParam(':description', $data['description']);
+        $stmt->bindParam(':size', $data['size']);
+        $stmt->bindParam(':category_id', $categoryId);
+        $stmt->bindParam(':occasion', $data['occasion']);
+        $stmt->bindParam(':rental_price', $data['rental_price']);
+        $stmt->bindParam(':terms', $data['terms']);
+        
+        $stmt->execute();
+        $productId = $db->lastInsertId();
+    }
+    
+    // Handle image uploads if any
+    if (isset($_FILES['images']) && count($_FILES['images']['name']) > 0) {
+        // Create product images directory if it doesn't exist
+        $uploadDir = UPLOADS_PATH . '/products/' . $productId;
+        if (!file_exists($uploadDir)) {
+            mkdir($uploadDir, 0777, true);
+        }
+        
+        // Upload each image
+        $fileCount = count($_FILES['images']['name']);
+        
+        for ($i = 0; $i < $fileCount; $i++) {
+            if ($_FILES['images']['error'][$i] === UPLOAD_ERR_OK) {
+                $tmpName = $_FILES['images']['tmp_name'][$i];
+                $fileName = time() . '_' . basename($_FILES['images']['name'][$i]);
+                $filePath = $uploadDir . '/' . $fileName;
+                
+                // Validate file type
+                $fileType = $_FILES['images']['type'][$i];
+                if (!in_array($fileType, ALLOWED_IMAGE_TYPES)) {
+                    continue; // Skip invalid file types
+                }
+                
+                // Move uploaded file
+                if (move_uploaded_file($tmpName, $filePath)) {
+                    // Store image path in database
+                    $imagePath = 'uploads/products/' . $productId . '/' . $fileName;
+                    $isPrimary = ($i === 0); // First image is primary
+                    
+                    $stmt = $db->prepare("
+                        INSERT INTO product_images (product_id, image_path, is_primary)
+                        VALUES (:product_id, :image_path, :is_primary)
+                    ");
+                    
+                    $stmt->bindParam(':product_id', $productId);
+                    $stmt->bindParam(':image_path', $imagePath);
+                    $stmt->bindParam(':is_primary', $isPrimary, PDO::PARAM_BOOL);
+                    $stmt->execute();
+                }
+            }
+        }
+    }
+    
+    // Commit transaction
+    $db->commit();
+    
+    Response::success($isEdit ? 'Product updated successfully' : 'Product added successfully', [
+        'product_id' => $productId
+    ]);
+} catch (Exception $e) {
+    // Rollback transaction on error
+    if (isset($db) && $db->inTransaction()) {
+        $db->rollBack();
+    }
+    
+    Response::error(($isEdit ? 'Failed to update product: ' : 'Failed to add product: ') . $e->getMessage());
+} 

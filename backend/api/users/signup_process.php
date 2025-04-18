@@ -1,149 +1,168 @@
 <?php
-// Enable error reporting
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+/**
+ * User Signup API
+ * Handles user registration for buyers and sellers
+ */
 
-// Include database connection
-require_once '../../config/db_connect.php';
+// Headers
+header('Access-Control-Allow-Origin: *');
+header('Content-Type: application/json');
+header('Access-Control-Allow-Methods: POST');
+header('Access-Control-Allow-Headers: Access-Control-Allow-Headers, Content-Type, Access-Control-Allow-Methods, Authorization, X-Requested-With');
 
-session_start();
+// Required files
+require_once __DIR__ . '/../../config/database.php';
+require_once __DIR__ . '/../../utils/auth.php';
+require_once __DIR__ . '/../../utils/response.php';
+require_once __DIR__ . '/../../utils/validate.php';
 
-// Initialize response array
-$response = [
-    'success' => false,
-    'message' => '',
-    'errors' => []
-];
-
-// Check if the form was submitted via POST
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Get form data
-    $username = trim($_POST['username']);
-    $email = trim($_POST['email']);
-    $password = $_POST['password'];
-    $phone = trim($_POST['phone']);
-    $userType = $_POST['user_type']; // 'buyer' or 'seller'
-    
-    // Basic validation
-    if (empty($username)) {
-        $response['errors'][] = 'Username is required';
-    }
-    
-    if (empty($email)) {
-        $response['errors'][] = 'Email is required';
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $response['errors'][] = 'Invalid email format';
-    }
-    
-    if (empty($password)) {
-        $response['errors'][] = 'Password is required';
-    } elseif (strlen($password) < 8) {
-        $response['errors'][] = 'Password must be at least 8 characters';
-    }
-    
-    if (empty($phone)) {
-        $response['errors'][] = 'Phone number is required';
-    } elseif (!preg_match('/^\d{10}$/', $phone)) {
-        $response['errors'][] = 'Invalid phone number format (must be 10 digits)';
-    }
-    
-    // Check if email already exists in either buyers or sellers table
-    $checkBuyerEmail = $conn->prepare("SELECT id FROM buyers WHERE email = ?");
-    $checkBuyerEmail->bind_param("s", $email);
-    $checkBuyerEmail->execute();
-    $buyerResult = $checkBuyerEmail->get_result();
-    
-    $checkSellerEmail = $conn->prepare("SELECT id FROM sellers WHERE email = ?");
-    $checkSellerEmail->bind_param("s", $email);
-    $checkSellerEmail->execute();
-    $sellerResult = $checkSellerEmail->get_result();
-    
-    if ($buyerResult->num_rows > 0 || $sellerResult->num_rows > 0) {
-        $response['errors'][] = 'Email already exists. Please use a different email or login.';
-    }
-    
-    // Additional validation for seller account
-    if ($userType === 'seller') {
-        $shopName = trim($_POST['shop_name']);
-        $shopAddress = trim($_POST['shop_address']);
-        $shopLatitude = $_POST['shop_latitude'];
-        $shopLongitude = $_POST['shop_longitude'];
-        $shopBio = ''; // Default empty shop bio
-        
-        // Validate required seller fields
-        if (empty($shopName)) {
-            $response['errors'][] = 'Shop name is required';
-        }
-        
-        if (empty($shopAddress)) {
-            $response['errors'][] = 'Shop address is required';
-        }
-        
-        if (empty($shopLatitude) || empty($shopLongitude)) {
-            $response['errors'][] = 'Shop location is required';
-        }
-        
-        // Handle shop logo upload - now optional
-        $shopLogoPath = 'frontend/assets/images/shop_logo.png'; // Default logo path
-    }
-    
-    // Process registration if no errors
-    if (empty($response['errors'])) {
-        // Hash password
-        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-        
-        // Start transaction
-        $conn->begin_transaction();
-        
-        try {
-            if ($userType === 'buyer') {
-                // Insert into buyers table
-                $insertBuyer = $conn->prepare("INSERT INTO buyers (name, email, password, phone_no) VALUES (?, ?, ?, ?)");
-                $insertBuyer->bind_param("ssss", $username, $email, $hashedPassword, $phone);
-                $insertBuyer->execute();
-                
-                if ($insertBuyer->affected_rows <= 0) {
-                    throw new Exception("Failed to create buyer account");
-                }
-                
-                $response['success'] = true;
-                $response['message'] = 'Registration successful! You can now login as a buyer.';
-            } else {
-                // Insert into sellers table
-                $insertSeller = $conn->prepare("INSERT INTO sellers (name, email, password, phone_no, shop_name, shop_address, shop_location, shop_logo, shop_bio) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-                $shopLocation = $shopLatitude . ',' . $shopLongitude; // Combine lat/long for storage
-                $insertSeller->bind_param("sssssssss", $username, $email, $hashedPassword, $phone, $shopName, $shopAddress, $shopLocation, $shopLogoPath, $shopBio);
-                $insertSeller->execute();
-                
-                if ($insertSeller->affected_rows <= 0) {
-                    throw new Exception("Failed to create seller account");
-                }
-                
-                $response['success'] = true;
-                $response['message'] = 'Registration successful! You can now login as a seller.';
-            }
-            
-            // Commit transaction
-            $conn->commit();
-        } catch (Exception $e) {
-            // Rollback transaction on error
-            $conn->rollback();
-            
-            // Delete uploaded file if exists
-            if ($userType === 'seller' && $shopLogoPath && file_exists($uploadPath)) {
-                unlink($uploadPath);
-            }
-            
-            $response['errors'][] = 'Registration failed: ' . $e->getMessage();
-        }
-    }
-} else {
-    // If not a POST request, redirect to registration page
-    header("Location: ../Account/register.html");
-    exit();
+// Process only POST requests
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    Response::error('Method not allowed', null, 405);
 }
 
-// Return JSON response
-header('Content-Type: application/json');
-echo json_encode($response);
-?> 
+// Get posted data (form data)
+$data = $_POST;
+
+// Sanitize inputs
+foreach ($data as $key => $value) {
+    if (is_string($value)) {
+        $data[$key] = htmlspecialchars(trim($value));
+    }
+}
+
+// Validate inputs
+Validate::reset();
+Validate::required('name', $data['name'] ?? '');
+Validate::required('email', $data['email'] ?? '');
+Validate::email('email', $data['email'] ?? '');
+Validate::required('password', $data['password'] ?? '');
+Validate::minLength('password', $data['password'] ?? '', 6);
+Validate::required('phone_no', $data['phone_no'] ?? '');
+Validate::required('user_type', $data['user_type'] ?? '');
+
+// User type specific validation
+if (($data['user_type'] ?? '') === 'buyer') {
+    Validate::required('buyer_latitude', $data['buyer_latitude'] ?? '');
+    Validate::required('buyer_longitude', $data['buyer_longitude'] ?? '');
+} elseif (($data['user_type'] ?? '') === 'seller') {
+    Validate::required('shop_name', $data['shop_name'] ?? '');
+    Validate::required('address', $data['address'] ?? '');
+} else {
+    Validate::addError('user_type', 'Invalid user type');
+}
+
+if (Validate::hasErrors()) {
+    Response::error('Validation failed', Validate::getErrors());
+}
+
+try {
+    // Database connection
+    $database = new Database();
+    $db = $database->getConnection();
+    
+    // Check if email already exists
+    $stmt = $db->prepare("SELECT id FROM users WHERE email = :email");
+    $stmt->bindParam(':email', $data['email']);
+    $stmt->execute();
+    
+    if ($stmt->rowCount() > 0) {
+        Response::error('Email already in use. Please use a different email or login.');
+    }
+    
+    // Start transaction
+    $db->beginTransaction();
+    
+    // Hash password
+    $hashedPassword = Auth::hashPassword($data['password']);
+    
+    // Insert into users table first
+    $stmt = $db->prepare("
+        INSERT INTO users (name, email, password, phone_no, role, status) 
+        VALUES (:name, :email, :password, :phone_no, :role, 'active')
+    ");
+    
+    $role = ($data['user_type'] === 'buyer') ? 'buyer' : 'seller';
+    
+    $stmt->bindParam(':name', $data['name']);
+    $stmt->bindParam(':email', $data['email']);
+    $stmt->bindParam(':password', $hashedPassword);
+    $stmt->bindParam(':phone_no', $data['phone_no']);
+    $stmt->bindParam(':role', $role);
+    
+    $stmt->execute();
+    
+    // Get the last inserted ID
+    $userId = $db->lastInsertId();
+    
+    // Now insert into role-specific table
+    if ($data['user_type'] === 'buyer') {
+        $stmt = $db->prepare("
+            INSERT INTO buyers (id, latitude, longitude) 
+            VALUES (:id, :latitude, :longitude)
+        ");
+        
+        $stmt->bindParam(':id', $userId);
+        $stmt->bindParam(':latitude', $data['buyer_latitude']);
+        $stmt->bindParam(':longitude', $data['buyer_longitude']);
+        
+        $stmt->execute();
+    } else { // seller
+        $stmt = $db->prepare("
+            INSERT INTO sellers (id, shop_name, address) 
+            VALUES (:id, :shop_name, :address)
+        ");
+        
+        $stmt->bindParam(':id', $userId);
+        $stmt->bindParam(':shop_name', $data['shop_name']);
+        $stmt->bindParam(':address', $data['address']);
+        
+        $stmt->execute();
+    }
+    
+    // Profile photo handling if provided
+    if (isset($_FILES['profile_photo']) && $_FILES['profile_photo']['error'] === UPLOAD_ERR_OK) {
+        $filename = time() . '_' . basename($_FILES['profile_photo']['name']);
+        $targetPath = __DIR__ . '/../../uploads/profile_photos/' . $filename;
+        
+        // Create directory if it doesn't exist
+        if (!file_exists(dirname($targetPath))) {
+            mkdir(dirname($targetPath), 0777, true);
+        }
+        
+        if (move_uploaded_file($_FILES['profile_photo']['tmp_name'], $targetPath)) {
+            // Update user with profile photo path
+            $stmt = $db->prepare("UPDATE users SET profile_photo = :photo WHERE id = :id");
+            $relativePhotoPath = 'uploads/profile_photos/' . $filename;
+            $stmt->bindParam(':photo', $relativePhotoPath);
+            $stmt->bindParam(':id', $userId);
+            $stmt->execute();
+        }
+    }
+    
+    // Commit transaction
+    $db->commit();
+    
+    // Fetch user data to return
+    $stmt = $db->prepare("SELECT * FROM users WHERE id = :id");
+    $stmt->bindParam(':id', $userId);
+    $stmt->execute();
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    // Remove password from user data
+    unset($user['password']);
+    
+    // Start session for the user
+    Auth::startSession($user);
+    
+    Response::success('Account created successfully', [
+        'user' => $user
+    ]);
+} catch (Exception $e) {
+    // Rollback transaction on error
+    if (isset($db) && $db->inTransaction()) {
+        $db->rollBack();
+    }
+    
+    Response::error('Registration failed: ' . $e->getMessage());
+} 

@@ -1,133 +1,152 @@
 <?php
-// Enable error reporting for debugging
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+/**
+ * Get Products API
+ * Lists or searches for products with various filtering options
+ */
 
-// Set headers to allow cross-origin requests and JSON content type
+// Headers
 header('Access-Control-Allow-Origin: *');
 header('Content-Type: application/json');
 header('Access-Control-Allow-Methods: GET');
-header('Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With');
+header('Access-Control-Allow-Headers: Access-Control-Allow-Headers, Content-Type, Access-Control-Allow-Methods, Authorization, X-Requested-With');
 
-// Include database connection
-require_once '../../config/db_connect.php';
+// Required files
+require_once __DIR__ . '/../../config/database.php';
+require_once __DIR__ . '/../../config/constants.php';
+require_once __DIR__ . '/../../utils/response.php';
 
-// Start session if not already started
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
+// Process only GET requests
+if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+    Response::error('Method not allowed', null, 405);
 }
+
+// Get search/filter parameters
+$page = isset($_GET['page']) ? intval($_GET['page']) : 1;
+$limit = isset($_GET['limit']) ? intval($_GET['limit']) : DEFAULT_PAGE_SIZE;
+$search = isset($_GET['search']) ? trim($_GET['search']) : '';
+$category = isset($_GET['category']) ? intval($_GET['category']) : 0;
+$size = isset($_GET['size']) ? trim($_GET['size']) : '';
+$minPrice = isset($_GET['min_price']) ? floatval($_GET['min_price']) : 0;
+$maxPrice = isset($_GET['max_price']) ? floatval($_GET['max_price']) : 0;
+$sortBy = isset($_GET['sort_by']) ? trim($_GET['sort_by']) : 'created_at';
+$sortDir = isset($_GET['sort_dir']) && strtolower($_GET['sort_dir']) === 'asc' ? 'ASC' : 'DESC';
+$sellerId = isset($_GET['seller_id']) ? intval($_GET['seller_id']) : 0;
+
+// Ensure valid pagination
+if ($page < 1) $page = 1;
+if ($limit < 1 || $limit > 50) $limit = DEFAULT_PAGE_SIZE;
+
+// Calculate offset
+$offset = ($page - 1) * $limit;
 
 try {
-    // Get request parameters
-    $user_type = isset($_GET['user_type']) ? $_GET['user_type'] : 'buyer';
-    $user_id = isset($_GET['user_id']) ? (int)$_GET['user_id'] : 
-              (isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : 0);
-    $category = isset($_GET['category']) ? $_GET['category'] : '';
-    $min_price = isset($_GET['min_price']) ? (float)$_GET['min_price'] : 0;
-    $max_price = isset($_GET['max_price']) ? (float)$_GET['max_price'] : PHP_FLOAT_MAX;
+    // Database connection
+    $database = new Database();
+    $db = $database->getConnection();
     
-    // Base SQL query
-    $sql = "SELECT cd.*, CONCAT(u.first_name, ' ', u.last_name) AS seller_name 
-            FROM cloth_details cd 
-            LEFT JOIN users u ON cd.seller_id = u.id 
-            WHERE 1=1";
+    // Build query
+    $query = "
+        SELECT 
+            p.*,
+            c.name AS category_name,
+            u.name AS seller_name,
+            s.shop_name,
+            (SELECT image_path FROM product_images WHERE product_id = p.id AND is_primary = 1 LIMIT 1) AS primary_image,
+            (SELECT COUNT(*) FROM reviews WHERE product_id = p.id) AS review_count,
+            (SELECT AVG(rating) FROM reviews WHERE product_id = p.id) AS avg_rating
+        FROM products p
+        LEFT JOIN categories c ON p.category_id = c.id
+        JOIN sellers s ON p.seller_id = s.id
+        JOIN users u ON s.id = u.id
+        WHERE p.status = 'available'
+    ";
+    
+    // Add filters
     $params = [];
-    $types = "";
     
-    // Add user filter for sellers (only show their own products)
-    if ($user_type === 'seller' && $user_id > 0) {
-        $sql .= " AND cd.seller_id = ?";
-        $params[] = &$user_id;
-        $types .= "i";
+    if (!empty($search)) {
+        $query .= " AND (p.title LIKE :search OR p.description LIKE :search)";
+        $searchTerm = "%$search%";
+        $params[':search'] = $searchTerm;
     }
     
-    // Add category filter if provided
-    if (!empty($category)) {
-        $sql .= " AND cd.category = ?";
-        $params[] = &$category;
-        $types .= "s";
+    if ($category > 0) {
+        $query .= " AND p.category_id = :category";
+        $params[':category'] = $category;
     }
     
-    // Add price range filter
-    $sql .= " AND cd.rental_price >= ? AND cd.rental_price <= ?";
-    $params[] = &$min_price;
-    $params[] = &$max_price;
-    $types .= "dd";
+    if (!empty($size)) {
+        $query .= " AND p.size = :size";
+        $params[':size'] = $size;
+    }
     
-    // Prepare and execute query
-    $stmt = $conn->prepare($sql);
+    if ($minPrice > 0) {
+        $query .= " AND p.rental_price >= :min_price";
+        $params[':min_price'] = $minPrice;
+    }
     
-    if ($stmt) {
-        if (!empty($types) && !empty($params)) {
-            $stmt->bind_param($types, ...$params);
+    if ($maxPrice > 0) {
+        $query .= " AND p.rental_price <= :max_price";
+        $params[':max_price'] = $maxPrice;
+    }
+    
+    if ($sellerId > 0) {
+        $query .= " AND p.seller_id = :seller_id";
+        $params[':seller_id'] = $sellerId;
+    }
+    
+    // Add sorting
+    $allowedSortFields = ['title', 'rental_price', 'created_at', 'views'];
+    if (!in_array($sortBy, $allowedSortFields)) {
+        $sortBy = 'created_at';
+    }
+    
+    $query .= " ORDER BY p.$sortBy $sortDir";
+    
+    // Get total count for pagination
+    $countQuery = "SELECT COUNT(*) as total FROM ($query) as subquery";
+    $stmt = $db->prepare($countQuery);
+    
+    foreach ($params as $key => $value) {
+        $stmt->bindValue($key, $value);
+    }
+    
+    $stmt->execute();
+    $totalCount = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
+    
+    // Add limit and offset for pagination
+    $query .= " LIMIT :limit OFFSET :offset";
+    $params[':limit'] = $limit;
+    $params[':offset'] = $offset;
+    
+    // Execute final query
+    $stmt = $db->prepare($query);
+    
+    foreach ($params as $key => $value) {
+        if ($key === ':limit' || $key === ':offset') {
+            $stmt->bindValue($key, $value, PDO::PARAM_INT);
+        } else {
+            $stmt->bindValue($key, $value);
         }
-        
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $products = [];
-        
-        while ($row = $result->fetch_assoc()) {
-            // Get product image (if available)
-            $image_data = '../../assets/images/placeholder.png'; // Default image
-            
-            $img_sql = "SELECT image_data, image_type FROM cloth_images WHERE cloth_id = ? LIMIT 1";
-            $img_stmt = $conn->prepare($img_sql);
-            
-            if ($img_stmt) {
-                $cloth_id = $row['id'];
-                $img_stmt->bind_param("i", $cloth_id);
-                $img_stmt->execute();
-                $img_result = $img_stmt->get_result();
-                
-                if ($img_row = $img_result->fetch_assoc()) {
-                    // Convert the BLOB data to a base64 string for display in HTML
-                    $image_data = 'data:image/' . $img_row['image_type'] . ';base64,' . base64_encode($img_row['image_data']);
-                }
-                
-                $img_stmt->close();
-            }
-            
-            // Format product data
-            $products[] = [
-                'id' => $row['id'],
-                'title' => $row['cloth_title'],
-                'description' => $row['description'] ?? '',
-                'size' => $row['size'] ?? '',
-                'category' => $row['category'] ?? '',
-                'rental_price' => (float)$row['rental_price'],
-                'contact_number' => $row['contact_number'] ?? '',
-                'whatsapp_number' => $row['whatsapp_number'] ?? '',
-                'terms_and_conditions' => $row['terms_and_conditions'] ?? '',
-                'created_at' => $row['created_at'],
-                'seller_id' => $row['seller_id'],
-                'seller_name' => $row['seller_name'] ?? 'ClothLoop Seller',
-                'image' => $image_data
-            ];
-        }
-        
-        $stmt->close();
-        
-        // Return JSON response
-        echo json_encode([
-            'status' => 'success',
-            'count' => count($products),
-            'products' => $products
-        ]);
-    } else {
-        throw new Exception("Failed to prepare statement: " . $conn->error);
     }
-} catch (Exception $e) {
-    // Return error response
-    echo json_encode([
-        'status' => 'error',
-        'message' => 'Error fetching products: ' . $e->getMessage(),
-        'debug' => [
-            'error' => $e->getMessage(),
-            'trace' => $e->getTraceAsString()
+    
+    $stmt->execute();
+    $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    // Format the results
+    $totalPages = ceil($totalCount / $limit);
+    
+    $result = [
+        'products' => $products,
+        'pagination' => [
+            'total_items' => $totalCount,
+            'total_pages' => $totalPages,
+            'current_page' => $page,
+            'limit' => $limit
         ]
-    ]);
-}
-
-// Close the database connection
-$conn->close();
-?> 
+    ];
+    
+    Response::success('Products retrieved successfully', $result);
+} catch (Exception $e) {
+    Response::error('Error retrieving products: ' . $e->getMessage());
+} 

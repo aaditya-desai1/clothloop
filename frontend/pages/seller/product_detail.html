@@ -777,22 +777,25 @@
         function getProductImages(product) {
             const images = [];
             
-            // Main product image
-            const mainImageUrl = `../../../backend/api/sellers/get_cloth_image.php?id=${product.id}`;
+            // Main product image - use the universal image display endpoint
+            const mainImageUrl = `/ClothLoop/backend/api/image_display.php?type=product&id=${product.id}`;
             images.push(mainImageUrl);
             
             // If the API provides additional images, add them
-            // This is a placeholder for real API implementation
             if (product.additional_images && Array.isArray(product.additional_images)) {
                 product.additional_images.forEach(img => {
                     images.push(img);
                 });
             } else {
-                // For demonstration, add sample images
-                // In a real implementation, these would come from the API
-                images.push(`../../assets/images/p1.jpg`);
-                images.push(`../../assets/images/p2.jpg`);
-                images.push(`../../assets/images/p3.jpg`);
+                // Add fallback images from the sellers API for backwards compatibility
+                const fallbackUrl = `../../../backend/api/sellers/get_cloth_image.php?id=${product.id}`;
+                
+                // Only add sample images in development, not in production
+                if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                    images.push(`../../assets/images/p1.jpg`);
+                    images.push(`../../assets/images/p2.jpg`);
+                    images.push(`../../assets/images/p3.jpg`);
+                }
             }
             
             return images;

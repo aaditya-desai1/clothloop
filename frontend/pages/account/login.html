@@ -21,6 +21,9 @@
             --footer-text: #cccccc;
             --border-radius: 0;
             --box-shadow: 0 5px 10px rgba(0, 0, 0, 0.8);
+            --error-color: #FF3B30;
+            --success-color: #34C759;
+            --border-color: #333333;
         }
 
         /* Light Theme Variables */
@@ -42,10 +45,10 @@
             padding: 0;
             box-sizing: border-box;
             transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+            font-family: 'Poppins', sans-serif;
         }
 
         body {
-            font-family: 'Poppins', sans-serif;
             line-height: 1.7;
             color: var(--text-color);
             background-color: var(--light-bg);
@@ -272,6 +275,9 @@
             </div>
             <!-- Error message container will be added here by JS -->
             <form id="login-form" class="fade-in-delay-1">
+              <div id="error-message" class="error-message"></div>
+              <div id="success-message" class="success-message" style="color: var(--success-color); margin: 0 0 1rem; text-align: left; width: 100%; font-size: 0.9rem; display: none;"></div>
+              
               <label for="email">Email:</label>
               <input type="email" id="email" name="email" required>
               
@@ -341,39 +347,65 @@
         document.getElementById('login-form').addEventListener('submit', function(e) {
             e.preventDefault();
             
-            // Remove previous error message if any
-            const existingError = document.querySelector('.error-message');
-            if (existingError) {
-                existingError.remove();
-            }
+            // Remove previous messages
+            const errorMsg = document.getElementById('error-message');
+            const successMsg = document.getElementById('success-message');
+            errorMsg.style.display = 'none';
+            successMsg.style.display = 'none';
             
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             
             // Simple client-side validation
             if (!email || !password) {
-                const errorMsg = document.createElement('div');
-                errorMsg.className = 'error-message';
                 errorMsg.textContent = 'Please fill in all fields';
                 errorMsg.style.display = 'block';
-                this.insertBefore(errorMsg, this.firstChild);
                 return;
             }
             
-            // Determine user type from the email
-            let userType = 'buyer'; // Default to buyer
-            
-            // Add custom login logic as needed
-            if (email.includes('seller')) {
-                userType = 'seller';
-            }
-            
-            // Demo login - in a real implementation, you would validate with a server
-            if (userType === 'seller') {
-                window.location.href = '../seller/seller_dashboard.html';
-            } else {
-                window.location.href = '../buyer/buyer_dashboard.html';
-            }
+            // Send login request
+            fetch('../../../backend/api/users/login.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    email: email,
+                    password: password
+                })
+            })
+            .then(response => {
+                console.log('Login response status:', response.status);
+                return response.json();
+            })
+            .then(data => {
+                console.log('Login API response:', data);
+                if (data.status === 'success') {
+                    // Show success message
+                    successMsg.textContent = 'Login successful. Redirecting...';
+                    successMsg.style.display = 'block';
+                    
+                    // Redirect based on user role
+                    setTimeout(() => {
+                        if (data.data.user.role === 'seller') {
+                            window.location.href = '../seller/seller_dashboard.html';
+                        } else if (data.data.user.role === 'buyer') {
+                            window.location.href = '../buyer/buyer_dashboard.html';
+                        } else {
+                            window.location.href = '/';
+                        }
+                    }, 1000);
+                } else {
+                    // Show error message
+                    errorMsg.textContent = data.message || 'Invalid credentials';
+                    errorMsg.style.display = 'block';
+                }
+            })
+            .catch(error => {
+                console.error('Login fetch error:', error);
+                errorMsg.textContent = 'An error occurred. Please try again.';
+                errorMsg.style.display = 'block';
+            });
         });
     </script>
 </body>

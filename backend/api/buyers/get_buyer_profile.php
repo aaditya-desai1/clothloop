@@ -1,58 +1,64 @@
 <?php
-// Enable CORS
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: GET, OPTIONS");
-header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
-header("Access-Control-Allow-Credentials: true");
+/**
+ * Get Buyer Profile API
+ * Retrieves buyer profile information
+ */
 
-// For preflight requests
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(200);
-    exit();
+// Headers
+header('Access-Control-Allow-Origin: *');
+header('Content-Type: application/json');
+header('Access-Control-Allow-Methods: GET');
+header('Access-Control-Allow-Headers: Access-Control-Allow-Headers, Content-Type, Access-Control-Allow-Methods, Authorization, X-Requested-With');
+
+// Required files
+require_once __DIR__ . '/../../config/database.php';
+require_once __DIR__ . '/../../utils/auth.php';
+require_once __DIR__ . '/../../utils/response.php';
+
+// Process only GET requests
+if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+    Response::error('Method not allowed', null, 405);
 }
 
-// Include session configuration
-require_once "../../config/session.php";
+// Require authentication
+Auth::requireAuth();
 
-// Include database connection
-include_once "../../config/db_connect.php";
+// Get current user
+$user = Auth::getCurrentUser();
 
-// Check if user is logged in
-if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] !== 'buyer') {
-    echo json_encode([
-        'status' => 'error',
-        'message' => 'Unauthorized access',
-        'debug' => [
-            'session_id' => session_id(),
-            'session_data' => $_SESSION
-        ]
-    ]);
-    exit;
+// Ensure the user is a buyer
+if ($user['role'] !== 'buyer') {
+    Response::error('Access denied. This endpoint is for buyers only.', null, 403);
 }
 
-// Get the buyer ID from the session
-$buyer_id = $_SESSION['user_id'];
-
-// Prepare SQL statement to get buyer details
-$stmt = $conn->prepare("SELECT id, name, email, phone_no, created_at FROM buyers WHERE id = ?");
-$stmt->bind_param("i", $buyer_id);
-$stmt->execute();
-$result = $stmt->get_result();
-
-if ($result->num_rows > 0) {
-    $buyer = $result->fetch_assoc();
-    echo json_encode([
-        'status' => 'success',
-        'buyer' => $buyer
-    ]);
-} else {
-    echo json_encode([
-        'status' => 'error',
-        'message' => 'Buyer not found'
-    ]);
-}
-
-$stmt->close();
-$conn->close();
-?> 
+try {
+    // Database connection
+    $database = new Database();
+    $db = $database->getConnection();
+    
+    // Get buyer info including location data
+    $stmt = $db->prepare("
+        SELECT u.*, b.address, b.latitude, b.longitude
+        FROM users u
+        JOIN buyers b ON u.id = b.id
+        WHERE u.id = :id
+    ");
+    
+    $stmt->bindParam(':id', $user['id']);
+    $stmt->execute();
+    
+    if ($stmt->rowCount() > 0) {
+        $buyer = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        // Remove sensitive information
+        unset($buyer['password']);
+        
+        Response::success('Buyer profile retrieved successfully', [
+            'buyer' => $buyer
+        ]);
+    } else {
+        Response::error('Failed to retrieve buyer profile', null, 404);
+    }
+} catch (Exception $e) {
+    Response::error('Error retrieving buyer profile: ' . $e->getMessage());
+} 
