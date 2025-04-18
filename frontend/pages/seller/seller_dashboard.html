@@ -179,6 +179,7 @@
             margin: 120px auto 50px;
             padding: 0 2rem;
             flex: 1;
+            width: 100%;
         }
 
         .content-header {
@@ -186,6 +187,7 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 30px;
+            width: 100%;
         }
 
         .content-title {
@@ -194,6 +196,7 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             color: var(--accent-color);
+            margin-right: auto;
         }
 
         .action-button {
@@ -210,6 +213,7 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             cursor: pointer;
+            margin-left: auto;
         }
         
         .action-button:hover {
@@ -230,46 +234,64 @@
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 20px;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
+            width: 100%;
         }
         
         .stat-card {
             background-color: var(--card-bg);
             border-radius: 0;
-            padding: 25px;
+            padding: 30px;
             box-shadow: var(--box-shadow);
             transition: all 0.3s ease;
             border: 1px solid var(--border-color);
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
         }
         
         .stat-card:hover {
             transform: translateY(-10px) skewX(-3deg);
-            box-shadow: 5px 5px 0 rgba(255, 255, 255, 0.1);
+            box-shadow: 8px 8px 0 rgba(255, 255, 255, 0.1);
         }
         
         .light-theme .stat-card:hover {
-            box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.1);
+            box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.1);
         }
         
         .stat-icon {
-            margin-bottom: 15px;
-            font-size: 28px;
+            margin-right: 20px;
+            font-size: 40px;
             color: var(--accent-color);
+            background-color: rgba(255, 255, 255, 0.05);
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0;
+            border: 1px solid var(--border-color);
         }
-
+        
         .stat-number {
-            font-size: 36px;
+            font-size: 48px;
             font-weight: 700;
             margin-bottom: 10px;
             color: var(--accent-color);
         }
         
         .stat-label {
-            font-size: 14px;
+            font-size: 16px;
             color: var(--text-color);
             text-transform: uppercase;
             letter-spacing: 1px;
             opacity: 0.8;
+        }
+        
+        .stat-info {
+            display: flex;
+            flex-direction: column;
         }
 
         /* Loading Spinner */
@@ -554,10 +576,6 @@
 
         /* Responsive Styles */
         @media (max-width: 992px) {
-            .dashboard-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
             .products-grid {
                 grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
             }
@@ -573,12 +591,22 @@
                 align-items: flex-start;
             }
 
+            .content-title {
+                margin-bottom: 15px;
+                margin-right: 0;
+            }
+
             .action-button {
                 margin-top: 15px;
+                margin-left: 0;
             }
             
             .dashboard-grid {
                 grid-template-columns: 1fr;
+            }
+            
+            .stat-card {
+                margin-bottom: 10px;
             }
         }
 
@@ -648,16 +676,20 @@
                 <div class="stat-icon">
                     <i class="fas fa-shopping-bag"></i>
                 </div>
-                <div class="stat-number" id="totalProducts">0</div>
-                <div class="stat-label">Total Products</div>
+                <div class="stat-info">
+                    <div class="stat-number" id="totalProducts">0</div>
+                    <div class="stat-label">Total Products</div>
+                </div>
             </div>
-        
+            
             <div class="stat-card">
                 <div class="stat-icon">
                     <i class="fas fa-star"></i>
                 </div>
-                <div class="stat-number" id="averageRating">0.0</div>
-                <div class="stat-label">Avg. Rating</div>
+                <div class="stat-info">
+                    <div class="stat-number" id="averageRating">0.0</div>
+                    <div class="stat-label">Avg. Rating</div>
+                </div>
             </div>
         </div>
         
