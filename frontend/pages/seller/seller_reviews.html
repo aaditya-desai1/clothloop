@@ -807,28 +807,6 @@
                 <div class="spinner"></div>
                     </div>
                 </div>
-                
-        <!-- Response Modal -->
-        <div id="responseModal" class="modal">
-            <div class="modal-content">
-                <span class="close-btn">&times;</span>
-                <h2>Respond to Review</h2>
-                <div class="review-preview" id="review-preview">
-                    <!-- Review preview will be inserted here -->
-                            </div>
-                <form id="responseForm">
-                    <input type="hidden" id="review-id">
-                    <div class="form-group">
-                        <label for="response">Your Response:</label>
-                        <textarea id="response" placeholder="Write your response to this review..."></textarea>
-                        </div>
-                    <div class="form-actions">
-                        <button type="button" class="cancel-btn">Cancel</button>
-                        <button type="submit" class="submit-btn">Submit Response</button>
-                        </div>
-                </form>
-            </div>
-        </div>
     </main>
 
     <!-- Footer -->
@@ -860,9 +838,6 @@
             
             // Fetch reviews when the page loads
             fetchReviews(sellerId);
-            
-            // Setup modal functionality
-            setupResponseModal();
             
             // Setup theme switcher
             const themeToggle = document.getElementById('theme-toggle');
@@ -916,14 +891,26 @@
             const loadingSpinner = document.getElementById('loading-spinner');
             loadingSpinner.style.display = 'flex';
             
-            // Construct the URL with seller_id parameter as expected by the backend
+            // Construct the URL with seller_id parameter
             const url = `../../../backend/api/sellers/get_seller_reviews.php?seller_id=${sellerId}`;
             console.log('Fetching reviews with URL:', url);
             
             fetch(url)
                 .then(response => {
                     console.log('Response status:', response.status);
-                    return response.json();
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.text().then(text => {
+                        try {
+                            // Try to parse the JSON response
+                            return JSON.parse(text);
+                        } catch (e) {
+                            // Log the problematic text
+                            console.error('Invalid JSON response:', text);
+                            throw new Error('Invalid JSON response from server');
+                        }
+                    });
                 })
                 .then(data => {
                     loadingSpinner.style.display = 'none';
@@ -975,7 +962,7 @@
                 stats.rating_percentages = stats.rating_percentages || defaultStats.rating_percentages;
                 
                 // Update overall rating
-                document.getElementById('overall-rating').textContent = stats.average_rating.toFixed(1);
+                document.getElementById('overall-rating').textContent = stats.average_rating ? stats.average_rating.toFixed(1) : '0';
                 
                 // Update rating count
                 document.getElementById('rating-count').textContent = `Based on ${stats.total_reviews} reviews`;
@@ -1002,8 +989,10 @@
                 // Update rating bars
                 for (let i = 5; i >= 1; i--) {
                     const percentage = stats.rating_percentages[i] || 0;
+                    // Round to nearest whole number for display
+                    const roundedPercentage = Math.round(percentage);
                     document.getElementById(`rating-bar-${i}`).style.width = `${percentage}%`;
-                    document.getElementById(`rating-percent-${i}`).textContent = `${percentage}%`;
+                    document.getElementById(`rating-percent-${i}`).textContent = `${roundedPercentage}%`;
                 }
             } catch (error) {
                 console.error('Error updating review stats:', error);
@@ -1018,7 +1007,11 @@
                 reviewsContainer.innerHTML = '';
                 
                 if (!reviews || !Array.isArray(reviews) || reviews.length === 0) {
-                    reviewsContainer.innerHTML = '<div class="no-reviews">No reviews found for this seller.</div>';
+                    // Show the no-reviews message if there are no reviews
+                    const noReviewsMessage = document.createElement('div');
+                    noReviewsMessage.className = 'no-reviews';
+                    noReviewsMessage.innerHTML = '<p>No reviews found for this seller.</p>';
+                    reviewsContainer.appendChild(noReviewsMessage);
                     return;
                 }
                 
@@ -1035,10 +1028,10 @@
                         
                         // Default values if fields are missing
                         const rating = isNaN(Number(review.rating)) ? 0 : Number(review.rating);
-                        const reviewText = review.review_text || review.content || 'No review text provided';
-                        const username = review.username || review.buyer_name || 'Anonymous';
+                        const reviewText = review.review_text || 'No review text provided';
+                        const username = review.buyer_name || 'Anonymous';
                         const reviewDate = review.review_date ? new Date(review.review_date).toLocaleDateString() : 'Unknown date';
-                        const reviewId = review.id || review.review_id || null;
+                        const productName = review.product_name || 'Unknown Product';
                         
                         // Create the rating stars
                         let starsHTML = '';
@@ -1053,7 +1046,7 @@
                         reviewElement.innerHTML = `
                             <div class="review-header">
                                 <div class="reviewer-info">
-                                    <div class="reviewer-avatar">${username.charAt(0).toUpperCase()}</div>
+                                    <div class="reviewer-avatar">${username ? username.charAt(0).toUpperCase() : 'A'}</div>
                                     <div class="reviewer-details">
                                         <div class="reviewer-name">${username}</div>
                                         <div class="review-date">${reviewDate}</div>
@@ -1067,95 +1060,19 @@
                             <div class="review-content">${reviewText}</div>
                         `;
                         
-                        // Add response section if the review has an ID
-                        if (reviewId) {
-                            const responseContainer = document.createElement('div');
-                            responseContainer.className = 'response-container';
-                            
-                            // Display existing response if any
-                            if (review.seller_response) {
-                                responseContainer.innerHTML = `
-                                    <div class="review-reply">
-                                        <div class="review-reply-header">Your Response:</div>
-                                        <p>${review.seller_response}</p>
-                                    </div>
-                                `;
-                            } else {
-                                // Create response form
-                                responseContainer.innerHTML = `
-                                    <div class="response-form" style="margin-top: 15px;">
-                                        <textarea id="response-${reviewId}" class="response-textarea" style="width: 100%; padding: 10px; margin-bottom: 10px;" placeholder="Respond to this review..."></textarea>
-                                        <button class="respond-button" data-review-id="${reviewId}">
-                                            <i class="fas fa-reply"></i> Submit Response
-                                        </button>
-                                    </div>
-                                `;
-                            }
-                            
-                            reviewElement.appendChild(responseContainer);
-                        } else {
-                            console.warn('Review missing ID:', review);
-                        }
-                        
-                        // Add product information if available
-                        if (review.product_name || review.product_id) {
-                            const productInfo = document.createElement('div');
-                            productInfo.className = 'review-product';
-                            
-                            const productName = review.product_name || 'Unknown Product';
-                            
-                            productInfo.innerHTML = `
-                                <div class="review-product-name">For: ${productName}</div>
-                            `;
-                            
-                            reviewElement.appendChild(productInfo);
-                        }
+                        // Add product information
+                        const productInfo = document.createElement('div');
+                        productInfo.className = 'review-product';
+                        productInfo.innerHTML = `
+                            <div class="review-product-name">For: ${productName}</div>
+                        `;
+                        reviewElement.appendChild(productInfo);
                         
                         reviewsContainer.appendChild(reviewElement);
                     } catch (reviewError) {
                         console.error('Error processing individual review:', reviewError);
                         // Continue with next review
                     }
-                });
-                
-                // Add event listeners to submit buttons
-                document.querySelectorAll('.respond-button').forEach(button => {
-                    button.addEventListener('click', function() {
-                        const reviewId = this.getAttribute('data-review-id');
-                        if (!reviewId) {
-                            console.error('Missing review ID for response button');
-                            return;
-                        }
-                        
-                        const responseTextarea = document.getElementById(`response-${reviewId}`);
-                        if (!responseTextarea) {
-                            console.error('Could not find textarea for review ID:', reviewId);
-                            return;
-                        }
-                        
-                        const responseText = responseTextarea.value.trim();
-                        
-                        if (responseText) {
-                            // Disable button while submitting
-                            this.disabled = true;
-                            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
-                            
-                            submitResponse(reviewId, responseText)
-                                .catch(error => {
-                                    console.error('Error in submit response:', error);
-                                    showError('Failed to submit response. Please try again.');
-                                })
-                                .finally(() => {
-                                    // Re-enable button if it's still in the DOM
-                                    if (document.contains(this)) {
-                                        this.disabled = false;
-                                        this.innerHTML = '<i class="fas fa-reply"></i> Submit Response';
-                                    }
-                                });
-                        } else {
-                            showError('Please enter a response before submitting.');
-                        }
-                    });
                 });
                 
                 // Hide loading spinner if it's still showing
@@ -1175,144 +1092,55 @@
             }
         }
         
-        // Function to set up the response modal
-        function setupResponseModal() {
-            const modal = document.getElementById('responseModal');
-            const closeBtn = modal.querySelector('.close-btn');
-            const cancelBtn = modal.querySelector('.cancel-btn');
-            const form = document.getElementById('responseForm');
-            
-            // Close modal when X is clicked
-            closeBtn.addEventListener('click', () => {
-                modal.style.display = 'none';
-            });
-            
-            // Close modal when Cancel is clicked
-            cancelBtn.addEventListener('click', () => {
-                modal.style.display = 'none';
-            });
-            
-            // Close modal when clicking outside
-            window.addEventListener('click', (event) => {
-                if (event.target === modal) {
-                    modal.style.display = 'none';
-                }
-            });
-            
-            // Handle form submission
-            form.addEventListener('submit', (event) => {
-                event.preventDefault();
-                submitResponse();
-            });
-        }
-        
-        // Function to open response modal
-        function openResponseModal(review) {
-            const modal = document.getElementById('responseModal');
-            const reviewPreview = document.getElementById('review-preview');
-            const reviewIdInput = document.getElementById('review-id');
-            
-            // Set review ID
-            reviewIdInput.value = review.id;
-            
-            // Create review preview
-            reviewPreview.innerHTML = `
-                <div class="preview-reviewer">${review.buyer.name}</div>
-                <div class="preview-rating">
-                    ${Array(5).fill().map((_, i) => 
-                        `<i class="${i < review.rating ? 'fas' : 'far'} fa-star"></i>`
-                    ).join('')}
-                </div>
-                <div class="preview-text">${review.review_text}</div>
-            `;
-            
-            // Show modal
-            modal.style.display = 'block';
-            
-            // Focus on textarea
-            document.getElementById('response').focus();
-        }
-        
-        // Function to submit response
-        function submitResponse(reviewId, responseText) {
-            return new Promise((resolve, reject) => {
-                console.log('Submitting response for review ID:', reviewId);
-
-                fetch('../../../backend/api/sellers/update_review_response.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        review_id: reviewId,
-                        response: responseText,
-                        seller_id: sessionStorage.getItem('user_id')
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 'success') {
-                        // Get seller ID from session storage
-                        const sellerId = sessionStorage.getItem('user_id');
-                        
-                        // Reload reviews
-                        fetchReviews(sellerId);
-                        resolve(data);
-                    } else {
-                        showError(data.message || 'Failed to submit response. Please try again.');
-                        reject(new Error(data.message || 'Failed to submit response'));
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    showError('Failed to submit response. Please try again.');
-                    reject(error);
-                });
-            });
-        }
-        
         // Function to show error message
         function showError(message) {
             // Display error in the dedicated error container
             const errorContainer = document.getElementById('error-container');
             const errorMessage = document.getElementById('error-message');
             
-            errorMessage.textContent = message;
-            errorContainer.style.display = 'block';
+            if (errorContainer && errorMessage) {
+                errorMessage.textContent = message;
+                errorContainer.style.display = 'block';
+            }
             
             // Also show in the reviews container if it's empty
             const reviewsContainer = document.getElementById('reviews-container');
-            const errorDiv = document.createElement('div');
-            errorDiv.className = 'error-message';
-            errorDiv.style.color = 'var(--error-color)';
-            errorDiv.style.padding = '20px';
-            errorDiv.style.textAlign = 'center';
-            errorDiv.style.fontSize = '16px';
-            errorDiv.textContent = message;
-            
-            // If no review cards exist, clear and show error in container too
-            const existingReviews = reviewsContainer.querySelectorAll('.review-card');
-            if (existingReviews.length === 0) {
-                // Keep only the spinner and no-reviews message, remove everything else
-                const childrenToRemove = [];
-                for (let i = 0; i < reviewsContainer.children.length; i++) {
-                    const child = reviewsContainer.children[i];
-                    if (child.id !== 'no-reviews-message' && child.id !== 'loading-spinner' && !child.classList.contains('error-message')) {
-                        childrenToRemove.push(child);
+            if (reviewsContainer) {
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'error-message';
+                errorDiv.style.color = 'var(--error-color)';
+                errorDiv.style.padding = '20px';
+                errorDiv.style.textAlign = 'center';
+                errorDiv.style.fontSize = '16px';
+                errorDiv.textContent = message;
+                
+                // If no review cards exist, clear and show error in container too
+                const existingReviews = reviewsContainer.querySelectorAll('.review-card');
+                if (existingReviews.length === 0) {
+                    // Keep only the spinner and no-reviews message, remove everything else
+                    const childrenToRemove = [];
+                    for (let i = 0; i < reviewsContainer.children.length; i++) {
+                        const child = reviewsContainer.children[i];
+                        if (child.id !== 'no-reviews-message' && child.id !== 'loading-spinner' && !child.classList.contains('error-message')) {
+                            childrenToRemove.push(child);
+                        }
                     }
-                }
-                
-                childrenToRemove.forEach(child => child.remove());
-                
-                // Hide no-reviews message
-                document.getElementById('no-reviews-message').style.display = 'none';
-                
-                // Add error message
-                const existingError = reviewsContainer.querySelector('.error-message');
-                if (existingError) {
-                    existingError.textContent = message;
-                } else {
-                    reviewsContainer.appendChild(errorDiv);
+                    
+                    childrenToRemove.forEach(child => child.remove());
+                    
+                    // Hide no-reviews message
+                    const noReviewsMessage = document.getElementById('no-reviews-message');
+                    if (noReviewsMessage) {
+                        noReviewsMessage.style.display = 'none';
+                    }
+                    
+                    // Add error message
+                    const existingError = reviewsContainer.querySelector('.error-message');
+                    if (existingError) {
+                        existingError.textContent = message;
+                    } else {
+                        reviewsContainer.appendChild(errorDiv);
+                    }
                 }
             }
             

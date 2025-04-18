@@ -1,7 +1,7 @@
 <?php
 /**
  * Get Seller Reviews API
- * Fetches all reviews for a specific seller
+ * Fetches all reviews for a specific seller from product reviews
  */
 
 // Allow cross-origin requests
@@ -63,18 +63,24 @@ if (!$sellerResult || mysqli_num_rows($sellerResult) === 0) {
 
 $sellerData = mysqli_fetch_assoc($sellerResult);
 
-// Get total reviews count for pagination
-$countQuery = "SELECT COUNT(*) as total FROM seller_reviews WHERE seller_id = '$sellerId'";
+// Get total reviews count for pagination - Only reviews for products from this seller
+$countQuery = "SELECT COUNT(*) as total 
+               FROM product_reviews pr 
+               JOIN products p ON pr.product_id = p.id 
+               WHERE p.seller_id = '$sellerId'";
 $countResult = mysqli_query($conn, $countQuery);
 $totalReviews = mysqli_fetch_assoc($countResult)['total'];
 $totalPages = ceil($totalReviews / $limit);
 
-// Query to get reviews with user information
-$query = "SELECT sr.*, u.username, u.profile_image 
-          FROM seller_reviews sr
-          LEFT JOIN users u ON sr.user_id = u.id
-          WHERE sr.seller_id = '$sellerId'
-          ORDER BY sr.created_at DESC
+// Query to get reviews with product and buyer information
+$query = "SELECT pr.id, pr.product_id, pr.buyer_id, pr.rating, pr.review as review_text, pr.created_at,
+          p.title as product_name, p.seller_id,
+          u.name as buyer_name, u.profile_photo as buyer_photo
+          FROM product_reviews pr
+          JOIN products p ON pr.product_id = p.id
+          LEFT JOIN users u ON pr.buyer_id = u.id
+          WHERE p.seller_id = '$sellerId'
+          ORDER BY pr.created_at DESC
           LIMIT $offset, $limit";
 
 $result = mysqli_query($conn, $query);
@@ -84,22 +90,17 @@ if ($result) {
     
     while ($row = mysqli_fetch_assoc($result)) {
         // Format the created_at date
-        $row['created_at'] = date('Y-m-d H:i:s', strtotime($row['created_at']));
-        
-        // Format the response date if exists
-        if (!empty($row['response_date'])) {
-            $row['response_date'] = date('Y-m-d H:i:s', strtotime($row['response_date']));
-        }
-        
-        // Mask sensitive user information
-        $row['user_email'] = null;
+        $row['review_date'] = date('Y-m-d H:i:s', strtotime($row['created_at']));
         
         // Add to reviews array
         $reviews[] = $row;
     }
     
     // Calculate average rating
-    $avgRatingQuery = "SELECT AVG(rating) as avg_rating FROM seller_reviews WHERE seller_id = '$sellerId'";
+    $avgRatingQuery = "SELECT AVG(pr.rating) as avg_rating 
+                      FROM product_reviews pr
+                      JOIN products p ON pr.product_id = p.id
+                      WHERE p.seller_id = '$sellerId'";
     $avgRatingResult = mysqli_query($conn, $avgRatingQuery);
     $avgRating = 0;
     
@@ -107,13 +108,44 @@ if ($result) {
         $avgRating = round(mysqli_fetch_assoc($avgRatingResult)['avg_rating'], 1);
     }
     
+    // Calculate rating distribution
+    $ratingDistribution = [
+        '5' => 0,
+        '4' => 0,
+        '3' => 0,
+        '2' => 0,
+        '1' => 0
+    ];
+    
+    if ($totalReviews > 0) {
+        $distributionQuery = "SELECT rating, COUNT(*) as count 
+                             FROM product_reviews pr
+                             JOIN products p ON pr.product_id = p.id
+                             WHERE p.seller_id = '$sellerId'
+                             GROUP BY rating";
+        $distributionResult = mysqli_query($conn, $distributionQuery);
+        
+        if ($distributionResult) {
+            while ($row = mysqli_fetch_assoc($distributionResult)) {
+                $rating = (int)$row['rating'];
+                $count = (int)$row['count'];
+                $ratingDistribution["$rating"] = ($count / $totalReviews) * 100;
+            }
+        }
+    }
+    
     $response['status'] = 'success';
     $response['message'] = count($reviews) > 0 ? 'Reviews retrieved successfully' : 'No reviews found for this seller';
     $response['data'] = [
         'seller' => [
             'id' => $sellerData['id'],
-            'name' => $sellerData['name'],
+            'name' => isset($sellerData['shop_name']) ? $sellerData['shop_name'] : '',
             'avg_rating' => $avgRating
+        ],
+        'stats' => [
+            'average_rating' => $avgRating,
+            'total_reviews' => (int)$totalReviews,
+            'rating_percentages' => $ratingDistribution
         ],
         'reviews' => $reviews,
         'pagination' => [

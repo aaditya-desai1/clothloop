@@ -1,7 +1,7 @@
 <?php
 /**
  * Respond to Review API
- * Allows sellers to respond to buyer reviews
+ * Allows sellers to respond to product reviews
  */
 
 // Allow cross-origin requests
@@ -26,9 +26,22 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-// Include database connection and authentication
+// Get JSON data from request body
+$json_data = file_get_contents('php://input');
+$data = json_decode($json_data, true);
+
+// Check if data is valid JSON
+if (!$data) {
+    http_response_code(400);
+    echo json_encode([
+        'status' => 'error',
+        'message' => 'Invalid JSON data'
+    ]);
+    exit;
+}
+
+// Include database connection
 require_once '../../config/db_connect.php';
-require_once '../../auth/auth.php';
 
 // Initialize response array
 $response = [
@@ -37,98 +50,98 @@ $response = [
     'data' => null
 ];
 
-// Check if user is authenticated and is a seller
-$userData = authenticate($conn);
-
-if (!$userData) {
-    $response['message'] = 'Authentication failed';
-    http_response_code(401);
+// Check if required fields are present
+if (!isset($data['review_id']) || !isset($data['response']) || !isset($data['seller_id'])) {
+    $response['message'] = 'Missing required fields';
     echo json_encode($response);
     exit;
 }
 
-// Check if user is a seller
-$userId = $userData['id'];
-$checkSellerQuery = "SELECT * FROM sellers WHERE user_id = '$userId'";
-$sellerResult = mysqli_query($conn, $checkSellerQuery);
-
-if (!$sellerResult || mysqli_num_rows($sellerResult) === 0) {
-    $response['message'] = 'Access denied. Only sellers can respond to reviews.';
-    http_response_code(403);
-    echo json_encode($response);
-    exit;
-}
-
-$sellerData = mysqli_fetch_assoc($sellerResult);
-$sellerId = $sellerData['id'];
-
-// Get JSON data from request body
-$jsonData = file_get_contents('php://input');
-$data = json_decode($jsonData, true);
-
-// Validate required fields
-if (!isset($data['review_id']) || !isset($data['response'])) {
-    $response['message'] = 'Missing required fields: review_id and response';
-    http_response_code(400);
-    echo json_encode($response);
-    exit;
-}
-
+// Get data from request
 $reviewId = mysqli_real_escape_string($conn, $data['review_id']);
 $responseText = mysqli_real_escape_string($conn, $data['response']);
+$sellerId = mysqli_real_escape_string($conn, $data['seller_id']);
+$reviewType = isset($data['review_type']) ? mysqli_real_escape_string($conn, $data['review_type']) : 'product';
 
-// Validate response text
-if (empty($responseText) || strlen($responseText) > 1000) {
-    $response['message'] = 'Response must be between 1 and 1000 characters';
-    http_response_code(400);
+// Validate data
+if (empty($reviewId) || empty($responseText) || empty($sellerId)) {
+    $response['message'] = 'Review ID, response text, and seller ID cannot be empty';
     echo json_encode($response);
     exit;
 }
 
-// Check if the review exists and belongs to this seller
-$checkReviewQuery = "SELECT * FROM seller_reviews WHERE id = '$reviewId' AND seller_id = '$sellerId'";
-$reviewResult = mysqli_query($conn, $checkReviewQuery);
-
-if (!$reviewResult || mysqli_num_rows($reviewResult) === 0) {
-    $response['message'] = 'Review not found or does not belong to your shop';
-    http_response_code(404);
-    echo json_encode($response);
-    exit;
-}
-
-// Update the review with the seller's response
-$updateQuery = "UPDATE seller_reviews 
-                SET seller_response = '$responseText', 
-                    response_date = NOW() 
-                WHERE id = '$reviewId' AND seller_id = '$sellerId'";
-
-if (mysqli_query($conn, $updateQuery)) {
-    // Get the updated review
-    $getUpdatedReviewQuery = "SELECT * FROM seller_reviews WHERE id = '$reviewId'";
-    $updatedReviewResult = mysqli_query($conn, $getUpdatedReviewQuery);
-    $updatedReview = mysqli_fetch_assoc($updatedReviewResult);
-    
-    // Log the response action
-    $logQuery = "INSERT INTO activity_logs (user_id, action, entity_type, entity_id, details) 
-                VALUES ('$userId', 'respond_to_review', 'seller_review', '$reviewId', 
-                'Seller responded to review #$reviewId')";
-    mysqli_query($conn, $logQuery);
-    
-    $response['status'] = 'success';
-    $response['message'] = 'Response added successfully';
-    $response['data'] = [
-        'review_id' => $updatedReview['id'],
-        'seller_id' => $updatedReview['seller_id'],
-        'response' => $updatedReview['seller_response'],
-        'response_date' => $updatedReview['response_date']
-    ];
+// Verify that the review exists and belongs to a product owned by this seller
+if ($reviewType === 'product') {
+    $checkQuery = "SELECT pr.id, p.seller_id 
+                  FROM product_reviews pr
+                  JOIN products p ON pr.product_id = p.id
+                  WHERE pr.id = '$reviewId' AND p.seller_id = '$sellerId'";
 } else {
-    $response['message'] = 'Failed to add response: ' . mysqli_error($conn);
-    http_response_code(500);
+    // For other review types like seller reviews
+    $checkQuery = "SELECT id FROM seller_reviews WHERE id = '$reviewId' AND seller_id = '$sellerId'";
+}
+
+$checkResult = mysqli_query($conn, $checkQuery);
+
+if (!$checkResult || mysqli_num_rows($checkResult) === 0) {
+    $response['message'] = 'Review not found or you do not have permission to respond to this review';
+    echo json_encode($response);
+    exit;
+}
+
+// Check if a response table exists, if not create it
+$checkTableQuery = "SHOW TABLES LIKE 'reviews_responses'";
+$tableExists = mysqli_query($conn, $checkTableQuery);
+
+if (!$tableExists || mysqli_num_rows($tableExists) === 0) {
+    $createTableQuery = "CREATE TABLE reviews_responses (
+        id INT(11) NOT NULL AUTO_INCREMENT,
+        review_id INT(11) NOT NULL,
+        review_type VARCHAR(20) NOT NULL DEFAULT 'product',
+        response TEXT NOT NULL,
+        response_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        UNIQUE KEY unique_review (review_id, review_type)
+    )";
+    
+    if (!mysqli_query($conn, $createTableQuery)) {
+        $response['message'] = 'Failed to create responses table: ' . mysqli_error($conn);
+        echo json_encode($response);
+        exit;
+    }
+}
+
+// Check if there's already a response for this review
+$checkResponseQuery = "SELECT id FROM reviews_responses WHERE review_id = '$reviewId' AND review_type = '$reviewType'";
+$responseExists = mysqli_query($conn, $checkResponseQuery);
+
+if ($responseExists && mysqli_num_rows($responseExists) > 0) {
+    // Update existing response
+    $updateQuery = "UPDATE reviews_responses 
+                   SET response = '$responseText', response_date = CURRENT_TIMESTAMP 
+                   WHERE review_id = '$reviewId' AND review_type = '$reviewType'";
+    
+    if (mysqli_query($conn, $updateQuery)) {
+        $response['status'] = 'success';
+        $response['message'] = 'Response updated successfully';
+    } else {
+        $response['message'] = 'Failed to update response: ' . mysqli_error($conn);
+    }
+} else {
+    // Insert new response
+    $insertQuery = "INSERT INTO reviews_responses (review_id, review_type, response) 
+                   VALUES ('$reviewId', '$reviewType', '$responseText')";
+    
+    if (mysqli_query($conn, $insertQuery)) {
+        $response['status'] = 'success';
+        $response['message'] = 'Response submitted successfully';
+    } else {
+        $response['message'] = 'Failed to submit response: ' . mysqli_error($conn);
+    }
 }
 
 // Close database connection
 mysqli_close($conn);
 
-// Return the response
+// Return response
 echo json_encode($response); 

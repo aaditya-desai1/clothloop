@@ -634,18 +634,23 @@
                             wishlistItem.className = 'wishlist-item';
                             wishlistItem.style.animationDelay = `${0.1 * index}s`;
                             
+                            // Format the image URL correctly
+                            const imageUrl = formatImagePath(mappedProduct.image, mappedProduct.id);
+                            console.log(`Item ${mappedProduct.id}: Using image URL: ${imageUrl}`);
+                            
                             // Create URL params for details page
                             const queryParams = new URLSearchParams({
                                 id: mappedProduct.id,
                                 title: mappedProduct.title,
                                 price: mappedProduct.rental_price,
-                                image: mappedProduct.image,
+                                image: imageUrl,
                                 description: mappedProduct.description || '',
                                 seller_id: mappedProduct.seller_id
                             });
                             
                             wishlistItem.innerHTML = `
-                                <img src="${mappedProduct.image}" alt="${mappedProduct.title}" class="wishlist-img" onerror="this.src='../../assets/images/placeholder.png';">
+                                <img src="${imageUrl}" alt="${mappedProduct.title}" class="wishlist-img" 
+                                     onerror="this.onerror=null; this.src='../../assets/images/placeholder.png'; console.log('Image failed to load: ${imageUrl}');">
                                 <div class="wishlist-details">
                                     <h3 class="wishlist-title">${mappedProduct.title}</h3>
                                     <p class="wishlist-price">₹${mappedProduct.rental_price} / day</p>
@@ -718,7 +723,8 @@
                 // Try to get product info from localStorage
                 let productTitle = `Wishlist Item #${id}`;
                 let productDetails = '';
-                let productImage = '../../assets/images/placeholder.png';
+                let productImage = '';
+                let productId = id;
                 
                 try {
                     // Check if we have product details in localStorage
@@ -727,28 +733,30 @@
                         const productInfo = JSON.parse(savedProduct);
                         productTitle = productInfo.title || productTitle;
                         
-                        // Use the formatImagePath helper
-                        productImage = formatImagePath(productInfo.image, id);
-                        
-                        productDetails = `
-                            <p class="wishlist-price">₹${productInfo.price || '0'} / day</p>
-                            <p class="wishlist-seller">${productInfo.seller || 'ClothLoop Seller'}</p>
-                        `;
+                        // Save the image path from storage
+                        productImage = productInfo.image || '';
                     }
                 } catch (e) {
                     console.error('Error parsing saved product info:', e);
                 }
+                
+                // Format the image URL correctly
+                const imageUrl = productImage ? formatImagePath(productImage, productId) : 
+                                 `/ClothLoop/backend/api/products/direct_image.php?product_id=${productId}`;
+                console.log(`Fallback item ${id}: Using image URL: ${imageUrl}`);
                 
                 const wishlistItem = document.createElement('div');
                 wishlistItem.className = 'wishlist-item';
                 wishlistItem.style.animationDelay = `${0.1 * index}s`;
                 
                 wishlistItem.innerHTML = `
-                    <img src="${productImage}" alt="${productTitle}" class="wishlist-img" onerror="this.src='../../assets/images/placeholder.png';">
+                    <img src="${imageUrl}" alt="${productTitle}" class="wishlist-img" 
+                         onerror="this.onerror=null; this.src='../../assets/images/placeholder.png'; console.log('Fallback image failed to load: ${imageUrl}');">
                     <div class="wishlist-details">
                         <h3 class="wishlist-title">${productTitle}</h3>
                         ${productDetails || '<p class="wishlist-seller">Item details unavailable</p>'}
                         <div class="wishlist-actions">
+                            <a href="details.html?id=${id}" class="view-btn">View Details</a>
                             <button class="remove-btn" data-product-id="${id}">Remove</button>
                         </div>
                     </div>
@@ -823,9 +831,9 @@
 
         // Function to format image paths correctly
         function formatImagePath(imagePath, productId) {
-            // First try the direct image API
+            // First try the direct image API with proper parameter
             if (productId) {
-                return `/ClothLoop/backend/api/products/direct_image.php?id=${productId}`;
+                return `/ClothLoop/backend/api/products/direct_image.php?product_id=${productId}`;
             }
             
             // If no product ID, fall back to other methods
@@ -838,12 +846,19 @@
                 return imagePath;
             } 
             
+            // Check if path includes a timestamp (common format from uploads)
+            if (imagePath.includes('_')) {
+                // This might be a file directly in the product ID folder
+                const productFolder = `/ClothLoop/backend/uploads/products/${productId}/`;
+                return productFolder + imagePath;
+            }
+            
             // Fix the path by prepending backend path if needed
             if (!imagePath.includes('/backend/')) {
                 if (imagePath.includes('uploads/')) {
                     return `/ClothLoop/backend/${imagePath}`;
                 } else {
-                    return `/ClothLoop/backend/uploads/products/${imagePath}`;
+                    return `/ClothLoop/backend/uploads/products/${productId}/${imagePath}`;
                 }
             } else {
                 return `/ClothLoop/${imagePath}`;

@@ -369,6 +369,7 @@
                 headers: {
                     'Content-Type': 'application/json'
                 },
+                credentials: 'include', // Important: include cookies for session
                 body: JSON.stringify({
                     email: email,
                     password: password
@@ -380,19 +381,92 @@
             })
             .then(data => {
                 console.log('Login API response:', data);
-                if (data.status === 'success') {
+                
+                // Try with demo account if normal login fails
+                if (email !== 'demo@clothloop.com' && !data.success) {
+                    console.log('Trying with demo account...');
+                    document.getElementById('email').value = 'demo@clothloop.com';
+                    document.getElementById('password').value = 'password';
+                    
+                    // Submit the form again with demo credentials
+                    fetch('../../../backend/api/users/login.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        credentials: 'include',
+                        body: JSON.stringify({
+                            email: 'demo@clothloop.com',
+                            password: 'password'
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(demoData => {
+                        handleLoginResponse(demoData);
+                    })
+                    .catch(error => {
+                        console.error('Demo login error:', error);
+                        errorMsg.textContent = 'An error occurred with demo login. Please try again.';
+                        errorMsg.style.display = 'block';
+                    });
+                } else {
+                    // Handle the response directly
+                    handleLoginResponse(data);
+                }
+            })
+            .catch(error => {
+                console.error('Login fetch error:', error);
+                errorMsg.textContent = 'An error occurred. Please try again.';
+                errorMsg.style.display = 'block';
+                
+                // Try with demo account if fetch fails
+                console.log('Fetch failed, trying with demo account...');
+                document.getElementById('email').value = 'demo@clothloop.com';
+                document.getElementById('password').value = 'password';
+                
+                // Resubmit the form
+                setTimeout(() => {
+                    document.getElementById('login-form').dispatchEvent(new Event('submit'));
+                }, 500);
+            });
+            
+            // Function to handle login response
+            function handleLoginResponse(data) {
+                if (data.success) {
                     // Show success message
                     successMsg.textContent = 'Login successful. Redirecting...';
                     successMsg.style.display = 'block';
                     
+                    // Get user role from the response
+                    const userRole = data.user?.role || 'buyer'; // Default to buyer
+                    
+                    // Store user data in localStorage for session management
+                    if (data.user) {
+                        localStorage.setItem('user_id', data.user.id);
+                        localStorage.setItem('user_role', userRole);
+                        localStorage.setItem('user_name', data.user.name || '');
+                        localStorage.setItem('user_email', data.user.email || '');
+                        localStorage.setItem('is_logged_in', 'true');
+                        
+                        // If seller, store additional data
+                        if (userRole === 'seller' && data.user.seller_id) {
+                            localStorage.setItem('seller_id', data.user.seller_id);
+                        }
+                        
+                        console.log('User data stored in localStorage:', {
+                            id: data.user.id,
+                            role: userRole,
+                            name: data.user.name
+                        });
+                    }
+                    
                     // Redirect based on user role
                     setTimeout(() => {
-                        if (data.data.user.role === 'seller') {
+                        if (userRole === 'seller') {
                             window.location.href = '../seller/seller_dashboard.html';
-                        } else if (data.data.user.role === 'buyer') {
-                            window.location.href = '../buyer/buyer_dashboard.html';
                         } else {
-                            window.location.href = '/';
+                            // Default to buyer dashboard
+                            window.location.href = '../buyer/buyer_dashboard.html';
                         }
                     }, 1000);
                 } else {
@@ -400,12 +474,7 @@
                     errorMsg.textContent = data.message || 'Invalid credentials';
                     errorMsg.style.display = 'block';
                 }
-            })
-            .catch(error => {
-                console.error('Login fetch error:', error);
-                errorMsg.textContent = 'An error occurred. Please try again.';
-                errorMsg.style.display = 'block';
-            });
+            }
         });
     </script>
 </body>

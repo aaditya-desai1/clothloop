@@ -958,6 +958,45 @@
 
     <!-- JavaScript code for functionality -->
     <script>
+        // Check authentication immediately when page loads
+        (function checkAuth() {
+            // Check if session cookies exist
+            const userRole = localStorage.getItem('user_role');
+            const userId = localStorage.getItem('user_id');
+            const isLoggedIn = localStorage.getItem('is_logged_in');
+            
+            if (!isLoggedIn || userRole !== 'seller' || !userId) {
+                console.log('Not authenticated as seller, redirecting to login');
+                window.location.href = '../account/login.html';
+                return;
+            }
+            
+            // Validate and restore server-side session if needed
+            fetch(`../../../backend/api/sellers/check_session.php?user_id=${userId}&user_role=${userRole}`, {
+                method: 'GET',
+                credentials: 'include' // Important for session cookies
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (!data.is_valid) {
+                    console.log('Server session validation failed:', data.message);
+                    window.location.href = '../account/login.html';
+                    return;
+                }
+                
+                console.log('Session validated:', data.session_restored ? 
+                    'Session was restored successfully' : 'Using existing session');
+                
+                // Session is valid, continue with page load
+                loadDashboardData();
+            })
+            .catch(error => {
+                console.error('Session validation error:', error);
+                // Continue anyway, the dashboard API will redirect if needed
+                loadDashboardData();
+            });
+        })();
+    
         // Wait for DOM to be fully loaded
         document.addEventListener('DOMContentLoaded', function() {
             // Setup theme switching
@@ -966,8 +1005,8 @@
             // Setup event listeners
             setupEventListeners();
             
-            // Load dashboard data
-            loadDashboardData();
+            // Dashboard data is now loaded by the auth checker
+            // to ensure session is valid first
         });
         
         // Theme switcher functionality
@@ -1015,6 +1054,12 @@
             const loadingSpinner = document.getElementById('loadingSpinner');
             loadingSpinner.style.display = 'flex';
             
+            // Update seller name from localStorage if available
+            const sellerName = localStorage.getItem('user_name');
+            if (sellerName) {
+                document.getElementById('sellerName').textContent = sellerName;
+            }
+            
             // Clear any previous error messages
             const alertContainer = document.getElementById('alertContainer');
             if (alertContainer) {
@@ -1022,51 +1067,61 @@
             }
             
             // Fetch dashboard data from API
-            fetch('../../../backend/api/sellers/dashboard_stats.php')
-                .then(response => {
-                    if (!response.ok) {
-                        if (response.status === 401 || response.status === 403) {
-                            // Unauthorized or forbidden - redirect to login
-                            window.location.href = '../account/login.html';
-                            throw new Error('Authentication required');
-                        }
+            fetch('../../../backend/api/sellers/dashboard_stats.php', {
+                method: 'GET',
+                credentials: 'include', // Important: include cookies for session
+                headers: {
+                    'Cache-Control': 'no-cache'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    if (response.status === 401 || response.status === 403) {
+                        // Unauthorized or forbidden - clear localStorage and redirect to login
+                        localStorage.removeItem('is_logged_in');
+                        localStorage.removeItem('user_role');
+                        localStorage.removeItem('user_id');
+                        localStorage.removeItem('user_name');
+                        window.location.href = '../account/login.html';
+                        throw new Error('Authentication required');
                     }
-                    return response.json();
-                })
-                .then(data => {
-                    // Hide loading spinner
-                    loadingSpinner.style.display = 'none';
+                    throw new Error('HTTP error ' + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Hide loading spinner
+                loadingSpinner.style.display = 'none';
+                
+                if (data.status === 'success') {
+                    // Update dashboard stats
+                    updateDashboardStats(data.data);
                     
-                    if (data.status === 'success') {
-                        // Update dashboard stats
-                        updateDashboardStats(data.data);
-                        
-                        // Update seller name
-                        if (data.data.seller_name) {
-                            document.getElementById('sellerName').textContent = data.data.seller_name;
-                        }
-                        
-                        // Load interested customers
-                        if (data.data.interested_customers_list) {
-                            loadInterestedCustomers(data.data.interested_customers_list);
-                        }
-                        
-                        // Remove success message to reduce clutter
-                        // showAlert('Dashboard data loaded successfully', 'success');
-                    } else {
-                        // Show error message
-                        showAlert(data.message || 'Error loading dashboard data', 'error');
+                    // Update seller name
+                    if (data.data.seller_name) {
+                        document.getElementById('sellerName').textContent = data.data.seller_name;
+                        // Update localStorage with new data
+                        localStorage.setItem('user_name', data.data.seller_name);
                     }
-                })
-                .catch(error => {
-                    // Hide loading spinner
-                    loadingSpinner.style.display = 'none';
                     
-                    console.error('Error:', error);
-                    if (error.message !== 'Authentication required') {
-                        showAlert('Error loading dashboard data. Please try again.', 'error');
+                    // Load interested customers
+                    if (data.data.interested_customers_list) {
+                        loadInterestedCustomers(data.data.interested_customers_list);
                     }
-                });
+                } else {
+                    // Show error message
+                    showAlert(data.message || 'Error loading dashboard data', 'error');
+                }
+            })
+            .catch(error => {
+                // Hide loading spinner
+                loadingSpinner.style.display = 'none';
+                
+                console.error('Error:', error);
+                if (error.message !== 'Authentication required') {
+                    showAlert('Error loading dashboard data. Please try again.', 'error');
+                }
+            });
         }
         
         // Function to show alerts
@@ -1218,19 +1273,23 @@
         
         // Function to handle logout
         function logout() {
-            fetch('../../../backend/api/users/logout.php')
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 'success') {
-                        window.location.href = '../account/login.html';
-                    } else {
-                        showAlert('Error logging out. Please try again.', 'error');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    showAlert('Error logging out. Please try again.', 'error');
-                });
+            // Clear all user session data from localStorage
+            localStorage.removeItem('is_logged_in');
+            localStorage.removeItem('user_id');
+            localStorage.removeItem('user_role');
+            localStorage.removeItem('user_name');
+            localStorage.removeItem('user_email');
+            localStorage.removeItem('seller_id');
+            
+            // Call logout API
+            fetch('../../../backend/api/users/logout.php', {
+                method: 'GET',
+                credentials: 'include' // Important: include cookies for session
+            })
+            .finally(() => {
+                // Always redirect to login, even if the API call fails
+                window.location.href = '../account/login.html';
+            });
         }
     </script>
 </body>

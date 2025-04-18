@@ -421,6 +421,23 @@
         .light-theme .wishlist-button:hover {
             box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.1);
         }
+        
+        .wishlist-button.active {
+            background-color: var(--accent-color);
+            color: var(--primary-color);
+        }
+        
+        .interest-button {
+            margin-top: 10px;
+            background-color: var(--accent-color);
+            color: var(--primary-color);
+        }
+        
+        .interest-button.active {
+            background-color: var(--primary-color);
+            color: var(--accent-color);
+            border: 2px solid var(--accent-color);
+        }
 
         .section-title {
             font-size: 1.5rem;
@@ -843,7 +860,7 @@
                 ADD TO WISHLIST
             </button>
             
-            <button class="wishlist-button" onclick="showInterest()" style="margin-top: 10px; background-color: var(--accent-color); color: var(--primary-color);">
+            <button class="wishlist-button interest-button" onclick="showInterest()">
                 I'M INTERESTED
             </button>
             
@@ -986,13 +1003,13 @@
         // Add to wishlist function
         function addToWishlist() {
             try {
-            const wishlistButton = document.querySelector('.wishlist-button[onclick="addToWishlist()"]');
+                const wishlistButton = document.querySelector('.wishlist-button[onclick="addToWishlist()"]');
                 
                 // Get user-specific wishlist key
                 const userId = localStorage.getItem('user_id');
                 const wishlistKey = userId ? `wishlist_${userId}` : 'wishlist';
-            
-            // Get current wishlist from localStorage
+                
+                // Get current wishlist from localStorage
                 let wishlist = JSON.parse(localStorage.getItem(wishlistKey) || '[]');
                 
                 // Get product ID from URL or data attribute
@@ -1003,37 +1020,53 @@
                     console.error('Product ID not found');
                     return;
                 }
-            
-            // Check if button is already in "added to wishlist" state
-            if (wishlistButton.textContent.trim() === 'ADDED TO WISHLIST') {
-                // Remove from wishlist
-                wishlist = wishlist.filter(item => {
+                
+                // Check if button is already in "added to wishlist" state
+                if (wishlistButton.textContent.trim() === 'ADDED TO WISHLIST') {
+                    // Remove from wishlist
+                    wishlist = wishlist.filter(item => {
                         const itemId = typeof item === 'object' ? item.id.toString() : item.toString();
                         return itemId !== productId.toString();
-                });
-                
+                    });
+                    
                     localStorage.setItem(wishlistKey, JSON.stringify(wishlist));
                     
+                    // For compatibility with any old code still using the old key
+                    localStorage.setItem('clothloop-wishlist', JSON.stringify(wishlist));
+                    
+                    // Also maintain compatibility with the global wishlist (no user ID)
+                    if (userId) {
+                        localStorage.setItem('wishlist', JSON.stringify(wishlist));
+                    }
+                    
                     // Reset button text and style
-                wishlistButton.textContent = 'ADD TO WISHLIST';
-                wishlistButton.style.backgroundColor = 'transparent';
-                wishlistButton.style.color = 'var(--accent-color)';
-                
-                // Show notification
-                showNotification('Removed from wishlist');
+                    wishlistButton.textContent = 'ADD TO WISHLIST';
+                    wishlistButton.style.backgroundColor = 'transparent';
+                    wishlistButton.style.color = 'var(--accent-color)';
+                    
+                    // Show notification
+                    showNotification('Removed from wishlist');
                 } else {
                     // Add to wishlist (store just the ID for consistency with dashboard)
                     if (!wishlist.includes(productId.toString())) {
                         wishlist.push(productId.toString());
                         localStorage.setItem(wishlistKey, JSON.stringify(wishlist));
-            
-            // Update button text and style for "added to wishlist" state
-            wishlistButton.textContent = 'ADDED TO WISHLIST';
-            wishlistButton.style.backgroundColor = 'var(--accent-color)';
-            wishlistButton.style.color = 'var(--primary-color)';
-            
-            // Show notification
-            showNotification('Product added to wishlist!');
+                        
+                        // For compatibility with any old code still using the old key
+                        localStorage.setItem('clothloop-wishlist', JSON.stringify(wishlist));
+                        
+                        // Also maintain compatibility with the global wishlist (no user ID)
+                        if (userId) {
+                            localStorage.setItem('wishlist', JSON.stringify(wishlist));
+                        }
+                        
+                        // Update button text and style for "added to wishlist" state
+                        wishlistButton.textContent = 'ADDED TO WISHLIST';
+                        wishlistButton.style.backgroundColor = 'var(--accent-color)';
+                        wishlistButton.style.color = 'var(--primary-color)';
+                        
+                        // Show notification
+                        showNotification('Product added to wishlist!');
                     }
                 }
             } catch (error) {
@@ -1070,50 +1103,53 @@
         // Show interest function
         function showInterest() {
             const productId = getQueryParams().id;
-            const productName = document.getElementById('clothTitle').textContent;
-            const sellerName = document.getElementById('shopName').textContent;
-            const contactNumber = document.getElementById('contactNumber').textContent;
+            const buyerId = localStorage.getItem('user_id');
             const interestButton = document.querySelector('.wishlist-button[onclick="showInterest()"]');
             
-            // Check if button is already in "interested" state
-            if (interestButton.textContent.trim() === 'MARKED INTERESTED') {
-                // Toggle back to original state
-                interestButton.textContent = 'I\'M INTERESTED';
-                interestButton.disabled = false;
-                
-                // Show notification that interest was removed
-                showNotification('Seller notification has been removed');
+            // Check if user is logged in
+            if (!buyerId) {
+                alert('Please log in to express interest in this product.');
                 return;
             }
             
-            // Update button text and style for "interested" state
-            interestButton.textContent = 'MARKED INTERESTED';
-            
-            // Show notification message
-            showNotification('The Seller Has Been Notified');
-            
-            // Check if contact information is available
-            if (contactNumber && contactNumber !== 'Not provided') {
-                // Create message for WhatsApp or direct contact
-                const message = `Hello, I am interested in renting the item "${productName}" from your shop on ClothLoop.`;
-                
-                // If whatsapp number is available, use that as primary contact method
-                const whatsappNumber = document.getElementById('whatsappNumber').textContent;
-                if (whatsappNumber && whatsappNumber !== 'Not provided') {
-                    if (confirm(`Would you like to contact ${sellerName} via WhatsApp about "${productName}"?`)) {
-                        const encodedMessage = encodeURIComponent(message);
-                        window.open(`https://wa.me/${whatsappNumber.replace(/\s+/g, '')}?text=${encodedMessage}`, '_blank');
-                        return;
+            // Toggle interest in database
+            fetch('/ClothLoop/backend/api/buyers/toggle_interest.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    buyer_id: buyerId,
+                    product_id: productId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    if (data.action === 'added') {
+                        // Interest was added
+                        interestButton.textContent = 'MARKED INTERESTED';
+                        interestButton.classList.add('active');
+                        
+                        // Show notification that interest was added
+                        showNotification('The Seller Has Been Notified');
+                    } else {
+                        // Interest was removed
+                        interestButton.textContent = 'I\'M INTERESTED';
+                        interestButton.classList.remove('active');
+                        
+                        // Show notification that interest was removed
+                        showNotification('Seller notification has been removed');
                     }
+                } else {
+                    // Error occurred
+                    showNotification('Error: ' + data.message);
                 }
-                
-                // Fallback to regular call/SMS
-                if (confirm(`Would you like to contact ${sellerName} about "${productName}"?`)) {
-                    window.open(`tel:${contactNumber.replace(/\s+/g, '')}`, '_blank');
-                }
-            } else {
-                alert('Contact information is not available for this seller.');
-            }
+            })
+            .catch(error => {
+                console.error('Error toggling interest:', error);
+                showNotification('Error connecting to server. Please try again.');
+            });
         }
 
         // Function to show a temporary notification
@@ -1558,36 +1594,43 @@
             try {
                 if (!productId) return;
                 
-                // Get user-specific wishlist key
+                // Get user-specific wishlist key and try other keys for backwards compatibility
                 const userId = localStorage.getItem('user_id');
-                const wishlistKey = userId ? `wishlist_${userId}` : 'wishlist';
-                
-                // Try to get wishlist from localStorage
                 let wishlist = [];
-                try {
-                    wishlist = JSON.parse(localStorage.getItem(wishlistKey) || '[]');
-                    
-                    // For backward compatibility, also check old wishlist format
-                    const oldWishlistData = localStorage.getItem('clothloop-wishlist');
-                    if (oldWishlistData) {
-                        const oldWishlist = JSON.parse(oldWishlistData);
-                        if (oldWishlist.length > 0) {
-                            // Extract IDs and add to current wishlist check
-                            oldWishlist.forEach(item => {
-                                const oldId = typeof item === 'object' ? item.id.toString() : item.toString();
-                                if (!wishlist.includes(oldId)) {
-                                    wishlist.push(oldId);
+                
+                // Try all possible keys where wishlist data might be stored
+                const keysToCheck = [
+                    userId ? `wishlist_${userId}` : 'wishlist',  // User-specific key
+                    'clothloop-wishlist',                        // Old key
+                    'wishlist'                                  // Global key
+                ];
+                
+                // Check all keys and combine wishlists
+                for (const key of keysToCheck) {
+                    try {
+                        const keyData = JSON.parse(localStorage.getItem(key) || '[]');
+                        if (Array.isArray(keyData) && keyData.length > 0) {
+                            // Extract IDs and add to the combined wishlist
+                            keyData.forEach(item => {
+                                const id = typeof item === 'object' ? item.id.toString() : item.toString();
+                                if (!wishlist.includes(id)) {
+                                    wishlist.push(id);
                                 }
                             });
-                            
-                            // Save merged wishlist to new format
-                            localStorage.setItem(wishlistKey, JSON.stringify(wishlist));
                         }
-                    }
                     } catch (e) {
-                        console.error('Error parsing wishlist data:', e);
-                        wishlist = [];
+                        console.error(`Error parsing wishlist for key ${key}:`, e);
+                    }
                 }
+                
+                // Save the combined wishlist to all formats for consistency
+                const newWishlistData = JSON.stringify(wishlist);
+                
+                if (userId) {
+                    localStorage.setItem(`wishlist_${userId}`, newWishlistData);
+                }
+                localStorage.setItem('wishlist', newWishlistData);
+                localStorage.setItem('clothloop-wishlist', newWishlistData);
                 
                 // Check if this product is in the wishlist
                 const productIdStr = productId.toString();
@@ -1634,6 +1677,9 @@
                 if (productId) {
                     // If we have an ID, fetch complete details from server
                     fetchProductDetails();
+                    
+                    // Check if user is interested in this product
+                    checkUserInterest(productId);
                 } else {
                     // No product ID, show an error
                     console.error('No product ID provided in URL');
@@ -1645,6 +1691,36 @@
                 console.error('Error in initialization:', error);
                 showNotification('Error initializing page', 3000);
             }
+        }
+        
+        // Function to check if the current user is interested in this product
+        function checkUserInterest(productId) {
+            const buyerId = localStorage.getItem('user_id');
+            
+            if (!buyerId || !productId) {
+                return;
+            }
+            
+            fetch(`/ClothLoop/backend/api/buyers/check_interest.php?buyer_id=${buyerId}&product_id=${productId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        const interestButton = document.querySelector('.wishlist-button[onclick="showInterest()"]');
+                        
+                        if (data.interested) {
+                            // User is already interested, update button state
+                            interestButton.textContent = 'MARKED INTERESTED';
+                            interestButton.classList.add('active');
+                        } else {
+                            // User is not interested, ensure button is in default state
+                            interestButton.textContent = 'I\'M INTERESTED';
+                            interestButton.classList.remove('active');
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error checking user interest:', error);
+                });
         }
         
         // Call initialize when page loads
