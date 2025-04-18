@@ -138,23 +138,19 @@
 
         /* Hero Section */
         .hero {
-            background: linear-gradient(to right, rgba(0, 0, 0, 0.9), rgba(20, 20, 20, 0.8)),
-                        url('https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80');
-            background-size: cover;
-            background-position: center;
-            min-height: 50vh;
+            background-color: var(--primary-color);
+            min-height: 30vh;
             display: flex;
             align-items: center;
-            color: white;
+            color: var(--accent-color);
             margin-top: 73px;
             position: relative;
-            clip-path: polygon(0 0, 100% 0, 100% 90%, 0 100%);
+            border-bottom: 1px solid var(--accent-color);
         }
 
         .light-theme .hero {
-            background: linear-gradient(to right, rgba(255, 255, 255, 0.9), rgba(240, 240, 240, 0.8)),
-                        url('https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80');
-            color: var(--text-color);
+            background-color: var(--primary-color);
+            color: var(--accent-color);
         }
 
         .hero-content {
@@ -213,7 +209,7 @@
         /* Profile Content */
         .profile-container {
             max-width: 800px;
-            margin: 120px auto 50px;
+            margin: 50px auto;
             padding: 0 20px;
         }
 
@@ -467,6 +463,102 @@
             }
         }
 
+        /* Location styles */
+        .location-container {
+            background-color: var(--card-bg);
+            border: 1px solid var(--input-border);
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .location-display {
+            margin-bottom: 20px;
+        }
+        
+        .location-value {
+            padding: 15px;
+            background-color: var(--light-bg);
+            border: 1px solid var(--input-border);
+            font-size: 16px;
+            margin-top: 5px;
+        }
+        
+        .location-btn {
+            width: 100%;
+            height: 50px;
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            border: 1px solid var(--accent-color);
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.2s linear;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .location-btn i {
+            margin-right: 10px;
+        }
+        
+        .location-btn:hover {
+            background-color: var(--hover-bg);
+            transform: translateY(-3px);
+        }
+        
+        .location-btn.secondary {
+            background-color: var(--accent-color);
+            color: var(--primary-color);
+        }
+        
+        .location-divider {
+            text-align: center;
+            position: relative;
+            margin: 25px 0;
+            font-size: 14px;
+            color: var(--text-color);
+            opacity: 0.7;
+        }
+        
+        .location-divider::before,
+        .location-divider::after {
+            content: '';
+            position: absolute;
+            width: 40%;
+            height: 1px;
+            background-color: var(--input-border);
+            top: 50%;
+        }
+        
+        .location-divider::before {
+            left: 0;
+        }
+        
+        .location-divider::after {
+            right: 0;
+        }
+        
+        .location-divider span {
+            background-color: var(--card-bg);
+            padding: 0 15px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .section-subtitle {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--accent-color);
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .profile-container {
@@ -504,6 +596,13 @@
             <i class="fas fa-recycle"></i> ClothLoop
         </a>
         <div style="display: flex; align-items: center;">
+            <ul>
+                <li><a href="buyer_dashboard.html">Listings</a></li>
+                <li><a href="wish.html">Wishlist</a></li>
+                <li><a href="buyer_profile.html" class="active">Profile</a></li>
+                <li><a href="../about/about_us.html">About</a></li>
+                <li><a href="../account/login.html">Logout</a></li>
+            </ul>
             <button class="theme-switcher" id="theme-toggle" aria-label="Toggle theme">
                 <i class="fas fa-sun"></i>
             </button>
@@ -567,6 +666,43 @@
                 <div class="form-group">
                     <label for="created_at" class="form-label">Account Created</label>
                     <input type="text" id="created_at" name="created_at" class="form-input" disabled>
+                </div>
+
+                <!-- Location Information Section -->
+                <div class="form-section">
+                    <h3 class="section-subtitle">Location Information</h3>
+                    
+                    <div class="location-container">
+                        <div class="location-display">
+                            <label class="form-label">Your Location:</label>
+                            <div class="location-value" id="locationDisplay">Location not set yet</div>
+                        </div>
+                        
+                        <button type="button" class="location-btn" id="getCurrentLocation">
+                            <i class="fas fa-map-marker-alt"></i> GET CURRENT LOCATION
+                        </button>
+                        
+                        <!-- Manual location entry - hidden by default -->
+                        <div id="manualLocationEntry" style="display: none;">
+                            <div class="location-divider">
+                                <span>Enter location manually</span>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="latitude" class="form-label">Latitude:</label>
+                                <input type="text" id="latitude" name="latitude" class="form-input" placeholder="e.g. 40.7128">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="longitude" class="form-label">Longitude:</label>
+                                <input type="text" id="longitude" name="longitude" class="form-input" placeholder="e.g. -74.0060">
+                            </div>
+                            
+                            <button type="button" class="location-btn secondary" id="setManualLocation">
+                                <i class="fas fa-check"></i> SET MANUAL LOCATION
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="password-toggle">
@@ -638,6 +774,9 @@
 
             // Check if user is logged in
             checkSession();
+            
+            // Initialize location features
+            initLocationFeatures();
             
             // Password change toggle
             const changePasswordCheckbox = document.getElementById('changePassword');
@@ -927,6 +1066,130 @@
                         showError('An error occurred during login. Please try again.');
                     });
             });
+
+            // Location handling
+            function initLocationFeatures() {
+                const getCurrentLocationBtn = document.getElementById('getCurrentLocation');
+                const setManualLocationBtn = document.getElementById('setManualLocation');
+                const latitudeInput = document.getElementById('latitude');
+                const longitudeInput = document.getElementById('longitude');
+                const locationDisplay = document.getElementById('locationDisplay');
+                const manualLocationEntry = document.getElementById('manualLocationEntry');
+                
+                // Load saved location if any
+                const savedLatitude = localStorage.getItem('user_latitude');
+                const savedLongitude = localStorage.getItem('user_longitude');
+                
+                if (savedLatitude && savedLongitude) {
+                    latitudeInput.value = savedLatitude;
+                    longitudeInput.value = savedLongitude;
+                    locationDisplay.textContent = `${savedLatitude}, ${savedLongitude}`;
+                }
+                
+                // Get current location
+                getCurrentLocationBtn.addEventListener('click', function() {
+                    if (navigator.geolocation) {
+                        getCurrentLocationBtn.disabled = true;
+                        getCurrentLocationBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> GETTING LOCATION...';
+                        
+                        // Hide manual entry section when trying to get location
+                        manualLocationEntry.style.display = 'none';
+                        
+                        navigator.geolocation.getCurrentPosition(
+                            // Success callback
+                            function(position) {
+                                const latitude = position.coords.latitude.toFixed(6);
+                                const longitude = position.coords.longitude.toFixed(6);
+                                
+                                // Update inputs and display
+                                latitudeInput.value = latitude;
+                                longitudeInput.value = longitude;
+                                locationDisplay.textContent = `${latitude}, ${longitude}`;
+                                
+                                // Save to localStorage
+                                localStorage.setItem('user_latitude', latitude);
+                                localStorage.setItem('user_longitude', longitude);
+                                
+                                // Reset button
+                                getCurrentLocationBtn.disabled = false;
+                                getCurrentLocationBtn.innerHTML = '<i class="fas fa-map-marker-alt"></i> GET CURRENT LOCATION';
+                                
+                                // Show success message
+                                showSuccess('Location updated successfully!');
+                            },
+                            // Error callback
+                            function(error) {
+                                let errorMessage = 'Error getting location.';
+                                
+                                switch(error.code) {
+                                    case error.PERMISSION_DENIED:
+                                        errorMessage = 'Location access denied. Please enable location services.';
+                                        break;
+                                    case error.POSITION_UNAVAILABLE:
+                                        errorMessage = 'Location information is unavailable.';
+                                        break;
+                                    case error.TIMEOUT:
+                                        errorMessage = 'Location request timed out.';
+                                        break;
+                                }
+                                
+                                showError(errorMessage);
+                                
+                                // Show manual location entry when geolocation fails
+                                manualLocationEntry.style.display = 'block';
+                                
+                                // Reset button
+                                getCurrentLocationBtn.disabled = false;
+                                getCurrentLocationBtn.innerHTML = '<i class="fas fa-map-marker-alt"></i> GET CURRENT LOCATION';
+                            }
+                        );
+                    } else {
+                        showError('Geolocation is not supported by this browser.');
+                        // Show manual location entry when geolocation is not supported
+                        manualLocationEntry.style.display = 'block';
+                    }
+                });
+                
+                // Set manual location
+                setManualLocationBtn.addEventListener('click', function() {
+                    const latitude = latitudeInput.value.trim();
+                    const longitude = longitudeInput.value.trim();
+                    
+                    if (!latitude || !longitude) {
+                        showError('Please enter both latitude and longitude.');
+                        return;
+                    }
+                    
+                    if (!isValidCoordinate(latitude, 'lat') || !isValidCoordinate(longitude, 'lng')) {
+                        showError('Please enter valid coordinates.');
+                        return;
+                    }
+                    
+                    // Update display
+                    locationDisplay.textContent = `${latitude}, ${longitude}`;
+                    
+                    // Save to localStorage
+                    localStorage.setItem('user_latitude', latitude);
+                    localStorage.setItem('user_longitude', longitude);
+                    
+                    // Show success message
+                    showSuccess('Location set manually!');
+                });
+                
+                // Validate coordinates
+                function isValidCoordinate(value, type) {
+                    const num = parseFloat(value);
+                    if (isNaN(num)) return false;
+                    
+                    if (type === 'lat') {
+                        return num >= -90 && num <= 90;
+                    } else if (type === 'lng') {
+                        return num >= -180 && num <= 180;
+                    }
+                    
+                    return false;
+                }
+            }
         });
     </script>
 </body>

@@ -335,6 +335,77 @@
         .terms-section {
             animation: fadeIn 2.4s ease-out;
         }
+        
+        /* Rating System Styles */
+        .rating-section {
+            margin-top: 30px;
+            animation: fadeIn 2.6s ease-out;
+        }
+        
+        .rating-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .stars {
+            display: flex;
+            margin-right: 15px;
+        }
+        
+        .stars i {
+            color: var(--accent-color);
+            font-size: 24px;
+            margin-right: 5px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .stars i:hover {
+            transform: scale(1.2);
+        }
+        
+        .avg-rating {
+            font-size: 18px;
+            color: var(--accent-color);
+            font-weight: 500;
+        }
+        
+        .review-textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid var(--accent-color);
+            background-color: transparent;
+            color: var(--text-color);
+            font-family: 'Poppins', sans-serif;
+            resize: vertical;
+            min-height: 80px;
+            margin-bottom: 10px;
+        }
+        
+        .review-button {
+            background-color: transparent;
+            color: var(--accent-color);
+            border: 2px solid var(--accent-color);
+            padding: 10px 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s linear;
+        }
+        
+        .review-button:hover {
+            transform: translateY(-2px) skewX(-5deg);
+            background-color: var(--accent-color);
+            color: var(--primary-color);
+            box-shadow: 3px 3px 0 rgba(255, 255, 255, 0.1);
+        }
+        
+        .light-theme .review-button:hover {
+            box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.1);
+        }
 
         /* Close button */
         .close-btn {
@@ -424,6 +495,11 @@
         <div style="display: flex; align-items: center;">
             <ul>
                 <li><a href="javascript:history.back()">Back</a></li>
+                <li><a href="buyer_dashboard.html">Listings</a></li>
+                <li><a href="wish.html">Wishlist</a></li>
+                <li><a href="buyer_profile.html">Profile</a></li>
+                <li><a href="../about/about_us.html">About</a></li>
+                <li><a href="../account/login.html">Logout</a></li>
             </ul>
             <button class="theme-switcher" id="theme-toggle" aria-label="Toggle theme">
                 <i class="fas fa-sun"></i>
@@ -454,6 +530,10 @@
             
             <button class="wishlist-button" onclick="addToWishlist()">
                 ADD TO WISHLIST
+            </button>
+            
+            <button class="wishlist-button" onclick="showInterest()" style="margin-top: 10px; background-color: var(--accent-color); color: var(--primary-color);">
+                I'M INTERESTED
             </button>
             
             <div class="shop-info-section">
@@ -488,6 +568,26 @@
                 <div class="section-title">Terms & Conditions</div>
                 <div class="product-description" id="termsConditions">
                     Terms and conditions will appear here.
+                </div>
+            </div>
+            
+            <div class="rating-section">
+                <div class="section-title">Rate the Product</div>
+                <div class="rating-container">
+                    <div class="stars">
+                        <i class="far fa-star" data-rating="1"></i>
+                        <i class="far fa-star" data-rating="2"></i>
+                        <i class="far fa-star" data-rating="3"></i>
+                        <i class="far fa-star" data-rating="4"></i>
+                        <i class="far fa-star" data-rating="5"></i>
+                    </div>
+                    <div class="avg-rating">
+                        <span id="avgRating">3.0</span>
+                    </div>
+                </div>
+                <div id="reviewFormContainer" style="display: none; margin-top: 15px;">
+                    <textarea id="reviewText" placeholder="Write a review..." class="review-textarea"></textarea>
+                    <button id="submitReview" class="review-button">SEND</button>
                 </div>
             </div>
         </div>
@@ -554,7 +654,28 @@
         // Add to wishlist function
         function addToWishlist() {
             const productId = getQueryParams().id;
-            alert(`Product added to wishlist!`);
+            const wishlistButton = document.querySelector('.wishlist-button[onclick="addToWishlist()"]');
+            
+            // Check if button is already in "added to wishlist" state
+            if (wishlistButton.textContent.trim() === 'ADDED TO WISHLIST') {
+                // Toggle back to original state
+                wishlistButton.textContent = 'ADD TO WISHLIST';
+                wishlistButton.style.backgroundColor = 'transparent';
+                wishlistButton.style.color = 'var(--accent-color)';
+                
+                // Show notification
+                showNotification('Removed from wishlist');
+                return;
+            }
+            
+            // Update button text and style for "added to wishlist" state
+            wishlistButton.textContent = 'ADDED TO WISHLIST';
+            wishlistButton.style.backgroundColor = 'var(--accent-color)';
+            wishlistButton.style.color = 'var(--primary-color)';
+            
+            // Show notification
+            showNotification('Product added to wishlist!');
+            
             // Here you would implement actual wishlist functionality
         }
 
@@ -582,6 +703,85 @@
                 alert('Location information is not available for this seller.');
                 console.log('No location data available');
             }
+        }
+        
+        // Show interest function
+        function showInterest() {
+            const productId = getQueryParams().id;
+            const productName = document.getElementById('clothTitle').textContent;
+            const sellerName = document.getElementById('shopName').textContent;
+            const contactNumber = document.getElementById('contactNumber').textContent;
+            const interestButton = document.querySelector('.wishlist-button[onclick="showInterest()"]');
+            
+            // Check if button is already in "interested" state
+            if (interestButton.textContent.trim() === 'MARKED INTERESTED') {
+                // Toggle back to original state
+                interestButton.textContent = 'I\'M INTERESTED';
+                interestButton.disabled = false;
+                
+                // Show notification that interest was removed
+                showNotification('Seller notification has been removed');
+                return;
+            }
+            
+            // Update button text and style for "interested" state
+            interestButton.textContent = 'MARKED INTERESTED';
+            
+            // Show notification message
+            showNotification('The Seller Has Been Notified');
+            
+            // Check if contact information is available
+            if (contactNumber && contactNumber !== 'Not provided') {
+                // Create message for WhatsApp or direct contact
+                const message = `Hello, I am interested in renting the item "${productName}" from your shop on ClothLoop.`;
+                
+                // If whatsapp number is available, use that as primary contact method
+                const whatsappNumber = document.getElementById('whatsappNumber').textContent;
+                if (whatsappNumber && whatsappNumber !== 'Not provided') {
+                    if (confirm(`Would you like to contact ${sellerName} via WhatsApp about "${productName}"?`)) {
+                        const encodedMessage = encodeURIComponent(message);
+                        window.open(`https://wa.me/${whatsappNumber.replace(/\s+/g, '')}?text=${encodedMessage}`, '_blank');
+                        return;
+                    }
+                }
+                
+                // Fallback to regular call/SMS
+                if (confirm(`Would you like to contact ${sellerName} about "${productName}"?`)) {
+                    window.open(`tel:${contactNumber.replace(/\s+/g, '')}`, '_blank');
+                }
+            } else {
+                alert('Contact information is not available for this seller.');
+            }
+        }
+
+        // Function to show a temporary notification
+        function showNotification(message) {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.style.position = 'fixed';
+            notification.style.top = '120px';
+            notification.style.left = '50%';
+            notification.style.transform = 'translateX(-50%)';
+            notification.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+            notification.style.color = 'white';
+            notification.style.padding = '10px 20px';
+            notification.style.borderRadius = '4px';
+            notification.style.zIndex = '1000';
+            notification.style.textAlign = 'center';
+            notification.style.maxWidth = '80%';
+            notification.textContent = message;
+            
+            // Add to body
+            document.body.appendChild(notification);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transition = 'opacity 0.5s ease';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 500);
+            }, 3000);
         }
 
         // Fetch complete product details from the server
@@ -938,7 +1138,93 @@
         }
         
         // Call initialize when page loads
-        document.addEventListener('DOMContentLoaded', initPage);
+        document.addEventListener('DOMContentLoaded', function() {
+            initPage();
+            initRatingSystem();
+        });
+        
+        // Product rating functionality
+        function initRatingSystem() {
+            const stars = document.querySelectorAll('.stars i');
+            const reviewFormContainer = document.getElementById('reviewFormContainer');
+            const submitReviewBtn = document.getElementById('submitReview');
+            let selectedRating = 0;
+            
+            // Function to update stars appearance
+            function updateStars(rating) {
+                stars.forEach(star => {
+                    const starRating = parseInt(star.getAttribute('data-rating'));
+                    if (starRating <= rating) {
+                        star.classList.remove('far');
+                        star.classList.add('fas');
+                    } else {
+                        star.classList.remove('fas');
+                        star.classList.add('far');
+                    }
+                });
+            }
+            
+            // Add click event for each star
+            stars.forEach(star => {
+                star.addEventListener('click', () => {
+                    const rating = parseInt(star.getAttribute('data-rating'));
+                    selectedRating = rating;
+                    updateStars(rating);
+                    
+                    // Show review form
+                    reviewFormContainer.style.display = 'block';
+                });
+                
+                // Add hover effects
+                star.addEventListener('mouseover', () => {
+                    const rating = parseInt(star.getAttribute('data-rating'));
+                    updateStars(rating);
+                });
+                
+                star.addEventListener('mouseout', () => {
+                    updateStars(selectedRating);
+                });
+            });
+            
+            // Handle submit review button
+            submitReviewBtn.addEventListener('click', () => {
+                const reviewText = document.getElementById('reviewText').value.trim();
+                const productId = getQueryParams().id;
+                
+                if (selectedRating === 0) {
+                    alert('Please select a rating before submitting your review.');
+                    return;
+                }
+                
+                if (reviewText === '') {
+                    alert('Please write a review before submitting.');
+                    return;
+                }
+                
+                // Here you would normally send the rating and review to the server
+                // For demo, just show a confirmation
+                alert(`Thank you for your review! You rated this product ${selectedRating} stars.`);
+                
+                // Reset the form
+                document.getElementById('reviewText').value = '';
+                reviewFormContainer.style.display = 'none';
+                selectedRating = 0;
+                updateStars(0);
+                
+                // Update the displayed average rating (simulated)
+                // In a real implementation, this would come from the server after updating the database
+                simulateAverageRatingUpdate(selectedRating);
+            });
+        }
+        
+        // Simulate updating the average rating after submitting a review
+        function simulateAverageRatingUpdate(newRating) {
+            // This is just a dummy calculation for demonstration
+            // In a real app, you would fetch the actual average from the server
+            const currentAvg = parseFloat(document.getElementById('avgRating').textContent);
+            const newAvg = ((currentAvg * 5) + newRating) / 6; // Assuming there were 5 previous ratings
+            document.getElementById('avgRating').textContent = newAvg.toFixed(1);
+        }
     </script>
 </body>
 </html>

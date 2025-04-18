@@ -191,7 +191,7 @@
 
         .search-container {
             position: relative;
-            width: 400px;
+            width: 600px;
         }
 
         .search-input {
@@ -237,11 +237,11 @@
             margin-right: 2rem;
             position: relative;
         }
-
+        
         .sort-button i {
             margin-right: 10px;
         }
-
+        
         .sort-button:hover {
             transform: translateY(-3px) skewX(-5deg);
             box-shadow: 5px 5px 0 rgba(255, 255, 255, 0.1);
@@ -277,6 +277,9 @@
             color: var(--text-color);
             font-size: 0.9rem;
             border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            position: relative;
         }
         
         .sort-option:last-child {
@@ -291,6 +294,63 @@
             margin-right: 10px;
             width: 15px;
             text-align: center;
+        }
+        
+        /* Submenu styles */
+        .sort-option.has-submenu {
+            position: relative;
+        }
+        
+        .submenu-icon {
+            margin-left: auto !important;
+            margin-right: 0 !important;
+            font-size: 0.8rem;
+            transform: rotate(180deg); /* Rotate chevron to point left */
+        }
+        
+        .submenu {
+            position: absolute;
+            top: 0;
+            left: -200px; /* Position to the left instead of right */
+            width: 200px;
+            background-color: var(--card-bg);
+            box-shadow: var(--box-shadow);
+            border: 1px solid var(--border-color);
+            display: none;
+            z-index: 101;
+        }
+        
+        .submenu-header {
+            padding: 12px 15px;
+            font-weight: bold;
+            color: var(--accent-color);
+            background-color: var(--primary-color);
+            border-bottom: 1px solid var(--border-color);
+            text-align: center;
+        }
+        
+        .submenu-option {
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--text-color);
+            font-size: 0.9rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .submenu-option:hover {
+            background-color: var(--hover-bg);
+        }
+        
+        .submenu-option.active {
+            background-color: var(--hover-bg);
+            font-weight: bold;
+        }
+        
+        /* Show submenu on hover */
+        .sort-option.has-submenu:hover .submenu {
+            display: block;
+            animation: fadeIn 0.3s ease-out;
         }
 
         /* Navigation bar with categories, search and sort */
@@ -535,7 +595,7 @@
         /* Responsive */
         @media (max-width: 992px) {
             .search-container {
-                width: 300px;
+                width: 450px;
             }
             
             .product-grid {
@@ -605,15 +665,16 @@
 <body>
     <!-- Navigation -->
     <nav>
-        <a href="../../../home.html" class="logo">
+        <a href="../../home.html" class="logo">
             <i class="fas fa-recycle"></i> ClothLoop
         </a>
         <div style="display: flex; align-items: center;">
             <ul>
-                <li><a href="wish.html"> Wishlist</a></li>
+                <li><a href="buyer_dashboard.html" class="active">Listings</a></li>
+                <li><a href="wish.html">Wishlist</a></li>
                 <li><a href="buyer_profile.html">Profile</a></li>
                 <li><a href="../about/about_us.html">About</a></li>
-                <li><a href="../account/logout.php">Logout</a></li>
+                <li><a href="../account/login.html">Logout</a></li>
             </ul>
             <button class="theme-switcher" id="theme-toggle" aria-label="Toggle theme">
                 <i class="fas fa-sun"></i>
@@ -625,7 +686,7 @@
     <div class="navigation-bar">
         <div class="categories">
             <ul>
-                <li><a href="#" class="active" id="menCategory">Men</a></li>
+                <li><a href="#" id="menCategory">Men</a></li>
                 <li><a href="#" id="womenCategory">Women</a></li>
                 <li><a href="#" id="kidsCategory">Kids</a></li>
             </ul>
@@ -646,6 +707,23 @@
                 </div>
                 <div class="sort-option" data-sort="price-high-low">
                     <i class="fas fa-arrow-down"></i> Price: High to Low
+                </div>
+                <div class="sort-option" data-sort="nearby">
+                    <i class="fas fa-map-marker-alt"></i> Nearby Listings
+                </div>
+                <div class="sort-option has-submenu" data-sort="occasion" id="occasionOption">
+                    <i class="fas fa-tshirt"></i> Occasion
+                    <i class="fas fa-chevron-right submenu-icon"></i>
+                    <div class="submenu" id="occasionSubmenu">
+                        <div class="submenu-header">Select Occasion</div>
+                        <div class="submenu-option" data-occasion="formal">Formal</div>
+                        <div class="submenu-option" data-occasion="casual">Casual</div>
+                        <div class="submenu-option" data-occasion="wedding">Wedding</div>
+                        <div class="submenu-option" data-occasion="traditional">Traditional</div>
+                        <div class="submenu-option" data-occasion="ethnic">Ethnic</div>
+                        <div class="submenu-option" data-occasion="western">Western</div>
+                        <div class="submenu-option" data-occasion="other">Other</div>
+                    </div>
                 </div>
                 <div class="sort-option" data-sort="clear">
                     <i class="fas fa-times"></i> Clear Filters
@@ -802,14 +880,23 @@
             categories.forEach(category => {
                 category.addEventListener('click', function(e) {
                     e.preventDefault();
+                    
+                    // Check if the clicked category already has the active class
+                    const wasActive = this.classList.contains('active');
+                    
                     // Remove active class from all categories
                     categories.forEach(cat => cat.classList.remove('active'));
-                    // Add active class to clicked category
-                    this.classList.add('active');
                     
-                    // Filter products based on category
-                    const selectedCategory = this.textContent.trim().toLowerCase();
-                    fetchProducts(selectedCategory);
+                    // Only add active class if this wasn't already active
+                    if (!wasActive) {
+                        this.classList.add('active');
+                        // Filter products based on category
+                        const selectedCategory = this.textContent.trim().toLowerCase();
+                        fetchProducts(selectedCategory);
+                    } else {
+                        // If it was active and now deselected, show all products
+                        fetchProducts();
+                    }
                 });
             });
         }
@@ -828,74 +915,148 @@
             });
         }
         
-        // Function to handle sorting
+        // Function to handle sorting options
         function setupSorting() {
             const sortButton = document.getElementById('sortButton');
             const sortDropdown = document.getElementById('sortDropdown');
             const sortOptions = document.querySelectorAll('.sort-option');
+            let activeSort = null;
+            let activeOccasion = null;
             
-            // Toggle dropdown on button click
+            // Show/hide dropdown when Sort button is clicked
             sortButton.addEventListener('click', function(e) {
                 e.stopPropagation();
                 sortDropdown.classList.toggle('active');
             });
             
-            // Close dropdown when clicking outside
-            document.addEventListener('click', function(e) {
-                if (!sortButton.contains(e.target)) {
-                    sortDropdown.classList.remove('active');
-                }
+            // Handle sort options click
+            sortOptions.forEach(option => {
+                option.addEventListener('click', function(e) {
+                    // Don't close dropdown if clicking occasion (submenu will open)
+                    if (this.getAttribute('data-sort') === 'occasion') {
+                        e.stopPropagation();
+                        return;
+                    }
+                    
+                    e.stopPropagation();
+                    const sortType = this.getAttribute('data-sort');
+                    
+                    // Clear filters if clear option selected
+                    if (sortType === 'clear') {
+                        sortOptions.forEach(opt => opt.classList.remove('active'));
+                        activeSort = null;
+                        activeOccasion = null;
+                        
+                        // Reset all products (using current category if any)
+                        const activeCategory = document.querySelector('.categories a.active');
+                        const category = activeCategory ? activeCategory.textContent.trim().toLowerCase() : null;
+                        fetchProducts(category);
+                        
+                        // Hide dropdown
+                        sortDropdown.classList.remove('active');
+                        return;
+                    }
+                    
+                    // Remove active class from all options
+                    sortOptions.forEach(opt => {
+                        if (opt.getAttribute('data-sort') !== 'occasion' || sortType !== 'occasion') {
+                            opt.classList.remove('active');
+                        }
+                    });
+                    
+                    // Add active class to clicked option
+                    this.classList.add('active');
+                    activeSort = sortType;
+                    
+                    // Apply the selected sort option
+                    applySorting(sortType);
+                    
+                    // Hide dropdown unless it's the occasion option
+                    if (sortType !== 'occasion') {
+                        sortDropdown.classList.remove('active');
+                    }
+                });
             });
             
-            // Handle sort option selection
-            sortOptions.forEach(option => {
-                option.addEventListener('click', function() {
-                    const sortValue = this.getAttribute('data-sort');
-                    const sortText = this.textContent.trim();
+            // Handle occasion submenu options
+            const occasionOptions = document.querySelectorAll('.submenu-option');
+            occasionOptions.forEach(option => {
+                option.addEventListener('click', function(e) {
+                    e.stopPropagation();
                     
-                    // Close dropdown
+                    // Remove active class from all occasion options
+                    occasionOptions.forEach(opt => opt.classList.remove('active'));
+                    
+                    // Add active class to clicked option
+                    this.classList.add('active');
+                    
+                    // Get occasion type and apply filter
+                    const occasionType = this.getAttribute('data-occasion');
+                    activeOccasion = occasionType;
+                    
+                    // Apply the selected occasion filter
+                    applyOccasionFilter(occasionType);
+                    
+                    // Hide dropdown
                     sortDropdown.classList.remove('active');
-                    
-                    // Get current active category
-                    const activeCategory = document.querySelector('.categories .active');
-                    const categoryName = activeCategory ? activeCategory.textContent.trim().toLowerCase() : null;
-                    
-                    // Apply sorting
-                    applySort(sortValue, categoryName);
-                    
-                    // Show notification
-                    showNotification(`Sorting by ${sortText}`);
                 });
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function() {
+                sortDropdown.classList.remove('active');
+            });
+            
+            // Prevent dropdown from closing when clicking inside it
+            sortDropdown.addEventListener('click', function(e) {
+                e.stopPropagation();
             });
         }
         
-        // Function to apply sorting to products
-        function applySort(sortType, category = null) {
-            // Get product grid
+        // Function to apply sorting logic
+        function applySorting(sortType) {
+            // Get products grid
             const productGrid = document.getElementById('productGrid');
             const products = Array.from(productGrid.getElementsByClassName('product-card'));
             
-            if (sortType === 'clear') {
-                // Reload products without sorting
-                fetchProducts(category);
-                return;
+            switch (sortType) {
+                case 'price-low-high':
+                    showNotification('Sorting products by price: Low to High');
+                    // Sort products by price (low to high)
+                    products.sort((a, b) => {
+                        const priceA = parseFloat(a.querySelector('.product-price').textContent.replace('₹', '').split('/')[0].trim());
+                        const priceB = parseFloat(b.querySelector('.product-price').textContent.replace('₹', '').split('/')[0].trim());
+                        return priceA - priceB;
+                    });
+                    break;
+                
+                case 'price-high-low':
+                    showNotification('Sorting products by price: High to Low');
+                    // Sort products by price (high to low)
+                    products.sort((a, b) => {
+                        const priceA = parseFloat(a.querySelector('.product-price').textContent.replace('₹', '').split('/')[0].trim());
+                        const priceB = parseFloat(b.querySelector('.product-price').textContent.replace('₹', '').split('/')[0].trim());
+                        return priceB - priceA;
+                    });
+                    break;
+                
+                case 'nearby':
+                    showNotification('Showing nearby listings first');
+                    // This would typically use geolocation - for demo, we'll just show a notification
+                    // In a real implementation, we would sort based on distance calculation
+                    fetchProducts(null, null, 'nearby');
+                    return; // Return early as we're fetching new data
+                
+                case 'occasion':
+                    // This is handled by occasion submenu
+                    return;
+                
+                default:
+                    return;
             }
             
-            // Sort products
-            products.sort((a, b) => {
-                const priceA = parseFloat(a.querySelector('.product-price').textContent.replace('₹', '').replace('/day', ''));
-                const priceB = parseFloat(b.querySelector('.product-price').textContent.replace('₹', '').replace('/day', ''));
-                
-                if (sortType === 'price-low-high') {
-                    return priceA - priceB;
-                } else if (sortType === 'price-high-low') {
-                    return priceB - priceA;
-                }
-                
-                return 0;
-            });
-            
-            // Clear grid
+            // Reorder products in the DOM
+            // Clear grid first
             productGrid.innerHTML = '';
             
             // Append sorted products
@@ -904,8 +1065,17 @@
             });
         }
         
-        // Function to fetch products from API
-        async function fetchProducts(category = null, searchTerm = null) {
+        // Function to apply occasion filter
+        function applyOccasionFilter(occasionType) {
+            showNotification(`Filtering products for ${occasionType} occasions`);
+            
+            // In a real implementation, we would filter based on the occasion type
+            // For this demo, we'll simulate by showing a notification
+            fetchProducts(null, null, null, occasionType);
+        }
+        
+        // Extended fetchProducts function to include sorting and occasion filters
+        async function fetchProducts(category = null, searchTerm = null, sortBy = null, occasion = null) {
             try {
                 let url = '/ClothLoop/backend/utils/product_operations.php?operation=fetch_all';
                 
@@ -915,6 +1085,14 @@
                 
                 if (searchTerm) {
                     url += `&search=${encodeURIComponent(searchTerm)}`;
+                }
+                
+                if (sortBy) {
+                    url += `&sort=${sortBy}`;
+                }
+                
+                if (occasion) {
+                    url += `&occasion=${occasion}`;
                 }
                 
                 const response = await fetch(url);
@@ -930,7 +1108,15 @@
                 } else {
                     console.error('No products found or error:', data);
                     // Don't replace static content - just show a notification
-                    showNotification('Could not load products from server. Showing sample products instead.');
+                    if (category) {
+                        showNotification('No products found in this category. Showing sample products instead.');
+                    } else if (occasion) {
+                        showNotification(`No products found for ${occasion} occasions. Showing sample products instead.`);
+                    } else if (sortBy === 'nearby') {
+                        showNotification('No nearby products found. Showing sample products instead.');
+                    } else {
+                        showNotification('Showing all products.');
+                    }
                 }
             } catch (error) {
                 console.error('Error fetching products:', error);
@@ -1026,11 +1212,10 @@
             setupSearch();
             setupSorting();
             
-            // Instead of immediately trying to load products from API,
-            // let's delay it to ensure our static products are visible
+            // Fetch all products without category filtering
             setTimeout(() => {
                 try {
-                    fetchProducts('men');
+                    fetchProducts();
                 } catch (error) {
                     console.error('Error initializing product fetch:', error);
                     // Static products will remain visible
