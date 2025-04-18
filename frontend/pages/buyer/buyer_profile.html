@@ -249,6 +249,88 @@
             animation: fadeIn 1.5s ease-out;
         }
 
+        /* Profile photo upload styles */
+        .profile-photo-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 30px;
+            animation: fadeIn 1.2s ease-out;
+        }
+        
+        .profile-photo-preview {
+            width: 150px;
+            height: 150px;
+            background-color: var(--card-bg);
+            border: 2px solid var(--accent-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+            color: var(--accent-color);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .profile-photo-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        
+        .profile-photo-preview:hover img {
+            transform: scale(1.05);
+        }
+        
+        .profile-photo-controls {
+            flex: 1;
+            min-width: 250px;
+        }
+        
+        .photo-input {
+            height: auto;
+            padding: 10px 15px;
+        }
+        
+        .photo-help-text {
+            font-size: 12px;
+            color: var(--text-color);
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+        
+        .photo-remove-btn {
+            background-color: transparent;
+            color: var(--error-color);
+            border: 1px solid var(--error-color);
+            padding: 8px 15px;
+            margin-top: 10px;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .photo-remove-btn:hover {
+            background-color: var(--error-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        @media (max-width: 768px) {
+            .profile-photo-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .profile-photo-controls {
+                width: 100%;
+                text-align: center;
+            }
+        }
+
         .form-container {
             background-color: var(--card-bg);
             border: 1px solid var(--input-border);
@@ -257,16 +339,6 @@
             animation: fadeIn 2s ease-out;
             position: relative;
             overflow: hidden;
-        }
-
-        .form-container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 5px;
-            height: 100%;
-            background-color: var(--accent-color);
         }
 
         .form-group {
@@ -648,6 +720,23 @@
                 <i class="fas fa-spinner"></i> Loading profile information...
             </div>
             <form id="profileForm" style="display: none;">
+                <!-- Profile Photo Section -->
+                <div class="profile-photo-container">
+                    <div class="profile-photo-preview" id="photoPreview">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="profile-photo-controls">
+                        <div class="form-group">
+                            <label for="profile_photo" class="form-label">Profile Photo</label>
+                            <input type="file" id="profile_photo" name="profile_photo" class="form-input photo-input" accept="image/*">
+                            <div class="photo-help-text">Upload a square image for best results</div>
+                        </div>
+                        <button type="button" class="btn photo-remove-btn" id="removePhoto" style="display: none;">
+                            <i class="fas fa-trash"></i> Remove Photo
+                        </button>
+                    </div>
+                </div>
+
                 <div class="form-group">
                     <label for="name" class="form-label">Full Name</label>
                     <input type="text" id="name" name="name" class="form-input" required>
@@ -828,6 +917,57 @@
                 }
                 
                 updateUserProfile(formData);
+            });
+            
+            // Profile photo upload functionality
+            const photoInput = document.getElementById('profile_photo');
+            const photoPreview = document.getElementById('photoPreview');
+            const removePhotoBtn = document.getElementById('removePhoto');
+            
+            // Load saved photo if any
+            const savedPhoto = localStorage.getItem('buyer_profile_photo');
+            if (savedPhoto) {
+                photoPreview.innerHTML = `<img src="${savedPhoto}" alt="Profile Photo">`;
+                removePhotoBtn.style.display = 'block';
+            }
+            
+            // Handle photo file selection
+            photoInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(event) {
+                        const imgSrc = event.target.result;
+                        photoPreview.innerHTML = `<img src="${imgSrc}" alt="Profile Photo">`;
+                        
+                        // Save to localStorage for demo purposes
+                        localStorage.setItem('buyer_profile_photo', imgSrc);
+                        
+                        // Show remove button
+                        removePhotoBtn.style.display = 'block';
+                    };
+                    
+                    reader.readAsDataURL(file);
+                }
+            });
+            
+            // Handle remove photo button
+            removePhotoBtn.addEventListener('click', function() {
+                // Reset preview
+                photoPreview.innerHTML = '<i class="fas fa-user"></i>';
+                
+                // Clear file input
+                photoInput.value = '';
+                
+                // Remove from localStorage
+                localStorage.removeItem('buyer_profile_photo');
+                
+                // Hide remove button
+                this.style.display = 'none';
+                
+                // Show success message
+                showSuccess('Profile photo removed');
             });
             
             function checkSession() {

@@ -587,6 +587,88 @@
             position: relative;
             z-index: 1;
         }
+
+        /* Shop logo upload styles */
+        .shop-logo-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 30px;
+            animation: fadeIn 1.2s ease-out;
+        }
+        
+        .shop-logo-preview {
+            width: 150px;
+            height: 150px;
+            background-color: var(--card-bg);
+            border: 2px solid var(--accent-color);
+            border-radius: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+            color: var(--accent-color);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .shop-logo-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        
+        .shop-logo-preview:hover img {
+            transform: scale(1.05);
+        }
+        
+        .shop-logo-controls {
+            flex: 1;
+            min-width: 250px;
+        }
+        
+        .logo-input {
+            height: auto;
+            padding: 10px 15px;
+        }
+        
+        .logo-help-text {
+            font-size: 12px;
+            color: var(--text-color);
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+        
+        .logo-remove-btn {
+            background-color: transparent;
+            color: var(--error-color);
+            border: 1px solid var(--error-color);
+            padding: 8px 15px;
+            margin-top: 10px;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .logo-remove-btn:hover {
+            background-color: var(--error-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        @media (max-width: 768px) {
+            .shop-logo-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .shop-logo-controls {
+                width: 100%;
+                text-align: center;
+            }
+        }
     </style>
 </head>
 <body>
@@ -673,6 +755,22 @@
                 <!-- Shop Information Section -->
                 <div class="form-section">
                     <h2 class="section-title"><i class="fas fa-store"></i> Shop Information</h2>
+                    
+                    <div class="shop-logo-container">
+                        <div class="shop-logo-preview" id="logoPreview">
+                            <i class="fas fa-store"></i>
+                        </div>
+                        <div class="shop-logo-controls">
+                            <div class="form-group">
+                                <label for="shop_logo" class="form-label">Shop Logo</label>
+                                <input type="file" id="shop_logo" name="shop_logo" class="form-input logo-input" accept="image/*">
+                                <div class="logo-help-text">Upload a square image (Recommended size: 200x200px)</div>
+                            </div>
+                            <button type="button" class="btn logo-remove-btn" id="removeLogo" style="display: none;">
+                                <i class="fas fa-trash"></i> Remove Logo
+                            </button>
+                        </div>
+                    </div>
         
                     <div class="form-group">
                         <label for="shop_name" class="form-label">Shop Name</label>
@@ -826,6 +924,57 @@
                 loadingSpinner.style.display = 'none';
                 profileForm.style.display = 'block';
             }, 1000);
+            
+            // Shop logo upload functionality
+            const logoInput = document.getElementById('shop_logo');
+            const logoPreview = document.getElementById('logoPreview');
+            const removeLogoBtn = document.getElementById('removeLogo');
+            
+            // Load saved logo if any
+            const savedLogo = localStorage.getItem('seller_shop_logo');
+            if (savedLogo) {
+                logoPreview.innerHTML = `<img src="${savedLogo}" alt="Shop Logo">`;
+                removeLogoBtn.style.display = 'block';
+            }
+            
+            // Handle logo file selection
+            logoInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(event) {
+                        const imgSrc = event.target.result;
+                        logoPreview.innerHTML = `<img src="${imgSrc}" alt="Shop Logo">`;
+                        
+                        // Save to localStorage for demo purposes
+                        localStorage.setItem('seller_shop_logo', imgSrc);
+                        
+                        // Show remove button
+                        removeLogoBtn.style.display = 'block';
+                    };
+                    
+                    reader.readAsDataURL(file);
+                }
+            });
+            
+            // Handle remove logo button
+            removeLogoBtn.addEventListener('click', function() {
+                // Reset preview
+                logoPreview.innerHTML = '<i class="fas fa-store"></i>';
+                
+                // Clear file input
+                logoInput.value = '';
+                
+                // Remove from localStorage
+                localStorage.removeItem('seller_shop_logo');
+                
+                // Hide remove button
+                this.style.display = 'none';
+                
+                // Show success message
+                showSuccess('Shop logo removed');
+            });
             
             profileForm.addEventListener('submit', function(e) {
                 e.preventDefault();
