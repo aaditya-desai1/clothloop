@@ -1016,35 +1016,76 @@
             profileForm.addEventListener('submit', function(e) {
                 e.preventDefault();
                 
-                const name = document.getElementById('name').value;
-                const email = document.getElementById('email').value;
-                const phone_no = document.getElementById('phone_no').value;
+                // Show loading spinner
+                const submitBtn = document.querySelector('button[type="submit"]');
+                const originalBtnText = submitBtn.innerHTML;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+                submitBtn.disabled = true;
                 
-                const formData = {
-                    name: name,
-                    email: email,
-                    phone_no: phone_no
-                };
+                // Get form data
+                const formData = new FormData();
+                formData.append('name', document.getElementById('name').value);
+                formData.append('email', document.getElementById('email').value);
+                formData.append('phone_no', document.getElementById('phone_no').value);
                 
-                // If change password is checked, add password to form data
-                if (changePasswordCheckbox.checked) {
+                // Add password if password change is checked
+                if (document.getElementById('changePassword').checked) {
                     const password = document.getElementById('password').value;
                     const confirmPassword = document.getElementById('confirm_password').value;
                     
-                    if (!password) {
-                        showError('Password cannot be empty');
-                        return;
-                    }
-                    
                     if (password !== confirmPassword) {
                         showError('Passwords do not match');
+                        submitBtn.innerHTML = originalBtnText;
+                        submitBtn.disabled = false;
                         return;
                     }
                     
-                    formData.password = password;
+                    if (password) {
+                        formData.append('password', password);
+                    }
                 }
                 
-                updateUserProfile(formData);
+                // Add photo file if selected
+                if (photoFile) {
+                    formData.append('profile_photo', photoFile);
+                }
+                
+                // Send data to server
+                fetch('../../../backend/api/buyers/update_profile.php', {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'include'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Reset button
+                    submitBtn.innerHTML = originalBtnText;
+                    submitBtn.disabled = false;
+                    
+                    if (data.status === 'success') {
+                        showSuccess('Profile updated successfully');
+                        
+                        // Update session data
+                        sessionStorage.setItem('buyer_name', document.getElementById('name').value);
+                        
+                        // If profile photo URL is returned, update it
+                        if (data.profile_photo_url) {
+                            // Update the preview with the new URL from server
+                            photoPreview.innerHTML = `<img src="${data.profile_photo_url}" alt="Profile Photo">`;
+                            removePhotoBtn.style.display = 'block';
+                        }
+                    } else {
+                        showError(data.message || 'Failed to update profile');
+                    }
+                })
+                .catch(error => {
+                    // Reset button
+                    submitBtn.innerHTML = originalBtnText;
+                    submitBtn.disabled = false;
+                    
+                    console.error('Error updating profile:', error);
+                    showError('An error occurred while updating your profile');
+                });
             });
             
             // Profile photo upload functionality
@@ -1052,30 +1093,34 @@
             const photoPreview = document.getElementById('photoPreview');
             const removePhotoBtn = document.getElementById('removePhoto');
             const fileNameDisplay = document.querySelector('.file-name');
-            
-            // Load saved photo if any
-            const savedPhoto = localStorage.getItem('buyer_profile_photo');
-            if (savedPhoto) {
-                photoPreview.innerHTML = `<img src="${savedPhoto}" alt="Profile Photo">`;
-                removePhotoBtn.style.display = 'block';
-                fileNameDisplay.textContent = 'Current photo selected';
-            }
+            let photoFile = null; // Store the file for later upload
             
             // Handle photo file selection
             photoInput.addEventListener('change', function(e) {
                 const file = e.target.files[0];
                 if (file) {
+                    photoFile = file; // Store the file for later upload
+                    
                     // Update file name display
                     fileNameDisplay.textContent = file.name;
+                    
+                    // Check file type and size
+                    const validImageTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif'];
+                    if (!validImageTypes.includes(file.type)) {
+                        showError('Please select a valid image file (JPEG, PNG, GIF)');
+                        return;
+                    }
+                    
+                    if (file.size > 5 * 1024 * 1024) { // 5MB limit
+                        showError('Image size should be less than 5MB');
+                        return;
+                    }
                     
                     const reader = new FileReader();
                     
                     reader.onload = function(event) {
                         const imgSrc = event.target.result;
                         photoPreview.innerHTML = `<img src="${imgSrc}" alt="Profile Photo">`;
-                        
-                        // Save to localStorage for demo purposes
-                        localStorage.setItem('buyer_profile_photo', imgSrc);
                         
                         // Show remove button
                         removePhotoBtn.style.display = 'block';
@@ -1089,24 +1134,44 @@
             
             // Handle remove photo button
             removePhotoBtn.addEventListener('click', function() {
-                // Reset preview
-                photoPreview.innerHTML = '<i class="fas fa-user"></i>';
-                
-                // Clear file input
-                photoInput.value = '';
-                
-                // Update file name display
-                fileNameDisplay.textContent = 'No file chosen';
-                
-                // Remove from localStorage
-                localStorage.removeItem('buyer_profile_photo');
-                
-                // Hide remove button
-                this.style.display = 'none';
-                
-                // Show success message
-                showSuccess('Profile photo removed');
+                if (confirm('Are you sure you want to remove your profile photo?')) {
+                    // Reset preview
+                    photoPreview.innerHTML = '<i class="fas fa-user"></i>';
+                    
+                    // Clear file input
+                    photoInput.value = '';
+                    photoFile = null;
+                    
+                    // Update file name display
+                    fileNameDisplay.textContent = 'No file chosen';
+                    
+                    // Hide remove button
+                    this.style.display = 'none';
+                    
+                    // Send API request to remove the photo
+                    removeProfilePhoto();
+                }
             });
+            
+            // Function to remove profile photo via API
+            function removeProfilePhoto() {
+                fetch('../../../backend/api/buyers/remove_profile_photo.php', {
+                    method: 'POST',
+                    credentials: 'include'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        showSuccess('Profile photo removed successfully');
+                    } else {
+                        showError(data.message || 'Failed to remove profile photo');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error removing profile photo:', error);
+                    showError('An error occurred while removing profile photo');
+                });
+            }
             
             function checkSession() {
                 // Show loading state
@@ -1115,134 +1180,97 @@
                 document.getElementById('profileForm').style.display = 'none';
                 document.getElementById('loginPrompt').style.display = 'none';
                 
-                fetch('../../../backend/api/users/check_session.php', { 
-                    credentials: 'include'  // This is important to include cookies
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok: ' + response.statusText);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('Session check response:', data); // Debug log
-                    
-                    if (data.logged_in && data.user_type === 'buyer') {
-                        // Proceed to fetch profile data if logged in
-                        fetchUserProfile();
-                    } else {
-                        // Hide loading spinner and show login prompt
-                        document.getElementById('profileLoading').style.display = 'none';
-                        document.getElementById('loginPrompt').style.display = 'block';
-                        showError('You need to log in to access your profile');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error checking session:', error);
-                    // Hide loading spinner and show login prompt
-                    document.getElementById('profileLoading').style.display = 'none';
-                    document.getElementById('loginPrompt').style.display = 'block';
-                    showError('Failed to verify login status: ' + error.message);
-                });
+                // Try to load profile data from the database
+                loadProfileData();
             }
             
-            function fetchUserProfile() {
-                // Show loading state and hide error message
-                document.getElementById('errorAlert').style.display = 'none';
+            function loadProfileData() {
+                // Show loading state
                 document.getElementById('profileLoading').style.display = 'flex';
                 document.getElementById('profileForm').style.display = 'none';
-                
-                fetch('../../../backend/api/buyers/get_buyer_profile.php', {
-                    credentials: 'include'  // This is important to include cookies
+                document.getElementById('loginPrompt').style.display = 'none';
+                document.getElementById('errorAlert').style.display = 'none';
+
+                // Fetch user data from the server
+                fetch('../../../backend/api/buyers/get_profile.php', {
+                    method: 'GET',
+                    credentials: 'include' // Include cookies for authentication
                 })
                 .then(response => {
+                    // Check if response is OK
                     if (!response.ok) {
                         throw new Error('Network response was not ok');
                     }
-                    return response.json();
+                    
+                    // Try to parse JSON response
+                    return response.text().then(text => {
+                        try {
+                            return JSON.parse(text);
+                        } catch (e) {
+                            console.error('JSON Parse Error:', e);
+                            console.error('Raw response:', text);
+                            throw new Error('Invalid JSON response: ' + e.message);
+                        }
+                    });
                 })
                 .then(data => {
-                    // Hide loading state
+                    // Hide loading spinner
                     document.getElementById('profileLoading').style.display = 'none';
-                    document.getElementById('profileForm').style.display = 'block';
                     
                     if (data.status === 'success') {
-                        const buyer = data.buyer;
+                        const user = data.user;
                         
-                        document.getElementById('name').value = buyer.name;
-                        document.getElementById('email').value = buyer.email;
-                        document.getElementById('phone_no').value = buyer.phone_no;
+                        // Populate form fields
+                        document.getElementById('name').value = user.name || '';
+                        document.getElementById('email').value = user.email || '';
+                        document.getElementById('phone_no').value = user.phone_no || '';
+                        document.getElementById('created_at').value = user.created_at || 'Not available';
                         
-                        // Format date for display
-                        const createdDate = new Date(buyer.created_at);
-                        document.getElementById('created_at').value = createdDate.toLocaleDateString();
+                        // Update profile photo if available
+                        const photoPreview = document.getElementById('photoPreview');
+                        const removePhotoBtn = document.getElementById('removePhoto');
+                        
+                        if (user.profile_photo_url) {
+                            photoPreview.innerHTML = `<img src="${user.profile_photo_url}" alt="Profile Photo">`;
+                            removePhotoBtn.style.display = 'block';
+                        } else {
+                            photoPreview.innerHTML = '<i class="fas fa-user"></i>';
+                            removePhotoBtn.style.display = 'none';
+                        }
+                        
+                        // Update location if available
+                        if (user.latitude && user.longitude) {
+                            document.getElementById('latitude').value = user.latitude;
+                            document.getElementById('longitude').value = user.longitude;
+                            document.getElementById('locationDisplay').textContent = `${user.latitude}, ${user.longitude}`;
+                        }
+                        
+                        // Show the form
+                        document.getElementById('profileForm').style.display = 'block';
+                        
+                        // Update session storage with current user name
+                        sessionStorage.setItem('buyer_name', user.name || '');
                     } else {
-                        showError(data.message || 'Failed to load profile data');
+                        // Check if error is due to authentication
+                        if (data.message === 'Not authenticated' || data.message.includes('authenticated')) {
+                            // Show login prompt
+                            document.getElementById('loginPrompt').style.display = 'block';
+                        } else {
+                            // Show error message
+                            showError(data.message || 'Failed to load profile data');
+                        }
                     }
                 })
                 .catch(error => {
-                    // Hide loading state
+                    // Hide loading spinner
                     document.getElementById('profileLoading').style.display = 'none';
-                    document.getElementById('profileForm').style.display = 'block';
                     
                     console.error('Error:', error);
-                    showError('An error occurred while loading profile data');
+                    showError('An error occurred while loading profile data: ' + error.message);
+                    
+                    // Always show login form in case of errors
+                    document.getElementById('loginPrompt').style.display = 'block';
                 });
-            }
-            
-            function updateUserProfile(formData) {
-                // Show loading state
-                const submitButton = document.querySelector('button[type="submit"]');
-                const originalButtonText = submitButton.textContent;
-                submitButton.disabled = true;
-                submitButton.innerHTML = '<i class="fas fa-spinner"></i> Saving...';
-                
-                document.getElementById('errorAlert').style.display = 'none';
-                document.getElementById('successAlert').style.display = 'none';
-                
-                fetch('../../../backend/api/buyers/update_buyer_profile.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    credentials: 'include', // Add credentials to include cookies
-                    body: JSON.stringify(formData)
-                })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok');
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        // Reset button state
-                        submitButton.disabled = false;
-                        submitButton.textContent = originalButtonText;
-                        
-                        if (data.status === 'success') {
-                            showSuccess(data.message);
-                            
-                            // Reset password fields if present
-                            if (changePasswordCheckbox.checked) {
-                                document.getElementById('password').value = '';
-                                document.getElementById('confirm_password').value = '';
-                                changePasswordCheckbox.checked = false;
-                                passwordSection.style.display = 'none';
-                            }
-                            
-                            // No need to refresh profile data immediately since we just updated it
-                        } else {
-                            showError(data.message || 'Failed to update profile');
-                        }
-                    })
-                    .catch(error => {
-                        // Reset button state
-                        submitButton.disabled = false;
-                        submitButton.textContent = originalButtonText;
-                        
-                        console.error('Error:', error);
-                        showError('An error occurred while updating profile');
-                    });
             }
             
             function showSuccess(message) {
@@ -1310,39 +1338,49 @@
                     credentials: 'include', // Add credentials to include cookies
                     body: JSON.stringify(loginData)
                 })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok');
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    
+                    // Try to parse JSON response
+                    return response.text().then(text => {
+                        try {
+                            return JSON.parse(text);
+                        } catch (e) {
+                            console.error('JSON Parse Error:', e);
+                            console.error('Raw response:', text);
+                            throw new Error('Invalid JSON response: ' + e.message);
                         }
-                        return response.json();
-                    })
-                    .then(data => {
-                        // Reset button state
-                        loginButton.disabled = false;
-                        loginButton.textContent = originalButtonText;
-                        
-                        if (data.success) {
-                            // Login successful
-                            showSuccess('Login successful! Loading your profile...');
-                            
-                            // Wait a moment for the success message to be visible
-                            setTimeout(function() {
-                                // Check session again to fetch profile
-                                checkSession();
-                            }, 1000);
-                        } else {
-                            // Login failed
-                            showError(data.message || 'Login failed. Please check your credentials.');
-                        }
-                    })
-                    .catch(error => {
-                        // Reset button state
-                        loginButton.disabled = false;
-                        loginButton.textContent = originalButtonText;
-                        
-                        console.error('Error during login:', error);
-                        showError('An error occurred during login. Please try again.');
                     });
+                })
+                .then(data => {
+                    // Reset button state
+                    loginButton.disabled = false;
+                    loginButton.textContent = originalButtonText;
+                    
+                    if (data.success) {
+                        // Login successful
+                        showSuccess('Login successful! Loading your profile...');
+                        
+                        // Wait a moment for the success message to be visible
+                        setTimeout(function() {
+                            // Check session again to fetch profile
+                            checkSession();
+                        }, 1000);
+                    } else {
+                        // Login failed
+                        showError(data.message || 'Login failed. Please check your credentials.');
+                    }
+                })
+                .catch(error => {
+                    // Reset button state
+                    loginButton.disabled = false;
+                    loginButton.textContent = originalButtonText;
+                    
+                    console.error('Error during login:', error);
+                    showError('An error occurred during login. Please try again.');
+                });
             });
 
             // Location handling

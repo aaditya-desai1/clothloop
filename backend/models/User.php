@@ -196,5 +196,76 @@ class User {
         
         return false;
     }
+
+    /**
+     * Get user by ID
+     * 
+     * @param int $id User ID
+     * @return bool True if user found and properties set, false otherwise
+     */
+    public function readById($id) {
+        $query = "SELECT * FROM " . $this->table . " WHERE id = :id LIMIT 1";
+        
+        // Prepare statement
+        $stmt = $this->conn->prepare($query);
+        
+        // Clean data
+        $id = htmlspecialchars(strip_tags($id));
+        
+        // Bind parameter
+        $stmt->bindParam(':id', $id);
+        
+        // Execute query
+        $stmt->execute();
+        
+        // Check if user exists
+        if ($stmt->rowCount() > 0) {
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            // Set properties
+            $this->id = $row['id'];
+            $this->name = $row['name'];
+            $this->email = $row['email'];
+            $this->password = $row['password'];
+            $this->phone_no = $row['phone_no'] ?? $row['phone'] ?? null;
+            $this->user_type = $row['user_type'] ?? $row['role'] ?? null;
+            $this->profile_photo = $row['profile_photo'] ?? $row['profile_image'] ?? null;
+            $this->status = $row['status'] ?? null;
+            $this->created_at = $row['created_at'];
+            $this->updated_at = $row['updated_at'];
+            
+            return true;
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Update profile photo
+     * 
+     * @param string $photoFilename Filename of the profile photo
+     * @return bool True if updated successfully, false otherwise
+     */
+    public function updateProfilePhoto($photoFilename) {
+        // Create query
+        $query = "UPDATE " . $this->table . " 
+                  SET profile_photo = :profile_photo,
+                      updated_at = NOW()
+                  WHERE id = :id";
+        
+        // Prepare statement
+        $stmt = $this->conn->prepare($query);
+        
+        // Clean data
+        $photoFilename = htmlspecialchars(strip_tags($photoFilename));
+        $this->id = htmlspecialchars(strip_tags($this->id));
+        
+        // Bind parameters
+        $stmt->bindParam(':profile_photo', $photoFilename);
+        $stmt->bindParam(':id', $this->id);
+        
+        // Execute query
+        return $stmt->execute();
+    }
 }
 ?> 

@@ -1024,13 +1024,13 @@
         // Add to wishlist function
         function addToWishlist() {
             try {
-                const wishlistButton = document.querySelector('.wishlist-button[onclick="addToWishlist()"]');
+            const wishlistButton = document.querySelector('.wishlist-button[onclick="addToWishlist()"]');
                 
                 // Get user-specific wishlist key
                 const userId = localStorage.getItem('user_id');
                 const wishlistKey = userId ? `wishlist_${userId}` : 'wishlist';
-                
-                // Get current wishlist from localStorage
+            
+            // Get current wishlist from localStorage
                 let wishlist = JSON.parse(localStorage.getItem(wishlistKey) || '[]');
                 
                 // Get product ID from URL or data attribute
@@ -1041,37 +1041,37 @@
                     console.error('Product ID not found');
                     return;
                 }
-                
-                // Check if button is already in "added to wishlist" state
-                if (wishlistButton.textContent.trim() === 'ADDED TO WISHLIST') {
-                    // Remove from wishlist
-                    wishlist = wishlist.filter(item => {
+            
+            // Check if button is already in "added to wishlist" state
+            if (wishlistButton.textContent.trim() === 'ADDED TO WISHLIST') {
+                // Remove from wishlist
+                wishlist = wishlist.filter(item => {
                         const itemId = typeof item === 'object' ? item.id.toString() : item.toString();
                         return itemId !== productId.toString();
-                    });
-                    
+                });
+                
                     localStorage.setItem(wishlistKey, JSON.stringify(wishlist));
                     
                     // Reset button text and style
-                    wishlistButton.textContent = 'ADD TO WISHLIST';
-                    wishlistButton.style.backgroundColor = 'transparent';
-                    wishlistButton.style.color = 'var(--accent-color)';
-                    
-                    // Show notification
-                    showNotification('Removed from wishlist');
+                wishlistButton.textContent = 'ADD TO WISHLIST';
+                wishlistButton.style.backgroundColor = 'transparent';
+                wishlistButton.style.color = 'var(--accent-color)';
+                
+                // Show notification
+                showNotification('Removed from wishlist');
                 } else {
                     // Add to wishlist (store just the ID for consistency with dashboard)
                     if (!wishlist.includes(productId.toString())) {
                         wishlist.push(productId.toString());
                         localStorage.setItem(wishlistKey, JSON.stringify(wishlist));
-                        
-                        // Update button text and style for "added to wishlist" state
-                        wishlistButton.textContent = 'ADDED TO WISHLIST';
-                        wishlistButton.style.backgroundColor = 'var(--accent-color)';
-                        wishlistButton.style.color = 'var(--primary-color)';
-                        
-                        // Show notification
-                        showNotification('Product added to wishlist!');
+            
+            // Update button text and style for "added to wishlist" state
+            wishlistButton.textContent = 'ADDED TO WISHLIST';
+            wishlistButton.style.backgroundColor = 'var(--accent-color)';
+            wishlistButton.style.color = 'var(--primary-color)';
+            
+            // Show notification
+            showNotification('Product added to wishlist!');
                     }
                 }
             } catch (error) {
@@ -1267,10 +1267,10 @@
                     await Promise.all([
                         fetchSellerInfo(productData),
                         fetchUserContactInfo(productData),
-                        fetchProductImages(productId)
+                        fetchProductImages(productData)
                     ]);
                 } else {
-                    await fetchProductImages(productId);
+                    await fetchProductImages(productData);
                 }
                 
                 // Try to fetch reviews (if implemented)
@@ -1404,44 +1404,81 @@
             }
         }
 
+        // Helper function to get product image URL
+        function getProductImageUrl(product) {
+            if (!product) return '../../assets/images/placeholder.png';
+            
+            // Use the direct image API as primary source if we have an ID
+            if (product.id) {
+                // Ensure ID is a string to avoid any type issues
+                const productId = typeof product.id === 'string' ? product.id : String(product.id);
+                return `/ClothLoop/backend/api/products/direct_image.php?id=${productId}`;
+            }
+            
+            // Try standard image fields
+            if (product.primary_image) {
+                return product.primary_image.startsWith('/') || product.primary_image.startsWith('http') 
+                    ? product.primary_image 
+                    : `/ClothLoop/backend/${product.primary_image}`;
+            }
+            
+            if (product.image_path) {
+                return product.image_path.startsWith('/') || product.image_path.startsWith('http') 
+                    ? product.image_path 
+                    : `/ClothLoop/backend/${product.image_path}`;
+            }
+            
+            if (product.image_url || product.image) {
+                const imagePath = product.image_url || product.image;
+                if (typeof imagePath === 'string') {
+                    if (imagePath.startsWith('data:')) {
+                        return imagePath;
+                    }
+                    return imagePath.startsWith('/') || imagePath.startsWith('http') 
+                        ? imagePath 
+                        : `/ClothLoop/backend/${imagePath}`;
+                }
+            }
+            
+            // Final fallback to placeholder
+            return '../../assets/images/placeholder.png';
+        }
+
         // Function to load the main product image
         function loadMainProductImage(product) {
             const imageEl = document.getElementById('mainProductImage');
             
-            // First attempt with the image data from the response
-            if (product.image && product.image.startsWith('data:image/')) {
-                imageEl.src = product.image;
-                console.log('Using base64 image data from response');
-            } 
-            // If we have an image path, use it directly
-            else if (product.image && typeof product.image === 'string' && product.image.trim() !== '') {
-                imageEl.src = product.image;
-                console.log('Using image path from response');
-            }
-            // If no valid image, use direct API URL with product ID
-            else {
-                imageEl.src = `/ClothLoop/backend/api/getimage.php?id=${product.id}`;
-                console.log('Using direct image API URL');
+            if (!product || !product.id) {
+                imageEl.src = '../../assets/images/placeholder.png';
+                console.log('No product data for image loading');
+                return;
             }
             
-            // Add error handling for image loading with retry
+            // Use our helper function to get the image URL
+            imageEl.src = getProductImageUrl(product);
+            console.log('Using image URL for main product image:', imageEl.src);
+            
+            // Add error handling for image loading with fallback
             imageEl.onerror = function() {
-                console.error('Failed to load image, trying fallback');
-                // Try legacy endpoint as fallback
-                if (product.image && !product.image.startsWith('data:image/')) {
-                    this.src = `/ClothLoop/uploads/products/${product.id}.jpg`;
-                    console.log('Using conventional path as fallback');
+                console.error('Failed to load image from API, trying fallback');
+                
+                // First try legacy API
+                this.onerror = function() {
+                    console.error('Legacy API failed, trying direct path');
                     
-                    // If that fails too, use placeholder
+                    // Try direct path to uploads folder
                     this.onerror = function() {
                         console.error('All fallbacks failed, using placeholder');
                         this.src = '../../assets/images/placeholder.png';
                         this.onerror = null; // Prevent infinite error handling
                     };
-                } else {
-                    this.src = '../../assets/images/placeholder.png';
-                    this.onerror = null; // Prevent infinite error handling
-                }
+                    
+                    // Try conventional image path
+                    this.src = `/ClothLoop/backend/uploads/products/${product.id}/${product.id}.jpg`;
+                };
+                
+                // Try legacy endpoint as fallback
+                this.src = `/ClothLoop/backend/api/getimage.php?id=${product.id}`;
             };
         }
         
@@ -1590,9 +1627,9 @@
                             localStorage.setItem(wishlistKey, JSON.stringify(wishlist));
                         }
                     }
-                } catch (e) {
-                    console.error('Error parsing wishlist data:', e);
-                    wishlist = [];
+                    } catch (e) {
+                        console.error('Error parsing wishlist data:', e);
+                        wishlist = [];
                 }
                 
                 // Check if this product is in the wishlist
@@ -2118,7 +2155,16 @@
                 
                 // If we have a product ID, try to fetch additional product images
                 if (params.id) {
-                    fetchProductImages(params.id).catch(err => {
+                    // Create a product object with the ID
+                    const productObj = {
+                        id: params.id,
+                        title: params.title || 'Product',
+                        price: params.price || '0',
+                        image: imageEl.src
+                    };
+                    
+                    // Fetch images using the product object
+                    fetchProductImages(productObj).catch(err => {
                         console.error('Error fetching additional images:', err);
                     });
                 }
@@ -2130,105 +2176,66 @@
         }
         
         // Function to fetch product images
-        async function fetchProductImages(productId) {
-            try {
-                console.log('Fetching product images for ID:', productId);
-                
-                // Try multiple API endpoints to get product images
-                let images = [];
-                
-                // First try the direct API endpoint for multiple product images
-                try {
-                    const imageApiUrl = `/ClothLoop/backend/api/getproductimages.php?id=${productId}`;
-                    const response = await fetch(imageApiUrl);
+        function fetchProductImages(product) {
+            if (!product || !product.id) {
+                console.error('No valid product data for image fetching');
+                setupImageSlider(['../../assets/images/placeholder.png']);
+                return;
+            }
+            
+            const images = [];
+            
+            // Add the main product image first using our helper function
+            const mainImageUrl = getProductImageUrl(product);
+            images.push(mainImageUrl);
+            
+            // Try to fetch additional images from the secondary API
+            fetch(`/ClothLoop/backend/api/products/getproductimages.php?id=${product.id}`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Additional images API response:', data);
                     
-                    if (response.ok) {
-                        const data = await response.json();
-                        console.log('Image API response:', data);
-                        
-                        if (data.status === 'success' && data.data && Array.isArray(data.data) && data.data.length > 0) {
-                            // Get the image paths from the response
-                            images = data.data.map(img => {
-                                // Try to get the image path from various possible properties
-                                const imagePath = img.image_path || img.path || img.url || img.image;
-                                
-                                if (!imagePath) return null;
-                                
-                                // Handle different types of paths
-                                if (imagePath.startsWith('data:image/')) {
-                                    // Base64 image data
-                                    return imagePath;
-                                } else if (imagePath.startsWith('http') || imagePath.startsWith('//')) {
-                                    // Full URL
-                                    return imagePath;
-                                } else if (imagePath.startsWith('/')) {
-                                    // Root-relative path
-                                    return `/ClothLoop${imagePath}`;
-                                } else {
-                                    // Relative path
-                                    return `/ClothLoop/${imagePath}`;
+                    if (data && Array.isArray(data) && data.length > 0) {
+                        // Process each additional image path
+                        data.forEach(imagePath => {
+                            if (typeof imagePath === 'string' && imagePath.trim() !== '') {
+                                // Handle base64 data
+                                if (imagePath.startsWith('data:')) {
+                                    images.push(imagePath);
+                                } 
+                                // Handle full URLs
+                                else if (imagePath.startsWith('http')) {
+                                    images.push(imagePath);
                                 }
-                            }).filter(url => url !== null);
-                        }
-                    }
-                } catch (error) {
-                    console.warn('Error fetching from primary image API:', error);
-                }
-                
-                // If we didn't get any images, try alternative endpoint
-                if (images.length === 0) {
-                    try {
-                        const altImageUrl = `/ClothLoop/backend/api/productimages.php?product_id=${productId}`;
-                        const altResponse = await fetch(altImageUrl);
-                        
-                        if (altResponse.ok) {
-                            const altData = await altResponse.json();
-                            
-                            if (altData.status === 'success' && altData.images && Array.isArray(altData.images) && altData.images.length > 0) {
-                                images = altData.images.map(img => {
-                                    const imagePath = img.path || img.url || img.image || img;
-                                    
-                                    if (typeof imagePath !== 'string') return null;
-                                    
-                                    if (imagePath.startsWith('data:image/')) {
-                                        return imagePath;
-                                    } else if (imagePath.startsWith('http') || imagePath.startsWith('//')) {
-                                        return imagePath;
-                                    } else if (imagePath.startsWith('/')) {
-                                        return `/ClothLoop${imagePath}`;
-                                    } else {
-                                        return `/ClothLoop/${imagePath}`;
-                                    }
-                                }).filter(url => url !== null);
+                                // Handle root-relative paths
+                                else if (imagePath.startsWith('/')) {
+                                    images.push(imagePath);
+                                }
+                                // Handle relative paths
+                                else {
+                                    images.push(`/ClothLoop/backend/${imagePath}`);
+                                }
                             }
-                        }
-                    } catch (error) {
-                        console.warn('Error fetching from alternate image API:', error);
+                        });
                     }
-                }
-                
-                // If we still don't have images, use the direct single image API as fallback
-                if (images.length === 0) {
-                    // Add the primary product image URL
-                    const mainImageUrl = `/ClothLoop/backend/api/getimage.php?id=${productId}`;
-                    images.push(mainImageUrl);
                     
-                    // Also try conventional path as a secondary image
-                    images.push(`/ClothLoop/uploads/products/${productId}.jpg`);
-                }
-                
-                // Setup slider with the images we've found
+                    // If we still only have one image (or none), try the conventional path
+                    if (images.length <= 1) {
+                        // Try adding a conventional path for additional images
+                        images.push(`/ClothLoop/backend/uploads/products/${product.id}/${product.id}_2.jpg`);
+                        images.push(`/ClothLoop/backend/uploads/products/${product.id}/${product.id}_3.jpg`);
+                        
+                        // Also try the legacy API
+                        images.push(`/ClothLoop/backend/api/getimage.php?id=${product.id}&index=2`);
+                    }
+                    
                 console.log('Setting up slider with images:', images);
                 setupImageSlider(images);
-                
-                return images;
-                
-            } catch (error) {
-                console.error('Error in fetchProductImages:', error);
-                // Use a default image in the slider as a last resort
-                setupImageSlider(['/ClothLoop/frontend/assets/images/placeholder.png']);
-                return [];
-            }
+                })
+                .catch(error => {
+                    console.error('Error fetching additional images:', error);
+                    setupImageSlider([mainImageUrl, '../../assets/images/placeholder.png']);
+                });
         }
         
         // Function to set up the image slider with the provided image URLs
@@ -2261,7 +2268,7 @@
                     // Create slide
                     const slide = document.createElement('div');
                     slide.className = `slider-slide ${index === 0 ? 'active' : ''}`;
-                    slide.innerHTML = `<img src="${imageUrl}" alt="Product Image ${index + 1}" onerror="this.src='/ClothLoop/frontend/assets/images/placeholder.png';">`;
+                    slide.innerHTML = `<img src="${imageUrl}" alt="Product Image ${index + 1}" onerror="if(this.src !== '../../assets/images/placeholder.png') this.src='../../assets/images/placeholder.png';">`;
                     sliderContainer.appendChild(slide);
                     
                     // Create dot
@@ -2279,7 +2286,9 @@
                     thumbnail.setAttribute('data-index', index);
                     thumbnail.addEventListener('click', () => goToSlide(index));
                     thumbnail.onerror = function() {
-                        this.src = '/ClothLoop/frontend/assets/images/placeholder.png';
+                        if (this.src !== '../../assets/images/placeholder.png') {
+                            this.src = '../../assets/images/placeholder.png';
+                        }
                     };
                     thumbnailsContainer.appendChild(thumbnail);
                 });
@@ -2371,17 +2380,29 @@
         function initializeSlider() {
             try {
                 console.log('Initializing image slider (legacy function)');
-                // This function is maintained for backward compatibility
-                // It will try to use the main image if available
-                const mainImage = document.getElementById('mainProductImage');
-                if (mainImage && mainImage.src) {
-                    setupImageSlider([mainImage.src]);
+                
+                // Get the product ID from URL parameters
+                const urlParams = new URLSearchParams(window.location.search);
+                const productId = urlParams.get('id');
+                
+                if (productId) {
+                    // Create a simple product object with just the ID
+                    const productObj = { id: productId };
+                    
+                    // Use our helper function to get the image URL
+                    const mainImageUrl = getProductImageUrl(productObj);
+                    
+                    // Set up the slider with this image
+                    setupImageSlider([mainImageUrl]);
                 } else {
-                    // No main image, use placeholder
+                    // No product ID, use placeholder
                     setupImageSlider(['../../assets/images/placeholder.png']);
                 }
             } catch (error) {
                 console.error('Error in legacy slider initialization:', error);
+                
+                // Fallback to placeholder in case of error
+                setupImageSlider(['../../assets/images/placeholder.png']);
             }
         }
 
