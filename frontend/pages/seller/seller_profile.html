@@ -669,6 +669,121 @@
                 text-align: center;
             }
         }
+
+        /* Custom file input styling */
+        .custom-file-input-container {
+            position: relative;
+            width: 100%;
+            margin: 10px 0;
+        }
+
+        .custom-file-input {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            height: 46px;
+            padding: 0;
+            border: 1px solid var(--input-border);
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+        }
+
+        .custom-file-input input[type="file"] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+            z-index: 3;
+        }
+
+        .file-button {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: var(--accent-color);
+            border: none;
+            border-right: 1px solid var(--accent-color);
+            height: 100%;
+            padding: 0 15px;
+            margin: 0;
+            text-align: center;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .file-name {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: var(--text-color);
+            flex: 1;
+            padding: 0 15px;
+        }
+
+        .image-preview-container {
+            width: 150px;
+            height: 150px;
+            border: 2px dashed var(--input-border);
+            border-radius: 10px;
+            margin: 10px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .image-preview-container img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .image-preview-container img.visible {
+            opacity: 1;
+        }
+        
+        .image-preview-placeholder {
+            color: var(--text-color-light);
+            font-size: 14px;
+            text-align: center;
+            padding: 15px;
+        }
+        
+        .image-preview-container:hover {
+            border-color: var(--primary-color);
+            cursor: pointer;
+        }
+        
+        .remove-image {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(0,0,0,0.5);
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 5;
+        }
+        
+        .remove-image.visible {
+            display: flex;
+        }
     </style>
 </head>
 <body>
@@ -756,19 +871,27 @@
                 <div class="form-section">
                     <h2 class="section-title"><i class="fas fa-store"></i> Shop Information</h2>
                     
-                    <div class="shop-logo-container">
-                        <div class="shop-logo-preview" id="logoPreview">
-                            <i class="fas fa-store"></i>
-                        </div>
-                        <div class="shop-logo-controls">
-                            <div class="form-group">
-                                <label for="shop_logo" class="form-label">Shop Logo</label>
-                                <input type="file" id="shop_logo" name="shop_logo" class="form-input logo-input" accept="image/*">
-                                <div class="logo-help-text">Upload a square image (Recommended size: 200x200px)</div>
+                    <div class="profile-section shop-info">
+                        <h3>Shop Information</h3>
+                        <div class="form-group">
+                            <label for="shopLogo">Shop Logo</label>
+                            <div class="image-preview-container" id="logoPreviewContainer">
+                                <div class="image-preview-placeholder">
+                                    <i class="fas fa-store" style="font-size: 30px; margin-bottom: 10px;"></i>
+                                    <p>Click to upload your shop logo</p>
+                                </div>
+                                <img id="logoPreview" src="#" alt="Shop logo preview">
+                                <div class="remove-image" id="removeLogoBtn">
+                                    <i class="fas fa-times"></i>
+                                </div>
                             </div>
-                            <button type="button" class="btn logo-remove-btn" id="removeLogo" style="display: none;">
-                                <i class="fas fa-trash"></i> Remove Logo
-                            </button>
+                            <div class="custom-file-input-container">
+                                <div class="custom-file-input">
+                                    <span class="file-button">Choose File</span>
+                                    <span class="file-name" id="fileName">No file chosen</span>
+                                    <input type="file" id="shopLogo" name="shopLogo" accept="image/*">
+                                </div>
+                            </div>
                         </div>
                     </div>
         
@@ -926,55 +1049,59 @@
             }, 1000);
             
             // Shop logo upload functionality
-            const logoInput = document.getElementById('shop_logo');
+            const fileInput = document.getElementById('shopLogo');
+            const fileName = document.getElementById('fileName');
             const logoPreview = document.getElementById('logoPreview');
-            const removeLogoBtn = document.getElementById('removeLogo');
+            const logoPreviewContainer = document.getElementById('logoPreviewContainer');
+            const removeLogoBtn = document.getElementById('removeLogoBtn');
             
-            // Load saved logo if any
-            const savedLogo = localStorage.getItem('seller_shop_logo');
-            if (savedLogo) {
-                logoPreview.innerHTML = `<img src="${savedLogo}" alt="Shop Logo">`;
-                removeLogoBtn.style.display = 'block';
-            }
-            
-            // Handle logo file selection
-            logoInput.addEventListener('change', function(e) {
-                const file = e.target.files[0];
-                if (file) {
+            // Shop logo upload handling
+            fileInput.addEventListener('change', function(e) {
+                if (this.files && this.files[0]) {
+                    const file = this.files[0];
+                    fileName.textContent = file.name;
+                    
                     const reader = new FileReader();
-                    
-                    reader.onload = function(event) {
-                        const imgSrc = event.target.result;
-                        logoPreview.innerHTML = `<img src="${imgSrc}" alt="Shop Logo">`;
+                    reader.onload = function(e) {
+                        logoPreview.src = e.target.result;
+                        logoPreview.classList.add('visible');
+                        removeLogoBtn.classList.add('visible');
                         
-                        // Save to localStorage for demo purposes
-                        localStorage.setItem('seller_shop_logo', imgSrc);
-                        
-                        // Show remove button
-                        removeLogoBtn.style.display = 'block';
-                    };
-                    
+                        // Store logo in localStorage (for demo purposes)
+                        localStorage.setItem('shopLogo', e.target.result);
+                    }
                     reader.readAsDataURL(file);
                 }
             });
             
-            // Handle remove logo button
-            removeLogoBtn.addEventListener('click', function() {
-                // Reset preview
-                logoPreview.innerHTML = '<i class="fas fa-store"></i>';
-                
-                // Clear file input
-                logoInput.value = '';
+            // Alternative way to trigger file input
+            logoPreviewContainer.addEventListener('click', function(e) {
+                if (!e.target.closest('.remove-image')) {
+                    fileInput.click();
+                }
+            });
+            
+            // Remove logo functionality
+            removeLogoBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                logoPreview.src = '#';
+                logoPreview.classList.remove('visible');
+                this.classList.remove('visible');
+                fileName.textContent = 'No file chosen';
+                fileInput.value = '';
                 
                 // Remove from localStorage
-                localStorage.removeItem('seller_shop_logo');
-                
-                // Hide remove button
-                this.style.display = 'none';
-                
-                // Show success message
-                showSuccess('Shop logo removed');
+                localStorage.removeItem('shopLogo');
             });
+            
+            // Load logo from localStorage if exists
+            const savedLogo = localStorage.getItem('shopLogo');
+            if (savedLogo) {
+                logoPreview.src = savedLogo;
+                logoPreview.classList.add('visible');
+                removeLogoBtn.classList.add('visible');
+                fileName.textContent = 'Saved logo';
+            }
             
             profileForm.addEventListener('submit', function(e) {
                 e.preventDefault();
