@@ -11,7 +11,9 @@ class Review {
     public $buyer_id;
     public $seller_id;
     public $rating;
-    public $comment;
+    public $review_text;
+    public $seller_response;
+    public $response_date;
     public $created_at;
     public $updated_at;
 
@@ -24,9 +26,9 @@ class Review {
     public function getSellerReviews($seller_id, $limit, $offset, $rating = null) {
         // Base query
         $query = 'SELECT r.id, r.order_id, r.product_id, r.buyer_id, r.seller_id, 
-                        r.rating, r.comment, r.created_at, r.updated_at,
-                        u.name as buyer_name, u.profile_image as buyer_image,
-                        p.name as product_name, p.image as product_image
+                        r.rating, r.review_text, r.seller_response, r.response_date, r.created_at, r.updated_at,
+                        u.name as buyer_name, u.profile_photo as buyer_image,
+                        p.title as product_name, p.id as product_id
                   FROM ' . $this->table . ' r
                   LEFT JOIN users u ON r.buyer_id = u.id
                   LEFT JOIN products p ON r.product_id = p.id
@@ -76,7 +78,9 @@ class Review {
                     'buyer_image' => $row['buyer_image'],
                     'seller_id' => $row['seller_id'],
                     'rating' => $row['rating'],
-                    'comment' => $row['comment'],
+                    'review_text' => $row['review_text'],
+                    'seller_response' => $row['seller_response'],
+                    'response_date' => $row['response_date'],
                     'created_at' => $row['created_at'],
                     'updated_at' => $row['updated_at']
                 ];
@@ -166,8 +170,8 @@ class Review {
     public function create() {
         // Create query
         $query = 'INSERT INTO ' . $this->table . ' 
-                 (order_id, product_id, buyer_id, seller_id, rating, comment)
-                 VALUES (:order_id, :product_id, :buyer_id, :seller_id, :rating, :comment)';
+                 (order_id, product_id, buyer_id, seller_id, rating, review_text)
+                 VALUES (:order_id, :product_id, :buyer_id, :seller_id, :rating, :review_text)';
                  
         // Prepare statement
         $stmt = $this->conn->prepare($query);
@@ -178,7 +182,7 @@ class Review {
         $this->buyer_id = htmlspecialchars(strip_tags($this->buyer_id));
         $this->seller_id = htmlspecialchars(strip_tags($this->seller_id));
         $this->rating = htmlspecialchars(strip_tags($this->rating));
-        $this->comment = htmlspecialchars(strip_tags($this->comment));
+        $this->review_text = htmlspecialchars(strip_tags($this->review_text));
         
         // Bind parameters
         $stmt->bindParam(':order_id', $this->order_id);
@@ -186,7 +190,7 @@ class Review {
         $stmt->bindParam(':buyer_id', $this->buyer_id);
         $stmt->bindParam(':seller_id', $this->seller_id);
         $stmt->bindParam(':rating', $this->rating);
-        $stmt->bindParam(':comment', $this->comment);
+        $stmt->bindParam(':review_text', $this->review_text);
         
         // Execute query
         if ($stmt->execute()) {

@@ -739,6 +739,12 @@
             <h1 class="content-title">Customer Reviews</h1>
         </div>
         
+        <!-- Error message area -->
+        <div id="error-container" style="background-color: var(--error-color); color: white; padding: 15px; margin-bottom: 20px; border-radius: 0; display: none;">
+            <i class="fas fa-exclamation-triangle" style="margin-right: 10px;"></i>
+            <span id="error-message"></span>
+        </div>
+        
         <!-- Reviews Overview Section -->
         <div class="reviews-section">
             <div class="reviews-stats">
@@ -838,31 +844,92 @@
     <!-- JavaScript code for functionality -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Get the seller ID from session storage
+            let sellerId = sessionStorage.getItem('user_id');
+            
+            // Check if we have a seller ID
+            if (!sellerId) {
+                // For development purposes, use ID 1 as default
+                sellerId = 1;
+                console.log('No seller ID in session storage, using default ID:', sellerId);
+                
+                // Store it in session storage for future use
+                sessionStorage.setItem('user_id', sellerId);
+                sessionStorage.setItem('user_role', 'seller');
+            }
+            
             // Fetch reviews when the page loads
-            fetchReviews();
+            fetchReviews(sellerId);
             
             // Setup modal functionality
             setupResponseModal();
         });
         
+        // Function to clear error message
+        function clearError() {
+            const errorContainer = document.getElementById('error-container');
+            errorContainer.style.display = 'none';
+            
+            // Remove any error messages from the reviews container
+            const reviewsContainer = document.getElementById('reviews-container');
+            const existingErrors = reviewsContainer.querySelectorAll('.error-message');
+            existingErrors.forEach(error => error.remove());
+        }
+        
         // Function to fetch reviews from the API
-        function fetchReviews() {
+        function fetchReviews(sellerId) {
             const loadingSpinner = document.getElementById('loading-spinner');
             loadingSpinner.style.display = 'flex';
             
-            fetch('../../../backend/api/sellers/get_seller_reviews.php')
-                .then(response => response.json())
+            // Construct the URL with seller_id parameter as expected by the backend
+            const url = `../../../backend/api/sellers/get_seller_reviews.php?seller_id=${sellerId}`;
+            console.log('Fetching reviews with URL:', url);
+            
+            fetch(url)
+                .then(response => {
+                    console.log('Response status:', response.status);
+                    // Get the response text for debugging
+                    return response.text().then(text => {
+                        // Try to parse the text as JSON and log it
+                        try {
+                            const data = JSON.parse(text);
+                            console.log('Response body:', data);
+                            return data;
+                        } catch (e) {
+                            console.error('Failed to parse response as JSON:', text);
+                            throw new Error('Invalid JSON response: ' + text);
+                        }
+                    });
+                })
                 .then(data => {
                     loadingSpinner.style.display = 'none';
                     
-                    if (data.status === 'success') {
+                    if (data.status === 'success' || data.success === true) {
+                        // Clear any previous errors
+                        clearError();
+                        
                         // Update stats
-                        updateReviewStats(data.data.stats);
+                        if (data.data && data.data.stats) {
+                            updateReviewStats(data.data.stats);
+                        } else if (data.summary) {
+                            // Alternative response format
+                            updateReviewStats(data.summary);
+                        } else {
+                            console.warn('No stats data available in response');
+                        }
                         
                         // Display reviews
-                        displayReviews(data.data.reviews);
+                        if (data.data && data.data.reviews) {
+                            displayReviews(data.data.reviews);
+                        } else if (data.reviews) {
+                            // Alternative response format
+                            displayReviews(data.reviews);
+                        } else {
+                            console.warn('No reviews data available in response');
+                            displayReviews([]);
+                        }
                     } else {
-                        console.error('Error fetching reviews:', data.message);
+                        console.error('API returned error:', data);
                         showError(data.message || 'Failed to load reviews. Please try again later.');
                     }
                 })
@@ -875,168 +942,219 @@
         
         // Function to update review statistics
         function updateReviewStats(stats) {
-            // Update overall rating
-            document.getElementById('overall-rating').textContent = stats.average_rating;
-            
-            // Update rating count
-            document.getElementById('rating-count').textContent = `Based on ${stats.total_reviews} reviews`;
-            
-            // Update rating stars
-            const starsContainer = document.getElementById('average-rating-stars');
-            starsContainer.innerHTML = '';
-            
-            const fullStars = Math.floor(stats.average_rating);
-            const hasHalfStar = stats.average_rating % 1 >= 0.5;
-            
-            for (let i = 1; i <= 5; i++) {
-                const star = document.createElement('i');
-                if (i <= fullStars) {
-                    star.className = 'fas fa-star';
-                } else if (i === fullStars + 1 && hasHalfStar) {
-                    star.className = 'fas fa-star-half-alt';
-                } else {
-                    star.className = 'far fa-star';
+            try {
+                // Default values if stats are missing
+                const defaultStats = {
+                    average_rating: 0,
+                    total_reviews: 0,
+                    rating_percentages: {1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
+                };
+                
+                // Merge with defaults to handle missing fields
+                stats = {...defaultStats, ...stats};
+                
+                // Make sure rating_percentages exist
+                stats.rating_percentages = stats.rating_percentages || defaultStats.rating_percentages;
+                
+                // Update overall rating
+                document.getElementById('overall-rating').textContent = stats.average_rating.toFixed(1);
+                
+                // Update rating count
+                document.getElementById('rating-count').textContent = `Based on ${stats.total_reviews} reviews`;
+                
+                // Update rating stars
+                const starsContainer = document.getElementById('average-rating-stars');
+                starsContainer.innerHTML = '';
+                
+                const fullStars = Math.floor(stats.average_rating);
+                const hasHalfStar = stats.average_rating % 1 >= 0.5;
+                
+                for (let i = 1; i <= 5; i++) {
+                    const star = document.createElement('i');
+                    if (i <= fullStars) {
+                        star.className = 'fas fa-star';
+                    } else if (i === fullStars + 1 && hasHalfStar) {
+                        star.className = 'fas fa-star-half-alt';
+                    } else {
+                        star.className = 'far fa-star';
+                    }
+                    starsContainer.appendChild(star);
                 }
-                starsContainer.appendChild(star);
-            }
-            
-            // Update rating bars
-            for (let i = 5; i >= 1; i--) {
-                const percentage = stats.rating_percentages[i];
-                document.getElementById(`rating-bar-${i}`).style.width = `${percentage}%`;
-                document.getElementById(`rating-percent-${i}`).textContent = `${percentage}%`;
+                
+                // Update rating bars
+                for (let i = 5; i >= 1; i--) {
+                    const percentage = stats.rating_percentages[i] || 0;
+                    document.getElementById(`rating-bar-${i}`).style.width = `${percentage}%`;
+                    document.getElementById(`rating-percent-${i}`).textContent = `${percentage}%`;
+                }
+            } catch (error) {
+                console.error('Error updating review stats:', error);
+                // Don't show an error to the user, just log it
             }
         }
         
         // Function to display reviews
         function displayReviews(reviews) {
-            const reviewsContainer = document.getElementById('reviews-container');
-            const noReviewsMessage = document.getElementById('no-reviews-message');
-            
-            // Clear previous content (except the no-reviews message and loading spinner)
-            const childrenToRemove = [];
-            for (let i = 0; i < reviewsContainer.children.length; i++) {
-                const child = reviewsContainer.children[i];
-                if (child.id !== 'no-reviews-message' && child.id !== 'loading-spinner') {
-                    childrenToRemove.push(child);
+            try {
+                const reviewsContainer = document.getElementById('reviews-container');
+                reviewsContainer.innerHTML = '';
+                
+                if (!reviews || !Array.isArray(reviews) || reviews.length === 0) {
+                    reviewsContainer.innerHTML = '<div class="no-reviews">No reviews found for this seller.</div>';
+                    return;
+                }
+                
+                reviews.forEach(review => {
+                    try {
+                        const reviewElement = document.createElement('div');
+                        reviewElement.className = 'review-card';
+                        
+                        // Ensure we have a valid review
+                        if (!review || typeof review !== 'object') {
+                            console.warn('Invalid review data', review);
+                            return;
+                        }
+                        
+                        // Default values if fields are missing
+                        const rating = isNaN(Number(review.rating)) ? 0 : Number(review.rating);
+                        const reviewText = review.review_text || review.content || 'No review text provided';
+                        const username = review.username || review.buyer_name || 'Anonymous';
+                        const reviewDate = review.review_date ? new Date(review.review_date).toLocaleDateString() : 'Unknown date';
+                        const reviewId = review.id || review.review_id || null;
+                        
+                        // Create the rating stars
+                        let starsHTML = '';
+                        for (let i = 1; i <= 5; i++) {
+                            if (i <= rating) {
+                                starsHTML += '<i class="fas fa-star"></i>';
+                            } else {
+                                starsHTML += '<i class="far fa-star"></i>';
+                            }
+                        }
+                        
+                        reviewElement.innerHTML = `
+                            <div class="review-header">
+                                <div class="reviewer-info">
+                                    <div class="reviewer-avatar">${username.charAt(0).toUpperCase()}</div>
+                                    <div class="reviewer-details">
+                                        <div class="reviewer-name">${username}</div>
+                                        <div class="review-date">${reviewDate}</div>
+                                    </div>
+                                </div>
+                                <div class="review-rating">
+                                    ${starsHTML}
+                                    <span style="margin-left: 5px;">${rating}/5</span>
+                                </div>
+                            </div>
+                            <div class="review-content">${reviewText}</div>
+                        `;
+                        
+                        // Add response section if the review has an ID
+                        if (reviewId) {
+                            const responseContainer = document.createElement('div');
+                            responseContainer.className = 'response-container';
+                            
+                            // Display existing response if any
+                            if (review.seller_response) {
+                                responseContainer.innerHTML = `
+                                    <div class="review-reply">
+                                        <div class="review-reply-header">Your Response:</div>
+                                        <p>${review.seller_response}</p>
+                                    </div>
+                                `;
+                            } else {
+                                // Create response form
+                                responseContainer.innerHTML = `
+                                    <div class="response-form" style="margin-top: 15px;">
+                                        <textarea id="response-${reviewId}" class="response-textarea" style="width: 100%; padding: 10px; margin-bottom: 10px;" placeholder="Respond to this review..."></textarea>
+                                        <button class="respond-button" data-review-id="${reviewId}">
+                                            <i class="fas fa-reply"></i> Submit Response
+                                        </button>
+                                    </div>
+                                `;
+                            }
+                            
+                            reviewElement.appendChild(responseContainer);
+                        } else {
+                            console.warn('Review missing ID:', review);
+                        }
+                        
+                        // Add product information if available
+                        if (review.product_name || review.product_id) {
+                            const productInfo = document.createElement('div');
+                            productInfo.className = 'review-product';
+                            
+                            const productName = review.product_name || 'Unknown Product';
+                            
+                            productInfo.innerHTML = `
+                                <div class="review-product-name">For: ${productName}</div>
+                            `;
+                            
+                            reviewElement.appendChild(productInfo);
+                        }
+                        
+                        reviewsContainer.appendChild(reviewElement);
+                    } catch (reviewError) {
+                        console.error('Error processing individual review:', reviewError);
+                        // Continue with next review
+                    }
+                });
+                
+                // Add event listeners to submit buttons
+                document.querySelectorAll('.respond-button').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const reviewId = this.getAttribute('data-review-id');
+                        if (!reviewId) {
+                            console.error('Missing review ID for response button');
+                            return;
+                        }
+                        
+                        const responseTextarea = document.getElementById(`response-${reviewId}`);
+                        if (!responseTextarea) {
+                            console.error('Could not find textarea for review ID:', reviewId);
+                            return;
+                        }
+                        
+                        const responseText = responseTextarea.value.trim();
+                        
+                        if (responseText) {
+                            // Disable button while submitting
+                            this.disabled = true;
+                            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+                            
+                            submitResponse(reviewId, responseText)
+                                .catch(error => {
+                                    console.error('Error in submit response:', error);
+                                    showError('Failed to submit response. Please try again.');
+                                })
+                                .finally(() => {
+                                    // Re-enable button if it's still in the DOM
+                                    if (document.contains(this)) {
+                                        this.disabled = false;
+                                        this.innerHTML = '<i class="fas fa-reply"></i> Submit Response';
+                                    }
+                                });
+                        } else {
+                            showError('Please enter a response before submitting.');
+                        }
+                    });
+                });
+                
+                // Hide loading spinner if it's still showing
+                const loadingSpinner = document.getElementById('loading-spinner');
+                if (loadingSpinner) {
+                    loadingSpinner.style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Error displaying reviews:', error);
+                showError('There was a problem displaying the reviews. Please try again later.');
+                
+                // Hide loading spinner if error occurred
+                const loadingSpinner = document.getElementById('loading-spinner');
+                if (loadingSpinner) {
+                    loadingSpinner.style.display = 'none';
                 }
             }
-            
-            childrenToRemove.forEach(child => child.remove());
-            
-            // Show message if no reviews
-            if (reviews.length === 0) {
-                noReviewsMessage.style.display = 'block';
-                return;
-            }
-            
-            noReviewsMessage.style.display = 'none';
-            
-            // Add each review
-            reviews.forEach(review => {
-                const reviewCard = createReviewCard(review);
-                reviewsContainer.appendChild(reviewCard);
-            });
-        }
-        
-        // Function to create a review card
-        function createReviewCard(review) {
-            const reviewCard = document.createElement('div');
-            reviewCard.className = 'review-card';
-            reviewCard.dataset.reviewId = review.id;
-            
-            // Create review header
-            const reviewHeader = document.createElement('div');
-            reviewHeader.className = 'review-header';
-            
-            // Create reviewer info
-            const reviewerInfo = document.createElement('div');
-            reviewerInfo.className = 'reviewer-info';
-            
-            const reviewerAvatar = document.createElement('div');
-            reviewerAvatar.className = 'reviewer-avatar';
-            reviewerAvatar.textContent = review.buyer.initials;
-            
-            const reviewerDetails = document.createElement('div');
-            reviewerDetails.className = 'reviewer-details';
-            
-            const reviewerName = document.createElement('div');
-            reviewerName.className = 'reviewer-name';
-            reviewerName.textContent = review.buyer.name;
-            
-            const reviewDate = document.createElement('div');
-            reviewDate.className = 'review-date';
-            reviewDate.textContent = review.date;
-            
-            reviewerDetails.appendChild(reviewerName);
-            reviewerDetails.appendChild(reviewDate);
-            
-            reviewerInfo.appendChild(reviewerAvatar);
-            reviewerInfo.appendChild(reviewerDetails);
-            
-            // Create rating stars
-            const reviewRating = document.createElement('div');
-            reviewRating.className = 'review-rating';
-            
-            for (let i = 1; i <= 5; i++) {
-                const star = document.createElement('i');
-                star.className = i <= review.rating ? 'fas fa-star' : 'far fa-star';
-                reviewRating.appendChild(star);
-            }
-            
-            reviewHeader.appendChild(reviewerInfo);
-            reviewHeader.appendChild(reviewRating);
-            
-            // Create review content
-            const reviewContent = document.createElement('div');
-            reviewContent.className = 'review-content';
-            reviewContent.textContent = review.review_text;
-            
-            // Create product info
-            const reviewProduct = document.createElement('div');
-            reviewProduct.className = 'review-product';
-            
-            const productImage = document.createElement('img');
-            productImage.src = review.product.image || 'https://via.placeholder.com/50x50/111111/ffffff?text=Product';
-            productImage.alt = review.product.name;
-            productImage.className = 'review-product-image';
-            
-            const productName = document.createElement('div');
-            productName.className = 'review-product-name';
-            productName.textContent = review.product.name;
-            
-            reviewProduct.appendChild(productImage);
-            reviewProduct.appendChild(productName);
-            
-            // Add elements to review card
-            reviewCard.appendChild(reviewHeader);
-            reviewCard.appendChild(reviewContent);
-            reviewCard.appendChild(reviewProduct);
-            
-            // Add seller response if exists
-            if (review.seller_response) {
-                const reviewReply = document.createElement('div');
-                reviewReply.className = 'review-reply';
-                
-                const replyHeader = document.createElement('div');
-                replyHeader.className = 'review-reply-header';
-                replyHeader.textContent = 'Your Response:';
-                
-                reviewReply.appendChild(replyHeader);
-                reviewReply.appendChild(document.createTextNode(review.seller_response));
-                
-                reviewCard.appendChild(reviewReply);
-            } else {
-                // Add respond button if no response yet
-                const respondButton = document.createElement('button');
-                respondButton.className = 'respond-button';
-                respondButton.innerHTML = '<i class="fas fa-reply"></i> Respond';
-                respondButton.addEventListener('click', () => openResponseModal(review));
-                
-                reviewCard.appendChild(respondButton);
-            }
-            
-            return reviewCard;
         }
         
         // Function to set up the response modal
@@ -1098,18 +1216,12 @@
         }
         
         // Function to submit response
-        function submitResponse() {
-            const reviewId = document.getElementById('review-id').value;
-            const response = document.getElementById('response').value.trim();
-            
-            if (!response) {
-                alert('Please enter a response');
-                return;
-            }
-            
+        function submitResponse(reviewId, responseText) {
             const submitBtn = document.querySelector('.submit-btn');
             submitBtn.disabled = true;
             submitBtn.textContent = 'Submitting...';
+            
+            console.log('Submitting response for review ID:', reviewId);
             
             fetch('../../../backend/api/sellers/update_review_response.php', {
                 method: 'POST',
@@ -1118,20 +1230,37 @@
                 },
                 body: JSON.stringify({
                     review_id: reviewId,
-                    response: response
+                    response: responseText
                 })
             })
-            .then(response => response.json())
+            .then(response => {
+                console.log('Response status:', response.status);
+                // Get the response text for debugging
+                return response.text().then(text => {
+                    // Try to parse the text as JSON and log it
+                    try {
+                        const data = JSON.parse(text);
+                        console.log('Response body:', data);
+                        return data;
+                    } catch (e) {
+                        console.error('Failed to parse response as JSON:', text);
+                        throw new Error('Invalid JSON response: ' + text);
+                    }
+                });
+            })
             .then(data => {
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Submit Response';
                 
-                if (data.status === 'success') {
+                if (data.success === true || data.status === 'success') {
                     // Close modal
                     document.getElementById('responseModal').style.display = 'none';
                     
+                    // Get seller ID from session storage
+                    const sellerId = sessionStorage.getItem('user_id');
+                    
                     // Reload reviews
-                    fetchReviews();
+                    fetchReviews(sellerId);
                 } else {
                     alert(data.message || 'Failed to submit response. Please try again.');
                 }
@@ -1146,14 +1275,51 @@
         
         // Function to show error message
         function showError(message) {
+            // Display error in the dedicated error container
+            const errorContainer = document.getElementById('error-container');
+            const errorMessage = document.getElementById('error-message');
+            
+            errorMessage.textContent = message;
+            errorContainer.style.display = 'block';
+            
+            // Also show in the reviews container if it's empty
             const reviewsContainer = document.getElementById('reviews-container');
             const errorDiv = document.createElement('div');
             errorDiv.className = 'error-message';
+            errorDiv.style.color = 'var(--error-color)';
+            errorDiv.style.padding = '20px';
+            errorDiv.style.textAlign = 'center';
+            errorDiv.style.fontSize = '16px';
             errorDiv.textContent = message;
             
-            // Clear container and show error
-            reviewsContainer.innerHTML = '';
-            reviewsContainer.appendChild(errorDiv);
+            // If no review cards exist, clear and show error in container too
+            const existingReviews = reviewsContainer.querySelectorAll('.review-card');
+            if (existingReviews.length === 0) {
+                // Keep only the spinner and no-reviews message, remove everything else
+                const childrenToRemove = [];
+                for (let i = 0; i < reviewsContainer.children.length; i++) {
+                    const child = reviewsContainer.children[i];
+                    if (child.id !== 'no-reviews-message' && child.id !== 'loading-spinner' && !child.classList.contains('error-message')) {
+                        childrenToRemove.push(child);
+                    }
+                }
+                
+                childrenToRemove.forEach(child => child.remove());
+                
+                // Hide no-reviews message
+                document.getElementById('no-reviews-message').style.display = 'none';
+                
+                // Add error message
+                const existingError = reviewsContainer.querySelector('.error-message');
+                if (existingError) {
+                    existingError.textContent = message;
+                } else {
+                    reviewsContainer.appendChild(errorDiv);
+                }
+            }
+            
+            // Scroll to the top to make sure error is visible
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     </script>
 </body>

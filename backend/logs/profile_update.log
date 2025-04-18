@@ -1,0 +1,142 @@
+{
+    "timestamp": "2025-04-18 17:38:35",
+    "received_data": {
+        "seller_id": "1",
+        "name": "Seller",
+        "email": "seller@gmail.com",
+        "phone_no": "1234567890",
+        "shop_name": "Seller Hub",
+        "description": "hi",
+        "latitude": "40.71280000",
+        "longitude": "-74.00600000"
+    },
+    "user_id": 1
+}
+
+Transaction started: 2025-04-18 17:38:35
+User Update SQL: UPDATE users SET email = ? WHERE id = ?
+User Params: ["seller@gmail.com",1]
+
+User Update Execution Result: Success
+Rows Affected: 0
+
+Description field check: 
+description set: yes
+shop_description set: no
+
+Seller Update SQL: UPDATE sellers SET shop_name = ?, description = ?, latitude = ?, longitude = ? WHERE user_id = ?
+Seller Params: ["Seller Hub","hi","40.71280000","-74.00600000",1]
+
+Transaction rolled back: 2025-04-18 17:38:35
+ERROR: 2025-04-18 17:38:35 - SQLSTATE[42S22]: Column not found: 1054 Unknown column 'user_id' in 'where clause'
+Stack trace: #0 C:\xampp\htdocs\ClothLoop\backend\api\sellers\update_seller_profile.php(169): PDOStatement->execute(Array)
+#1 {main}
+
+{
+    "timestamp": "2025-04-18 17:43:24",
+    "received_data": {
+        "seller_id": "1",
+        "name": "Seller",
+        "email": "seller@gmail.com",
+        "phone_no": "1234567890",
+        "shop_name": "Seller Hub",
+        "description": "hi",
+        "latitude": "40.71280000",
+        "longitude": "-74.00600000"
+    }
+}
+
+Transaction started
+User Update Query: UPDATE users SET name = ?, email = ?, phone_no = ? WHERE id = ?
+User Params: ["Seller","seller@gmail.com","1234567890",1]
+User Update Result: Success
+User Rows Affected: 0
+
+Seller Update Query: UPDATE sellers SET shop_name = ?, description = ?, latitude = ?, longitude = ? WHERE id = ?
+Seller Params: ["Seller Hub","hi","40.71280000","-74.00600000",1]
+Seller Update Result: Success
+Seller Rows Affected: 1
+
+Transaction committed successfully
+
+{
+    "timestamp": "2025-04-18 17:43:50",
+    "received_data": {
+        "seller_id": "1",
+        "name": "Seller2",
+        "email": "seller@gmail.com",
+        "phone_no": "1234567890",
+        "shop_name": "Seller Hub",
+        "description": "hi",
+        "latitude": "40.71280000",
+        "longitude": "-74.00600000"
+    }
+}
+
+Transaction started
+User Update Query: UPDATE users SET name = ?, email = ?, phone_no = ? WHERE id = ?
+User Params: ["Seller2","seller@gmail.com","1234567890",1]
+User Update Result: Success
+User Rows Affected: 1
+
+Seller Update Query: UPDATE sellers SET shop_name = ?, description = ?, latitude = ?, longitude = ? WHERE id = ?
+Seller Params: ["Seller Hub","hi","40.71280000","-74.00600000",1]
+Seller Update Result: Success
+Seller Rows Affected: 0
+
+Transaction committed successfully
+
+{
+    "timestamp": "2025-04-18 17:43:59",
+    "received_data": {
+        "seller_id": "1",
+        "name": "Seller",
+        "email": "seller@gmail.com",
+        "phone_no": "1234567890",
+        "shop_name": "Seller Hub",
+        "description": "hi",
+        "latitude": "40.71280000",
+        "longitude": "-74.00600000"
+    }
+}
+
+Transaction started
+User Update Query: UPDATE users SET name = ?, email = ?, phone_no = ? WHERE id = ?
+User Params: ["Seller","seller@gmail.com","1234567890",1]
+User Update Result: Success
+User Rows Affected: 1
+
+Seller Update Query: UPDATE sellers SET shop_name = ?, description = ?, latitude = ?, longitude = ? WHERE id = ?
+Seller Params: ["Seller Hub","hi","40.71280000","-74.00600000",1]
+Seller Update Result: Success
+Seller Rows Affected: 0
+
+Transaction committed successfully
+
+{
+    "timestamp": "2025-04-18 18:03:32",
+    "received_data": {
+        "seller_id": "1",
+        "name": "Seller",
+        "email": "seller@gmail.com",
+        "phone_no": "1234567890",
+        "shop_name": "Seller Hub",
+        "description": "hi",
+        "latitude": "40.71280000",
+        "longitude": "-74.00600000"
+    }
+}
+
+Transaction started
+User Update Query: UPDATE users SET name = ?, email = ?, phone_no = ? WHERE id = ?
+User Params: ["Seller","seller@gmail.com","1234567890",1]
+User Update Result: Success
+User Rows Affected: 0
+
+Seller Update Query: UPDATE sellers SET shop_name = ?, description = ?, latitude = ?, longitude = ? WHERE id = ?
+Seller Params: ["Seller Hub","hi","40.71280000","-74.00600000",1]
+Seller Update Result: Success
+Seller Rows Affected: 0
+
+Transaction committed successfully
+

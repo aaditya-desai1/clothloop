@@ -240,32 +240,6 @@
             height: 100%;
             background-color: var(--accent-color);
         }
-        
-        /* Debug info display */
-        .debug-info {
-            background-color: rgba(0,0,0,0.8);
-            color: lime;
-            font-family: monospace;
-            padding: 15px;
-            border: 1px solid #333;
-            margin-bottom: 20px;
-            max-height: 300px;
-            overflow: auto;
-            white-space: pre-wrap;
-            font-size: 12px;
-            position: relative;
-        }
-        
-        .debug-info .close-debug {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            background: none;
-            border: none;
-            color: white;
-            cursor: pointer;
-            font-size: 16px;
-        }
 
         .form-group {
             margin-bottom: 25px;
@@ -931,51 +905,6 @@
         #loginForm .btn {
             margin-top: 15px;
         }
-
-        /* Debug Panel Styles */
-        #debugPanel {
-            position: fixed;
-            bottom: 0;
-            right: 0;
-            background-color: rgba(0, 0, 0, 0.9);
-            color: #00ff00;
-            width: 400px;
-            max-height: 300px;
-            overflow-y: auto;
-            padding: 15px;
-            border-top: 2px solid #00ff00;
-            border-left: 2px solid #00ff00;
-            font-family: monospace;
-            font-size: 12px;
-            z-index: 9999;
-            display: none;
-        }
-        
-        #debugPanel h3 {
-            color: #00ff00;
-            border-bottom: 1px solid #00ff00;
-            padding-bottom: 5px;
-            margin-bottom: 10px;
-        }
-        
-        #debugPanel pre {
-            margin: 5px 0;
-            white-space: pre-wrap;
-        }
-        
-        #debugPanel button {
-            background-color: #333;
-            color: #00ff00;
-            border: 1px solid #00ff00;
-            padding: 5px 10px;
-            margin: 5px 5px 5px 0;
-            cursor: pointer;
-        }
-        
-        #debugPanel button:hover {
-            background-color: #00ff00;
-            color: #000;
-        }
     </style>
 </head>
 <body>
@@ -1037,26 +966,6 @@
         <div class="form-container">
             <div id="profileLoading" class="loading-spinner" style="display: none;">
                 <i class="fas fa-spinner"></i> Loading profile information...
-            </div>
-            
-            <!-- Debug information display (hidden by default) -->
-            <div id="debugInfo" class="debug-info" style="display: none;">
-                <button class="close-debug" onclick="document.getElementById('debugInfo').style.display='none';">×</button>
-                <h3>API Response Debug Information</h3>
-                <div id="debugContent"></div>
-            </div>
-            
-            <!-- Developer tools -->
-            <div id="devTools" style="margin-bottom: 20px; text-align: right;">
-                <button type="button" id="toggleDebug" class="btn btn-secondary" style="font-size: 12px; height: 30px; padding: 0 10px; background-color: #333;">
-                    <i class="fas fa-bug"></i> Toggle Debug
-                </button>
-                <button type="button" id="directFetch" class="btn btn-secondary" style="font-size: 12px; height: 30px; padding: 0 10px; margin-left: 5px; background-color: #333;">
-                    <i class="fas fa-sync-alt"></i> Direct API Test
-                </button>
-                <button type="button" id="forceDemo" class="btn btn-secondary" style="font-size: 12px; height: 30px; padding: 0 10px; margin-left: 5px; background-color: #333;">
-                    <i class="fas fa-vial"></i> Load Demo Data
-                </button>
             </div>
             
             <form id="profileForm" style="display: block;">
@@ -1178,7 +1087,6 @@
                 <div class="form-actions">
                     <button type="button" class="btn btn-secondary" id="cancelBtn">Cancel</button>
                     <button type="submit" class="btn btn-primary">Save Changes</button>
-                    <button type="button" class="btn btn-primary" id="forceDemo" style="margin-left: 10px; background-color: #333;">Load Demo Data</button>
                 </div>
             </form>
         </div>
@@ -1193,22 +1101,9 @@
             <p>&copy; 2024 ClothLoop. All rights reserved.</p>
         </div>
     </footer>
-    
-    <!-- Debug Panel -->
-    <div id="debugPanel">
-        <h3>Debug Panel (Press Ctrl+Shift+D to toggle)</h3>
-        <div id="debugInfo"></div>
-        <div style="margin-top: 10px;">
-            <button id="debugSetSession">Set Demo Session</button>
-            <button id="debugClearSession">Clear Session</button>
-            <button id="debugReload">Reload Page</button>
-            <button id="debugForceLoad">Force Load Sample User</button>
-            <button id="debugClose">Close</button>
-        </div>
-    </div>
-    
+
     <!-- Hidden Reset Button (Double-click ClothLoop logo to access) -->
-    <button id="resetButton" style="position: fixed; bottom: 10px; right: 10px; opacity: 0.1; z-index: 999; background: transparent; border: none; cursor: help; padding: 10px;">Reset</button>
+    <button id="resetButton" style="display: none;">Reset</button>
     
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -1246,55 +1141,19 @@
             
             changePasswordCheckbox.addEventListener('change', function() {
                 passwordSection.style.display = this.checked ? 'block' : 'none';
-                
-                // Add animation class if showing
-                if (this.checked) {
-                    passwordSection.classList.add('animate__animated', 'animate__fadeIn');
-                }
             });
             
             // Cancel button
             const cancelBtn = document.getElementById('cancelBtn');
-            
             cancelBtn.addEventListener('click', function() {
                 window.location.href = 'seller_dashboard.html';
             });
             
-            // Force Demo button
-            const forceDemoBtn = document.getElementById('forceDemo');
-            forceDemoBtn.addEventListener('click', function() {
-                console.log("Loading demo data directly into form");
-                
-                // Demo data that will be loaded directly
-                const demoData = {
-                    name: "Demo Seller",
-                    email: "demo@clothloop.com",
-                    phone: "1234567890",
-                    shop_name: "Fashion Forward Shop",
-                    description: "A premium boutique for trendy and sustainable fashion.",
-                    latitude: "40.7128",
-                    longitude: "-74.0060"
-                };
-                
-                // Populate form fields directly
-                nameInput.value = demoData.name;
-                emailInput.value = demoData.email;
-                phoneInput.value = demoData.phone;
-                shopNameInput.value = demoData.shop_name;
-                shopDescriptionInput.value = demoData.description;
-                latitudeInput.value = demoData.latitude;
-                longitudeInput.value = demoData.longitude;
-                locationDisplay.textContent = `${demoData.latitude}, ${demoData.longitude}`;
-                
-                // Show success message
-                showSuccess("Demo data loaded successfully! Form is now populated with sample data.");
-            });
-            
-            // Form submission
+            // Form elements
             const profileForm = document.getElementById('profileForm');
             const loadingSpinner = document.getElementById('profileLoading');
             
-            // Get form fields
+            // Form fields
             const nameInput = document.getElementById('name');
             const emailInput = document.getElementById('email');
             const phoneInput = document.getElementById('phone_no');
@@ -1303,10 +1162,7 @@
             const latitudeInput = document.getElementById('latitude');
             const longitudeInput = document.getElementById('longitude');
             const locationDisplay = document.getElementById('locationDisplay');
-            
-            // Show loading spinner while fetching profile data
-            loadingSpinner.style.display = 'block';
-            profileForm.style.display = 'none';
+            const shopLogoInput = document.getElementById('shopLogo');
             
             // Get user ID from session storage or URL parameter
             let userId = sessionStorage.getItem('user_id');
@@ -1315,64 +1171,63 @@
                 userId = urlParams.get('id');
             }
             
-            console.log("Current user ID from session storage:", userId);
-            
-            // If no user ID is available, try to get the authenticated user's profile
+            // If no user ID is available, set a default seller ID
             if (!userId) {
-                // In a production environment, you would redirect to login
-                // For demo purposes, we'll set a default seller ID
                 userId = 1; // Use a default seller ID (demo account)
-                console.log("Using default seller ID for demo:", userId);
-                
-                // Store in session storage for future use
                 sessionStorage.setItem('user_id', userId);
                 sessionStorage.setItem('user_role', 'seller');
-                
-                // Continue to fetch profile with the default ID
-                fetchSellerProfile(userId);
-            } else {
-                // Fetch seller profile data from API
-                fetchSellerProfile(userId);
             }
             
-            // Function to fetch seller profile data with better error handling
-            function fetchSellerProfile(sellerId) {
-                console.log("Fetching profile for seller ID:", sellerId);
+            // Fetch seller profile
+            fetchSellerProfile(userId);
+            
+            // Helper function to add a debug message
+            function debugLog(message) {
+                const debugOutput = document.getElementById('debugOutput');
+                if (debugOutput) {
+                    const timestamp = new Date().toLocaleTimeString();
+                    const logEntry = document.createElement('div');
+                    logEntry.textContent = `[${timestamp}] ${message}`;
+                    debugOutput.appendChild(logEntry);
+                    
+                    // Keep only the last 10 messages
+                    while (debugOutput.children.length > 10) {
+                        debugOutput.removeChild(debugOutput.firstChild);
+                    }
+                    
+                    // Auto-scroll to the bottom
+                    debugOutput.scrollTop = debugOutput.scrollHeight;
+                }
                 
+                // Also log to console
+                console.log(message);
+            }
+            
+            // Function to fetch seller profile data
+            function fetchSellerProfile(sellerId) {
                 // Show loading state
                 loadingSpinner.style.display = 'block';
                 profileForm.style.display = 'none';
                 
-                // Reset debug info
-                const debugInfo = document.getElementById('debugInfo');
-                const debugContent = document.getElementById('debugContent');
-                debugContent.innerHTML = 'Fetching data...';
-                debugInfo.style.display = 'block';
+                console.log("Fetching profile for seller ID:", sellerId);
                 
                 fetch(`../../../backend/api/sellers/get_seller_profile.php?id=${sellerId}`)
                     .then(response => {
                         console.log("Response status:", response.status);
-                        return response.text(); // Get raw text first for debugging
+                        return response.text(); // Get raw text first for parsing
                     })
                     .then(rawText => {
-                        // Display raw text in debug info
-                        debugContent.innerHTML = "Raw API Response:\n" + rawText;
-                        
                         // Try to parse as JSON
                         try {
                             return JSON.parse(rawText);
                         } catch (e) {
                             console.error("Failed to parse JSON:", e);
-                            debugContent.innerHTML += "\n\nError: Failed to parse JSON response: " + e.message;
                             throw new Error("Invalid JSON response: " + e.message);
                         }
                     })
                     .then(data => {
-                        console.log("Profile data received:", data);
+                        console.log("Profile data received");
                         loadingSpinner.style.display = 'none';
-                        
-                        // Add formatted JSON to debug info
-                        debugContent.innerHTML += "\n\nFormatted JSON:\n" + JSON.stringify(data, null, 2);
                         
                         // Try to handle the data regardless of format
                         let sellerData = null;
@@ -1389,15 +1244,15 @@
                         if (data.data) {
                             // Standard API format
                             sellerData = data.data;
-                            debugContent.innerHTML += "\n\nUsing data.data structure";
                         } else if (data.seller) {
                             // Alternative format
                             sellerData = data.seller;
-                            debugContent.innerHTML += "\n\nUsing data.seller structure";
                         } else if (data.name && data.email) {
                             // Direct format
                             sellerData = data;
-                            debugContent.innerHTML += "\n\nUsing direct data structure";
+                        } else if (data.status === 'success' && data.data) {
+                            // New API format
+                            sellerData = data.data;
                         } else {
                             // Unknown format - try to make best guess
                             for (const key in data) {
@@ -1405,7 +1260,6 @@
                                     // This might be our data object
                                     if (data[key].name || data[key].email || data[key].shop_name) {
                                         sellerData = data[key];
-                                        debugContent.innerHTML += "\n\nUsing detected object at key: " + key;
                                         break;
                                     }
                                 }
@@ -1413,14 +1267,9 @@
                             
                             // If still not found, use the data directly
                             if (!sellerData) {
-                                debugContent.innerHTML += "\n\nWARNING: Could not identify data structure, using raw data";
                                 sellerData = data;
                             }
                         }
-                        
-                        // Log what we found
-                        console.log("Using seller data:", sellerData);
-                        debugContent.innerHTML += "\n\nFinal data being used:\n" + JSON.stringify(sellerData, null, 2);
                         
                         // Check if we have any usable data
                         if (!sellerData) {
@@ -1446,12 +1295,12 @@
                                 latitudeInput.value = sellerData.latitude || '';
                                 longitudeInput.value = sellerData.longitude || '';
                                 locationDisplay.textContent = `${sellerData.latitude || ''}, ${sellerData.longitude || ''}`;
-                                
+                            
                                 // Store in localStorage
                                 if (sellerData.latitude) localStorage.setItem('seller_latitude', sellerData.latitude);
                                 if (sellerData.longitude) localStorage.setItem('seller_longitude', sellerData.longitude);
                             }
-                            
+                        
                             // Populate shop logo - try different possible field names
                             const logoImage = sellerData.profile_image || sellerData.shop_logo || sellerData.logo || sellerData.profile_photo;
                             if (logoImage) {
@@ -1462,19 +1311,17 @@
                                 logoPreview.appendChild(img);
                             }
                             
-                            // Show success
-                            showSuccess("Profile data loaded successfully!");
+                            // Show success silently without message
+                            console.log("Profile data loaded successfully!");
                         } catch (err) {
-                            console.error("Error populating form:", err);
-                            debugContent.innerHTML += "\n\nError populating form: " + err.message;
+                            console.error("Error populating form:", err.message);
                         }
                         
                         // Show the form regardless of errors
                         profileForm.style.display = 'block';
                     })
                     .catch(error => {
-                        console.error("Error fetching profile:", error);
-                        debugContent.innerHTML += "\n\nFetch error: " + error.message;
+                        console.error("Error fetching profile:", error.message);
                         loadingSpinner.style.display = 'none';
                         showError('Error fetching profile: ' + error.message);
                         profileForm.style.display = 'block';
@@ -1482,7 +1329,6 @@
             }
             
             // Shop logo upload functionality
-            const shopLogoInput = document.getElementById('shopLogo');
             const logoPreview = document.querySelector('.logo-preview');
             const fileName = document.querySelector('.file-name');
             
@@ -1490,6 +1336,7 @@
                 if (this.files && this.files[0]) {
                     const file = this.files[0];
                     fileName.textContent = file.name;
+                    console.log(`File selected: ${file.name}`);
                     
                     const reader = new FileReader();
                     reader.onload = function(e) {
@@ -1519,30 +1366,22 @@
                 document.getElementById('errorAlert').style.display = 'none';
                 document.getElementById('successAlert').style.display = 'none';
                 
-                // Prepare form data for submission
-                const formData = new FormData();
+                console.log("Preparing form data for submission...");
                 
-                // Add seller ID
-                formData.append('seller_id', userId); // Use the userId variable from the parent scope
+                // Prepare profile data
+                const profileData = {
+                    seller_id: userId,
+                    name: nameInput.value,
+                    email: emailInput.value,
+                    phone_no: phoneInput.value,
+                    shop_name: shopNameInput.value,
+                    description: shopDescriptionInput.value
+                };
                 
-                // Add personal info from users table
-                formData.append('name', nameInput.value);
-                formData.append('email', emailInput.value);
-                formData.append('phone_no', phoneInput.value);
-                
-                // Add shop info from sellers table
-                formData.append('shop_name', shopNameInput.value);
-                formData.append('description', shopDescriptionInput.value);
-                
-                // Add location data from sellers table
+                // Add location data if set
                 if (latitudeInput.value && longitudeInput.value) {
-                    formData.append('latitude', latitudeInput.value);
-                    formData.append('longitude', longitudeInput.value);
-                }
-                
-                // Add shop logo to users table (profile_photo field)
-                if (shopLogoInput.files.length > 0) {
-                    formData.append('profile_photo', shopLogoInput.files[0]);
+                    profileData.latitude = latitudeInput.value;
+                    profileData.longitude = longitudeInput.value;
                 }
                 
                 // Add password info if change password checkbox is checked
@@ -1558,27 +1397,42 @@
                         return;
                     }
                     
-                    formData.append('current_password', currentPasswordInput.value);
-                    formData.append('new_password', newPasswordInput.value);
+                    profileData.current_password = currentPasswordInput.value;
+                    profileData.new_password = newPasswordInput.value;
                 }
                 
-                console.log("Submitting form data to update profile");
+                console.log(`Submitting profile data for user ID: ${userId}`);
                 
                 // Send data to API
                 fetch('../../../backend/api/sellers/update_seller_profile.php', {
                     method: 'POST',
-                    body: formData
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(profileData)
                 })
-                .then(response => response.json())
+                .then(response => {
+                    console.log(`Response status: ${response.status}`);
+                    return response.text();
+                })
+                .then(rawText => {
+                    console.log(`Raw response: ${rawText.substring(0, 150)}...`);
+                    try {
+                        return JSON.parse(rawText);
+                    } catch (e) {
+                        console.error(`Failed to parse JSON response: ${e.message}`);
+                        throw new Error("Invalid response: " + rawText);
+                    }
+                })
                 .then(data => {
-                    console.log("Profile update response:", data);
+                    console.log(`Profile update response: ${data.status || data.success}`);
                     submitButton.disabled = false;
                     submitButton.textContent = originalButtonText;
                     
-                    if (data.success) {
+                    if (data.status === 'success' || data.success === true) {
                         showSuccess('Profile updated successfully!');
                         
-                        // If password change was requested, reset those fields
+                        // Reset password fields if they were changed
                         if (changePasswordCheckbox.checked) {
                             document.getElementById('current_password').value = '';
                             document.getElementById('new_password').value = '';
@@ -1587,20 +1441,23 @@
                             passwordSection.style.display = 'none';
                         }
                         
-                        // Refresh profile data after update
-                        fetchSellerProfile(userId);
+                        // Refresh profile data
+                        setTimeout(function() {
+                            fetchSellerProfile(userId);
+                        }, 500);
                     } else {
                         showError(data.message || 'Failed to update profile');
                     }
                 })
                 .catch(error => {
-                    console.error("Profile update error:", error);
+                    console.error(`Profile update error: ${error.message}`);
                     submitButton.disabled = false;
                     submitButton.textContent = originalButtonText;
                     showError('Error updating profile: ' + error.message);
                 });
             });
             
+            // Success message display
             function showSuccess(message) {
                 const successAlert = document.getElementById('successAlert');
                 successAlert.textContent = message;
@@ -1619,12 +1476,12 @@
                 // Hide after 3 seconds
                 setTimeout(function() {
                     successAlert.style.display = 'none';
-                    // Remove the icon after hiding
                     successAlert.innerHTML = '';
                     successAlert.classList.remove('alert-fixed');
                 }, 3000);
             }
             
+            // Error message display
             function showError(message) {
                 const errorAlert = document.getElementById('errorAlert');
                 errorAlert.textContent = message;
@@ -1643,24 +1500,23 @@
                 // Hide after 5 seconds
                 setTimeout(function() {
                     errorAlert.style.display = 'none';
-                    // Remove the icon after hiding
                     errorAlert.innerHTML = '';
                     errorAlert.classList.remove('alert-fixed');
                 }, 5000);
             }
-
-            // Initialize location features
+            
+            // Location features
             const getCurrentLocationBtn = document.getElementById('getCurrentLocation');
             const setManualLocationBtn = document.getElementById('setManualLocation');
             const manualLocationEntry = document.getElementById('manualLocationEntry');
             
-            // Toggle manual location entry
+            // Get current location
             getCurrentLocationBtn.addEventListener('click', function() {
                 if (navigator.geolocation) {
                     getCurrentLocationBtn.disabled = true;
                     getCurrentLocationBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> GETTING LOCATION...';
                     
-                    // Hide manual entry section when trying to get location
+                    // Hide manual entry section
                     manualLocationEntry.style.display = 'none';
                     
                     navigator.geolocation.getCurrentPosition(
@@ -1685,7 +1541,6 @@
                             getCurrentLocationBtn.disabled = false;
                             getCurrentLocationBtn.innerHTML = '<i class="fas fa-map-marker-alt"></i> GET CURRENT LOCATION';
                             
-                            // Show success message
                             showSuccess('Shop location updated successfully!');
                         },
                         // Error callback
@@ -1706,7 +1561,7 @@
                             
                             showError(errorMessage);
                             
-                            // Show manual location entry when geolocation fails
+                            // Show manual entry section
                             manualLocationEntry.style.display = 'block';
                             
                             // Reset button
@@ -1716,7 +1571,7 @@
                     );
                 } else {
                     showError('Geolocation is not supported by this browser.');
-                    // Show manual location entry when geolocation is not supported
+                    // Show manual entry section
                     manualLocationEntry.style.display = 'block';
                 }
             });
@@ -1751,7 +1606,6 @@
                 localStorage.setItem('seller_latitude', latitude);
                 localStorage.setItem('seller_longitude', longitude);
                 
-                // Show success message
                 showSuccess('Shop location set manually!');
             });
             
@@ -1768,218 +1622,6 @@
                 
                 return false;
             }
-            
-            // Handle login form submission
-            const loginForm = document.getElementById('loginForm');
-            if (loginForm) {
-                loginForm.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    console.log("Login form submitted");
-                    
-                    const email = document.getElementById('loginEmail').value;
-                    const password = document.getElementById('loginPassword').value;
-                    
-                    // For demo purposes, allow a simple login without API call
-                    if (email === "demo@clothloop.com" && password === "demo") {
-                        console.log("Demo login successful");
-                        // Use seller ID 1 for demo purposes
-                        sessionStorage.setItem('user_id', '1');
-                        sessionStorage.setItem('user_role', 'seller');
-                        
-                        // Show success message
-                        showSuccess("Login successful! Loading your profile...");
-                        
-                        // Reload the page to fetch profile with new user ID
-                        setTimeout(() => {
-                            window.location.reload();
-                        }, 1000);
-                        return;
-                    }
-                    
-                    // Otherwise, try the actual API
-                    console.log("Attempting API login with:", email);
-                    fetch('../../../backend/api/auth/login.php', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            email: email,
-                            password: password,
-                            user_type: 'seller'
-                        })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log("Login response:", data);
-                        if (data.success) {
-                            // Store user data in session storage
-                            sessionStorage.setItem('user_id', data.user_id);
-                            sessionStorage.setItem('user_role', 'seller');
-                            
-                            // Show success message
-                            showSuccess("Login successful! Loading your profile...");
-                            
-                            // Reload the page to fetch profile with new user ID
-                            setTimeout(() => {
-                                window.location.reload();
-                            }, 1000);
-                        } else {
-                            showError(data.message || 'Login failed. Please check your credentials.');
-                        }
-                    })
-                    .catch(error => {
-                        console.error("Login error:", error);
-                        showError('Error during login: ' + error.message);
-                    });
-                });
-            }
-
-            // Debug Panel Functionality
-            const debugPanel = document.getElementById('debugPanel');
-            const debugInfo = document.getElementById('debugInfo');
-            
-            // Toggle debug panel with Ctrl+Shift+D
-            document.addEventListener('keydown', function(e) {
-                if (e.ctrlKey && e.shiftKey && e.key === 'D') {
-                    toggleDebugPanel();
-                }
-            });
-            
-            function toggleDebugPanel() {
-                if (debugPanel.style.display === 'none' || !debugPanel.style.display) {
-                    debugPanel.style.display = 'block';
-                    updateDebugInfo();
-                } else {
-                    debugPanel.style.display = 'none';
-                }
-            }
-            
-            function updateDebugInfo() {
-                const info = [];
-                
-                // Session Storage Info
-                info.push('<strong>Session Storage:</strong>');
-                info.push(`user_id: ${sessionStorage.getItem('user_id') || 'not set'}`);
-                info.push(`user_role: ${sessionStorage.getItem('user_role') || 'not set'}`);
-                
-                // Local Storage Info
-                info.push('<strong>Local Storage:</strong>');
-                info.push(`seller_latitude: ${localStorage.getItem('seller_latitude') || 'not set'}`);
-                info.push(`seller_longitude: ${localStorage.getItem('seller_longitude') || 'not set'}`);
-                info.push(`clothloop-theme: ${localStorage.getItem('clothloop-theme') || 'not set'}`);
-                
-                // URL Info
-                info.push('<strong>URL Info:</strong>');
-                info.push(`Path: ${window.location.pathname}`);
-                info.push(`Query: ${window.location.search}`);
-                
-                // Display info
-                debugInfo.innerHTML = `<pre>${info.join('\n')}</pre>`;
-            }
-            
-            // Debug panel buttons
-            document.getElementById('debugSetSession').addEventListener('click', function() {
-                sessionStorage.setItem('user_id', '1');
-                sessionStorage.setItem('user_role', 'seller');
-                updateDebugInfo();
-                showSuccess('Demo session set. User ID: 1, Role: seller');
-            });
-            
-            document.getElementById('debugClearSession').addEventListener('click', function() {
-                sessionStorage.removeItem('user_id');
-                sessionStorage.removeItem('user_role');
-                updateDebugInfo();
-                showError('Session cleared');
-            });
-            
-            document.getElementById('debugReload').addEventListener('click', function() {
-                window.location.reload();
-            });
-            
-            document.getElementById('debugClose').addEventListener('click', function() {
-                debugPanel.style.display = 'none';
-            });
-
-            // Debug panel buttons with additional force load button
-            document.getElementById('debugForceLoad').addEventListener('click', function() {
-                console.log("Loading demo data directly into form");
-                
-                // Demo data that will be loaded directly
-                const demoData = {
-                    name: "Demo Seller",
-                    email: "demo@clothloop.com",
-                    phone: "1234567890",
-                    shop_name: "Fashion Forward Shop",
-                    description: "A premium boutique for trendy and sustainable fashion.",
-                    latitude: "40.7128",
-                    longitude: "-74.0060"
-                };
-                
-                // Populate form fields directly
-                nameInput.value = demoData.name;
-                emailInput.value = demoData.email;
-                phoneInput.value = demoData.phone;
-                shopNameInput.value = demoData.shop_name;
-                shopDescriptionInput.value = demoData.description;
-                latitudeInput.value = demoData.latitude;
-                longitudeInput.value = demoData.longitude;
-                locationDisplay.textContent = `${demoData.latitude}, ${demoData.longitude}`;
-                
-                // Show success message
-                showSuccess("Demo data loaded successfully! Form is now populated with sample data.");
-            });
-
-            // Hidden reset button functionality
-            document.getElementById('resetButton').addEventListener('click', function() {
-                sessionStorage.setItem('user_id', '1');
-                sessionStorage.setItem('user_role', 'seller');
-                showSuccess("Session reset with default seller ID");
-                setTimeout(() => window.location.reload(), 1000);
-            });
-            
-            // Double-click logo to show reset button
-            document.querySelector('.logo').addEventListener('dblclick', function() {
-                toggleDebugPanel();
-            });
-
-            // Toggle debug info display
-            document.getElementById('toggleDebug').addEventListener('click', function() {
-                const debugInfo = document.getElementById('debugInfo');
-                debugInfo.style.display = debugInfo.style.display === 'none' || !debugInfo.style.display ? 'block' : 'none';
-            });
-            
-            // Direct API test button
-            document.getElementById('directFetch').addEventListener('click', function() {
-                const debugInfo = document.getElementById('debugInfo');
-                const debugContent = document.getElementById('debugContent');
-                
-                debugInfo.style.display = 'block';
-                debugContent.innerHTML = 'Directly testing API connection...';
-                
-                // Test with Fetch API
-                fetch('../../../backend/api/sellers/get_seller_profile.php?id=1')
-                    .then(response => response.text())
-                    .then(data => {
-                        debugContent.innerHTML = 'Direct API Response:\n' + data;
-                        
-                        try {
-                            // Try to parse and use this data
-                            const jsonData = JSON.parse(data);
-                            if (jsonData.success) {
-                                showSuccess("API test successful! You can now load this data into the form.");
-                            } else {
-                                showError("API test returned an error: " + (jsonData.message || "Unknown error"));
-                            }
-                        } catch (e) {
-                            debugContent.innerHTML += '\n\nError parsing response: ' + e.message;
-                        }
-                    })
-                    .catch(error => {
-                        debugContent.innerHTML = 'Error testing API: ' + error.message;
-                        showError("API test failed: " + error.message);
-                    });
-            });
         });
     </script>
 </body>
