@@ -105,6 +105,7 @@
             align-items: center;
             letter-spacing: 3px;
             text-transform: uppercase;
+            position: relative;
         }
 
         nav .logo i {
@@ -138,23 +139,19 @@
 
         /* Hero Section */
         .hero {
-            background: linear-gradient(to right, rgba(0, 0, 0, 0.9), rgba(20, 20, 20, 0.8)),
-                        url('https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80');
-            background-size: cover;
-            background-position: center;
-            min-height: 50vh;
+            background-color: var(--primary-color);
+            min-height: 30vh;
             display: flex;
             align-items: center;
-            color: white;
+            color: var(--accent-color);
             margin-top: 73px;
             position: relative;
-            clip-path: polygon(0 0, 100% 0, 100% 90%, 0 100%);
+            border-bottom: 1px solid var(--accent-color);
         }
 
         .light-theme .hero {
-            background: linear-gradient(to right, rgba(255, 255, 255, 0.9), rgba(240, 240, 240, 0.8)),
-                        url('https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80');
-            color: var(--text-color);
+            background-color: var(--primary-color);
+            color: var(--accent-color);
         }
 
         .hero-content {
@@ -488,6 +485,7 @@
             letter-spacing: 0.5px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
             animation: pulse 2s infinite;
+            z-index: 10;
         }
         
         @keyframes pulse {
