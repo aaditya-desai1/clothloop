@@ -253,8 +253,8 @@
     }
 
     .action-button {
-        background-color: rgba(255, 255, 255, 0.1);
-        color: var(--accent-color);
+        background-color: var(--accent-color);
+        color: var(--primary-color);
         border: 2px solid var(--accent-color);
         padding: 0.8rem 1.8rem;
         font-size: 1rem;
@@ -361,8 +361,8 @@
         display: block;
         width: 100%;
         padding: 12px;
-        background-color: transparent;
-        color: var(--accent-color);
+        background-color: var(--accent-color);
+        color: var(--primary-color);
         text-decoration: none;
         text-align: center;
         text-transform: uppercase;
@@ -384,18 +384,19 @@
 
     /* Product action buttons */
     .product-buttons {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
+        display: flex;
+        flex-direction: row;
+        gap: 8px; /* Consistent small gap between buttons */
         width: 100%;
     }
-
+    
     .product-action-btn {
         background-color: transparent;
         color: var(--accent-color);
         border: 2px solid var(--accent-color);
-        padding: 10px 5px;
-        font-size: 14px;
+        height: 46px; /* Match height with view-details-btn */
+        padding: 0 5px; /* Horizontal padding only */
+        font-size: 13px;
         font-weight: 600;
         border-radius: 0;
         cursor: pointer;
@@ -405,6 +406,8 @@
         align-items: center;
         justify-content: center;
         letter-spacing: 1px;
+        flex: 1;
+        box-sizing: border-box; /* Ensure padding is included in height */
     }
     
     .product-action-btn:hover {
@@ -415,14 +418,30 @@
     .light-theme .product-action-btn:hover {
         box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.1);
     }
+    
+    .product-action-btn.unavailable-btn {
+        background-color: transparent;
+        margin: 0;
+    }
+    
+    .product-action-btn.unavailable-btn.active {
+        background-color: rgba(255, 59, 48, 0.2);
+    }
+    
+    .edit-btn i, .delete-btn i, .unavailable-btn i {
+        margin-right: 5px;
+    }
 
-    /* Button container */
-    .product-buttons {
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-        gap: 10px;
-        width: 100%;
+    /* Update responsive styles for buttons */
+    @media (max-width: 576px) {
+        .product-buttons {
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .product-action-btn.unavailable-btn {
+            margin: 5px 0; /* Reset margins on mobile */
+        }
     }
 
     .no-products {
@@ -626,6 +645,11 @@
         
         .product-buttons {
             flex-direction: column;
+            gap: 5px;
+        }
+        
+        .product-action-btn.unavailable-btn {
+            margin: 5px 0; /* Reset margins on mobile */
         }
     }
 
@@ -675,6 +699,7 @@
             <ul>
                 <li><a href="seller_dashboard.html">Dashboard</a></li>
                 <li><a href="product_listings.html" class="active">Listings</a></li>
+                <li><a href="seller_reviews.html">Reviews</a></li>
                 <li><a href="seller_profile.html">Profile</a></li>
                 <li><a href="../about/about_us.html">About</a></li>
                 <li><a href="../account/login.html">Logout</a></li>
@@ -730,6 +755,9 @@
                 <div class="product-buttons">
                     <button class="product-action-btn edit-btn" title="Edit Product">
                         <i class="fas fa-edit"></i> EDIT
+                    </button>
+                    <button class="product-action-btn unavailable-btn" title="Mark Unavailable">
+                        <i class="fas fa-toggle-on"></i> AVAILABLE
                     </button>
                     <button class="product-action-btn delete-btn" title="Delete Product">
                         <i class="fas fa-trash"></i> DELETE
@@ -885,6 +913,9 @@
                 productCard.className = 'product-card';
                 productCard.style.transitionDelay = `${index * 0.1}s`;
                 
+                // Check if product is available
+                const isAvailable = product.is_available !== false; // Default to true if not specified
+                
                 productCard.innerHTML = `
                     <div class="product-image">
                         <img src="${product.image_url || '../../assets/images/placeholder.png'}" alt="${product.name}" onerror="this.src='https://via.placeholder.com/300x400/111111/ffffff?text=Product+Image'">
@@ -899,6 +930,12 @@
                         <div class="product-buttons">
                             <button class="product-action-btn edit-btn" onclick="editProduct(${product.id})">
                                 <i class="fas fa-edit"></i> EDIT
+                            </button>
+                            <button class="product-action-btn unavailable-btn ${!isAvailable ? 'active' : ''}" 
+                                    onclick="toggleAvailability(${product.id}, ${isAvailable})" 
+                                    data-available="${isAvailable}">
+                                <i class="fas ${isAvailable ? 'fa-toggle-on' : 'fa-toggle-off'}"></i> 
+                                ${isAvailable ? 'AVAILABLE' : 'UNAVAILABLE'}
                             </button>
                             <button class="product-action-btn delete-btn" onclick="deleteProduct(${product.id})">
                                 <i class="fas fa-trash"></i> DELETE
@@ -919,6 +956,63 @@
         // Function to edit a product
         function editProduct(productId) {
             window.location.href = `cloth_upload.html?edit=${productId}`;
+        }
+        
+        // Function to toggle product availability
+        function toggleAvailability(productId, currentStatus) {
+            // Show loading spinner
+            document.getElementById('loadingSpinner').style.display = 'flex';
+            
+            // For demo purposes, we'll just simulate an API call
+            setTimeout(() => {
+                // Hide loading spinner
+                document.getElementById('loadingSpinner').style.display = 'none';
+                
+                // Get the button that was clicked
+                const buttons = document.querySelectorAll(`.unavailable-btn[onclick*="${productId}"]`);
+                if (buttons.length > 0) {
+                    const button = buttons[0];
+                    
+                    // Toggle availability status
+                    const newStatus = !currentStatus;
+                    
+                    // Update button text and icon
+                    button.innerHTML = `<i class="fas ${newStatus ? 'fa-toggle-on' : 'fa-toggle-off'}"></i> ${newStatus ? 'AVAILABLE' : 'UNAVAILABLE'}`;
+                    
+                    // Update onclick attribute
+                    button.setAttribute('onclick', `toggleAvailability(${productId}, ${newStatus})`);
+                    
+                    // Update active class
+                    if (newStatus) {
+                        button.classList.remove('active');
+                    } else {
+                        button.classList.add('active');
+                    }
+                    
+                    // Show success message
+                    const message = newStatus ? 'Product marked as available' : 'Product marked as unavailable';
+                    showAlert(message, 'success');
+                    
+                    // In a real implementation, you would call an API here
+                    /*
+                    fetch(`../../../backend/api/sellers/toggle_availability.php?id=${productId}&available=${newStatus}`, {
+                        method: 'POST'
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            showAlert(message, 'success');
+                        } else {
+                            showAlert(data.message || 'Error updating product availability', 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showAlert('Error updating product availability', 'error');
+                    });
+                    */
+                }
+            }, 800);
         }
         
         // Function to delete a product

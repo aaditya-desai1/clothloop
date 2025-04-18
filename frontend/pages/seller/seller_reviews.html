@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seller Reviews - ClothLoop</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Theme Variables */
+        :root {
+            /* Dark Theme (Default) */
+            --primary-color: #000000;
+            --secondary-color: #333333;
+            --accent-color: #ffffff;
+            --text-color: #ffffff;
+            --light-bg: #111111;
+            --card-bg: #1a1a1a;
+            --footer-bg: #000000;
+            --footer-text: #cccccc;
+            --border-radius: 0;
+            --box-shadow: 0 5px 10px rgba(0, 0, 0, 0.8);
+            --border-color: #333333;
+            --hover-bg: #222222;
+            --input-bg: #333333;
+            --input-text: #ffffff;
+            --error-color: #FF3B30;
+            --success-color: #34C759;
+            --seller-highlight: #ffffff;
+            --star-color: #FFD700;
+            --star-empty: #555555;
+        }
+
+        /* Light Theme Variables */
+        .light-theme {
+            --primary-color: #ffffff;
+            --secondary-color: #000000;
+            --accent-color: #000000;
+            --text-color: #000000;
+            --light-bg: #f5f5f5;
+            --card-bg: #ffffff;
+            --footer-bg: #f5f5f5;
+            --footer-text: #000000;
+            --border-radius: 0;
+            --box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+            --border-color: #e0e0e0;
+            --hover-bg: #e0e0e0;
+            --input-bg: #f0f0f0;
+            --input-text: #333333;
+            --error-color: #FF3B30;
+            --success-color: #34C759;
+            --seller-highlight: #000000;
+            --star-color: #FFD700;
+            --star-empty: #cccccc;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.7;
+            color: var(--text-color);
+            background-color: var(--light-bg);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Theme Switcher */
+        .theme-switcher {
+            background: var(--primary-color);
+            border: 2px solid var(--accent-color);
+            color: var(--accent-color);
+            width: 40px;
+            height: 40px;
+            border-radius: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            margin-left: 20px;
+            transition: all 0.2s linear;
+        }
+        
+        .theme-switcher:hover {
+            transform: skewX(-5deg);
+            box-shadow: 3px 3px 0 rgba(128, 128, 128, 0.3);
+        }
+
+        /* Navigation */
+        nav {
+            background-color: var(--primary-color);
+            padding: 1.2rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(255, 255, 255, 0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        nav .logo {
+            color: var(--accent-color);
+            font-size: 1.8rem;
+            font-weight: 700;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            position: relative;
+        }
+
+        nav .logo i {
+            margin-right: 10px;
+        }
+        
+        .seller-badge {
+            position: absolute;
+            top: -10px;
+            right: -30px;
+            background-color: var(--accent-color);
+            color: var(--primary-color);
+            font-size: 10px;
+            font-weight: bold;
+            padding: 3px 8px;
+            border-radius: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 1.5rem;
+        }
+
+        nav ul li a {
+            color: var(--accent-color);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0;
+            transition: all 0.2s linear;
+            font-weight: 500;
+            border-bottom: 2px solid transparent;
+        }
+
+        nav ul li a:hover, nav ul li a.active {
+            background-color: transparent;
+            color: var(--accent-color);
+            border-bottom: 2px solid var(--accent-color);
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 1200px;
+            margin: 120px auto 50px;
+            padding: 0 2rem;
+            flex: 1;
+            width: 100%;
+        }
+
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            width: 100%;
+        }
+
+        .content-title {
+            font-size: 24px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--accent-color);
+            margin-right: auto;
+        }
+
+        /* Reviews Section */
+        .reviews-section {
+            margin-bottom: 40px;
+        }
+        
+        .reviews-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background-color: var(--card-bg);
+            border-radius: 0;
+            box-shadow: var(--box-shadow);
+            border: 1px solid var(--border-color);
+            margin-bottom: 30px;
+        }
+        
+        .avg-rating-display {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .rating-number {
+            font-size: 48px;
+            font-weight: 700;
+            color: var(--accent-color);
+            line-height: 1;
+        }
+        
+        .rating-stars {
+            margin: 10px 0;
+            font-size: 24px;
+            color: var(--star-color);
+        }
+        
+        .rating-count {
+            font-size: 14px;
+            color: var(--text-color);
+            opacity: 0.8;
+        }
+        
+        .rating-breakdown {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            max-width: 60%;
+            margin-left: 40px;
+        }
+        
+        .rating-bar {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .rating-label {
+            font-size: 14px;
+            width: 50px;
+            text-align: right;
+            margin-right: 10px;
+        }
+        
+        .rating-progress {
+            flex: 1;
+            height: 8px;
+            background-color: var(--hover-bg);
+            border-radius: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .rating-progress-fill {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background-color: var(--star-color);
+        }
+        
+        .rating-percent {
+            font-size: 14px;
+            width: 50px;
+            margin-left: 10px;
+        }
+        
+        /* Reviews List */
+        .reviews-list {
+            margin-top: 20px;
+        }
+        
+        .review-card {
+            background-color: var(--card-bg);
+            border-radius: 0;
+            box-shadow: var(--box-shadow);
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .review-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 5px 5px 0 rgba(255, 255, 255, 0.1);
+        }
+        
+        .light-theme .review-card:hover {
+            box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.1);
+        }
+        
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        
+        .reviewer-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .reviewer-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--accent-color);
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 15px;
+            font-size: 16px;
+        }
+        
+        .reviewer-details {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .reviewer-name {
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+        
+        .review-date {
+            font-size: 12px;
+            color: var(--text-color);
+            opacity: 0.7;
+        }
+        
+        .review-rating {
+            font-size: 16px;
+            color: var(--star-color);
+        }
+        
+        .review-content {
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        
+        .review-product {
+            display: flex;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-color);
+            font-size: 12px;
+        }
+        
+        .review-product-image {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            margin-right: 15px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .review-product-name {
+            font-weight: 500;
+        }
+        
+        .review-reply {
+            margin-left: 55px;
+            padding: 15px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-left: 3px solid var(--accent-color);
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        
+        .review-reply-header {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--accent-color);
+        }
+
+        /* Footer */
+        .footer {
+            background-color: var(--footer-bg);
+            color: var(--footer-text);
+            padding: 1rem 0 1rem;
+            clip-path: polygon(0 10%, 100% 0, 100% 100%, 0 100%);
+            padding-top: 3rem !important;
+            margin-top: auto;
+            width: 100%;
+        }
+
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem 0;
+            border-top: none;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .footer-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--accent-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        .footer-logo i {
+            margin-right: 10px;
+            color: var(--accent-color) !important;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 992px) {
+            .reviews-stats {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .rating-breakdown {
+                max-width: 100%;
+                margin-left: 0;
+                margin-top: 20px;
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            nav {
+                padding: 1rem;
+            }
+
+            .content-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .content-title {
+                margin-bottom: 15px;
+                margin-right: 0;
+            }
+            
+            .review-header {
+                flex-direction: column;
+            }
+            
+            .review-rating {
+                margin-top: 10px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .main-content {
+                padding: 0 1rem;
+            }
+            
+            .user-actions {
+                margin-left: auto;
+            }
+            
+            .action-item {
+                margin: 0 0.5rem;
+            }
+            
+            .action-item span {
+                display: none;
+            }
+            
+            .review-card {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <a href="../../../home.html" class="logo">
+            <i class="fas fa-recycle"></i> ClothLoop
+            <span class="seller-badge">Seller</span>
+        </a>
+        <div style="display: flex; align-items: center;">
+            <ul>
+                <li><a href="seller_dashboard.html">Dashboard</a></li>
+                <li><a href="product_listings.html">Listings</a></li>
+                <li><a href="seller_reviews.html" class="active">Reviews</a></li>
+                <li><a href="seller_profile.html">Profile</a></li>
+                <li><a href="../about/about_us.html">About</a></li>
+                <li><a href="../account/login.html">Logout</a></li>
+            </ul>
+            <button class="theme-switcher" id="theme-toggle" aria-label="Toggle theme">
+                <i class="fas fa-sun"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="content-header">
+            <h1 class="content-title">Customer Reviews</h1>
+        </div>
+        
+        <!-- Reviews Overview Section -->
+        <div class="reviews-section">
+            <div class="reviews-stats">
+                <div class="avg-rating-display">
+                    <div class="rating-number">4.7</div>
+                    <div class="rating-stars">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                    </div>
+                    <div class="rating-count">Based on 24 reviews</div>
+                </div>
+                
+                <div class="rating-breakdown">
+                    <div class="rating-bar">
+                        <span class="rating-label">5 <i class="fas fa-star"></i></span>
+                        <div class="rating-progress">
+                            <div class="rating-progress-fill" style="width: 75%"></div>
+                        </div>
+                        <span class="rating-percent">75%</span>
+                    </div>
+                    <div class="rating-bar">
+                        <span class="rating-label">4 <i class="fas fa-star"></i></span>
+                        <div class="rating-progress">
+                            <div class="rating-progress-fill" style="width: 20%"></div>
+                        </div>
+                        <span class="rating-percent">20%</span>
+                    </div>
+                    <div class="rating-bar">
+                        <span class="rating-label">3 <i class="fas fa-star"></i></span>
+                        <div class="rating-progress">
+                            <div class="rating-progress-fill" style="width: 5%"></div>
+                        </div>
+                        <span class="rating-percent">5%</span>
+                    </div>
+                    <div class="rating-bar">
+                        <span class="rating-label">2 <i class="fas fa-star"></i></span>
+                        <div class="rating-progress">
+                            <div class="rating-progress-fill" style="width: 0%"></div>
+                        </div>
+                        <span class="rating-percent">0%</span>
+                    </div>
+                    <div class="rating-bar">
+                        <span class="rating-label">1 <i class="fas fa-star"></i></span>
+                        <div class="rating-progress">
+                            <div class="rating-progress-fill" style="width: 0%"></div>
+                        </div>
+                        <span class="rating-percent">0%</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Reviews List -->
+            <div class="reviews-list">
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="reviewer-info">
+                            <div class="reviewer-avatar">AS</div>
+                            <div class="reviewer-details">
+                                <div class="reviewer-name">Ananya Singh</div>
+                                <div class="review-date">June 10, 2024</div>
+                            </div>
+                        </div>
+                        <div class="review-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                    </div>
+                    <div class="review-content">
+                        The saree I rented was absolutely beautiful and in perfect condition. Delivery was prompt and the return process was hassle-free. Would definitely rent from this seller again!
+                    </div>
+                    <div class="review-product">
+                        <img src="https://via.placeholder.com/50x50/111111/ffffff?text=Saree" alt="Designer Saree" class="review-product-image">
+                        <div class="review-product-name">Designer Silk Saree</div>
+                    </div>
+                    <div class="review-reply">
+                        <div class="review-reply-header">Your Response:</div>
+                        Thank you for your kind review, Ananya! We're glad you loved the saree and had a smooth experience. Looking forward to serving you again.
+                    </div>
+                </div>
+                
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="reviewer-info">
+                            <div class="reviewer-avatar">RK</div>
+                            <div class="reviewer-details">
+                                <div class="reviewer-name">Rahul Kumar</div>
+                                <div class="review-date">June 5, 2024</div>
+                            </div>
+                        </div>
+                        <div class="review-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="far fa-star"></i>
+                        </div>
+                    </div>
+                    <div class="review-content">
+                        The suit fit perfectly and looked exactly as shown in the pictures. Great quality fabric and very well maintained. The only minor issue was that the delivery was slightly delayed.
+                    </div>
+                    <div class="review-product">
+                        <img src="https://via.placeholder.com/50x50/111111/ffffff?text=Suit" alt="Formal Suit" class="review-product-image">
+                        <div class="review-product-name">Premium Black Formal Suit</div>
+                    </div>
+                </div>
+                
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="reviewer-info">
+                            <div class="reviewer-avatar">PP</div>
+                            <div class="reviewer-details">
+                                <div class="reviewer-name">Priya Patel</div>
+                                <div class="review-date">May 28, 2024</div>
+                            </div>
+                        </div>
+                        <div class="review-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                        </div>
+                    </div>
+                    <div class="review-content">
+                        I rented a lehenga for my cousin's wedding and received so many compliments! The embroidery was intricate and the fabric was premium quality. The seller was very responsive and helpful throughout the process.
+                    </div>
+                    <div class="review-product">
+                        <img src="https://via.placeholder.com/50x50/111111/ffffff?text=Lehenga" alt="Bridal Lehenga" class="review-product-image">
+                        <div class="review-product-name">Designer Wedding Lehenga</div>
+                    </div>
+                    <div class="review-reply">
+                        <div class="review-reply-header">Your Response:</div>
+                        Thank you for your wonderful review, Priya! We're delighted to know that the lehenga was a hit at the wedding. It was a pleasure assisting you, and we hope to see you again soon!
+                    </div>
+                </div>
+                
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="reviewer-info">
+                            <div class="reviewer-avatar">VG</div>
+                            <div class="reviewer-details">
+                                <div class="reviewer-name">Vikram Gupta</div>
+                                <div class="review-date">May 15, 2024</div>
+                            </div>
+                        </div>
+                        <div class="review-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="far fa-star"></i>
+                            <i class="far fa-star"></i>
+                        </div>
+                    </div>
+                    <div class="review-content">
+                        The kurta set was good but there was a small stain on the sleeve that wasn't mentioned in the description. The seller was apologetic and offered a partial refund, which was fair.
+                    </div>
+                    <div class="review-product">
+                        <img src="https://via.placeholder.com/50x50/111111/ffffff?text=Kurta" alt="Men's Kurta" class="review-product-image">
+                        <div class="review-product-name">Traditional Men's Kurta Set</div>
+                    </div>
+                    <div class="review-reply">
+                        <div class="review-reply-header">Your Response:</div>
+                        We sincerely apologize for the inconvenience, Vikram. Thank you for bringing this to our attention. We've improved our quality check process to ensure this doesn't happen again. We appreciate your understanding and feedback.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-bottom">
+            <div class="footer-logo">
+                <i class="fas fa-recycle"></i> ClothLoop
+            </div>
+            <p>&copy; 2024 ClothLoop. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript code for functionality -->
+    <script>
+        // Wait for DOM to be fully loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Setup theme switching
+            setupThemeSwitcher();
+        });
+        
+        // Theme switcher functionality
+        function setupThemeSwitcher() {
+            const themeToggle = document.getElementById('theme-toggle');
+            const themeIcon = themeToggle.querySelector('i');
+            
+            // Check for saved theme preference or use default
+            const savedTheme = localStorage.getItem('clothloop-theme');
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-theme');
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+            }
+            
+            // Toggle theme
+            themeToggle.addEventListener('click', () => {
+                document.body.classList.toggle('light-theme');
+                
+                // Update icon
+                if (document.body.classList.contains('light-theme')) {
+                    themeIcon.classList.remove('fa-sun');
+                    themeIcon.classList.add('fa-moon');
+                    localStorage.setItem('clothloop-theme', 'light');
+                } else {
+                    themeIcon.classList.remove('fa-moon');
+                    themeIcon.classList.add('fa-sun');
+                    localStorage.setItem('clothloop-theme', 'dark');
+                }
+            });
+        }
+    </script>
+</body>
+</html> 
