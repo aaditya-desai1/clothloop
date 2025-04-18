@@ -651,7 +651,7 @@
                 <li><a href="product_listings.html">Listings</a></li>
                 <li><a href="seller_profile.html">Profile</a></li>
                 <li><a href="../about/about_us.html">About</a></li>
-                <li><a href="../account/logout.php">Logout</a></li>
+                <li><a href="../account/login.html">Logout</a></li>
             </ul>
             <button class="theme-switcher" id="theme-toggle" aria-label="Toggle theme">
                 <i class="fas fa-sun"></i>
@@ -718,6 +718,9 @@
             <p>&copy; 2024 ClothLoop. All rights reserved.</p>
         </div>
     </footer>
+
+    <!-- Include static products for testing -->
+    <script src="../../assets/js/static-products.js"></script>
 
     <!-- JavaScript code for functionality -->
     <script>
@@ -802,6 +805,34 @@
                 alertContainer.innerHTML = '';
             }
             
+            // For testing: Use static products
+            setTimeout(() => {
+                // Hide loading spinner
+                loadingSpinner.style.display = 'none';
+                
+                // Get static products
+                const result = getRecentStaticProducts(4);
+                
+                if (result.status === 'success') {
+                    // Update dashboard stats
+                    updateDashboardStats({
+                        total_products: staticProducts.length,
+                        average_rating: 4.7
+                    });
+                    
+                    // Display recent products
+                    if (result.products && result.products.length > 0) {
+                        displayRecentProducts(result.products);
+                    } else {
+                        showNoProductsMessage();
+                    }
+                } else {
+                    showAlert(result.message || 'Error loading dashboard data', 'error');
+                }
+            }, 500); // Simulate loading delay
+            
+            // Comment out the actual API call for now
+            /*
             // Fetch dashboard data from backend API
             fetch('../../../backend/api/sellers/dashboard_stats.php')
                 .then(response => {
@@ -833,6 +864,7 @@
                     loadingSpinner.style.display = 'none';
                     showAlert('Error loading dashboard data. Please try again later.', 'error');
                 });
+            */
         }
         
         // Function to update dashboard stats
@@ -861,13 +893,21 @@
                 const productCard = document.createElement('div');
                 productCard.className = 'product-card';
                 
+                // For testing: Format created_at into readable date if not already formatted
+                const createdAt = product.created_at_formatted || 
+                    new Date(product.created_at).toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'short', 
+                        day: 'numeric' 
+                    });
+                
                 productCard.innerHTML = `
                     <img class="product-image" src="${product.image_url}" alt="${product.name}">
                     <div class="product-info">
                         <h3 class="product-name">${product.name}</h3>
                         <div class="product-price">₹${product.price_per_day}/day</div>
-                        <div class="product-date">Added: ${product.created_at_formatted}</div>
-                        <div class="product-details">${product.category} | ${product.size} | ${product.occasion}</div>
+                        <div class="product-date">Added: ${createdAt}</div>
+                        <div class="product-details">${product.category || 'General'} | ${product.size || 'One Size'} | ${product.occasion || 'Casual'}</div>
                         <div class="product-actions">
                             <a href="product_detail.html?id=${product.id}" class="view-details-btn">View Details</a>
                         </div>

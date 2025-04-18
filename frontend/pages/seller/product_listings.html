@@ -677,7 +677,7 @@
                 <li><a href="product_listings.html" class="active">Listings</a></li>
                 <li><a href="seller_profile.html">Profile</a></li>
                 <li><a href="../about/about_us.html">About</a></li>
-                <li><a href="../account/logout.php">Logout</a></li>
+                <li><a href="../account/login.html">Logout</a></li>
             </ul>
             <button class="theme-switcher" id="theme-toggle" aria-label="Toggle theme">
                 <i class="fas fa-sun"></i>
@@ -739,6 +739,9 @@
         </div>
     </template>
 
+    <!-- Add static-products.js before the script tag -->
+    <script src="../../assets/js/static-products.js"></script>
+    
     <!-- JavaScript code for functionality -->
     <script>
         // Theme switcher functionality
@@ -815,8 +818,20 @@
         function loadProductListings() {
             // Show loading spinner or message
             document.getElementById('productsContainer').innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
-                
-            // Fetch products from backend API
+            
+            // For testing: Use static products instead of API call
+            setTimeout(() => {
+                const data = getStaticProducts();
+                if (data.status === 'success') {
+                    displayProducts(data.products);
+                } else {
+                    showAlert(data.message || 'Error loading products', 'error');
+                    document.getElementById('productsContainer').innerHTML = '<div class="no-products"><i class="fas fa-exclamation-circle"></i><p>Failed to load products. Please try again.</p></div>';
+                }
+            }, 500); // Simulate network delay
+            
+            // Comment out the actual API call for now
+            /*
             fetch('../../../backend/api/sellers/get_seller_products.php')
             .then(response => {
                 if (!response.ok) {
@@ -837,6 +852,7 @@
                 showAlert('Error loading products. Please try again.', 'error');
                 document.getElementById('productsContainer').innerHTML = '<div class="no-products"><i class="fas fa-exclamation-circle"></i><p>Failed to load products. Please try again.</p></div>';
             });
+            */
         }
         
         // Function to display products with staggered animation
