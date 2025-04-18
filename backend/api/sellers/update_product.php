@@ -16,6 +16,9 @@ require_once __DIR__ . '/../../utils/auth.php';
 require_once __DIR__ . '/../../utils/response.php';
 require_once __DIR__ . '/../../config/constants.php';
 
+// Debugging: Log the incoming data 
+file_put_contents(__DIR__ . '/update_debug_log.txt', "Request method: " . $_SERVER['REQUEST_METHOD'] . "\nData: " . print_r($_POST, true) . "\nFiles: " . print_r($_FILES, true) . "\n\n", FILE_APPEND);
+
 // Check if seller is authenticated
 Auth::requireRole('seller');
 
@@ -23,8 +26,8 @@ Auth::requireRole('seller');
 $seller = Auth::getCurrentUser();
 $sellerId = $seller['id'];
 
-// Get posted data
-$data = json_decode(file_get_contents('php://input'), true);
+// Get posted data (form data instead of JSON)
+$data = $_POST;
 
 // Validate required fields
 if (!isset($data['id']) || empty($data['id'])) {
@@ -43,7 +46,7 @@ if (!isset($data['size']) || empty($data['size'])) {
     Response::error('Product size is required');
 }
 
-if (!isset($data['category']) || empty($data['category'])) {
+if (!isset($data['category_id']) || empty($data['category_id'])) {
     Response::error('Product category is required');
 }
 
@@ -78,17 +81,14 @@ try {
         Response::error('Product not found or you do not have permission to update it', null, 403);
     }
     
-    // Get category ID from name
-    $categoryId = null;
-    if (!empty($data['category'])) {
-        $stmt = $db->prepare("SELECT id FROM categories WHERE name = :name");
-        $stmt->bindParam(':name', $data['category']);
-        $stmt->execute();
-        
-        if ($stmt->rowCount() > 0) {
-            $category = $stmt->fetch(PDO::FETCH_ASSOC);
-            $categoryId = $category['id'];
-        }
+    // Verify category exists
+    $categoryId = $data['category_id'];
+    $stmt = $db->prepare("SELECT id FROM categories WHERE id = :id");
+    $stmt->bindParam(':id', $categoryId);
+    $stmt->execute();
+    
+    if ($stmt->rowCount() === 0) {
+        Response::error('Invalid category selected');
     }
     
     // Begin transaction

@@ -741,14 +741,23 @@
                     if (!response.ok) {
                         throw new Error('Network response was not ok: ' + response.status);
                     }
-                    return response.json();
+                    return response.text();
+                })
+                .then(text => {
+                    console.log('Raw response:', text);
+                    try {
+                        return JSON.parse(text);
+                    } catch (e) {
+                        console.error('JSON parse error:', e);
+                        throw new Error('Invalid JSON response: ' + text);
+                    }
                 })
                 .then(data => {
                     // Hide loading spinner
                     document.getElementById('loadingSpinner').style.display = 'none';
                     console.log('API response:', data);
                     
-                    if (data.status === 'success') {
+                    if (data.status === 'success' && data.product) {
                         // Update product details
                         displayProductDetails(data.product);
                         document.getElementById('productDetails').style.display = 'block';
@@ -1053,8 +1062,12 @@
                 document.getElementById('loadingSpinner').style.display = 'flex';
             
             // Call delete API
-                fetch(`../../../backend/api/sellers/delete_cloth.php?id=${productId}`, {
-                    method: 'POST'
+                fetch(`../../../backend/api/sellers/delete_product.php?id=${productId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ id: productId })
             })
             .then(response => response.json())
             .then(data => {

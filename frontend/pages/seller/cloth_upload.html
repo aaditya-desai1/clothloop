@@ -580,16 +580,8 @@
                         
                         <div class="form-group">
                             <label for="category" class="form-label">Category</label>
-                            <div class="radio-group">
-                                <label class="radio-label">
-                                    <input type="radio" name="category" value="Men" required> Men
-                                </label>
-                                <label class="radio-label">
-                                    <input type="radio" name="category" value="Women" required> Women
-                                </label>
-                                <label class="radio-label">
-                                    <input type="radio" name="category" value="Kids" required> Kids
-                                </label>
+                            <div class="radio-group" id="category-container">
+                                <!-- Categories will be populated here -->
                             </div>
                         </div>
                         
@@ -682,6 +674,9 @@
             
             // Check if we're in edit mode
             checkForEditMode();
+            
+            // Load categories
+            loadCategories();
         });
         
         // Function to preview selected images
@@ -735,6 +730,13 @@
             e.preventDefault();
             console.log('Form submission triggered');
             
+            // Show validation message if no category is selected
+            const selectedCategory = document.querySelector('input[name="category"]:checked');
+            if (!selectedCategory) {
+                showError('Please select a category');
+                return;
+            }
+            
             // Disable submit button to prevent multiple submissions
             const submitBtn = document.getElementById('submitBtn');
             submitBtn.disabled = true;
@@ -744,7 +746,7 @@
             formData.append('title', document.getElementById('title').value);
             formData.append('description', document.getElementById('description').value);
             formData.append('size', document.getElementById('size').value);
-            formData.append('category', document.querySelector('input[name="category"]:checked')?.value || '');
+            formData.append('category_id', selectedCategory.value);
             formData.append('occasion', document.getElementById('occasion').value);
             formData.append('rental_price', document.getElementById('rental_price').value);
             formData.append('terms', document.getElementById('terms').value);
@@ -758,27 +760,39 @@
                 formData.append('id', editId);
             }
             
-            // Add images
+            // Add images if any are selected
             const images = document.getElementById('images').files;
-            for (let i = 0; i < images.length; i++) {
-                formData.append('images[]', images[i]);
-            }
-            
-            // For compatibility with the backend API
             if (images.length > 0) {
+                for (let i = 0; i < images.length; i++) {
+                    formData.append('images[]', images[i]);
+                }
+                
+                // For compatibility with the backend API
                 formData.append('clothImage', images[0]);
             }
             
-            // Send data to server
-            console.log('Sending form data to server:', Object.fromEntries(formData.entries()));
+            // Log form data for debugging
+            console.log('Form data contents:');
+            for (let pair of formData.entries()) {
+                console.log(pair[0] + ': ' + (pair[1] instanceof File ? pair[1].name : pair[1]));
+            }
             
+            // Send data to server
             fetch('../../../backend/api/sellers/upload_cloth.php', {
                 method: 'POST',
                 body: formData
             })
             .then(response => {
-                console.log('Response received:', response);
-                return response.json();
+                console.log('Response status:', response.status);
+                return response.text().then(text => {
+                    try {
+                        return JSON.parse(text);
+                    } catch (e) {
+                        console.error('Error parsing JSON:', e);
+                        console.error('Raw response:', text);
+                        throw new Error('Invalid server response');
+                    }
+                });
             })
             .then(data => {
                 console.log('Processed response data:', data);
@@ -799,10 +813,7 @@
                     }, 2000);
                 } else {
                     // Show error message
-                    const errorAlert = document.getElementById('errorAlert');
-                    const errorMessage = document.getElementById('errorMessage');
-                    errorMessage.textContent = data.message || 'An error occurred. Please try again.';
-                    errorAlert.style.display = 'block';
+                    showError(data.message || 'An error occurred. Please try again.');
                 }
             })
             .catch(error => {
@@ -813,10 +824,7 @@
                 submitBtn.innerHTML = editId ? 'Update Product' : 'Add Product';
                 
                 // Show error message
-                const errorAlert = document.getElementById('errorAlert');
-                const errorMessage = document.getElementById('errorMessage');
-                errorMessage.textContent = 'Network error. Please check your connection and try again.';
-                errorAlert.style.display = 'block';
+                showError('Network error. Please check your connection and try again.');
             });
         }
         
@@ -857,15 +865,10 @@
             document.getElementById('title').value = product.title || product.cloth_title || product.name || '';
             document.getElementById('description').value = product.description || '';
             
-            // Set the correct radio button for category
-            const categoryRadios = document.querySelectorAll('input[name="category"]');
-            const productCategory = product.category_name || product.category || '';
-            for (const radio of categoryRadios) {
-                if (radio.value === productCategory) {
-                    radio.checked = true;
-                    break;
-                }
-            }
+            // We'll set the category after categories have been loaded
+            // Saving the product data for reference when categories load
+            window.productData = product;
+            window.isEditMode = true;
             
             document.getElementById('occasion').value = product.occasion || '';
             document.getElementById('size').value = product.size || '';
@@ -945,6 +948,115 @@
         
         function closeImageModal() {
             document.getElementById('imageModal').style.display = 'none';
+        }
+
+        // Update the JavaScript to load categories and handle form submission
+        function loadCategories() {
+            fetch('../../../backend/api/categories/list.php')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        const categoryContainer = document.getElementById('category-container');
+                        categoryContainer.innerHTML = ''; // Clear existing content
+                        
+                        data.data.forEach(category => {
+                            const radioLabel = document.createElement('label');
+                            radioLabel.className = 'radio-label';
+                            
+                            const radioInput = document.createElement('input');
+                            radioInput.type = 'radio';
+                            radioInput.name = 'category';
+                            radioInput.value = category.id;
+                            radioInput.required = true;
+                            
+                            radioLabel.appendChild(radioInput);
+                            radioLabel.appendChild(document.createTextNode(' ' + category.name));
+                            
+                            categoryContainer.appendChild(radioLabel);
+                        });
+                        
+                        // If we're in edit mode, set the selected category
+                        if (window.isEditMode && window.productData) {
+                            if (window.productData.category_id) {
+                                const radios = document.querySelectorAll('input[name="category"]');
+                                radios.forEach(radio => {
+                                    if (radio.value == window.productData.category_id) {
+                                        radio.checked = true;
+                                    }
+                                });
+                            }
+                        }
+                    }
+                })
+                .catch(error => console.error('Error loading categories:', error));
+        }
+
+        // Update the loadProductForEdit function to properly handle category_id
+        function loadProductForEdit(productId) {
+            document.getElementById('loadingSpinner').style.display = 'flex';
+            
+            // Fetch product details from API
+            fetch(`../../../backend/api/sellers/get_product_details.php?id=${productId}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('loadingSpinner').style.display = 'none';
+                    
+                    if (data.status === 'success' && data.product) {
+                        const product = data.product;
+                        productData = product; // Store for later use
+                        
+                        // Set form values
+                        document.getElementById('product-title').value = product.name || '';
+                        document.getElementById('description').value = product.description || '';
+                        document.getElementById('size').value = product.size || '';
+                        document.getElementById('occasion').value = product.occasion || '';
+                        document.getElementById('rental_price').value = product.price_per_day || '';
+                        document.getElementById('terms').value = product.terms_and_conditions || '';
+                        
+                        // Wait for categories to load, then set the selected category
+                        const categoryCheckInterval = setInterval(() => {
+                            const categorySelect = document.getElementById('category');
+                            if (categorySelect.options.length > 1) {
+                                clearInterval(categoryCheckInterval);
+                                // Set category by ID
+                                if (product.category_id) {
+                                    categorySelect.value = product.category_id;
+                                }
+                            }
+                        }, 100);
+                        
+                        // Set product ID in hidden field
+                        document.getElementById('product-id').value = product.id;
+                        
+                        // Update page title and button text
+                        document.getElementById('page-title').textContent = 'Edit Product';
+                        document.getElementById('submit-button').textContent = 'Update Product';
+                        
+                        // Show the existing product image if available
+                        if (product.product_image) {
+                            const imagePreview = document.getElementById('image-preview');
+                            imagePreview.innerHTML = `
+                                <div class="preview-image-container">
+                                    <img src="${product.product_image}" alt="${product.name}" class="preview-image">
+                                    <div class="image-overlay">
+                                        <span class="delete-icon" onclick="removeUploadedImage(event)">
+                                            <i class="fas fa-trash"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            `;
+                            imagePreview.style.display = 'flex';
+                        }
+                    } else {
+                        console.error('Failed to load product:', data.message);
+                        displayAlert('Error loading product details. Please try again.', 'error');
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('loadingSpinner').style.display = 'none';
+                    console.error('Error:', error);
+                    displayAlert('Error loading product details. Please try again.', 'error');
+                });
         }
     </script>
 </body>

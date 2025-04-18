@@ -219,13 +219,13 @@
             margin-bottom: 30px;
         }
         
-        .avg-rating-display {
+        .stats-left {
             display: flex;
             flex-direction: column;
             align-items: center;
         }
         
-        .rating-number {
+        .overall-rating {
             font-size: 48px;
             font-weight: 700;
             color: var(--accent-color);
@@ -238,35 +238,33 @@
             color: var(--star-color);
         }
         
+        .stats-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+        
         .rating-count {
             font-size: 14px;
             color: var(--text-color);
             opacity: 0.8;
         }
         
-        .rating-breakdown {
+        .rating-bars {
             display: flex;
             flex-direction: column;
-            flex: 1;
-            max-width: 60%;
-            margin-left: 40px;
+            align-items: flex-end;
         }
         
-        .rating-bar {
+        .rating-bar-item {
             display: flex;
-            align-items: center;
+            flex-direction: column;
+            align-items: flex-end;
             margin-bottom: 8px;
         }
         
-        .rating-label {
-            font-size: 14px;
-            width: 50px;
-            text-align: right;
-            margin-right: 10px;
-        }
-        
-        .rating-progress {
-            flex: 1;
+        .rating-bar {
+            width: 200px;
             height: 8px;
             background-color: var(--hover-bg);
             border-radius: 4px;
@@ -274,7 +272,7 @@
             overflow: hidden;
         }
         
-        .rating-progress-fill {
+        .rating-bar-fill {
             position: absolute;
             top: 0;
             left: 0;
@@ -444,11 +442,8 @@
                 align-items: flex-start;
             }
             
-            .rating-breakdown {
-                max-width: 100%;
-                margin-left: 0;
-                margin-top: 20px;
-                width: 100%;
+            .rating-bars {
+                align-items: flex-start;
             }
         }
 
@@ -497,6 +492,223 @@
                 padding: 15px;
             }
         }
+
+        /* Loading Spinner */
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 9999;
+        }
+
+        .loading-spinner::after {
+            content: "";
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--border-color);
+            border-top-color: var(--accent-color);
+            border-radius: 50%;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: 0;
+            box-shadow: var(--box-shadow);
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+            border: 1px solid var(--border-color);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--accent-color);
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 24px;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close-modal:hover {
+            color: var(--accent-color);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-group input, 
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            background-color: var(--input-bg);
+            color: var(--input-text);
+            border: 1px solid var(--border-color);
+            border-radius: 0;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .cancel-btn, 
+        .submit-btn {
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .cancel-btn {
+            background-color: transparent;
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+
+        .submit-btn {
+            background-color: var(--accent-color);
+            color: var(--primary-color);
+        }
+
+        .cancel-btn:hover {
+            background-color: var(--hover-bg);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .review-preview {
+            padding: 15px;
+            background-color: var(--light-bg);
+            border: 1px solid var(--border-color);
+            margin-bottom: 20px;
+            border-radius: 0;
+        }
+
+        .error-message {
+            color: var(--error-color);
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .success-message {
+            color: var(--success-color);
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        /* No reviews message */
+        #no-reviews-message {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+            font-size: 16px;
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        /* Respond button */
+        .respond-button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 12px;
+            margin-top: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .respond-button:hover {
+            opacity: 0.9;
+        }
+
+        /* Responsive design for modals */
+        @media (max-width: 576px) {
+            .modal-content {
+                width: 95%;
+                padding: 20px;
+            }
+
+            .modal-footer {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .cancel-btn, 
+            .submit-btn {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -530,174 +742,85 @@
         <!-- Reviews Overview Section -->
         <div class="reviews-section">
             <div class="reviews-stats">
-                <div class="avg-rating-display">
-                    <div class="rating-number">4.7</div>
-                    <div class="rating-stars">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star-half-alt"></i>
+                <div class="stats-left">
+                    <div class="overall-rating" id="overall-rating">0</div>
+                    <div class="rating-stars" id="average-rating-stars">
+                        <!-- Stars will be filled dynamically -->
                     </div>
-                    <div class="rating-count">Based on 24 reviews</div>
                 </div>
-                
-                <div class="rating-breakdown">
+                <div class="stats-right">
+                    <div class="rating-count" id="rating-count">Based on 0 reviews</div>
+                    <div class="rating-bars">
+                        <div class="rating-bar-item">
+                            <div class="rating-label">5</div>
                     <div class="rating-bar">
-                        <span class="rating-label">5 <i class="fas fa-star"></i></span>
-                        <div class="rating-progress">
-                            <div class="rating-progress-fill" style="width: 75%"></div>
+                                <div class="rating-bar-fill" id="rating-bar-5" style="width: 0%"></div>
                         </div>
-                        <span class="rating-percent">75%</span>
+                            <div class="rating-percent" id="rating-percent-5">0%</div>
                     </div>
+                        <div class="rating-bar-item">
+                            <div class="rating-label">4</div>
                     <div class="rating-bar">
-                        <span class="rating-label">4 <i class="fas fa-star"></i></span>
-                        <div class="rating-progress">
-                            <div class="rating-progress-fill" style="width: 20%"></div>
+                                <div class="rating-bar-fill" id="rating-bar-4" style="width: 0%"></div>
                         </div>
-                        <span class="rating-percent">20%</span>
+                            <div class="rating-percent" id="rating-percent-4">0%</div>
                     </div>
+                        <div class="rating-bar-item">
+                            <div class="rating-label">3</div>
                     <div class="rating-bar">
-                        <span class="rating-label">3 <i class="fas fa-star"></i></span>
-                        <div class="rating-progress">
-                            <div class="rating-progress-fill" style="width: 5%"></div>
+                                <div class="rating-bar-fill" id="rating-bar-3" style="width: 0%"></div>
                         </div>
-                        <span class="rating-percent">5%</span>
+                            <div class="rating-percent" id="rating-percent-3">0%</div>
                     </div>
+                        <div class="rating-bar-item">
+                            <div class="rating-label">2</div>
                     <div class="rating-bar">
-                        <span class="rating-label">2 <i class="fas fa-star"></i></span>
-                        <div class="rating-progress">
-                            <div class="rating-progress-fill" style="width: 0%"></div>
+                                <div class="rating-bar-fill" id="rating-bar-2" style="width: 0%"></div>
                         </div>
-                        <span class="rating-percent">0%</span>
+                            <div class="rating-percent" id="rating-percent-2">0%</div>
                     </div>
+                        <div class="rating-bar-item">
+                            <div class="rating-label">1</div>
                     <div class="rating-bar">
-                        <span class="rating-label">1 <i class="fas fa-star"></i></span>
-                        <div class="rating-progress">
-                            <div class="rating-progress-fill" style="width: 0%"></div>
+                                <div class="rating-bar-fill" id="rating-bar-1" style="width: 0%"></div>
                         </div>
-                        <span class="rating-percent">0%</span>
+                            <div class="rating-percent" id="rating-percent-1">0%</div>
                     </div>
                 </div>
             </div>
-            
-            <!-- Reviews List -->
-            <div class="reviews-list">
-                <div class="review-card">
-                    <div class="review-header">
-                        <div class="reviewer-info">
-                            <div class="reviewer-avatar">AS</div>
-                            <div class="reviewer-details">
-                                <div class="reviewer-name">Ananya Singh</div>
-                                <div class="review-date">June 10, 2024</div>
-                            </div>
-                        </div>
-                        <div class="review-rating">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                        </div>
-                    </div>
-                    <div class="review-content">
-                        The saree I rented was absolutely beautiful and in perfect condition. Delivery was prompt and the return process was hassle-free. Would definitely rent from this seller again!
-                    </div>
-                    <div class="review-product">
-                        <img src="https://via.placeholder.com/50x50/111111/ffffff?text=Saree" alt="Designer Saree" class="review-product-image">
-                        <div class="review-product-name">Designer Silk Saree</div>
-                    </div>
-                    <div class="review-reply">
-                        <div class="review-reply-header">Your Response:</div>
-                        Thank you for your kind review, Ananya! We're glad you loved the saree and had a smooth experience. Looking forward to serving you again.
                     </div>
                 </div>
                 
-                <div class="review-card">
-                    <div class="review-header">
-                        <div class="reviewer-info">
-                            <div class="reviewer-avatar">RK</div>
-                            <div class="reviewer-details">
-                                <div class="reviewer-name">Rahul Kumar</div>
-                                <div class="review-date">June 5, 2024</div>
+        <!-- Reviews List -->
+        <div class="reviews-list" id="reviews-container">
+            <!-- Reviews will be loaded dynamically -->
+            <div id="no-reviews-message" style="display: none;">
+                <p>You don't have any reviews yet. As customers rent your items and leave reviews, they will appear here.</p>
                             </div>
-                        </div>
-                        <div class="review-rating">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="far fa-star"></i>
-                        </div>
-                    </div>
-                    <div class="review-content">
-                        The suit fit perfectly and looked exactly as shown in the pictures. Great quality fabric and very well maintained. The only minor issue was that the delivery was slightly delayed.
-                    </div>
-                    <div class="review-product">
-                        <img src="https://via.placeholder.com/50x50/111111/ffffff?text=Suit" alt="Formal Suit" class="review-product-image">
-                        <div class="review-product-name">Premium Black Formal Suit</div>
+            <div id="loading-spinner" class="loading-spinner">
+                <div class="spinner"></div>
                     </div>
                 </div>
                 
-                <div class="review-card">
-                    <div class="review-header">
-                        <div class="reviewer-info">
-                            <div class="reviewer-avatar">PP</div>
-                            <div class="reviewer-details">
-                                <div class="reviewer-name">Priya Patel</div>
-                                <div class="review-date">May 28, 2024</div>
+        <!-- Response Modal -->
+        <div id="responseModal" class="modal">
+            <div class="modal-content">
+                <span class="close-btn">&times;</span>
+                <h2>Respond to Review</h2>
+                <div class="review-preview" id="review-preview">
+                    <!-- Review preview will be inserted here -->
                             </div>
+                <form id="responseForm">
+                    <input type="hidden" id="review-id">
+                    <div class="form-group">
+                        <label for="response">Your Response:</label>
+                        <textarea id="response" placeholder="Write your response to this review..."></textarea>
                         </div>
-                        <div class="review-rating">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star-half-alt"></i>
+                    <div class="form-actions">
+                        <button type="button" class="cancel-btn">Cancel</button>
+                        <button type="submit" class="submit-btn">Submit Response</button>
                         </div>
-                    </div>
-                    <div class="review-content">
-                        I rented a lehenga for my cousin's wedding and received so many compliments! The embroidery was intricate and the fabric was premium quality. The seller was very responsive and helpful throughout the process.
-                    </div>
-                    <div class="review-product">
-                        <img src="https://via.placeholder.com/50x50/111111/ffffff?text=Lehenga" alt="Bridal Lehenga" class="review-product-image">
-                        <div class="review-product-name">Designer Wedding Lehenga</div>
-                    </div>
-                    <div class="review-reply">
-                        <div class="review-reply-header">Your Response:</div>
-                        Thank you for your wonderful review, Priya! We're delighted to know that the lehenga was a hit at the wedding. It was a pleasure assisting you, and we hope to see you again soon!
-                    </div>
-                </div>
-                
-                <div class="review-card">
-                    <div class="review-header">
-                        <div class="reviewer-info">
-                            <div class="reviewer-avatar">VG</div>
-                            <div class="reviewer-details">
-                                <div class="reviewer-name">Vikram Gupta</div>
-                                <div class="review-date">May 15, 2024</div>
-                            </div>
-                        </div>
-                        <div class="review-rating">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="far fa-star"></i>
-                            <i class="far fa-star"></i>
-                        </div>
-                    </div>
-                    <div class="review-content">
-                        The kurta set was good but there was a small stain on the sleeve that wasn't mentioned in the description. The seller was apologetic and offered a partial refund, which was fair.
-                    </div>
-                    <div class="review-product">
-                        <img src="https://via.placeholder.com/50x50/111111/ffffff?text=Kurta" alt="Men's Kurta" class="review-product-image">
-                        <div class="review-product-name">Traditional Men's Kurta Set</div>
-                    </div>
-                    <div class="review-reply">
-                        <div class="review-reply-header">Your Response:</div>
-                        We sincerely apologize for the inconvenience, Vikram. Thank you for bringing this to our attention. We've improved our quality check process to ensure this doesn't happen again. We appreciate your understanding and feedback.
-                    </div>
-                </div>
+                </form>
             </div>
         </div>
     </main>
@@ -714,40 +837,323 @@
 
     <!-- JavaScript code for functionality -->
     <script>
-        // Wait for DOM to be fully loaded
         document.addEventListener('DOMContentLoaded', function() {
-            // Setup theme switching
-            setupThemeSwitcher();
+            // Fetch reviews when the page loads
+            fetchReviews();
+            
+            // Setup modal functionality
+            setupResponseModal();
         });
         
-        // Theme switcher functionality
-        function setupThemeSwitcher() {
-            const themeToggle = document.getElementById('theme-toggle');
-            const themeIcon = themeToggle.querySelector('i');
+        // Function to fetch reviews from the API
+        function fetchReviews() {
+            const loadingSpinner = document.getElementById('loading-spinner');
+            loadingSpinner.style.display = 'flex';
             
-            // Check for saved theme preference or use default
-            const savedTheme = localStorage.getItem('clothloop-theme');
-            if (savedTheme === 'light') {
-                document.body.classList.add('light-theme');
-                themeIcon.classList.remove('fa-sun');
-                themeIcon.classList.add('fa-moon');
+            fetch('../../../backend/api/sellers/get_seller_reviews.php')
+                .then(response => response.json())
+                .then(data => {
+                    loadingSpinner.style.display = 'none';
+                    
+                    if (data.status === 'success') {
+                        // Update stats
+                        updateReviewStats(data.data.stats);
+                        
+                        // Display reviews
+                        displayReviews(data.data.reviews);
+                    } else {
+                        console.error('Error fetching reviews:', data.message);
+                        showError(data.message || 'Failed to load reviews. Please try again later.');
+                    }
+                })
+                .catch(error => {
+                    loadingSpinner.style.display = 'none';
+                    console.error('Error:', error);
+                    showError('Failed to load reviews. Please try again later.');
+                });
+        }
+        
+        // Function to update review statistics
+        function updateReviewStats(stats) {
+            // Update overall rating
+            document.getElementById('overall-rating').textContent = stats.average_rating;
+            
+            // Update rating count
+            document.getElementById('rating-count').textContent = `Based on ${stats.total_reviews} reviews`;
+            
+            // Update rating stars
+            const starsContainer = document.getElementById('average-rating-stars');
+            starsContainer.innerHTML = '';
+            
+            const fullStars = Math.floor(stats.average_rating);
+            const hasHalfStar = stats.average_rating % 1 >= 0.5;
+            
+            for (let i = 1; i <= 5; i++) {
+                const star = document.createElement('i');
+                if (i <= fullStars) {
+                    star.className = 'fas fa-star';
+                } else if (i === fullStars + 1 && hasHalfStar) {
+                    star.className = 'fas fa-star-half-alt';
+                } else {
+                    star.className = 'far fa-star';
+                }
+                starsContainer.appendChild(star);
             }
             
-            // Toggle theme
-            themeToggle.addEventListener('click', () => {
-                document.body.classList.toggle('light-theme');
+            // Update rating bars
+            for (let i = 5; i >= 1; i--) {
+                const percentage = stats.rating_percentages[i];
+                document.getElementById(`rating-bar-${i}`).style.width = `${percentage}%`;
+                document.getElementById(`rating-percent-${i}`).textContent = `${percentage}%`;
+            }
+        }
+        
+        // Function to display reviews
+        function displayReviews(reviews) {
+            const reviewsContainer = document.getElementById('reviews-container');
+            const noReviewsMessage = document.getElementById('no-reviews-message');
+            
+            // Clear previous content (except the no-reviews message and loading spinner)
+            const childrenToRemove = [];
+            for (let i = 0; i < reviewsContainer.children.length; i++) {
+                const child = reviewsContainer.children[i];
+                if (child.id !== 'no-reviews-message' && child.id !== 'loading-spinner') {
+                    childrenToRemove.push(child);
+                }
+            }
+            
+            childrenToRemove.forEach(child => child.remove());
+            
+            // Show message if no reviews
+            if (reviews.length === 0) {
+                noReviewsMessage.style.display = 'block';
+                return;
+            }
+            
+            noReviewsMessage.style.display = 'none';
+            
+            // Add each review
+            reviews.forEach(review => {
+                const reviewCard = createReviewCard(review);
+                reviewsContainer.appendChild(reviewCard);
+            });
+        }
+        
+        // Function to create a review card
+        function createReviewCard(review) {
+            const reviewCard = document.createElement('div');
+            reviewCard.className = 'review-card';
+            reviewCard.dataset.reviewId = review.id;
+            
+            // Create review header
+            const reviewHeader = document.createElement('div');
+            reviewHeader.className = 'review-header';
+            
+            // Create reviewer info
+            const reviewerInfo = document.createElement('div');
+            reviewerInfo.className = 'reviewer-info';
+            
+            const reviewerAvatar = document.createElement('div');
+            reviewerAvatar.className = 'reviewer-avatar';
+            reviewerAvatar.textContent = review.buyer.initials;
+            
+            const reviewerDetails = document.createElement('div');
+            reviewerDetails.className = 'reviewer-details';
+            
+            const reviewerName = document.createElement('div');
+            reviewerName.className = 'reviewer-name';
+            reviewerName.textContent = review.buyer.name;
+            
+            const reviewDate = document.createElement('div');
+            reviewDate.className = 'review-date';
+            reviewDate.textContent = review.date;
+            
+            reviewerDetails.appendChild(reviewerName);
+            reviewerDetails.appendChild(reviewDate);
+            
+            reviewerInfo.appendChild(reviewerAvatar);
+            reviewerInfo.appendChild(reviewerDetails);
+            
+            // Create rating stars
+            const reviewRating = document.createElement('div');
+            reviewRating.className = 'review-rating';
+            
+            for (let i = 1; i <= 5; i++) {
+                const star = document.createElement('i');
+                star.className = i <= review.rating ? 'fas fa-star' : 'far fa-star';
+                reviewRating.appendChild(star);
+            }
+            
+            reviewHeader.appendChild(reviewerInfo);
+            reviewHeader.appendChild(reviewRating);
+            
+            // Create review content
+            const reviewContent = document.createElement('div');
+            reviewContent.className = 'review-content';
+            reviewContent.textContent = review.review_text;
+            
+            // Create product info
+            const reviewProduct = document.createElement('div');
+            reviewProduct.className = 'review-product';
+            
+            const productImage = document.createElement('img');
+            productImage.src = review.product.image || 'https://via.placeholder.com/50x50/111111/ffffff?text=Product';
+            productImage.alt = review.product.name;
+            productImage.className = 'review-product-image';
+            
+            const productName = document.createElement('div');
+            productName.className = 'review-product-name';
+            productName.textContent = review.product.name;
+            
+            reviewProduct.appendChild(productImage);
+            reviewProduct.appendChild(productName);
+            
+            // Add elements to review card
+            reviewCard.appendChild(reviewHeader);
+            reviewCard.appendChild(reviewContent);
+            reviewCard.appendChild(reviewProduct);
+            
+            // Add seller response if exists
+            if (review.seller_response) {
+                const reviewReply = document.createElement('div');
+                reviewReply.className = 'review-reply';
                 
-                // Update icon
-                if (document.body.classList.contains('light-theme')) {
-                    themeIcon.classList.remove('fa-sun');
-                    themeIcon.classList.add('fa-moon');
-                    localStorage.setItem('clothloop-theme', 'light');
-                } else {
-                    themeIcon.classList.remove('fa-moon');
-                    themeIcon.classList.add('fa-sun');
-                    localStorage.setItem('clothloop-theme', 'dark');
+                const replyHeader = document.createElement('div');
+                replyHeader.className = 'review-reply-header';
+                replyHeader.textContent = 'Your Response:';
+                
+                reviewReply.appendChild(replyHeader);
+                reviewReply.appendChild(document.createTextNode(review.seller_response));
+                
+                reviewCard.appendChild(reviewReply);
+            } else {
+                // Add respond button if no response yet
+                const respondButton = document.createElement('button');
+                respondButton.className = 'respond-button';
+                respondButton.innerHTML = '<i class="fas fa-reply"></i> Respond';
+                respondButton.addEventListener('click', () => openResponseModal(review));
+                
+                reviewCard.appendChild(respondButton);
+            }
+            
+            return reviewCard;
+        }
+        
+        // Function to set up the response modal
+        function setupResponseModal() {
+            const modal = document.getElementById('responseModal');
+            const closeBtn = modal.querySelector('.close-btn');
+            const cancelBtn = modal.querySelector('.cancel-btn');
+            const form = document.getElementById('responseForm');
+            
+            // Close modal when X is clicked
+            closeBtn.addEventListener('click', () => {
+                modal.style.display = 'none';
+            });
+            
+            // Close modal when Cancel is clicked
+            cancelBtn.addEventListener('click', () => {
+                modal.style.display = 'none';
+            });
+            
+            // Close modal when clicking outside
+            window.addEventListener('click', (event) => {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
                 }
             });
+            
+            // Handle form submission
+            form.addEventListener('submit', (event) => {
+                event.preventDefault();
+                submitResponse();
+            });
+        }
+        
+        // Function to open response modal
+        function openResponseModal(review) {
+            const modal = document.getElementById('responseModal');
+            const reviewPreview = document.getElementById('review-preview');
+            const reviewIdInput = document.getElementById('review-id');
+            
+            // Set review ID
+            reviewIdInput.value = review.id;
+            
+            // Create review preview
+            reviewPreview.innerHTML = `
+                <div class="preview-reviewer">${review.buyer.name}</div>
+                <div class="preview-rating">
+                    ${Array(5).fill().map((_, i) => 
+                        `<i class="${i < review.rating ? 'fas' : 'far'} fa-star"></i>`
+                    ).join('')}
+                </div>
+                <div class="preview-text">${review.review_text}</div>
+            `;
+            
+            // Show modal
+            modal.style.display = 'block';
+            
+            // Focus on textarea
+            document.getElementById('response').focus();
+        }
+        
+        // Function to submit response
+        function submitResponse() {
+            const reviewId = document.getElementById('review-id').value;
+            const response = document.getElementById('response').value.trim();
+            
+            if (!response) {
+                alert('Please enter a response');
+                return;
+            }
+            
+            const submitBtn = document.querySelector('.submit-btn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
+            
+            fetch('../../../backend/api/sellers/update_review_response.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    review_id: reviewId,
+                    response: response
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Response';
+                
+                if (data.status === 'success') {
+                    // Close modal
+                    document.getElementById('responseModal').style.display = 'none';
+                    
+                    // Reload reviews
+                    fetchReviews();
+                } else {
+                    alert(data.message || 'Failed to submit response. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Response';
+                alert('Failed to submit response. Please try again.');
+            });
+        }
+        
+        // Function to show error message
+        function showError(message) {
+            const reviewsContainer = document.getElementById('reviews-container');
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.textContent = message;
+            
+            // Clear container and show error
+            reviewsContainer.innerHTML = '';
+            reviewsContainer.appendChild(errorDiv);
         }
     </script>
 </body>

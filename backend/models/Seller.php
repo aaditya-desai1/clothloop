@@ -1,0 +1,248 @@
+<?php
+/**
+ * Seller Model Class
+ * Handles all seller-related database operations
+ */
+class Seller {
+    // Database connection and table name
+    private $conn;
+    private $table = 'sellers';
+
+    // Seller properties
+    public $id;
+    public $seller_id;
+    public $shop_name;
+    public $description;
+    public $address;
+    public $latitude;
+    public $longitude;
+    public $shop_logo;
+    public $created_at;
+    public $updated_at;
+    public $avg_rating;
+    public $total_reviews;
+
+    // Constructor with DB connection
+    public function __construct($db) {
+        $this->conn = $db;
+    }
+
+    /**
+     * Get a single seller by ID
+     * 
+     * @return array|bool Seller data or false if not found
+     */
+    public function getSingle() {
+        $query = "SELECT * FROM " . $this->table . " WHERE id = :id LIMIT 1";
+        
+        // Check which ID to use
+        $idToUse = $this->id ?? $this->seller_id;
+        
+        if (!$idToUse) {
+            return false;
+        }
+        
+        // Prepare statement
+        $stmt = $this->conn->prepare($query);
+        
+        // Bind parameter
+        $stmt->bindParam(':id', $idToUse);
+        
+        // Execute query
+        $stmt->execute();
+        
+        // Check if seller exists
+        if ($stmt->rowCount() > 0) {
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        }
+        
+        return false;
+    }
+
+    /**
+     * Find a seller by ID
+     * 
+     * @param int $id Seller ID
+     * @return bool True if seller exists, false otherwise
+     */
+    public function findById($id) {
+        $query = "SELECT id FROM " . $this->table . " WHERE id = :id LIMIT 1";
+        
+        // Prepare statement
+        $stmt = $this->conn->prepare($query);
+        
+        // Bind parameter
+        $stmt->bindParam(':id', $id);
+        
+        // Execute query
+        $stmt->execute();
+        
+        // Return true if seller exists
+        return $stmt->rowCount() > 0;
+    }
+
+    /**
+     * Create a new seller
+     * 
+     * @return bool True if created successfully, false otherwise
+     */
+    public function create() {
+        // Create query
+        $query = "INSERT INTO " . $this->table . " 
+                  (id, shop_name, description, address, latitude, longitude, shop_logo) 
+                  VALUES (:id, :shop_name, :description, :address, :latitude, :longitude, :shop_logo)";
+        
+        // Prepare statement
+        $stmt = $this->conn->prepare($query);
+        
+        // Clean data
+        $this->id = htmlspecialchars(strip_tags($this->id));
+        $this->shop_name = htmlspecialchars(strip_tags($this->shop_name));
+        $this->description = htmlspecialchars(strip_tags($this->description));
+        $this->address = htmlspecialchars(strip_tags($this->address));
+        $this->latitude = htmlspecialchars(strip_tags($this->latitude));
+        $this->longitude = htmlspecialchars(strip_tags($this->longitude));
+        $this->shop_logo = htmlspecialchars(strip_tags($this->shop_logo));
+        
+        // Bind parameters
+        $stmt->bindParam(':id', $this->id);
+        $stmt->bindParam(':shop_name', $this->shop_name);
+        $stmt->bindParam(':description', $this->description);
+        $stmt->bindParam(':address', $this->address);
+        $stmt->bindParam(':latitude', $this->latitude);
+        $stmt->bindParam(':longitude', $this->longitude);
+        $stmt->bindParam(':shop_logo', $this->shop_logo);
+        
+        // Execute query
+        if ($stmt->execute()) {
+            return true;
+        }
+        
+        // Print error if something goes wrong
+        printf("Error: %s.\n", $stmt->error);
+        
+        return false;
+    }
+
+    /**
+     * Update a seller
+     * 
+     * @return bool True if updated successfully, false otherwise
+     */
+    public function update() {
+        // Create query
+        $query = "UPDATE " . $this->table . " 
+                  SET shop_name = :shop_name, 
+                      description = :description, 
+                      address = :address, 
+                      latitude = :latitude, 
+                      longitude = :longitude, 
+                      shop_logo = :shop_logo,
+                      updated_at = NOW()
+                  WHERE id = :id";
+        
+        // Prepare statement
+        $stmt = $this->conn->prepare($query);
+        
+        // Clean data
+        $this->id = htmlspecialchars(strip_tags($this->id));
+        $this->shop_name = htmlspecialchars(strip_tags($this->shop_name));
+        $this->description = htmlspecialchars(strip_tags($this->description));
+        $this->address = htmlspecialchars(strip_tags($this->address));
+        $this->latitude = htmlspecialchars(strip_tags($this->latitude));
+        $this->longitude = htmlspecialchars(strip_tags($this->longitude));
+        $this->shop_logo = htmlspecialchars(strip_tags($this->shop_logo));
+        
+        // Bind parameters
+        $stmt->bindParam(':id', $this->id);
+        $stmt->bindParam(':shop_name', $this->shop_name);
+        $stmt->bindParam(':description', $this->description);
+        $stmt->bindParam(':address', $this->address);
+        $stmt->bindParam(':latitude', $this->latitude);
+        $stmt->bindParam(':longitude', $this->longitude);
+        $stmt->bindParam(':shop_logo', $this->shop_logo);
+        
+        // Execute query
+        if ($stmt->execute()) {
+            return true;
+        }
+        
+        // Print error if something goes wrong
+        printf("Error: %s.\n", $stmt->error);
+        
+        return false;
+    }
+
+    /**
+     * Get all sellers with pagination
+     * 
+     * @param int $limit Number of records to return
+     * @param int $offset Offset for pagination
+     * @return array Array of sellers
+     */
+    public function getAll($limit = 10, $offset = 0) {
+        $query = "SELECT s.*, u.name, u.email, u.phone
+                  FROM " . $this->table . " s
+                  JOIN users u ON s.id = u.id
+                  ORDER BY s.created_at DESC
+                  LIMIT :limit OFFSET :offset";
+        
+        // Prepare statement
+        $stmt = $this->conn->prepare($query);
+        
+        // Bind parameters
+        $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
+        $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
+        
+        // Execute query
+        $stmt->execute();
+        
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Count total sellers
+     * 
+     * @return int Number of sellers
+     */
+    public function countAll() {
+        $query = "SELECT COUNT(*) as total FROM " . $this->table;
+        
+        // Prepare statement
+        $stmt = $this->conn->prepare($query);
+        
+        // Execute query
+        $stmt->execute();
+        
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        return (int)$row['total'];
+    }
+
+    /**
+     * Update seller's rating statistics
+     * 
+     * @param int $sellerId The seller ID
+     * @param float $avgRating Average rating
+     * @param int $totalReviews Total number of reviews
+     * @return bool True if updated successfully, false otherwise
+     */
+    public function updateRatingStats($sellerId, $avgRating, $totalReviews) {
+        $query = "UPDATE " . $this->table . " 
+                  SET avg_rating = :avg_rating, 
+                      total_reviews = :total_reviews
+                  WHERE id = :id";
+        
+        // Prepare statement
+        $stmt = $this->conn->prepare($query);
+        
+        // Bind parameters
+        $stmt->bindParam(':avg_rating', $avgRating);
+        $stmt->bindParam(':total_reviews', $totalReviews, PDO::PARAM_INT);
+        $stmt->bindParam(':id', $sellerId);
+        
+        // Execute query
+        return $stmt->execute();
+    }
+}
+?> 

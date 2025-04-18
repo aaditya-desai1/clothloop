@@ -1,0 +1,141 @@
+Request method: POST
+Data: Array
+(
+    [title] => Saree
+    [description] => Pink
+    [size] => M
+    [category_id] => 18
+    [occasion] => Traditional
+    [rental_price] => 2599.00
+    [terms] => Do not Wash
+    [id] => 1
+)
+
+Files: Array
+(
+)
+
+
+Request method: POST
+Data: Array
+(
+    [title] => Polo
+    [description] => Tri Color
+    [size] => XXXL
+    [category_id] => 17
+    [occasion] => Casual
+    [rental_price] => 899
+    [terms] => Do not Wash
+)
+
+Files: Array
+(
+    [images] => Array
+        (
+            [name] => Array
+                (
+                    [0] => Aaryan.jpg
+                )
+
+            [full_path] => Array
+                (
+                    [0] => Aaryan.jpg
+                )
+
+            [type] => Array
+                (
+                    [0] => image/jpeg
+                )
+
+            [tmp_name] => Array
+                (
+                    [0] => C:\xampp\tmp\php5456.tmp
+                )
+
+            [error] => Array
+                (
+                    [0] => 0
+                )
+
+            [size] => Array
+                (
+                    [0] => 356529
+                )
+
+        )
+
+    [clothImage] => Array
+        (
+            [name] => Aaryan.jpg
+            [full_path] => Aaryan.jpg
+            [type] => image/jpeg
+            [tmp_name] => C:\xampp\tmp\php5457.tmp
+            [error] => 0
+            [size] => 356529
+        )
+
+)
+
+
+Request method: POST
+Data: Array
+(
+    [title] => Saaaree
+    [description] => Pinky
+    [size] => XS
+    [category_id] => 18
+    [occasion] => Wedding
+    [rental_price] => 2999
+    [terms] => Do not Wash in machine
+    [id] => 1
+)
+
+Files: Array
+(
+    [images] => Array
+        (
+            [name] => Array
+                (
+                    [0] => Nishidh.jpg
+                )
+
+            [full_path] => Array
+                (
+                    [0] => Nishidh.jpg
+                )
+
+            [type] => Array
+                (
+                    [0] => image/jpeg
+                )
+
+            [tmp_name] => Array
+                (
+                    [0] => C:\xampp\tmp\phpDB1D.tmp
+                )
+
+            [error] => Array
+                (
+                    [0] => 0
+                )
+
+            [size] => Array
+                (
+                    [0] => 256756
+                )
+
+        )
+
+    [clothImage] => Array
+        (
+            [name] => Nishidh.jpg
+            [full_path] => Nishidh.jpg
+            [type] => image/jpeg
+            [tmp_name] => C:\xampp\tmp\phpDB1E.tmp
+            [error] => 0
+            [size] => 256756
+        )
+
+)
+
+

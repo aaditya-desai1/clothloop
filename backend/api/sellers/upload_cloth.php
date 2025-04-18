@@ -33,6 +33,9 @@ if ($user['role'] !== 'seller') {
     Response::error('Access denied. This endpoint is for sellers only.', null, 403);
 }
 
+// Debugging: Log the incoming data 
+file_put_contents(__DIR__ . '/debug_log.txt', "Request method: " . $_SERVER['REQUEST_METHOD'] . "\nData: " . print_r($_POST, true) . "\nFiles: " . print_r($_FILES, true) . "\n\n", FILE_APPEND);
+
 // Get posted data (form data)
 $data = $_POST;
 
@@ -41,15 +44,15 @@ Validate::reset();
 Validate::required('title', $data['title'] ?? '');
 Validate::required('description', $data['description'] ?? '');
 Validate::required('size', $data['size'] ?? '');
-Validate::required('category', $data['category'] ?? '');
+Validate::required('category_id', $data['category_id'] ?? '');
 Validate::required('rental_price', $data['rental_price'] ?? '');
 Validate::numeric('rental_price', $data['rental_price'] ?? '');
 
 // Check if this is an edit or a new upload
 $isEdit = isset($data['id']) && !empty($data['id']);
 
-// If new upload, require at least one image
-if (!$isEdit && (!isset($_FILES['images']) || count($_FILES['images']['name']) === 0)) {
+// Only require images for new products
+if (!$isEdit && (!isset($_FILES['images']) || empty($_FILES['images']['name'][0]))) {
     Validate::addError('images', 'At least one product image is required');
 }
 
@@ -81,16 +84,17 @@ try {
         }
     }
     
-    // Get category ID from name
-    $categoryId = null;
-    if (!empty($data['category'])) {
-        $stmt = $db->prepare("SELECT id FROM categories WHERE name = :name");
-        $stmt->bindParam(':name', $data['category']);
+    // Get category ID directly from form data
+    $categoryId = $data['category_id'] ?? null;
+
+    // Verify the category exists
+    if ($categoryId) {
+        $stmt = $db->prepare("SELECT id FROM categories WHERE id = :id");
+        $stmt->bindParam(':id', $categoryId);
         $stmt->execute();
         
-        if ($stmt->rowCount() > 0) {
-            $category = $stmt->fetch(PDO::FETCH_ASSOC);
-            $categoryId = $category['id'];
+        if ($stmt->rowCount() === 0) {
+            Response::error('Selected category does not exist');
         }
     }
     
