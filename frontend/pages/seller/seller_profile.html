@@ -4,84 +4,70 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Seller Profile | ClothLoop</title>
-    <!-- Font Awesome for Icons -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
-    <!-- Google Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
-    <!-- Animation Library -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
-
-  <style>
-        /* Root variables for theme switching */
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Theme Variables */
         :root {
             /* Dark Theme (Default) */
-            --background: #121212;
-            --text-primary: #FFFFFF;
-            --text-secondary: #CCCCCC;
-            --button-primary: #333333;
-            --button-text: #FFFFFF;
-            --button-hover: #555555;
-            --button-secondary: transparent;
-            --button-secondary-text: #FFFFFF;
-            --header-bg: #000000;
-            --border-color: #333333;
-            --hover-bg: #1a1a1a;
-            --input-bg: #1a1a1a;
-            --error-color: #FF3B30;
-            --success-color: #34C759;
-            --accent-color: #FFFFFF;
-            --seller-highlight: #FFFFFF;
+            --primary-color: #000000;
+            --secondary-color: #333333;
+            --accent-color: #ffffff;
+            --text-color: #ffffff;
+            --light-bg: #111111;
             --card-bg: #1a1a1a;
             --footer-bg: #000000;
             --footer-text: #cccccc;
+            --border-radius: 0;
             --box-shadow: 0 5px 10px rgba(0, 0, 0, 0.8);
+            --error-color: #FF3B30;
+            --success-color: #34C759;
+            --input-bg: #222222;
+            --input-border: #333333;
+            --hover-bg: #333333;
         }
 
         /* Light Theme Variables */
         .light-theme {
-            --background: #FFFFFF;
-            --text-primary: #333333;
-            --text-secondary: #666666;
-            --button-primary: #333333;
-            --button-text: #FFFFFF;
-            --button-hover: #555555;
-            --button-secondary: transparent;
-            --button-secondary-text: #333333;
-            --header-bg: #FFFFFF;
-            --border-color: #EEEEEE;
-            --hover-bg: #F5F5F5;
-            --input-bg: #F9F9F9;
-            --error-color: #FF3B30;
-            --success-color: #34C759;
-            --accent-color: #333333;
-            --seller-highlight: #333333;
+            --primary-color: #ffffff;
+            --secondary-color: #000000;
+            --accent-color: #000000;
+            --text-color: #000000;
+            --light-bg: #f5f5f5;
             --card-bg: #ffffff;
             --footer-bg: #f5f5f5;
             --footer-text: #000000;
+            --border-radius: 0;
             --box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+            --error-color: #FF3B30;
+            --success-color: #34C759;
+            --input-bg: #f9f9f9;
+            --input-border: #e0e0e0;
+            --hover-bg: #f0f0f0;
         }
 
-        /* Apply colors to elements */
-        body {
-            background-color: var(--background);
-            color: var(--text-primary);
-            font-family: 'Roboto', sans-serif;
+        * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            letter-spacing: 0.02em;
-            overflow-x: hidden;
-            transition: background-color 0.3s ease, color 0.3s ease;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.7;
+            color: var(--text-color);
+            background-color: var(--light-bg);
         }
 
         /* Theme Switcher */
         .theme-switcher {
-            background: var(--header-bg);
+            background: var(--primary-color);
             border: 2px solid var(--accent-color);
             color: var(--accent-color);
             width: 40px;
             height: 40px;
-            border-radius: 50%;
+            border-radius: 0;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -91,78 +77,409 @@
         }
         
         .theme-switcher:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transform: skewX(-5deg);
+            box-shadow: 3px 3px 0 rgba(128, 128, 128, 0.3);
         }
 
-        /* Header styles */
-        .header {
-            background-color: var(--header-bg);
-            padding: 0;
-            box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.05);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            height: 80px;
+        /* Navigation */
+        nav {
+            background-color: var(--primary-color);
+            padding: 1.2rem 2rem;
             display: flex;
-            align-items: center;
-            transition: background-color 0.3s ease;
-        }
-
-        .header-container {
-            display: flex;
-            align-items: center;
             justify-content: space-between;
-            width: 100%;
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 30px;
-            position: relative;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(255, 255, 255, 0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
         }
 
-        .header-left {
+        nav .logo {
+            color: var(--accent-color);
+            font-size: 1.8rem;
+            font-weight: 700;
+            text-decoration: none;
             display: flex;
             align-items: center;
-            z-index: 2;
+            letter-spacing: 3px;
+            text-transform: uppercase;
         }
 
-        .header-center {
+        nav .logo i {
+            margin-right: 10px;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 1.5rem;
+        }
+
+        nav ul li a {
+            color: var(--accent-color);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0;
+            transition: all 0.2s linear;
+            font-weight: 500;
+            border-bottom: 2px solid transparent;
+        }
+
+        nav ul li a:hover, nav ul li a.active {
+            background-color: transparent;
+            color: var(--accent-color);
+            border-bottom: 2px solid var(--accent-color);
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(to right, rgba(0, 0, 0, 0.9), rgba(20, 20, 20, 0.8)),
+                        url('https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80');
+            background-size: cover;
+            background-position: center;
+            min-height: 50vh;
+            display: flex;
+            align-items: center;
+            color: white;
+            margin-top: 73px;
+            position: relative;
+            clip-path: polygon(0 0, 100% 0, 100% 90%, 0 100%);
+        }
+
+        .light-theme .hero {
+            background: linear-gradient(to right, rgba(255, 255, 255, 0.9), rgba(240, 240, 240, 0.8)),
+                        url('https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80');
+            color: var(--text-color);
+        }
+
+        .hero-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            animation: fadeIn 1s ease-out;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        .hero p {
+            font-size: 1.5rem;
+            max-width: 700px;
+            margin: 0 auto 2rem;
+            opacity: 0.9;
+            animation: fadeIn 1.5s ease-out;
+        }
+
+        /* Profile Content */
+        .profile-container {
+            max-width: 800px;
+            margin: 120px auto 50px;
+            padding: 0 20px;
+        }
+
+        .profile-header {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .profile-title {
+            font-size: 2.5rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            position: relative;
+            display: inline-block;
+            color: var(--accent-color);
+            animation: fadeIn 1s ease-out;
+        }
+
+        .profile-title::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            bottom: -10px;
+            width: 80px;
+            height: 4px;
+            background-color: var(--accent-color);
+            transform: translateX(-50%) skewX(-20deg);
+        }
+
+        .profile-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-color);
+            font-weight: 400;
+            margin-top: 20px;
+            animation: fadeIn 1.5s ease-out;
+        }
+
+        .form-container {
+            background-color: var(--card-bg);
+            border: 1px solid var(--input-border);
+            padding: 40px;
+            box-shadow: var(--box-shadow);
+            animation: fadeIn 2s ease-out;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .form-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background-color: var(--accent-color);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--accent-color);
+        }
+
+        .form-input {
+            width: 100%;
+            height: 50px;
+            border: 1px solid var(--input-border);
+            background-color: var(--input-bg);
+            padding: 0 15px;
+            font-size: 16px;
+            color: var(--text-color);
+            transition: all 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 3px 3px 0 rgba(128, 128, 128, 0.1);
+            transform: translateY(-2px) skewX(-2deg);
+        }
+
+        textarea.form-input {
+            height: auto;
+            min-height: 100px;
+            padding: 15px;
+            resize: vertical;
+        }
+
+        .form-input:disabled {
+            background-color: rgba(128, 128, 128, 0.1);
+            cursor: not-allowed;
+            color: var(--text-color);
+            opacity: 0.7;
+        }
+
+        .btn {
+            height: 50px;
+            padding: 0 30px;
+            border: none;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: var(--accent-color);
+            border: 2px solid var(--accent-color);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px) skewX(-5deg);
+            box-shadow: 5px 5px 0 rgba(128, 128, 128, 0.2);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--accent-color);
+            border: 2px solid var(--accent-color);
+            margin-right: 15px;
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--accent-color);
+            color: var(--primary-color);
+            transform: translateY(-3px) skewX(-5deg);
+            box-shadow: 5px 5px 0 rgba(128, 128, 128, 0.2);
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-top: 40px;
+        }
+
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: none;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto 20px;
+            text-align: center;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .alert-success {
+            background-color: var(--success-color);
+            color: white;
+            border-left: 5px solid #2a9f47;
+        }
+
+        .alert-error {
+            background-color: var(--error-color);
+            color: white;
+            border-left: 5px solid #d62d22;
+        }
+
+        .password-toggle {
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            color: var(--text-color);
+        }
+
+        .password-toggle input {
+            margin-right: 10px;
+            accent-color: var(--accent-color);
+        }
+
+        .password-section {
+            margin-top: 20px;
+            border-top: 1px solid var(--input-border);
+            padding-top: 20px;
+            display: none;
+        }
+
+        .loading-spinner {
             display: flex;
             align-items: center;
             justify-content: center;
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1;
-        }
-
-        .header-right {
-            display: flex;
-            align-items: center;
-            z-index: 2;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            margin-right: 30px;
-            position: relative;
-        }
-
-        .logo-name {
-            font-size: 24px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 2px;
+            padding: 30px;
+            font-size: 16px;
+            color: var(--text-color);
         }
         
-        /* Seller badge */
+        .loading-spinner i {
+            margin-right: 10px;
+            font-size: 24px;
+            animation: spin 1s linear infinite;
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--accent-color);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title i {
+            margin-right: 10px;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .profile-container {
+                margin-top: 100px;
+            }
+            
+            .form-container {
+                padding: 30px 20px;
+            }
+            
+            .profile-title {
+                font-size: 2rem;
+            }
+            
+            .profile-subtitle {
+                font-size: 1rem;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .btn-secondary {
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+            
+            nav {
+                flex-direction: column;
+                padding: 1rem;
+            }
+            
+            nav ul {
+                margin-top: 1rem;
+            }
+            
+            nav ul li {
+                margin-left: 0.5rem;
+                margin-right: 0.5rem;
+            }
+        }
+
         .seller-badge {
             position: absolute;
             top: -10px;
-            right: -10px;
-            background-color: var(--seller-highlight);
-            color: #000000;
+            right: -30px;
+            background-color: var(--accent-color);
+            color: var(--primary-color);
             font-size: 10px;
             font-weight: bold;
             padding: 3px 8px;
@@ -171,11 +488,6 @@
             letter-spacing: 0.5px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
             animation: pulse 2s infinite;
-        }
-        
-        /* Light theme specific overrides */
-        .light-theme .seller-badge {
-            color: #000000;
         }
         
         @keyframes pulse {
@@ -189,682 +501,46 @@
                 transform: scale(1);
             }
         }
-
-        /* Navigation styles */
-        .nav-container {
-            display: flex;
-            align-items: center;
-        }
-
-        .nav-items {
-            display: flex;
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            height: 100%;
-        }
-
-        .nav-items li {
-            height: 80px;
-            display: flex;
-            align-items: center;
-            margin: 0 15px;
-            position: relative;
-        }
-
-        .nav-items li a {
-            text-decoration: none;
-            color: var(--text-primary);
-            font-weight: 500;
-            font-size: 14px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            position: relative;
-            transition: color 0.3s ease;
-        }
-
-        .nav-items li a:hover {
-            color: var(--seller-highlight);
-        }
-        
-        .nav-items li a:hover::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background-color: var(--seller-highlight);
-            transform: scaleX(0);
-            animation: expandLine 0.3s forwards;
-        }
-        
-        @keyframes expandLine {
-            to {
-                transform: scaleX(1);
-            }
-        }
-
-        .nav-items li a.active {
-            font-weight: 700;
-            color: var(--seller-highlight);
-        }
-
-        .nav-items li a.active::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background-color: var(--seller-highlight);
-        }
-        
-        /* User actions */
-        .actions {
-            display: flex;
-            align-items: center;
-        }
-        
-        .action-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            margin: 0 15px;
-            cursor: pointer;
-            position: relative;
-            transition: transform 0.3s ease;
-        }
-        
-        .action-item:hover {
-            transform: translateY(-3px);
-        }
-
-        .action-item i {
-            font-size: 20px;
-            margin-bottom: 4px;
-            color: var(--text-primary);
-        }
-
-        .action-item span {
-            font-size: 12px;
-            color: var(--text-primary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        /* Profile dropdown menu styles */
-        .profile-dropdown {
-            position: absolute;
-            top: 100%;
-            right: -20px;
-            width: 200px;
-            background-color: white;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            padding: 10px 0;
-            z-index: 200;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(10px);
-            transition: all 0.3s ease;
-            margin-top: 5px;
-            border-radius: 5px;
-            overflow: hidden;
-        }
-        
-        .profile-dropdown.active {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-            animation: dropdownFadeIn 0.3s ease;
-        }
-        
-        @keyframes dropdownFadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .profile-dropdown a {
-            display: flex;
-            align-items: center;
-            padding: 10px 15px;
-            color: var(--text-primary);
-            text-decoration: none;
-            font-size: 13px;
-            letter-spacing: 0.5px;
-            transition: all 0.2s ease;
-        }
-        
-        .profile-dropdown a:hover {
-            background-color: var(--hover-bg);
-            transform: translateX(5px);
-        }
-        
-        .profile-dropdown a i {
-            margin-right: 10px;
-            font-size: 16px;
-            width: 20px;
-            text-align: center;
-            color: var(--seller-highlight);
-        }
-        
-        .profile-divider {
-            height: 1px;
-            background-color: var(--border-color);
-            margin: 5px 0;
-        }
-
-        /* Profile Content */
-        .profile-container {
-            max-width: 900px;
-            width: 95%;
-            margin: 40px auto;
-            padding: 20px;
-        }
-
-        .profile-header {
-            margin-bottom: 30px;
-            text-align: center;
-            animation: fadeInDown 0.6s ease both;
-        }
-
-        .profile-title {
-            font-size: 24px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-weight: 700;
-            margin-bottom: 10px;
-            color: var(--seller-highlight);
-        }
-
-        .profile-subtitle {
-            font-size: 14px;
-            color: var(--text-secondary);
-            font-weight: 400;
-        }
-        
-        .form-container {
-            background-color: var(--card-bg);
-            border-radius: 4px;
-            box-shadow: var(--box-shadow);
-            padding: 30px;
-            margin-top: 20px;
-            width: 100%;
-            box-sizing: border-box;
-            transition: box-shadow 0.3s ease, transform 0.3s ease, background-color 0.3s ease;
-        }
-        
-        .form-container:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-        }
-        
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
-        }
-        
-        @keyframes fadeInDown {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .form-group {
-            margin-bottom: 25px;
-            width: 100%;
-            box-sizing: border-box;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: var(--text-primary);
-            transition: color 0.3s ease;
-        }
-
-        .form-input {
-            width: 100%;
-            height: 45px;
-            padding: 10px 15px;
-            font-size: 14px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            background-color: var(--input-bg);
-            color: var(--text-primary);
-            transition: all 0.3s ease;
-            box-sizing: border-box;
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: var(--seller-highlight);
-            box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1);
-        }
-
-        .form-input:disabled {
-            background-color: var(--hover-bg);
-            cursor: not-allowed;
-        }
-        
-        textarea.form-input {
-            min-height: 100px;
-            padding: 15px;
-            resize: vertical;
-            overflow: auto;
-            font-family: 'Roboto', sans-serif;
-            line-height: 1.5;
-            box-sizing: border-box;
-        }
-        
-        .file-input {
-            padding: 10px;
-            height: auto;
-            background-color: transparent;
-            border: 1px dashed var(--border-color);
-        }
-        
-        .logo-preview-container {
-            margin-bottom: 10px;
-            position: relative;
-            display: inline-block;
-        }
-        
-        .logo-preview {
-            border-radius: 4px;
-            border: 2px solid var(--border-color);
-            transition: transform 0.3s ease;
-        }
-        
-        .logo-preview:hover {
-            transform: scale(1.05);
-        }
-
-        .btn {
-            height: 50px;
-            padding: 0 30px;
-            border: none;
-            font-size: 14px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 500;
-            border-radius: 4px;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .btn::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 5px;
-            height: 5px;
-            background: rgba(255, 255, 255, 0.5);
-            opacity: 0;
-            border-radius: 100%;
-            transform: scale(1, 1) translate(-50%, -50%);
-            transform-origin: 50% 50%;
-        }
-        
-        .btn:focus:not(:active)::after {
-            animation: ripple 1s ease-out;
-        }
-        
-        @keyframes ripple {
-            0% {
-                transform: scale(0, 0);
-                opacity: 1;
-            }
-            20% {
-                transform: scale(25, 25);
-                opacity: 1;
-            }
-            100% {
-                opacity: 0;
-                transform: scale(40, 40);
-            }
-        }
-
-        .btn-primary {
-            background-color: var(--button-primary);
-            color: var(--button-text);
-        }
-
-        .btn-primary:hover {
-            background-color: var(--button-hover);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            transform: translateY(-2px);
-        }
-
-        .btn-secondary {
-            background-color: var(--button-secondary);
-            color: var(--button-secondary-text);
-            border: 1px solid var(--text-primary);
-            margin-right: 15px;
-        }
-
-        .btn-secondary:hover {
-            background-color: var(--text-primary);
-            color: white;
-            transform: translateY(-2px);
-        }
-
-        .form-actions {
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            margin-top: 30px;
-        }
-
-        .alert {
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 4px;
-            font-size: 14px;
-            display: none;  /* Make sure alerts are hidden by default */
-            width: 100%;
-            max-width: 800px;
-            margin: 0 auto 20px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .alert::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: 100%;
-            width: 5px;
-        }
-
-        .alert-success {
-            background-color: rgba(52, 199, 89, 0.1);
-            color: var(--success-color);
-            border: 1px solid var(--success-color);
-        }
-        
-        .alert-success::before {
-            background-color: var(--success-color);
-        }
-
-        .alert-error {
-            background-color: rgba(255, 59, 48, 0.1);
-            color: var(--error-color);
-            border: 1px solid var(--error-color);
-        }
-        
-        .alert-error::before {
-            background-color: var(--error-color);
-        }
-
-        .password-toggle {
-            margin-top: 10px;
-            display: flex;
-            align-items: center;
-            font-size: 14px;
-        }
-
-        .password-toggle input {
-            margin-right: 8px;
-        }
-
-        .password-section {
-            margin-top: 20px;
-            border-top: 1px solid var(--border-color);
-            padding-top: 20px;
-            display: none;
-            animation: fadeIn 0.5s ease;
-        }
-        
-        .password-strength-meter {
-            height: 5px;
-            background-color: #eee;
-            margin-top: 5px;
-            border-radius: 3px;
-            overflow: hidden;
-        }
-        
-        .strength-bar {
-            height: 100%;
-            width: 0;
-            transition: width 0.3s ease, background-color 0.3s ease;
-        }
-        
-        .form-hint {
-            display: block;
-            margin-top: 5px;
-            font-size: 12px;
-            color: var(--text-secondary);
-        }
-
-        .loading-spinner {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 30px;
-            font-size: 16px;
-            color: var(--text-secondary);
-        }
-        
-        .loading-spinner i {
-            margin-right: 10px;
-            font-size: 24px;
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .form-section {
-            margin-bottom: 40px;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 20px;
-        }
-        
-        .section-title {
-            font-size: 18px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            color: var(--seller-highlight);
-        }
-        
-        .section-title i {
-            margin-right: 10px;
-            font-size: 20px;
-        }
-        
-        @media (max-width: 768px) {
-            .form-actions {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .btn-secondary {
-                margin-right: 0;
-                margin-bottom: 15px;
-            }
-        }
-        
-        /* Animated input focus effect */
-        .form-group {
-            position: relative;
-        }
-        
-        .form-group::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            width: 0;
-            height: 2px;
-            background-color: var(--seller-highlight);
-            transition: width 0.3s ease, left 0.3s ease;
-            transform: translateY(25px);
-        }
-        
-        .form-group:focus-within::after {
-            width: 100%;
-            left: 0;
-        }
-
-        /* Location input container styles */
-        .location-input-container {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-top: 5px;
-        }
-        
-        .location-fields {
-            display: flex;
-            gap: 15px;
-        }
-        
-        .coordinate-field {
-            flex: 1;
-        }
-        
-        .coord-label {
-            display: block;
-            font-size: 13px;
-            margin-bottom: 5px;
-            color: var(--text-secondary);
-        }
-        
-        .coordinate-input {
-            width: 100%;
-            height: 45px;
-        }
-        
-        .location-btn {
-            background-color: var(--button-primary);
-            color: var(--button-text);
-            border: none;
-            padding: 12px 15px;
-            font-size: 14px;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 5px;
-        }
-        
-        .location-btn:hover {
-            background-color: var(--button-hover);
-            transform: translateY(-2px);
-        }
-        
-        .location-btn i {
-            font-size: 16px;
-        }
-        
-        @media (min-width: 768px) {
-            .location-input-container {
-                flex-direction: row;
-                align-items: flex-start;
-            }
-            
-            .location-fields {
-                flex: 2;
-            }
-            
-            .location-btn {
-                flex: 1;
-                margin-top: 25px;
-                height: 45px;
-            }
-        }
     </style>
 </head>
 <body>
-    <!-- Header Section -->
-    <header class="header">
-        <div class="header-container">
-            <div class="header-left">
-                <div class="logo animate__animated animate__fadeIn">
-                    <span class="logo-name">CLOTHLOOP</span>
-                    <span class="seller-badge">Seller</span>
-                </div>
-                
-                <nav class="nav-container animate__animated animate__fadeIn animate__delay-1s">
-                    <ul class="nav-items">
-                        <li><a href="seller_dashboard.html">Dashboard</a></li>
-                        <li><a href="product_listings.html">Listings</a></li>
-                        <li><a href="seller_profile.html" class="active">Profile</a></li>
-                    </ul>
-                </nav>
-            </div>
-            
-            <div class="header-right">
-                <div class="actions animate__animated animate__fadeIn animate__delay-2s">
-                    <div class="action-item" id="logoutBtn">
-                        <i class="fas fa-sign-out-alt"></i>
-                        <span>LOGOUT</span>
-                    </div>
-                    
-                    <div class="action-item" id="statisticsBtn">
-                        <i class="fas fa-chart-bar"></i>
-                        <span>STATS</span>
-                    </div>
-                    
-                    <div class="action-item" id="helpBtn">
-                        <i class="fas fa-question-circle"></i>
-                        <span>ABOUT US</span>
-                    </div>
-                    
-                    <button class="theme-switcher" id="theme-toggle" aria-label="Toggle theme">
-                        <i class="fas fa-sun"></i>
-                    </button>
-                </div>
-            </div>
+    <!-- Navigation -->
+    <nav>
+        <a href="../../../home.html" class="logo">
+            <i class="fas fa-recycle"></i> ClothLoop
+            <span class="seller-badge">Seller</span>
+        </a>
+        <div style="display: flex; align-items: center;">
+            <ul>
+                <li><a href="seller_dashboard.html">Dashboard</a></li>
+                <li><a href="product_listings.html">Listings</a></li>
+                <li><a href="seller_profile.html" class="active">Profile</a></li>
+                <li><a href="../about/about_us.html">About</a></li>
+                <li><a href="../account/logout.php">Logout</a></li>
+            </ul>
+            <button class="theme-switcher" id="theme-toggle" aria-label="Toggle theme">
+                <i class="fas fa-sun"></i>
+            </button>
         </div>
-    </header>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Seller Profile</h1>
+            <p>Manage your shop and personal information</p>
+        </div>
+    </section>
 
     <!-- Profile Content -->
     <main class="profile-container">
-        <div class="profile-header animate__animated animate__fadeInDown">
-            <h1 class="profile-title">Seller Profile</h1>
-            <p class="profile-subtitle">Manage your shop and personal information</p>
-        </div>
+        <div class="alert alert-success" id="successAlert"></div>
+        <div class="alert alert-error" id="errorAlert"></div>
 
-        <div class="alert alert-success animate__animated animate__fadeIn" id="successAlert"></div>
-        <div class="alert alert-error animate__animated animate__fadeIn" id="errorAlert"></div>
-
-        <div id="loginPrompt" style="display: none; text-align: center; margin: 30px auto;" class="animate__animated animate__fadeIn">
-            <p style="margin-bottom: 20px;">You need to be logged in to view your profile.</p>
+        <div id="loginPrompt" style="display: none;">
+            <p>You need to be logged in to view your profile.</p>
             
-            <div style="max-width: 400px; margin: 0 auto; padding: 20px; border: 1px solid var(--border-color); background-color: var(--input-bg);">
+            <div class="login-box">
                 <form id="loginForm">
                     <div class="form-group">
                         <label for="loginEmail" class="form-label">Email</label>
@@ -877,18 +553,18 @@
                     <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
                 </form>
                 <div style="margin-top: 15px; text-align: center;">
-                    <a href="../../../index.html" style="color: var(--text-primary); text-decoration: none;">Return to Home</a>
+                    <a href="../../index.html" style="color: var(--text-color); text-decoration: none; opacity: 0.8; transition: opacity 0.2s;">Return to Home</a>
                 </div>
             </div>
         </div>
-        
-        <div class="form-container animate__animated animate__fadeIn animate__delay-1s">
+
+        <div class="form-container">
             <div id="profileLoading" class="loading-spinner" style="display: none;">
-                <i class="fas fa-spinner fa-spin"></i> Loading profile information...
+                <i class="fas fa-spinner"></i> Loading profile information...
             </div>
             <form id="profileForm" style="display: block;">
                 <!-- Personal Information Section -->
-                <div class="form-section animate__animated animate__fadeIn">
+                <div class="form-section">
                     <h2 class="section-title"><i class="fas fa-user-circle"></i> Personal Information</h2>
                     
                     <div class="form-group">
@@ -908,7 +584,7 @@
                 </div>
                 
                 <!-- Shop Information Section -->
-                <div class="form-section animate__animated animate__fadeIn" style="animation-delay: 0.2s;">
+                <div class="form-section">
                     <h2 class="section-title"><i class="fas fa-store"></i> Shop Information</h2>
         
                     <div class="form-group">
@@ -917,72 +593,35 @@
                     </div>
         
                     <div class="form-group">
-                        <label for="shop_address" class="form-label">Shop Address</label>
-                        <input type="text" id="shop_address" name="shop_address" class="form-input" required>
+                        <label for="shop_description" class="form-label">Shop Description</label>
+                        <textarea id="shop_description" name="shop_description" class="form-input" rows="3" required></textarea>
                     </div>
         
                     <div class="form-group">
-                        <label for="shop_location" class="form-label">Shop Location (Coordinates)</label>
-                        <div class="location-input-container">
-                            <div class="location-fields">
-                                <div class="coordinate-field">
-                                    <label for="shop_latitude" class="coord-label">Latitude</label>
-                                    <input type="text" id="shop_latitude" name="shop_latitude" class="form-input coordinate-input" placeholder="e.g. 28.6139">
-                                </div>
-                                <div class="coordinate-field">
-                                    <label for="shop_longitude" class="coord-label">Longitude</label>
-                                    <input type="text" id="shop_longitude" name="shop_longitude" class="form-input coordinate-input" placeholder="e.g. 77.2090">
-                                </div>
-                            </div>
-                            <button type="button" id="getLocationBtn" class="location-btn">
-                                <i class="fas fa-map-marker-alt"></i> Get Current Location
-                            </button>
-                        </div>
-                        <small class="form-hint">These coordinates help customers find your shop on the map</small>
+                        <label for="shop_location" class="form-label">Shop Location</label>
+                        <input type="text" id="shop_location" name="shop_location" class="form-input" required>
+                    </div>
                 </div>
-        
-                <div class="form-group">
-                        <label for="shop_bio" class="form-label">Shop Description</label>
-                        <textarea id="shop_bio" name="shop_bio" class="form-input" rows="4"></textarea>
-                </div>
-        
-                <div class="form-group">
-                        <label for="shop_logo" class="form-label">Shop Logo</label>
-                        <div class="logo-preview-container">
-                            <img id="logoPreview" src="#" alt="Shop Logo Preview" class="logo-preview" style="display: none; max-width: 150px; max-height: 150px; margin-bottom: 10px;">
-                        </div>
-                        <input type="file" id="shop_logo" name="shop_logo" class="form-input file-input" accept="image/*">
-                </div>
-            </div>
 
-                <!-- Account Information Section -->
-                <div class="form-section animate__animated animate__fadeIn" style="animation-delay: 0.4s;">
-                    <h2 class="section-title"><i class="fas fa-shield-alt"></i> Account Information</h2>
+                <div class="password-toggle">
+                    <input type="checkbox" id="changePassword">
+                    <label for="changePassword">Change Password</label>
+                </div>
+
+                <div id="passwordSection" class="password-section">
+                    <div class="form-group">
+                        <label for="current_password" class="form-label">Current Password</label>
+                        <input type="password" id="current_password" name="current_password" class="form-input">
+                    </div>
                     
                     <div class="form-group">
-                        <label for="created_at" class="form-label">Account Created</label>
-                        <input type="text" id="created_at" name="created_at" class="form-input" disabled>
+                        <label for="new_password" class="form-label">New Password</label>
+                        <input type="password" id="new_password" name="new_password" class="form-input">
                     </div>
 
-                    <div class="password-toggle">
-                        <input type="checkbox" id="changePassword">
-                        <label for="changePassword">Change Password</label>
-                    </div>
-        
-                    <div id="passwordSection" class="password-section" style="display: none;">
-                        <div class="form-group">
-                            <label for="password" class="form-label">New Password</label>
-                            <input type="password" id="password" name="password" class="form-input">
-                            <div class="password-strength-meter">
-                                <div class="strength-bar" id="strengthBar"></div>
-                            </div>
-                            <small id="passwordHint" class="form-hint">Use 8+ characters with letters, numbers & symbols</small>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="confirm_password" class="form-label">Confirm New Password</label>
-                            <input type="password" id="confirm_password" name="confirm_password" class="form-input">
-                        </div>
+                    <div class="form-group">
+                        <label for="confirm_password" class="form-label">Confirm New Password</label>
+                        <input type="password" id="confirm_password" name="confirm_password" class="form-input">
                     </div>
                 </div>
 
@@ -993,594 +632,140 @@
             </form>
         </div>
     </main>
-  
-  <script>
-    // Wait for DOM to be fully loaded
-    document.addEventListener('DOMContentLoaded', function() {
-        // Hide any error alerts on initial page load
-        const errorAlert = document.getElementById('errorAlert');
-        if (errorAlert) {
-            errorAlert.style.display = 'none';
-            errorAlert.textContent = ''; // Clear content immediately
-        }
-        
-        // Also clear any success alerts
-        const successAlert = document.getElementById('successAlert');
-        if (successAlert) {
-            successAlert.style.display = 'none';
-            successAlert.textContent = '';
-        }
-        
-        // And clear any other alerts that might exist in the DOM
-        const alertElements = document.querySelectorAll('.alert');
-        alertElements.forEach(alert => {
-            alert.style.display = 'none';
-            alert.textContent = '';
-        });
-        
-        // Setup event listeners
-        setupEventListeners();
-        
-        // Load profile data
-        loadProfileData();
-    });
-            
-    // Function to setup all event listeners
-    function setupEventListeners() {
-        // Handle form submission
-        const profileForm = document.getElementById('profileForm');
-        if (profileForm) {
-            profileForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                updateProfile();
-            });
-        }
-            
-        // Get Location button
-        const getLocationBtn = document.getElementById('getLocationBtn');
-        if (getLocationBtn) {
-            getLocationBtn.addEventListener('click', getCurrentLocation);
-        }
-            
-        // Logout button
-        const logoutBtn = document.getElementById('logoutBtn');
-        if (logoutBtn) {
-            logoutBtn.addEventListener('click', function() {
-                logout();
-            });
-        }
 
-        // Statistics button
-        const statisticsBtn = document.getElementById('statisticsBtn');
-        if (statisticsBtn) {
-            statisticsBtn.addEventListener('click', function() {
-                window.location.href = 'seller_statistics.html';
-            });
-        }
+    <!-- Footer -->
+    <footer class="footer" style="background-color: var(--footer-bg); color: var(--footer-text); padding: 1rem 0; margin-top: 50px; text-align: center;">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 1rem 2rem;">
+            <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 0.5rem;">
+                <span style="font-size: 1.8rem; font-weight: 700; letter-spacing: 3px; text-transform: uppercase;">
+                    <i class="fas fa-recycle" style="margin-right: 10px; color: var(--accent-color);"></i> ClothLoop
+                </span>
+            </div>
+            <p style="font-size: 0.9rem;">&copy; 2024 ClothLoop. All rights reserved.</p>
+        </div>
+    </footer>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Theme switcher functionality
+            const themeToggle = document.getElementById('theme-toggle');
+            const themeIcon = themeToggle.querySelector('i');
             
-        // Help button
-        const helpBtn = document.getElementById('helpBtn');
-        if (helpBtn) {
-            helpBtn.addEventListener('click', function() {
-                window.location.href = '../about/about_us.html';
-            });
-        }
-        
-        // Change password toggle
-        const changePasswordCheckbox = document.getElementById('changePassword');
-        if (changePasswordCheckbox) {
-            changePasswordCheckbox.addEventListener('change', function() {
-                const passwordSection = document.getElementById('passwordSection');
-                if (passwordSection) {
-                    passwordSection.style.display = this.checked ? 'block' : 'none';
-                }
-            });
-        }
-    }
-            
-    // Function to handle logout
-    function logout() {
-        // Call logout API
-        fetch('../../../backend/api/users/logout.php')
-            .then(response => response.json())
-                .then(data => {
-                if (data.status === 'success') {
-                    window.location.href = '../../pages/account/login.html';
-                    } else {
-                    showAlert('Error logging out. Please try again.', 'error');
-                    }
-                })
-                .catch(error => {
-                console.error('Error:', error);
-                showAlert('Error logging out. Please try again.', 'error');
-                });
-            }
-            
-    // Function to load profile data
-    function loadProfileData() {
-        // Show loading message or spinner
-        showLoadingState(true);
-        
-        // Fetch profile data from backend API
-        fetch('../../../backend/api/sellers/get_seller_profile.php')
-          .then(response => {
-            if (!response.ok) {
-                        throw new Error('Network response was not ok');
-            }
-            return response.json();
-          })
-          .then(data => {
-                    // Hide loading state
-                showLoadingState(false);
-                    
-            if (data.status === 'success') {
-                    // Populate form with profile data
-                    populateProfileForm(data.profile);
-                    } else {
-                    showAlert(data.message || 'Error loading profile data', 'error');
-            }
-          })
-          .catch(error => {
-                console.error('Error fetching profile data:', error);
-                showLoadingState(false);
-                showAlert('Error occurred while loading profile data. Please try again.', 'error');
-                });
-            }
-            
-    // Function to show loading state
-    function showLoadingState(isLoading) {
-        const profileForm = document.getElementById('profileForm');
-        const profileLoading = document.getElementById('profileLoading');
-        
-        if (isLoading) {
-            // Show loading state
-            if (profileLoading) {
-                profileLoading.style.display = 'flex';
-            }
-            if (profileForm) {
-                profileForm.style.opacity = '0.5';
-                profileForm.querySelectorAll('input, textarea, button').forEach(el => {
-                    el.disabled = true;
-                });
-            }
-        } else {
-            // Hide loading state
-            if (profileLoading) {
-                profileLoading.style.display = 'none';
-            }
-            if (profileForm) {
-                profileForm.style.opacity = '1';
-                profileForm.querySelectorAll('input, textarea, button').forEach(el => {
-                    el.disabled = false;
-                });
-            }
-        }
-    }
-            
-    // Function to populate profile form with data
-    function populateProfileForm(profile) {
-        console.log('Populating form with profile data:', profile);
-
-        // Clear any error messages
-        const errorAlert = document.getElementById('errorAlert');
-        if (errorAlert) {
-            errorAlert.style.display = 'none';
-            errorAlert.textContent = '';
-        }
-        
-        // Hide any alerts at the top of the page
-        const alertElements = document.querySelectorAll('.alert');
-        alertElements.forEach(alert => {
-            alert.style.display = 'none';
-            alert.textContent = '';
-        });
-        
-        // Personal Information section
-        document.getElementById('name').value = profile.name || '';
-        document.getElementById('email').value = profile.email || '';
-        document.getElementById('phone_no').value = profile.phone_no || '';
-        
-        // Shop Information section - use empty string as fallback to ensure fields are never undefined
-        document.getElementById('shop_name').value = profile.shop_name || '';
-        document.getElementById('shop_address').value = profile.shop_address || '';
-        document.getElementById('shop_bio').value = profile.shop_bio || '';
-        
-        console.log('Set shop_name to:', profile.shop_name);
-        console.log('Set shop_address to:', profile.shop_address);
-        
-        // Shop Location
-        if (profile.shop_latitude && profile.shop_longitude) {
-            document.getElementById('shop_latitude').value = profile.shop_latitude;
-            document.getElementById('shop_longitude').value = profile.shop_longitude;
-        }
-        
-        // Handle shop logo with error handling
-        const logoPreview = document.getElementById('logoPreview');
-        if (profile.has_shop_logo && profile.shop_logo_url) {
-            console.log('Setting shop logo URL:', profile.shop_logo_url);
-            
-            // Set up error handler before setting src
-            logoPreview.onerror = function() {
-                console.warn('Failed to load shop logo:', profile.shop_logo_url);
-                // Hide the broken image
-                this.style.display = 'none';
-                this.src = '#'; // Reset src to prevent additional requests
-            };
-            
-            logoPreview.onload = function() {
-                // Show the image once it successfully loads
-                console.log('Shop logo loaded successfully');
-                this.style.display = 'block';
-            };
-            
-            // Add cache-busting parameter to avoid browser caching
-            const cacheBuster = '?t=' + new Date().getTime();
-            logoPreview.src = profile.shop_logo_url + cacheBuster;
-            logoPreview.style.display = 'block';
-        } else {
-            console.log('No shop logo provided');
-            logoPreview.style.display = 'none';
-            logoPreview.src = '#'; // Set a placeholder to avoid 404 errors
-        }
-        
-        // If there's a created_at date, format and display it
-        if (profile.created_at) {
-            const createdDate = new Date(profile.created_at);
-            document.getElementById('created_at').value = createdDate.toLocaleDateString();
-        }
-    }
-            
-    // Function to update profile
-    function updateProfile() {
-        // Show loading state
-        showLoadingState(true);
-        
-        // Get form data
-        const form = document.getElementById('profileForm');
-        const formData = new FormData(form);
-        
-        // Debug log form data values
-        console.log('Submitting profile update with data:');
-        for (let [key, value] of formData.entries()) {
-            console.log(`${key}: ${value}`);
-        }
-        
-        // Get and trim the shop name and address to make sure they're not just whitespace
-        const shopName = document.getElementById('shop_name').value.trim();
-        const shopAddress = document.getElementById('shop_address').value.trim();
-        
-        console.log(`Direct shop_name value: "${shopName}"`);
-        console.log(`Direct shop_address value: "${shopAddress}"`);
-        
-        // Check required fields
-        if (!shopName || !shopAddress) {
-            showLoadingState(false);
-            showAlert('Required fields are missing: Shop Name and Shop Address are required.', 'error');
-            return;
-        }
-        
-        // Explicitly set these values in FormData 
-        formData.set('shop_name', shopName);
-        formData.set('shop_address', shopAddress);
-        
-        console.log('After resetting form data:');
-        for (let [key, value] of formData.entries()) {
-            console.log(`${key}: ${value}`);
-        }
-        
-        // Send data to backend API
-        fetch('../../../backend/api/sellers/update_seller_profile.php', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => {
-            console.log('Update response status:', response.status);
-            return response.json()
-                .then(data => {
-                    console.log('Update response data:', data);
-                    return { response, data };
-                })
-                .catch(err => {
-                    // Handle case where response isn't valid JSON
-                    console.error('Error parsing response JSON:', err);
-                    return { 
-                        response, 
-                        data: { status: 'error', message: 'Invalid server response format' } 
-                    };
-                });
-        })
-        .then(({ response, data }) => {
-            // Hide loading state
-            showLoadingState(false);
-            
-            if (!response.ok) {
-                throw new Error(`Server returned ${response.status}: ${data.message || 'Unknown error'}`);
-            }
-            
-            if (data.status === 'success') {
-                showAlert('Profile updated successfully!', 'success');
-                
-                // If we got updated profile data in response, update the form
-                if (data.profile) {
-                    populateProfileForm(data.profile);
-                }
-                
-                // Force reload after 1 second to refresh the data
-                setTimeout(() => {
-                    fetchSellerData();
-                }, 1000);
-            } else {
-                showAlert(data.message || 'Error updating profile', 'error');
-            }
-        })
-        .catch(error => {
-            console.error('Error updating profile:', error);
-            showLoadingState(false);
-            showAlert('Error occurred while updating profile. Please try again.', 'error');
-        });
-    }
-            
-    // Function to handle image preview for shop logo
-    function handleShopLogoPreview(event) {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const preview = document.getElementById('logoPreview');
-                preview.src = e.target.result;
-                preview.style.display = 'block';
-            }
-            reader.readAsDataURL(file);
-        }
-    }
-            
-    // Function to show alerts
-    function showAlert(message, type) {
-        const successAlert = document.getElementById('successAlert');
-        const errorAlert = document.getElementById('errorAlert');
-        
-        // First, hide both alerts
-        if (successAlert) {
-            successAlert.style.display = 'none';
-            successAlert.textContent = '';
-        }
-        
-        if (errorAlert) {
-            errorAlert.style.display = 'none';
-            errorAlert.textContent = '';
-        }
-        
-        if (type === 'success' && successAlert) {
-            // Show success message
-            successAlert.textContent = message;
-            successAlert.style.display = 'block';
-            
-            // Auto-hide after 3 seconds
-            setTimeout(() => {
-                successAlert.style.display = 'none';
-            }, 3000);
-        } else if (type === 'error' && errorAlert) {
-            // Show error message
-            errorAlert.textContent = message;
-            errorAlert.style.display = 'block';
-        }
-    }
-
-    // Add event listeners for image uploads
-    document.getElementById('shop_logo').addEventListener('change', handleShopLogoPreview);
-
-    // Get seller profile data
-    document.addEventListener('DOMContentLoaded', function () {
-        // First check if user is logged in
-        checkLoginStatus()
-            .then(isLoggedIn => {
-                if (isLoggedIn) {
-                    fetchSellerData();
-                } else {
-                    // Show login prompt
-                    showLoginPrompt();
-                }
-            })
-            .catch(error => {
-                console.error('Error checking login status:', error);
-                showAlert('Error checking login status. Please try again.', 'error');
-            });
-        
-        // Set up location detection button
-        const locationBtn = document.getElementById('getLocationBtn');
-        if (locationBtn) {
-            locationBtn.addEventListener('click', getCurrentLocation);
-        }
-    });
-
-    function getCurrentLocation() {
-        const latInput = document.getElementById('shop_latitude');
-        const lngInput = document.getElementById('shop_longitude');
-        const locationBtn = document.getElementById('getLocationBtn');
-        
-        if (!navigator.geolocation) {
-            alert('Geolocation is not supported by your browser');
-            return;
-        }
-        
-        // Change button text to show loading
-        locationBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Getting location...';
-        locationBtn.disabled = true;
-        
-        navigator.geolocation.getCurrentPosition(
-            // Success callback
-            function(position) {
-                latInput.value = position.coords.latitude.toFixed(6);
-                lngInput.value = position.coords.longitude.toFixed(6);
-                
-                // Reset button text
-                locationBtn.innerHTML = '<i class="fas fa-map-marker-alt"></i> Get Current Location';
-                locationBtn.disabled = false;
-                
-                // Add visual feedback
-                latInput.classList.add('is-valid');
-                lngInput.classList.add('is-valid');
-                setTimeout(() => {
-                    latInput.classList.remove('is-valid');
-                    lngInput.classList.remove('is-valid');
-                }, 2000);
-            },
-            // Error callback
-            function(error) {
-                let errorMessage = 'Unknown error occurred while getting location';
-                
-                switch(error.code) {
-                    case error.PERMISSION_DENIED:
-                        errorMessage = 'Location permission denied. Please enable location access.';
-                        break;
-                    case error.POSITION_UNAVAILABLE:
-                        errorMessage = 'Location information is unavailable.';
-                        break;
-                    case error.TIMEOUT:
-                        errorMessage = 'Location request timed out.';
-                        break;
-                }
-                
-                alert(errorMessage);
-                
-                // Reset button text
-                locationBtn.innerHTML = '<i class="fas fa-map-marker-alt"></i> Get Current Location';
-                locationBtn.disabled = false;
-            },
-            // Options
-            {
-                enableHighAccuracy: true,
-                timeout: 10000,
-                maximumAge: 0
-            }
-        );
-    }
-
-    function fetchSellerData() {
-        // Show loading state
-        showLoadingState(true);
-        
-        console.log('Fetching seller profile data...');
-        
-        // Hide any error alerts when starting to fetch data
-        const errorAlert = document.getElementById('errorAlert');
-        if (errorAlert) {
-            errorAlert.style.display = 'none';
-            errorAlert.textContent = '';  // Clear any existing error message
-        }
-        
-        // Hide any alerts at the top of the page
-        const alertElements = document.querySelectorAll('.alert');
-        alertElements.forEach(alert => {
-            alert.style.display = 'none';
-            alert.textContent = '';
-        });
-        
-        // Fetch seller profile data from the API
-        fetch('../../../backend/api/sellers/get_seller_profile.php')
-            .then(response => {
-                console.log('Response status:', response.status);
-                return response.json()
-                    .then(data => {
-                        console.log('Response data:', data);
-                        return { response, data };
-                    });
-            })
-            .then(({ response, data }) => {
-                showLoadingState(false);
-                
-                if (!response.ok) {
-                    throw new Error(`Server returned ${response.status}: ${data.message || 'Unknown error'}`);
-                }
-                
-                if (data.status === 'success') {
-                    console.log('Profile data received:', data.profile);
-                    
-                    // Prevent error message about missing fields
-                    const shopName = data.profile.shop_name || '';
-                    const shopAddress = data.profile.shop_address || '';
-                    
-                    // If both fields are empty, we'll set placeholder values to prevent validation errors
-                    if (!shopName.trim() && !shopAddress.trim()) {
-                        console.log('Shop name and address are empty, setting temporary values');
-                        data.profile.shop_name = data.profile.shop_name || 'Your Shop Name';
-                        data.profile.shop_address = data.profile.shop_address || 'Your Shop Address';
-                    }
-                    
-                    // Populate the form with the data
-                    populateProfileForm(data.profile);
-                } else {
-                    console.error('API returned error:', data.message);
-                    // Don't show error if it's about missing fields
-                    if (data.message && !data.message.toLowerCase().includes('missing') && !data.message.toLowerCase().includes('required')) {
-                        showAlert(data.message || 'Error loading profile data', 'error');
-                    }
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching profile data:', error);
-                showLoadingState(false);
-                showAlert('Error occurred while loading profile data. Please try again.', 'error');
-            });
-    }
-
-    // Function to check if user is logged in
-    function checkLoginStatus() {
-        return fetch('../../../backend/api/users/check_session.php')
-            .then(response => response.json())
-            .then(data => {
-                console.log('Login status:', data);
-                return data.logged_in === true && data.user_type === 'seller';
-            });
-    }
-            
-    // Function to show login prompt
-    function showLoginPrompt() {
-        showLoadingState(false);
-        const profileForm = document.getElementById('profileForm');
-        const loginPrompt = document.getElementById('loginPrompt');
-        
-        if (profileForm) {
-            profileForm.style.display = 'none';
-        }
-        
-        if (loginPrompt) {
-            loginPrompt.style.display = 'block';
-        }
-        
-        // Also show a message to the user
-        showAlert('Please log in to view your profile.', 'error');
-    }
-
-    // Theme switcher functionality
-    document.addEventListener('DOMContentLoaded', function() {
-        const themeToggle = document.getElementById('theme-toggle');
-        const themeIcon = themeToggle.querySelector('i');
-        
-        // Check for saved theme preference or use default
-        const savedTheme = localStorage.getItem('clothloop-theme');
-        if (savedTheme === 'light') {
-            document.body.classList.add('light-theme');
-            themeIcon.classList.remove('fa-sun');
-            themeIcon.classList.add('fa-moon');
-        }
-        
-        // Toggle theme
-        themeToggle.addEventListener('click', () => {
-            document.body.classList.toggle('light-theme');
-            
-            // Update icon
-            if (document.body.classList.contains('light-theme')) {
+            // Check for saved theme preference or use default
+            const savedTheme = localStorage.getItem('clothloop-theme');
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-theme');
                 themeIcon.classList.remove('fa-sun');
                 themeIcon.classList.add('fa-moon');
-                localStorage.setItem('clothloop-theme', 'light');
-            } else {
-                themeIcon.classList.remove('fa-moon');
-                themeIcon.classList.add('fa-sun');
-                localStorage.setItem('clothloop-theme', 'dark');
+            }
+            
+            // Toggle theme
+            themeToggle.addEventListener('click', () => {
+                document.body.classList.toggle('light-theme');
+                
+                // Update icon
+                if (document.body.classList.contains('light-theme')) {
+                    themeIcon.classList.remove('fa-sun');
+                    themeIcon.classList.add('fa-moon');
+                    localStorage.setItem('clothloop-theme', 'light');
+                } else {
+                    themeIcon.classList.remove('fa-moon');
+                    themeIcon.classList.add('fa-sun');
+                    localStorage.setItem('clothloop-theme', 'dark');
+                }
+            });
+            
+            // Password change toggle
+            const changePasswordCheckbox = document.getElementById('changePassword');
+            const passwordSection = document.getElementById('passwordSection');
+            
+            changePasswordCheckbox.addEventListener('change', function() {
+                passwordSection.style.display = this.checked ? 'block' : 'none';
+                
+                // Add animation class if showing
+                if (this.checked) {
+                    passwordSection.classList.add('animate__animated', 'animate__fadeIn');
+                }
+            });
+            
+            // Cancel button
+            const cancelBtn = document.getElementById('cancelBtn');
+            
+            cancelBtn.addEventListener('click', function() {
+                window.location.href = 'seller_dashboard.html';
+            });
+            
+            // Form submission
+            const profileForm = document.getElementById('profileForm');
+            const loadingSpinner = document.getElementById('profileLoading');
+            
+            // Hide loading spinner after a delay (simulating data fetch)
+            setTimeout(() => {
+                loadingSpinner.style.display = 'none';
+                profileForm.style.display = 'block';
+            }, 1000);
+            
+            profileForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Show loading state
+                const submitButton = document.querySelector('button[type="submit"]');
+                const originalButtonText = submitButton.textContent;
+                submitButton.disabled = true;
+                submitButton.innerHTML = '<i class="fas fa-spinner"></i> Saving...';
+                
+                // Hide any existing messages
+                document.getElementById('errorAlert').style.display = 'none';
+                document.getElementById('successAlert').style.display = 'none';
+                
+                // Simulate form submission with delay
+                setTimeout(() => {
+                    // Reset button state
+                    submitButton.disabled = false;
+                    submitButton.textContent = originalButtonText;
+                    
+                    // Show success message
+                    showSuccess('Profile updated successfully!');
+                    
+                    // If password change was requested, reset those fields
+                    if (changePasswordCheckbox.checked) {
+                        document.getElementById('current_password').value = '';
+                        document.getElementById('new_password').value = '';
+                        document.getElementById('confirm_password').value = '';
+                        changePasswordCheckbox.checked = false;
+                        passwordSection.style.display = 'none';
+                    }
+                }, 1500);
+            });
+            
+            function showSuccess(message) {
+                const successAlert = document.getElementById('successAlert');
+                successAlert.textContent = message;
+                successAlert.style.display = 'block';
+                
+                // Scroll to the message
+                successAlert.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                // Hide after 3 seconds
+                setTimeout(function() {
+                    successAlert.style.display = 'none';
+                }, 3000);
+            }
+            
+            function showError(message) {
+                const errorAlert = document.getElementById('errorAlert');
+                errorAlert.textContent = message;
+                errorAlert.style.display = 'block';
+                
+                // Scroll to the error
+                errorAlert.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                // Hide after 5 seconds
+                setTimeout(function() {
+                    errorAlert.style.display = 'none';
+                }, 5000);
             }
         });
-    });
-  </script>
+    </script>
 </body>
 </html> 
