@@ -33,7 +33,7 @@ if (!isset($_FILES['profile_photo']) || $_FILES['profile_photo']['error'] !== UP
 
 try {
     // Set upload directory
-    $upload_dir = __DIR__ . '/../../uploads/profiles/';
+    $upload_dir = __DIR__ . '/../../uploads/profile_photos/';
     
     // Create directory if it doesn't exist
     if (!file_exists($upload_dir)) {
@@ -48,7 +48,7 @@ try {
     // Move the uploaded file
     if (move_uploaded_file($_FILES['profile_photo']['tmp_name'], $upload_path)) {
         // File path to store in the database (relative path)
-        $relative_path = 'uploads/profiles/' . $unique_filename;
+        $relative_path = 'uploads/profile_photos/' . $unique_filename;
         
         // Connect to database
         $database = new Database();

@@ -1,0 +1,47 @@
+/* Toggle Switch Styles - Completely Redesigned */
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    flex: 1;
+}
+
+.toggle-switch input {
+    display: none;
+}
+
+/* Simple button design instead of a slider */
+.toggle-slider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #444444;
+    color: #FFFFFF;
+    border: none;
+    height: 46px;
+    cursor: pointer;
+    text-transform: uppercase;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    transition: all 0.2s linear;
+}
+
+/* Active state - green background */
+input:checked + .toggle-slider {
+    background-color: #22B94A;
+}
+
+/* Hover effect */
+.toggle-slider:hover {
+    transform: translateY(-3px) skewX(-5deg);
+    box-shadow: 5px 5px 0 rgba(255, 255, 255, 0.1);
+}
+
+.light-theme .toggle-slider:hover {
+    box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.1);
+}
+
+/* Hide the toggle status elements */
+.toggle-status {
+    display: none;
+} 

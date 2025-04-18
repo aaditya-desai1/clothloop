@@ -96,14 +96,25 @@ try {
     
     // Try to get buyer location data if available
     try {
-        $buyer->user_id = $userId;
+        $buyer->id = $userId;
         if ($buyer->readSingle()) {
             $userData['latitude'] = $buyer->latitude;
             $userData['longitude'] = $buyer->longitude;
+            
+            // Only add properties that exist in the Buyer model
+            // and are set in this particular buyer record
+            if (isset($buyer->address)) {
+                $userData['address'] = $buyer->address;
+            }
         }
     } catch (Exception $e) {
         error_log('Error fetching buyer location: ' . $e->getMessage());
         // Continue even if location data can't be fetched
+    }
+    
+    // Add profile photo URL if available
+    if (!empty($user->profile_photo)) {
+        $userData['profile_photo_url'] = '../uploads/profile_photos/' . $user->profile_photo;
     }
     
     // Success response

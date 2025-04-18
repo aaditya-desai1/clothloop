@@ -184,6 +184,58 @@ try {
             }
         }
         
+        // Try product directory structure
+        if ($type === 'product' || $type === 'cloth') {
+            $productUploadDir = $baseDir . "/backend/uploads/products/{$id}";
+            
+            if ($debug) {
+                echo "<h3>Checking Product Upload Directory</h3>";
+                echo "<p>Directory: $productUploadDir</p>";
+                echo "<p>Directory exists: " . (is_dir($productUploadDir) ? "YES" : "NO") . "</p>";
+            }
+            
+            // If the directory exists, look for any image file
+            if (is_dir($productUploadDir)) {
+                $files = scandir($productUploadDir);
+                
+                if ($debug) {
+                    echo "<h4>Files in upload directory:</h4>";
+                    echo "<ul>";
+                    foreach ($files as $file) {
+                        if ($file !== '.' && $file !== '..') {
+                            echo "<li>$file</li>";
+                        }
+                    }
+                    echo "</ul>";
+                }
+                
+                // Look for image files
+                $imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+                foreach ($files as $file) {
+                    if ($file === '.' || $file === '..') continue;
+                    
+                    $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+                    if (in_array($ext, $imageExtensions)) {
+                        $imagePath = "$productUploadDir/$file";
+                        
+                        if ($debug) {
+                            echo "<p>Found image file: $imagePath</p>";
+                        } else {
+                            // Determine content type based on file extension
+                            $contentType = 'image/jpeg'; // Default
+                            if ($ext === 'png') $contentType = 'image/png';
+                            elseif ($ext === 'gif') $contentType = 'image/gif';
+                            elseif ($ext === 'webp') $contentType = 'image/webp';
+                            
+                            header("Content-Type: $contentType");
+                            readfile($imagePath);
+                            exit;
+                        }
+                    }
+                }
+            }
+        }
+        
         // If we reach here, we didn't find a valid image
         if ($debug) {
             echo "<p>No valid image found in any field, using fallback</p>";

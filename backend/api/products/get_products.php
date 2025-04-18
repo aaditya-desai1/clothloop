@@ -48,6 +48,7 @@ try {
     $query = "
         SELECT 
             p.*,
+            COALESCE(p.status, 'inactive') AS status_normalized,
             c.name AS category_name,
             u.name AS seller_name,
             s.shop_name,
@@ -58,7 +59,7 @@ try {
         LEFT JOIN categories c ON p.category_id = c.id
         JOIN sellers s ON p.seller_id = s.id
         JOIN users u ON s.id = u.id
-        WHERE p.status = 'available'
+        WHERE (p.status = 'available' OR p.status = 'active' OR p.status IS NULL)
     ";
     
     // Add filters

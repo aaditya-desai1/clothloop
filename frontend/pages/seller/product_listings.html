@@ -44,6 +44,8 @@
         --success-color: #34C759;
         --seller-highlight: #ffffff;
         --button-border: #444444;
+        --toggle-bg-off: #444444;
+        --toggle-bg-on: #34C759;
     }
 
     /* Light Theme Variables */
@@ -67,6 +69,8 @@
         --success-color: #34C759;
         --seller-highlight: #000000;
         --button-border: #cccccc;
+        --toggle-bg-off: #cccccc;
+        --toggle-bg-on: #34C759;
     }
     
     * {
@@ -753,6 +757,93 @@
     .status-pending {
         background-color: #FF9500;
     }
+
+    /* Toggle Switch Styles */
+    .toggle-switch {
+        position: relative;
+        display: inline-block;
+        width: 95px;
+        height: 46px;
+        flex: 1;
+    }
+
+    .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .toggle-slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: var(--toggle-bg-off);
+        transition: .4s;
+        border: 2px solid var(--accent-color);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 10px;
+        color: var(--accent-color);
+        text-transform: uppercase;
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 1px;
+    }
+
+    .toggle-slider:before {
+        position: absolute;
+        content: "";
+        height: 70%;
+        width: 10px;
+        left: 8px;
+        bottom: 15%;
+        background-color: var(--accent-color);
+        transition: .4s;
+        z-index: 1;
+    }
+
+    input:checked + .toggle-slider {
+        background-color: var(--toggle-bg-on);
+    }
+
+    input:checked + .toggle-slider:before {
+        transform: translateX(70px);
+    }
+
+    .toggle-switch:hover .toggle-slider {
+        transform: translateY(-3px) skewX(-5deg);
+        box-shadow: 5px 5px 0 rgba(255, 255, 255, 0.1);
+    }
+
+    .light-theme .toggle-switch:hover .toggle-slider {
+        box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.1);
+    }
+
+    .toggle-status {
+        position: relative;
+        z-index: 2;
+        transition: opacity 0.3s ease;
+    }
+
+    .toggle-on {
+        opacity: 0;
+    }
+
+    .toggle-off {
+        opacity: 1;
+    }
+
+    input:checked + .toggle-slider .toggle-on {
+        opacity: 1;
+    }
+
+    input:checked + .toggle-slider .toggle-off {
+        opacity: 0;
+    }
   </style>
 </head>
 <body>
@@ -828,6 +919,13 @@
                     <button class="product-action-btn edit-btn">
                         <i class="fas fa-edit"></i> Edit
                     </button>
+                    <label class="toggle-switch" title="Toggle availability">
+                        <input type="checkbox" class="availability-toggle">
+                        <span class="toggle-slider">
+                            <span class="toggle-status toggle-on">SHOW</span>
+                            <span class="toggle-status toggle-off">HIDE</span>
+                        </span>
+                    </label>
                     <button class="product-action-btn delete-btn">
                         <i class="fas fa-trash"></i> Delete
                     </button>
@@ -843,6 +941,37 @@
         let currentProducts = [];
         let productsContainer;
         let paginationContainer;
+        
+        // Create a status cache manager
+        const statusCacheManager = {
+            getCache: function() {
+                const cache = localStorage.getItem('product_status_cache');
+                return cache ? JSON.parse(cache) : {};
+            },
+            
+            updateStatus: function(productId, status) {
+                const cache = this.getCache();
+                cache[productId] = status;
+                localStorage.setItem('product_status_cache', JSON.stringify(cache));
+            },
+            
+            getStatus: function(productId) {
+                const cache = this.getCache();
+                return cache[productId] || null;
+            },
+            
+            removeItem: function(productId) {
+                const cache = this.getCache();
+                if (cache[productId]) {
+                    delete cache[productId];
+                    localStorage.setItem('product_status_cache', JSON.stringify(cache));
+                }
+            },
+            
+            clearCache: function() {
+                localStorage.removeItem('product_status_cache');
+            }
+        };
         
         // Wait for DOM to be fully loaded
         document.addEventListener('DOMContentLoaded', function() {
@@ -1131,9 +1260,13 @@
             // Add products to grid
             products.forEach((product, index) => {
                 console.log(`Processing product ${index}:`, product);
+                console.log(`Product ${product.id} status in DB:`, product.status || 'empty');
                 
                 // Clone the template
                 const productElement = document.importNode(template.content, true).querySelector('.product-card');
+                
+                // Add data-id attribute for easier reference
+                productElement.setAttribute('data-id', product.id);
                 
                 // Set product image
                 const imageElement = productElement.querySelector('.product-image');
@@ -1148,6 +1281,8 @@
                 // Create a list of fallback image sources to try in order
                 const imageSources = [
                     `${basePath}/backend/api/image_display.php?type=product&id=${product.id}`,
+                    `${basePath}/backend/uploads/products/${product.id}/${product.image_filename || 'product_image.jpg'}`,
+                    `${basePath}/backend/uploads/products/${product.id}/product_image.jpg`,
                     `${basePath}/backend/api/products/direct_image.php?product_id=${product.id}`,
                     `${basePath}/frontend/assets/images/Clothify.png`,
                     `${basePath}/frontend/assets/images/placeholder.png`,
@@ -1163,22 +1298,50 @@
                     
                     // Try current image source
                     imageElement.src = imageSources[index];
-                    console.log(`Trying image source ${index + 1}/${imageSources.length}: ${imageSources[index]}`);
+                    console.log(`Trying image source ${index + 1}/${imageSources.length}:`, imageSources[index]);
                     
                     // Set up error handler to try next source if this one fails
                     imageElement.onerror = function() {
                         console.log(`Image source ${index + 1} failed, trying next...`);
-                        tryNextImage(index + 1);
+                        // Add a random query parameter to prevent browser caching
+                        if (index === 0 || index === 1 || index === 2) {
+                            // First try directly accessing the product folder to see if we can find any images
+                            console.log(`Trying direct folder access for product ${product.id}...`);
+                            // Make an AJAX request to check if the directory exists and has images
+                            fetch(`${basePath}/backend/api/check_product_images.php?product_id=${product.id}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.status === 'success' && data.image_path) {
+                                    console.log(`Found image at: ${data.image_path}`);
+                                    imageElement.src = data.image_path;
+                                } else {
+                                    tryNextImage(index + 1);
+                                }
+                            })
+                            .catch(error => {
+                                console.log('Error checking product images:', error);
+                                tryNextImage(index + 1);
+                            });
+                        } else {
+                            tryNextImage(index + 1);
+                        }
                     };
                 }
                 
-                // Start trying image sources
+                // Start trying paths
                 tryNextImage(0);
                 
                 // Set product status badge
                 const statusElement = productElement.querySelector('.product-status');
                 let statusClass = '';
-                const status = product.status ? product.status.toLowerCase() : 'available';
+                
+                // First check if we have a cached status
+                const cachedStatus = statusCacheManager.getStatus(product.id);
+                // Use cached status if available, otherwise use status_normalized from API
+                // status_normalized will never be empty, it will be either 'active', 'available', or 'inactive'
+                const dbStatus = product.status_normalized ? product.status_normalized.toLowerCase() : 
+                                (product.status ? product.status.toLowerCase() : '');
+                const status = cachedStatus || (dbStatus === 'active' || dbStatus === 'available' ? dbStatus : 'inactive');
                 
                 switch (status) {
                     case 'active':
@@ -1191,13 +1354,14 @@
                         statusClass = 'status-inactive';
                         statusElement.textContent = 'Unavailable';
                         break;
+                    case 'rented':
                     case 'pending':
                         statusClass = 'status-pending';
-                        statusElement.textContent = 'Pending';
+                        statusElement.textContent = 'Rented';
                         break;
                     default:
-                        statusClass = 'status-active'; // Default to active if no status
-                        statusElement.textContent = status || 'Available';
+                        statusClass = 'status-inactive'; // Default to inactive if no status
+                        statusElement.textContent = 'Unavailable';
                 }
                 
                 statusElement.className = `product-status ${statusClass}`;
@@ -1236,6 +1400,28 @@
                 deleteBtn.addEventListener('click', function() {
                     const productName = product.title || product.name || 'this product';
                     confirmDeleteProduct(product.id, productName);
+                });
+                
+                // Setup availability toggle
+                const availabilityToggle = productElement.querySelector('.availability-toggle');
+                
+                // Set initial state based on product status
+                const isAvailable = (status === 'active' || status === 'available');
+                availabilityToggle.checked = isAvailable;
+                
+                // If the database status is empty, update it to match the current toggle state
+                if (!product.status && !cachedStatus) {
+                    // Update database to set proper initial status
+                    const initialStatus = isAvailable ? 'available' : 'unavailable';
+                    toggleProductStatus(product.id, initialStatus);
+                }
+                
+                // Add event listener for toggle
+                availabilityToggle.addEventListener('change', function() {
+                    const newStatus = this.checked ? 'available' : 'unavailable';
+                    // Update cache immediately so page refresh doesn't reset it
+                    statusCacheManager.updateStatus(product.id, newStatus);
+                    toggleProductStatus(product.id, newStatus);
                 });
                 
                 // Add to grid
@@ -1388,6 +1574,8 @@
                 
                         if (data.status === 'success') {
                     showAlert('Product deleted successfully', 'success');
+                    // Remove deleted product from status cache
+                    statusCacheManager.removeItem(productId);
                     loadProducts(); // Reload products
                         } else {
                     showAlert(data.message || 'Error deleting product', 'error');
@@ -1406,32 +1594,86 @@
             const loadingSpinner = document.getElementById('loadingSpinner');
             loadingSpinner.style.display = 'flex';
             
+            // Log what we're trying to update for debugging
+            console.log(`Updating product ${productId} status to ${newStatus}...`);
+            
+            // Create the request payload
+            const payload = {
+                id: productId,
+                status: newStatus
+            };
+            
+            console.log('Request payload:', payload);
+            
             fetch('../../../backend/api/sellers/update_product_status.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    id: productId,
-                    status: newStatus
+                body: JSON.stringify(payload)
                 })
+                .then(response => {
+                    // Check if the response is OK
+                    if (!response.ok) {
+                        console.error(`HTTP error: ${response.status}`);
+                        return response.text().then(text => {
+                            console.error('Response text:', text);
+                            throw new Error(`HTTP error! Status: ${response.status}`);
+                        });
+                    }
+                    return response.json();
                 })
-                .then(response => response.json())
                 .then(data => {
-                loadingSpinner.style.display = 'none';
+                    loadingSpinner.style.display = 'none';
+                    console.log('API response:', data);
                     
                     if (data.status === 'success') {
-                    showAlert(`Product status updated to ${newStatus}`, 'success');
-                    loadProducts(); // Reload products
+                        // Save status to cache
+                        statusCacheManager.updateStatus(productId, newStatus);
+                        
+                        const statusText = newStatus === 'available' ? 'visible to buyers' : 'hidden from buyers';
+                        showAlert(`Product is now ${statusText}`, 'success');
+                        
+                        // Update the status badge directly instead of reloading all products
+                        const productCard = document.querySelector(`.product-card[data-id="${productId}"]`);
+                        if (productCard) {
+                            const statusBadge = productCard.querySelector('.product-status');
+                            if (statusBadge) {
+                                statusBadge.className = `product-status ${newStatus === 'available' ? 'status-active' : 'status-inactive'}`;
+                                statusBadge.textContent = newStatus === 'available' ? 'Available' : 'Unavailable';
+                            }
+                        } else {
+                            // If can't find the specific card, reload all products
+                            loadProducts();
+                        }
                     } else {
-                    showAlert(data.message || 'Error updating product status', 'error');
+                        console.error('Error updating status:', data);
+                        showAlert(data.message || 'Error updating product status', 'error');
+                        
+                        // Revert toggle state on error
+                        const productCard = document.querySelector(`.product-card[data-id="${productId}"]`);
+                        if (productCard) {
+                            const toggle = productCard.querySelector('.availability-toggle');
+                            if (toggle) {
+                                toggle.checked = newStatus !== 'active';
+                            }
+                        }
                     }
                 })
                 .catch(error => {
-                loadingSpinner.style.display = 'none';
+                    loadingSpinner.style.display = 'none';
                     console.error('Error:', error);
-                showAlert('Error updating product status. Please try again.', 'error');
-            });
+                    showAlert('Error updating product status. Please try again.', 'error');
+                    
+                    // Revert toggle state on error
+                    const productCard = document.querySelector(`.product-card[data-id="${productId}"]`);
+                    if (productCard) {
+                        const toggle = productCard.querySelector('.availability-toggle');
+                        if (toggle) {
+                            toggle.checked = newStatus !== 'active';
+                        }
+                    }
+                });
         }
         
         // Function to handle logout

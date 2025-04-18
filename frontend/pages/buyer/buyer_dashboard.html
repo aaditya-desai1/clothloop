@@ -1532,8 +1532,8 @@
                     if (data.data.buyer.profile_photo) {
                         const userAvatar = document.getElementById('userAvatar');
                         if (userAvatar) {
-                            userAvatar.innerHTML = `<img src="/ClothLoop/backend/uploads/profile/${data.data.buyer.profile_photo}" alt="User Profile">`;
-                            localStorage.setItem('buyer_profile_photo', `/ClothLoop/backend/uploads/profile/${data.data.buyer.profile_photo}`);
+                            userAvatar.innerHTML = `<img src="/ClothLoop/backend/uploads/profile_photos/${data.data.buyer.profile_photo}" alt="User Profile">`;
+                            localStorage.setItem('buyer_profile_photo', `/ClothLoop/backend/uploads/profile_photos/${data.data.buyer.profile_photo}`);
                         }
                     }
                     

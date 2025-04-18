@@ -67,12 +67,18 @@ try {
     
     // Build query based on whether ID is provided
     if ($productId) {
-        $query = "SELECT * FROM products WHERE id = :product_id";
+        $query = "SELECT p.*, c.name as category_name 
+                 FROM products p 
+                 LEFT JOIN categories c ON p.category_id = c.id 
+                 WHERE p.id = :product_id";
         $stmt = $db->prepare($query);
         $stmt->bindParam(':product_id', $productId);
     } else {
         // If no ID provided, get all products (limit to 20)
-        $query = "SELECT * FROM products ORDER BY created_at DESC LIMIT 20";
+        $query = "SELECT p.*, c.name as category_name 
+                FROM products p 
+                LEFT JOIN categories c ON p.category_id = c.id 
+                ORDER BY p.created_at DESC LIMIT 20";
         $stmt = $db->prepare($query);
     }
     

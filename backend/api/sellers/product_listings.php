@@ -65,7 +65,9 @@ try {
     // Build query based on parameters and table existence
     if ($customerInterestsExists) {
         $query = "
-            SELECT p.*, c.name as category_name,
+            SELECT p.*, 
+                   COALESCE(p.status, 'inactive') AS status_normalized,
+                   c.name as category_name,
                    (SELECT COUNT(*) FROM customer_interests ci WHERE ci.product_id = p.id) as interest_count
             FROM products p
             LEFT JOIN categories c ON p.category_id = c.id
@@ -73,7 +75,10 @@ try {
         ";
     } else {
         $query = "
-            SELECT p.*, c.name as category_name, 0 as interest_count
+            SELECT p.*, 
+                   COALESCE(p.status, 'inactive') AS status_normalized,
+                   c.name as category_name, 
+                   0 as interest_count
             FROM products p
             LEFT JOIN categories c ON p.category_id = c.id
             WHERE p.seller_id = :seller_id

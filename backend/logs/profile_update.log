@@ -140,3 +140,30 @@ Seller Rows Affected: 0
 
 Transaction committed successfully
 
+{
+    "timestamp": "2025-04-18 20:49:16",
+    "received_data": {
+        "seller_id": "1",
+        "name": "Seller",
+        "email": "seller@gmail.com",
+        "phone_no": "1234567890",
+        "shop_name": "Seller Hub",
+        "description": "hi",
+        "latitude": "40.71280000",
+        "longitude": "-74.00600000"
+    }
+}
+
+Transaction started
+User Update Query: UPDATE users SET name = ?, email = ?, phone_no = ? WHERE id = ?
+User Params: ["Seller","seller@gmail.com","1234567890",1]
+User Update Result: Success
+User Rows Affected: 0
+
+Seller Update Query: UPDATE sellers SET shop_name = ?, description = ?, latitude = ?, longitude = ? WHERE id = ?
+Seller Params: ["Seller Hub","hi","40.71280000","-74.00600000",1]
+Seller Update Result: Success
+Seller Rows Affected: 0
+
+Transaction committed successfully
+

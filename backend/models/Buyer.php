@@ -11,10 +11,6 @@ class Buyer {
     // Properties
     public $id;
     public $user_id;
-    public $address;
-    public $city;
-    public $state;
-    public $zip;
     public $latitude;
     public $longitude;
     public $created_at;
@@ -25,17 +21,17 @@ class Buyer {
         $this->conn = $db;
     }
     
-    // Read single buyer by user_id
+    // Read single buyer by id
     public function readSingle() {
         try {
-            // Try first with id as the key (recommended approach)
+            // Query to select a single buyer by id
             $query = "SELECT * FROM " . $this->table_name . " WHERE id = ? LIMIT 0,1";
             
             // Prepare statement
             $stmt = $this->conn->prepare($query);
             
             // Bind ID
-            $stmt->bindParam(1, $this->user_id);
+            $stmt->bindParam(1, $this->id);
             
             // Execute query
             $stmt->execute();
@@ -148,7 +144,7 @@ class Buyer {
             
             // Add WHERE clause
             $query .= " WHERE id = :id";
-            $params[':id'] = $this->user_id; // Use user_id as id
+            $params[':id'] = $this->id; // Use id
             
             // Prepare statement
             $stmt = $this->conn->prepare($query);
@@ -159,7 +155,12 @@ class Buyer {
             }
             
             // Execute query
-            return $stmt->execute();
+            if(!$stmt->execute()) {
+                error_log('Buyer update error: ' . implode(', ', $stmt->errorInfo()));
+                return false;
+            }
+            
+            return true;
             
         } catch (PDOException $e) {
             // Log the error
@@ -178,7 +179,7 @@ class Buyer {
             $stmt = $this->conn->prepare($query);
             
             // Bind data
-            $stmt->bindParam(1, $this->user_id);
+            $stmt->bindParam(1, $this->id);
             
             // Execute query
             return $stmt->execute();

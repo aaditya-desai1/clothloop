@@ -1,115 +1,135 @@
 <?php
 /**
  * Get Seller Reviews API
- * Retrieves all reviews for a specific seller with pagination
+ * Fetches all reviews for a specific seller
  */
 
-// Set headers
-header('Access-Control-Allow-Origin: *');
-header('Content-Type: application/json');
-header('Access-Control-Allow-Methods: GET');
-header('Access-Control-Allow-Headers: Access-Control-Allow-Headers, Content-Type, Access-Control-Allow-Methods, Authorization, X-Requested-With');
+// Allow cross-origin requests
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: GET, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, Authorization");
+header("Content-Type: application/json");
 
-// Include database and utilities
-require_once '../../config/Database.php';
-require_once '../../models/User.php';
-require_once '../../models/Seller.php';
-require_once '../../models/Review.php';
-require_once '../../utils/Validator.php';
+// Handle preflight OPTIONS request
+if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+    http_response_code(200);
+    exit;
+}
 
-// Instantiate validator
-$validator = new Validator();
+// Check if request method is GET
+if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+    http_response_code(405);
+    echo json_encode([
+        'status' => 'error',
+        'message' => 'Method not allowed. Please use GET.'
+    ]);
+    exit;
+}
 
-// Parse the query parameters
-$seller_id = isset($_GET['seller_id']) ? $_GET['seller_id'] : null;
+// Include database connection
+require_once '../../config/db_connect.php';
+
+// Initialize response array
+$response = [
+    'status' => 'error',
+    'message' => '',
+    'data' => null
+];
+
+// Get seller ID from URL parameter
+$sellerId = isset($_GET['seller_id']) ? mysqli_real_escape_string($conn, $_GET['seller_id']) : null;
+
+// Validate seller ID
+if (!$sellerId || !is_numeric($sellerId)) {
+    $response['message'] = 'Invalid or missing seller ID';
+    echo json_encode($response);
+    exit;
+}
+
+// Get pagination parameters
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 10;
-$rating = isset($_GET['rating']) ? (int)$_GET['rating'] : null;
+$offset = ($page - 1) * $limit;
 
-// Validate input parameters
-if (!$seller_id) {
-    echo json_encode([
-        'status' => 'error',
-        'message' => 'Seller ID is required'
-    ]);
-    exit();
-}
+// Check if the seller exists
+$checkSellerQuery = "SELECT * FROM sellers WHERE id = '$sellerId'";
+$sellerResult = mysqli_query($conn, $checkSellerQuery);
 
-if (!$validator->validateId($seller_id)) {
-    echo json_encode([
-        'status' => 'error', 
-        'message' => 'Invalid seller ID format'
-    ]);
-    exit();
-}
-
-if ($page < 1) {
-    $page = 1;
-}
-
-if ($limit < 1 || $limit > 50) {
-    $limit = 10; // Default limit if invalid
-}
-
-if ($rating !== null && ($rating < 1 || $rating > 5)) {
-    echo json_encode([
-        'status' => 'error',
-        'message' => 'Rating must be between 1 and 5'
-    ]);
-    exit();
-}
-
-try {
-    // Instantiate DB and connect
-    $database = new Database();
-    $db = $database->connect();
-
-    // Instantiate seller object
-    $seller = new Seller($db);
-    
-    // Check if seller exists
-    if (!$seller->findById($seller_id)) {
-        echo json_encode([
-            'status' => 'error',
-            'message' => 'Seller not found'
-        ]);
-        exit();
-    }
-
-    // Instantiate review object
-    $review = new Review($db);
-    
-    // Calculate offset for pagination
-    $offset = ($page - 1) * $limit;
-    
-    // Get reviews with pagination and optional rating filter
-    $result = $review->getSellerReviews($seller_id, $limit, $offset, $rating);
-    
-    // Get total reviews count for pagination
-    $totalReviews = $review->countSellerReviews($seller_id, $rating);
-    
-    // Get rating summary
-    $ratingSummary = $review->getSellerRatingSummary($seller_id);
-    
-    // Calculate total pages
-    $totalPages = ceil($totalReviews / $limit);
-    
-    // Construct response
-    $response = [
-        'status' => 'success',
-        'current_page' => $page,
-        'total_pages' => $totalPages,
-        'limit' => $limit,
-        'total_reviews' => $totalReviews,
-        'summary' => $ratingSummary,
-        'reviews' => $result
-    ];
-    
+if (!$sellerResult || mysqli_num_rows($sellerResult) === 0) {
+    $response['message'] = 'Seller not found';
     echo json_encode($response);
+    exit;
+}
+
+$sellerData = mysqli_fetch_assoc($sellerResult);
+
+// Get total reviews count for pagination
+$countQuery = "SELECT COUNT(*) as total FROM seller_reviews WHERE seller_id = '$sellerId'";
+$countResult = mysqli_query($conn, $countQuery);
+$totalReviews = mysqli_fetch_assoc($countResult)['total'];
+$totalPages = ceil($totalReviews / $limit);
+
+// Query to get reviews with user information
+$query = "SELECT sr.*, u.username, u.profile_image 
+          FROM seller_reviews sr
+          LEFT JOIN users u ON sr.user_id = u.id
+          WHERE sr.seller_id = '$sellerId'
+          ORDER BY sr.created_at DESC
+          LIMIT $offset, $limit";
+
+$result = mysqli_query($conn, $query);
+
+if ($result) {
+    $reviews = [];
     
-} catch (Exception $e) {
-    echo json_encode([
-        'status' => 'error',
-        'message' => 'Database error: ' . $e->getMessage()
-    ]);
-} 
+    while ($row = mysqli_fetch_assoc($result)) {
+        // Format the created_at date
+        $row['created_at'] = date('Y-m-d H:i:s', strtotime($row['created_at']));
+        
+        // Format the response date if exists
+        if (!empty($row['response_date'])) {
+            $row['response_date'] = date('Y-m-d H:i:s', strtotime($row['response_date']));
+        }
+        
+        // Mask sensitive user information
+        $row['user_email'] = null;
+        
+        // Add to reviews array
+        $reviews[] = $row;
+    }
+    
+    // Calculate average rating
+    $avgRatingQuery = "SELECT AVG(rating) as avg_rating FROM seller_reviews WHERE seller_id = '$sellerId'";
+    $avgRatingResult = mysqli_query($conn, $avgRatingQuery);
+    $avgRating = 0;
+    
+    if ($avgRatingResult && mysqli_num_rows($avgRatingResult) > 0) {
+        $avgRating = round(mysqli_fetch_assoc($avgRatingResult)['avg_rating'], 1);
+    }
+    
+    $response['status'] = 'success';
+    $response['message'] = count($reviews) > 0 ? 'Reviews retrieved successfully' : 'No reviews found for this seller';
+    $response['data'] = [
+        'seller' => [
+            'id' => $sellerData['id'],
+            'name' => $sellerData['name'],
+            'avg_rating' => $avgRating
+        ],
+        'reviews' => $reviews,
+        'pagination' => [
+            'total_reviews' => (int)$totalReviews,
+            'total_pages' => $totalPages,
+            'current_page' => $page,
+            'limit' => $limit
+        ]
+    ];
+} else {
+    $response['message'] = 'Failed to retrieve reviews: ' . mysqli_error($conn);
+}
+
+// Close database connection
+mysqli_close($conn);
+
+// Return the response
+echo json_encode($response);
+?> 

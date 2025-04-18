@@ -843,6 +843,9 @@
             <div id="profileLoading" class="loading-spinner" style="display: none;">
                 <i class="fas fa-spinner"></i> Loading profile information...
             </div>
+            <div id="updateError" class="alert alert-error" style="display: none; margin-bottom: 20px;">
+                Error updating profile. Please try again.
+            </div>
             <form id="profileForm" style="display: none;">
                 <!-- Profile Photo Section -->
                 <div class="profile-photo-container">
@@ -901,12 +904,16 @@
                             <i class="fas fa-map-marker-alt"></i> GET CURRENT LOCATION
                         </button>
                         
+                        <div class="location-divider">
+                            <span>OR</span>
+                        </div>
+                        
+                        <button type="button" class="location-btn" id="toggleManualLocation">
+                            <i class="fas fa-edit"></i> ENTER LOCATION MANUALLY
+                        </button>
+                        
                         <!-- Manual location entry - hidden by default -->
-                        <div id="manualLocationEntry" style="display: none;">
-                            <div class="location-divider">
-                                <span>Enter location manually</span>
-                            </div>
-                            
+                        <div id="manualLocationEntry" style="display: none;">                            
                             <div class="form-group">
                                 <label for="latitude" class="form-label">Latitude:</label>
                                 <input type="text" id="latitude" name="latitude" class="form-input" placeholder="e.g. 40.7128">
@@ -1028,6 +1035,14 @@
                 formData.append('email', document.getElementById('email').value);
                 formData.append('phone_no', document.getElementById('phone_no').value);
                 
+                // Add latitude and longitude if available
+                const latitude = document.getElementById('latitude').value;
+                const longitude = document.getElementById('longitude').value;
+                if (latitude && longitude) {
+                    formData.append('latitude', latitude);
+                    formData.append('longitude', longitude);
+                }
+                
                 // Add password if password change is checked
                 if (document.getElementById('changePassword').checked) {
                     const password = document.getElementById('password').value;
@@ -1056,7 +1071,12 @@
                     body: formData,
                     credentials: 'include'
                 })
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     // Reset button
                     submitBtn.innerHTML = originalBtnText;
@@ -1084,7 +1104,19 @@
                     submitBtn.disabled = false;
                     
                     console.error('Error updating profile:', error);
-                    showError('An error occurred while updating your profile');
+                    
+                    // Display a more specific error message
+                    const updateError = document.getElementById('updateError');
+                    updateError.textContent = 'Error updating profile: ' + error.message;
+                    updateError.style.display = 'block';
+                    
+                    // Scroll to the error message
+                    updateError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    
+                    // Hide after 5 seconds
+                    setTimeout(function() {
+                        updateError.style.display = 'none';
+                    }, 5000);
                 });
             });
             
@@ -1289,15 +1321,20 @@
             
             function showError(message) {
                 const errorAlert = document.getElementById('errorAlert');
-                errorAlert.textContent = message;
-                errorAlert.style.display = 'block';
+                const updateError = document.getElementById('updateError');
+                
+                // Choose which error element to use based on context
+                const errorElement = updateError.style.display !== 'none' ? updateError : errorAlert;
+                
+                errorElement.textContent = message;
+                errorElement.style.display = 'block';
                 
                 // Scroll to the error
-                errorAlert.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 
                 // Hide after 5 seconds
                 setTimeout(function() {
-                    errorAlert.style.display = 'none';
+                    errorElement.style.display = 'none';
                 }, 5000);
             }
 
@@ -1386,6 +1423,7 @@
             // Location handling
             function initLocationFeatures() {
                 const getCurrentLocationBtn = document.getElementById('getCurrentLocation');
+                const toggleManualLocationBtn = document.getElementById('toggleManualLocation');
                 const setManualLocationBtn = document.getElementById('setManualLocation');
                 const latitudeInput = document.getElementById('latitude');
                 const longitudeInput = document.getElementById('longitude');
@@ -1402,14 +1440,22 @@
                     locationDisplay.textContent = `${savedLatitude}, ${savedLongitude}`;
                 }
                 
+                // Toggle manual location entry
+                toggleManualLocationBtn.addEventListener('click', function() {
+                    if (manualLocationEntry.style.display === 'none') {
+                        manualLocationEntry.style.display = 'block';
+                        this.innerHTML = '<i class="fas fa-times"></i> HIDE MANUAL ENTRY';
+                    } else {
+                        manualLocationEntry.style.display = 'none';
+                        this.innerHTML = '<i class="fas fa-edit"></i> ENTER LOCATION MANUALLY';
+                    }
+                });
+                
                 // Get current location
                 getCurrentLocationBtn.addEventListener('click', function() {
                     if (navigator.geolocation) {
                         getCurrentLocationBtn.disabled = true;
                         getCurrentLocationBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> GETTING LOCATION...';
-                        
-                        // Hide manual entry section when trying to get location
-                        manualLocationEntry.style.display = 'none';
                         
                         navigator.geolocation.getCurrentPosition(
                             // Success callback
@@ -1432,6 +1478,12 @@
                                 
                                 // Show success message
                                 showSuccess('Location updated successfully!');
+                                
+                                // Hide manual entry if it's open
+                                if (manualLocationEntry.style.display !== 'none') {
+                                    manualLocationEntry.style.display = 'none';
+                                    toggleManualLocationBtn.innerHTML = '<i class="fas fa-edit"></i> ENTER LOCATION MANUALLY';
+                                }
                             },
                             // Error callback
                             function(error) {
@@ -1453,6 +1505,7 @@
                                 
                                 // Show manual location entry when geolocation fails
                                 manualLocationEntry.style.display = 'block';
+                                toggleManualLocationBtn.innerHTML = '<i class="fas fa-times"></i> HIDE MANUAL ENTRY';
                                 
                                 // Reset button
                                 getCurrentLocationBtn.disabled = false;
@@ -1463,6 +1516,7 @@
                         showError('Geolocation is not supported by this browser.');
                         // Show manual location entry when geolocation is not supported
                         manualLocationEntry.style.display = 'block';
+                        toggleManualLocationBtn.innerHTML = '<i class="fas fa-times"></i> HIDE MANUAL ENTRY';
                     }
                 });
                 
@@ -1490,6 +1544,10 @@
                     
                     // Show success message
                     showSuccess('Location set manually!');
+                    
+                    // Hide manual entry if it's open
+                    manualLocationEntry.style.display = 'none';
+                    toggleManualLocationBtn.innerHTML = '<i class="fas fa-edit"></i> ENTER LOCATION MANUALLY';
                 });
                 
                 // Validate coordinates

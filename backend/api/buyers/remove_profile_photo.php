@@ -81,7 +81,7 @@ try {
     }
     
     // Delete the profile photo file
-    $uploadDir = __DIR__ . '/../../../uploads/profile_photos/';
+    $uploadDir = __DIR__ . '/../../uploads/profile_photos/';
     $photoPath = $uploadDir . $user->profile_photo;
     
     if (file_exists($photoPath)) {

@@ -157,3 +157,125 @@ Files: Array
 )
 
 
+Request method: POST
+Data: Array
+(
+    [title] => Tee
+    [description] => Black
+    [size] => S
+    [category_id] => 19
+    [occasion] => Casual
+    [rental_price] => 359
+    [terms] => Do not Wash
+)
+
+Files: Array
+(
+    [images] => Array
+        (
+            [name] => Array
+                (
+                    [0] => Aadi.jpg
+                )
+
+            [full_path] => Array
+                (
+                    [0] => Aadi.jpg
+                )
+
+            [type] => Array
+                (
+                    [0] => image/jpeg
+                )
+
+            [tmp_name] => Array
+                (
+                    [0] => C:\xampp\tmp\phpE06B.tmp
+                )
+
+            [error] => Array
+                (
+                    [0] => 0
+                )
+
+            [size] => Array
+                (
+                    [0] => 56837
+                )
+
+        )
+
+    [clothImage] => Array
+        (
+            [name] => Aadi.jpg
+            [full_path] => Aadi.jpg
+            [type] => image/jpeg
+            [tmp_name] => C:\xampp\tmp\phpE06C.tmp
+            [error] => 0
+            [size] => 56837
+        )
+
+)
+
+
+Request method: POST
+Data: Array
+(
+    [title] => Saaree
+    [description] => Blue and Red
+    [size] => M
+    [category_id] => 18
+    [occasion] => Ethnic
+    [rental_price] => 2299
+    [terms] => Do not Wash
+)
+
+Files: Array
+(
+    [images] => Array
+        (
+            [name] => Array
+                (
+                    [0] => p5.jpg
+                )
+
+            [full_path] => Array
+                (
+                    [0] => p5.jpg
+                )
+
+            [type] => Array
+                (
+                    [0] => image/jpeg
+                )
+
+            [tmp_name] => Array
+                (
+                    [0] => C:\xampp\tmp\phpEF54.tmp
+                )
+
+            [error] => Array
+                (
+                    [0] => 0
+                )
+
+            [size] => Array
+                (
+                    [0] => 65824
+                )
+
+        )
+
+    [clothImage] => Array
+        (
+            [name] => p5.jpg
+            [full_path] => p5.jpg
+            [type] => image/jpeg
+            [tmp_name] => C:\xampp\tmp\phpEF55.tmp
+            [error] => 0
+            [size] => 65824
+        )
+
+)
+
+

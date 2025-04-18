@@ -78,7 +78,7 @@ try {
     // Handle file upload for profile photo
     $profilePhotoUrl = null;
     if (isset($_FILES['profile_photo']) && $_FILES['profile_photo']['error'] === UPLOAD_ERR_OK) {
-        $uploadDir = __DIR__ . '/../../../uploads/profile_photos/';
+        $uploadDir = __DIR__ . '/../../uploads/profile_photos/';
         
         // Create directory if it doesn't exist
         if (!file_exists($uploadDir)) {
@@ -113,7 +113,7 @@ try {
             }
             
             $user->profile_photo = $fileName;
-            $profilePhotoUrl = '../../../uploads/profile_photos/' . $fileName;
+            $profilePhotoUrl = '../uploads/profile_photos/' . $fileName;
         } else {
             $response['message'] = 'Failed to upload profile photo.';
             echo json_encode($response);
@@ -135,7 +135,7 @@ try {
     if ($user->update()) {
         // Update buyer location if provided
         if (isset($_POST['latitude']) && isset($_POST['longitude'])) {
-            $buyer->user_id = $userId; // This will be used as id for the buyers table
+            $buyer->id = $userId; // Use id for the buyers table
             $buyer->readSingle(); // Get current data
             
             $buyer->latitude = $_POST['latitude'];

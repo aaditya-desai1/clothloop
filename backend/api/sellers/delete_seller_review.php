@@ -4,72 +4,105 @@
  * Allows users to delete their reviews for sellers
  */
 
-// Required headers
+// Allow cross-origin requests
 header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: DELETE");
-header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
+header("Access-Control-Allow-Methods: DELETE, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, Authorization");
+header("Content-Type: application/json");
 
-// Include database and model files
-include_once '../../config/Database.php';
-include_once '../../models/Review.php';
-include_once '../../utils/Validator.php';
-include_once '../../utils/Response.php';
-include_once '../../utils/Auth.php';
-
-// Make sure user is authenticated
-Auth::requireAuth();
-$current_user = Auth::getCurrentUser();
-$user_id = $current_user['id'];
-
-// Get DELETE data
-$data = json_decode(file_get_contents("php://input"), true);
-
-// Initialize validator
-$validator = new Validator();
-
-// Instantiate DB & connect
-$database = new Database();
-$db = $database->connect();
-
-// Instantiate review object
-$review = new Review($db);
-
-// Check if review_id is provided in URL parameter or request body
-$review_id = null;
-if (isset($_GET['id'])) {
-    $review_id = $_GET['id'];
-} elseif (isset($data['review_id'])) {
-    $review_id = $data['review_id'];
-} else {
-    Response::error('Missing review ID', null, 400);
+// Handle preflight OPTIONS request
+if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+    http_response_code(200);
+    exit;
 }
 
-// Validate review_id
-if (!$validator->validateId($review_id)) {
-    Response::error('Invalid review ID format', null, 400);
+// Check if request method is DELETE
+if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
+    http_response_code(405);
+    echo json_encode([
+        'status' => 'error',
+        'message' => 'Method not allowed. Please use DELETE.'
+    ]);
+    exit;
 }
 
-// Check if review exists and belongs to the current user
-$review->id = $review_id;
-$existing_review = $review->getById($review->id);
+// Include database connection
+require_once '../../config/db_connect.php';
 
-if (!$existing_review) {
-    Response::error('Review not found', null, 404);
+// Include authentication
+require_once '../../auth/authenticate.php';
+
+// Initialize response array
+$response = [
+    'status' => 'error',
+    'message' => '',
+    'data' => null
+];
+
+// Check if user is admin
+$checkAdminQuery = "SELECT role FROM users WHERE id = '$user_id'";
+$adminResult = mysqli_query($conn, $checkAdminQuery);
+
+if (!$adminResult || mysqli_num_rows($adminResult) === 0) {
+    $response['message'] = 'Authentication failed';
+    echo json_encode($response);
+    exit;
 }
 
-// Check if user is the owner of the review or an admin
-if ($existing_review['user_id'] != $user_id && $current_user['role'] !== 'admin') {
-    Response::error('You can only delete your own reviews', null, 403);
+$userData = mysqli_fetch_assoc($adminResult);
+if ($userData['role'] !== 'admin') {
+    $response['message'] = 'Access denied. Only administrators can delete reviews';
+    http_response_code(403);
+    echo json_encode($response);
+    exit;
 }
+
+// Get review ID from URL parameter
+$reviewId = isset($_GET['id']) ? mysqli_real_escape_string($conn, $_GET['id']) : null;
+
+// Validate review ID
+if (!$reviewId || !is_numeric($reviewId)) {
+    $response['message'] = 'Invalid or missing review ID';
+    echo json_encode($response);
+    exit;
+}
+
+// Check if the review exists
+$checkReviewQuery = "SELECT * FROM seller_reviews WHERE id = '$reviewId'";
+$reviewResult = mysqli_query($conn, $checkReviewQuery);
+
+if (!$reviewResult || mysqli_num_rows($reviewResult) === 0) {
+    $response['message'] = 'Review not found';
+    echo json_encode($response);
+    exit;
+}
+
+// Get review details before deletion for logging purposes
+$reviewData = mysqli_fetch_assoc($reviewResult);
 
 // Delete the review
-try {
-    if ($review->delete()) {
-        Response::success('Review deleted successfully', null);
-    } else {
-        Response::error('Failed to delete review', null, 500);
-    }
-} catch (Exception $e) {
-    Response::error('Error deleting review: ' . $e->getMessage(), null, 500);
-} 
+$deleteQuery = "DELETE FROM seller_reviews WHERE id = '$reviewId'";
+$deleteResult = mysqli_query($conn, $deleteQuery);
+
+if ($deleteResult) {
+    // Log the deletion action
+    $logQuery = "INSERT INTO admin_logs (admin_id, action, details, created_at) 
+                VALUES ('$user_id', 'delete_review', 'Deleted seller review ID: $reviewId for seller ID: {$reviewData['seller_id']}', NOW())";
+    mysqli_query($conn, $logQuery);
+    
+    $response['status'] = 'success';
+    $response['message'] = 'Review deleted successfully';
+    $response['data'] = [
+        'deleted_review_id' => $reviewId,
+        'seller_id' => $reviewData['seller_id']
+    ];
+} else {
+    $response['message'] = 'Failed to delete review: ' . mysqli_error($conn);
+}
+
+// Close database connection
+mysqli_close($conn);
+
+// Return the response
+echo json_encode($response);
+?> 

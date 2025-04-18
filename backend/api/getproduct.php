@@ -82,24 +82,31 @@ try {
             // Phone column exists, use the original query
             $query = "SELECT p.*, 
                         s.shop_name, s.address as shop_address, s.latitude, s.longitude,
-                        u.phone as contact_number
+                        u.phone as contact_number,
+                        c.name as category_name
                     FROM products p
                     LEFT JOIN sellers s ON p.seller_id = s.id
                     LEFT JOIN users u ON p.seller_id = u.id
+                    LEFT JOIN categories c ON p.category_id = c.id
                     WHERE p.id = :product_id 
                     LIMIT 1";
         } else {
             // Phone column doesn't exist, modify query
             $query = "SELECT p.*, 
-                        s.shop_name, s.address as shop_address, s.latitude, s.longitude
+                        s.shop_name, s.address as shop_address, s.latitude, s.longitude,
+                        c.name as category_name
                     FROM products p
                     LEFT JOIN sellers s ON p.seller_id = s.id
+                    LEFT JOIN categories c ON p.category_id = c.id
                     WHERE p.id = :product_id 
                     LIMIT 1";
         }
     } else {
         // Users table doesn't exist, use simple query
-        $query = "SELECT p.* FROM products p WHERE p.id = :product_id LIMIT 1";
+        $query = "SELECT p.*, c.name as category_name 
+                 FROM products p 
+                 LEFT JOIN categories c ON p.category_id = c.id
+                 WHERE p.id = :product_id LIMIT 1";
     }
 
     $stmt = $db->prepare($query);

@@ -4,114 +4,131 @@
  * Allows sellers to respond to buyer reviews
  */
 
-// Headers
-header('Access-Control-Allow-Origin: *');
-header('Content-Type: application/json');
-header('Access-Control-Allow-Methods: POST');
-header('Access-Control-Allow-Headers: Access-Control-Allow-Headers, Content-Type, Access-Control-Allow-Methods, Authorization, X-Requested-With');
+// Allow cross-origin requests
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: POST, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, Authorization");
+header("Content-Type: application/json");
 
-// Required files
-require_once __DIR__ . '/../../config/database.php';
-require_once __DIR__ . '/../../utils/response.php';
-require_once __DIR__ . '/../../utils/auth.php';
-
-// Check if user is authenticated
-if (!Auth::isAuthenticated()) {
-    Response::error('Unauthorized - Please log in to respond to a review', null, 401);
+// Handle preflight OPTIONS request
+if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+    http_response_code(200);
+    exit;
 }
 
-// Get current user
-$user = Auth::getCurrentUser();
-
-// Verify user is a seller
-if ($user['role'] !== 'seller') {
-    Response::error('Only sellers can respond to reviews', null, 403);
+// Check if request method is POST
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    echo json_encode([
+        'status' => 'error',
+        'message' => 'Method not allowed. Please use POST.'
+    ]);
+    exit;
 }
 
-// Get JSON data
-$data = json_decode(file_get_contents("php://input"), true);
+// Include database connection and authentication
+require_once '../../config/db_connect.php';
+require_once '../../auth/auth.php';
+
+// Initialize response array
+$response = [
+    'status' => 'error',
+    'message' => '',
+    'data' => null
+];
+
+// Check if user is authenticated and is a seller
+$userData = authenticate($conn);
+
+if (!$userData) {
+    $response['message'] = 'Authentication failed';
+    http_response_code(401);
+    echo json_encode($response);
+    exit;
+}
+
+// Check if user is a seller
+$userId = $userData['id'];
+$checkSellerQuery = "SELECT * FROM sellers WHERE user_id = '$userId'";
+$sellerResult = mysqli_query($conn, $checkSellerQuery);
+
+if (!$sellerResult || mysqli_num_rows($sellerResult) === 0) {
+    $response['message'] = 'Access denied. Only sellers can respond to reviews.';
+    http_response_code(403);
+    echo json_encode($response);
+    exit;
+}
+
+$sellerData = mysqli_fetch_assoc($sellerResult);
+$sellerId = $sellerData['id'];
+
+// Get JSON data from request body
+$jsonData = file_get_contents('php://input');
+$data = json_decode($jsonData, true);
 
 // Validate required fields
 if (!isset($data['review_id']) || !isset($data['response'])) {
-    Response::error('Missing required fields: review_id and response are required', null, 400);
+    $response['message'] = 'Missing required fields: review_id and response';
+    http_response_code(400);
+    echo json_encode($response);
+    exit;
 }
 
-// Validate response content
-if (empty(trim($data['response'])) || strlen($data['response']) > 1000) {
-    Response::error('Response cannot be empty and must be less than 1000 characters', null, 400);
+$reviewId = mysqli_real_escape_string($conn, $data['review_id']);
+$responseText = mysqli_real_escape_string($conn, $data['response']);
+
+// Validate response text
+if (empty($responseText) || strlen($responseText) > 1000) {
+    $response['message'] = 'Response must be between 1 and 1000 characters';
+    http_response_code(400);
+    echo json_encode($response);
+    exit;
 }
 
-// Connect to database
-$database = new Database();
-$db = $database->getConnection();
+// Check if the review exists and belongs to this seller
+$checkReviewQuery = "SELECT * FROM seller_reviews WHERE id = '$reviewId' AND seller_id = '$sellerId'";
+$reviewResult = mysqli_query($conn, $checkReviewQuery);
 
-try {
-    // Check if the review exists and belongs to this seller
-    $checkQuery = "SELECT r.id 
-                  FROM reviews r 
-                  WHERE r.id = :review_id 
-                  AND r.seller_id = :seller_id";
-                  
-    $checkStmt = $db->prepare($checkQuery);
-    $checkStmt->bindParam(':review_id', $data['review_id']);
-    $checkStmt->bindParam(':seller_id', $user['id']);
-    $checkStmt->execute();
-    
-    if ($checkStmt->rowCount() === 0) {
-        Response::error('Review not found or you are not authorized to respond to this review', null, 404);
-    }
-    
-    // Update the review with the seller's response
-    $query = "UPDATE reviews 
-              SET seller_response = :response, response_date = NOW() 
-              WHERE id = :review_id 
-              AND seller_id = :seller_id";
-              
-    $stmt = $db->prepare($query);
-    $stmt->bindParam(':response', $data['response']);
-    $stmt->bindParam(':review_id', $data['review_id']);
-    $stmt->bindParam(':seller_id', $user['id']);
-    
-    if (!$stmt->execute()) {
-        Response::error('Failed to submit response', null, 500);
-    }
-    
+if (!$reviewResult || mysqli_num_rows($reviewResult) === 0) {
+    $response['message'] = 'Review not found or does not belong to your shop';
+    http_response_code(404);
+    echo json_encode($response);
+    exit;
+}
+
+// Update the review with the seller's response
+$updateQuery = "UPDATE seller_reviews 
+                SET seller_response = '$responseText', 
+                    response_date = NOW() 
+                WHERE id = '$reviewId' AND seller_id = '$sellerId'";
+
+if (mysqli_query($conn, $updateQuery)) {
     // Get the updated review
-    $getReviewQuery = "SELECT 
-                        r.id, 
-                        r.buyer_id as user_id, 
-                        u.name as user_name, 
-                        u.profile_photo, 
-                        r.order_id, 
-                        r.rating, 
-                        r.review_text as comment, 
-                        r.created_at,
-                        r.seller_response,
-                        r.response_date
-                      FROM reviews r
-                      JOIN users u ON r.buyer_id = u.id
-                      WHERE r.id = :review_id";
-                      
-    $getReviewStmt = $db->prepare($getReviewQuery);
-    $getReviewStmt->bindParam(':review_id', $data['review_id']);
-    $getReviewStmt->execute();
-    $review = $getReviewStmt->fetch(PDO::FETCH_ASSOC);
+    $getUpdatedReviewQuery = "SELECT * FROM seller_reviews WHERE id = '$reviewId'";
+    $updatedReviewResult = mysqli_query($conn, $getUpdatedReviewQuery);
+    $updatedReview = mysqli_fetch_assoc($updatedReviewResult);
     
-    Response::success('Response submitted successfully', [
-        'review' => [
-            'id' => $review['id'],
-            'user_id' => $review['user_id'],
-            'user_name' => $review['user_name'],
-            'profile_photo' => $review['profile_photo'],
-            'order_id' => $review['order_id'],
-            'rating' => (int)$review['rating'],
-            'comment' => $review['comment'],
-            'created_at' => $review['created_at'],
-            'seller_response' => $review['seller_response'],
-            'response_date' => $review['response_date']
-        ]
-    ]);
+    // Log the response action
+    $logQuery = "INSERT INTO activity_logs (user_id, action, entity_type, entity_id, details) 
+                VALUES ('$userId', 'respond_to_review', 'seller_review', '$reviewId', 
+                'Seller responded to review #$reviewId')";
+    mysqli_query($conn, $logQuery);
     
-} catch (Exception $e) {
-    Response::error('Error submitting response: ' . $e->getMessage());
-} 
+    $response['status'] = 'success';
+    $response['message'] = 'Response added successfully';
+    $response['data'] = [
+        'review_id' => $updatedReview['id'],
+        'seller_id' => $updatedReview['seller_id'],
+        'response' => $updatedReview['seller_response'],
+        'response_date' => $updatedReview['response_date']
+    ];
+} else {
+    $response['message'] = 'Failed to add response: ' . mysqli_error($conn);
+    http_response_code(500);
+}
+
+// Close database connection
+mysqli_close($conn);
+
+// Return the response
+echo json_encode($response); 

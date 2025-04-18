@@ -177,6 +177,7 @@
             position: relative;
             width: 100%;
             height: 100%;
+            overflow: visible !important; /* Ensure navigation arrows are visible */
         }
 
         .image-slider {
@@ -240,43 +241,52 @@
             transform: scale(1.2);
         }
 
+        /* Enhanced slider arrow styling */
         .slider-arrow {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 40px;
-            height: 40px;
-            background-color: rgba(0, 0, 0, 0.5);
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            z-index: 10;
-            transition: all 0.3s ease;
-            color: white;
-            font-size: 20px;
+            position: absolute !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            width: 40px !important;
+            height: 40px !important;
+            background-color: rgba(0, 0, 0, 0.6) !important;
+            border-radius: 50% !important;
+            display: flex !important;
+            justify-content: center !important;
+            align-items: center !important;
+            cursor: pointer !important;
+            z-index: 100 !important; /* High z-index to ensure visibility */
+            transition: all 0.3s ease !important;
+            color: white !important;
+            font-size: 20px !important;
+            opacity: 1 !important;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3) !important;
         }
 
         .slider-arrow:hover {
-            background-color: rgba(0, 0, 0, 0.8);
-            transform: translateY(-50%) scale(1.1);
+            background-color: rgba(0, 0, 0, 0.8) !important;
+            transform: translateY(-50%) scale(1.1) !important;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.5) !important;
         }
 
         .slider-arrow.left {
-            left: 20px;
+            left: 20px !important;
         }
 
         .slider-arrow.right {
-            right: 20px;
+            right: 20px !important;
+        }
+
+        .slider-arrow i {
+            color: white !important;
+            font-size: 18px !important;
         }
 
         .light-theme .slider-arrow {
-            background-color: rgba(0, 0, 0, 0.3);
+            background-color: rgba(0, 0, 0, 0.5) !important;
         }
 
         .light-theme .slider-arrow:hover {
-            background-color: rgba(0, 0, 0, 0.6);
+            background-color: rgba(0, 0, 0, 0.7) !important;
         }
 
         .thumbnails-container {
@@ -789,16 +799,20 @@
                         <img id="mainProductImage" src="" alt="Product Image">
                     </div>
                 </div>
+                
+                <!-- Ensure navigation arrows are properly structured -->
+                <div class="slider-arrow left" id="prevSlide" style="position: absolute; top: 50%; left: 20px; transform: translateY(-50%); z-index: 100; opacity: 1; width: 40px; height: 40px; background-color: rgba(0,0,0,0.6); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer;">
+                    <i class="fas fa-chevron-left" style="color: white; font-size: 18px;"></i>
+                </div>
+                
+                <div class="slider-arrow right" id="nextSlide" style="position: absolute; top: 50%; right: 20px; transform: translateY(-50%); z-index: 100; opacity: 1; width: 40px; height: 40px; background-color: rgba(0,0,0,0.6); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer;">
+                    <i class="fas fa-chevron-right" style="color: white; font-size: 18px;"></i>
+                </div>
+                
                 <div class="slider-controls">
-                    <div class="slider-arrow left" id="prevSlide">
-                        <i class="fas fa-chevron-left"></i>
-                    </div>
                     <div class="slider-dots" id="sliderDots">
                         <!-- Dots will be added dynamically -->
                         <span class="slider-dot active"></span>
-                    </div>
-                    <div class="slider-arrow right" id="nextSlide">
-                        <i class="fas fa-chevron-right"></i>
                     </div>
                 </div>
             </div>
@@ -895,63 +909,11 @@
                 <div class="section-title">Customer Reviews</div>
                 <div id="reviewsList" class="reviews-list">
                     <!-- No reviews message -->
-                    <div id="noReviewsMessage" class="review-placeholder" style="display: none;">
+                    <div id="noReviewsMessage" class="review-placeholder">
                         No reviews yet. Be the first to review this product!
                     </div>
                     
-                    <!-- Static reviews as fallback -->
-                    <div class="review-item">
-                        <div class="review-header">
-                            <div class="reviewer-name">Priya Sharma</div>
-                            <div class="review-date">Jun 15, 2023</div>
-                        </div>
-                        <div class="review-rating">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                        </div>
-                        <div class="review-content">
-                            Excellent quality! This dress was perfect for my event. The material is very comfortable and the fit was exactly as described.
-                        </div>
-                    </div>
-                    
-                    <div class="review-item">
-                        <div class="review-header">
-                            <div class="reviewer-name">Amit Kumar</div>
-                            <div class="review-date">May 28, 2023</div>
-                        </div>
-                        <div class="review-rating">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="far fa-star"></i>
-                        </div>
-                        <div class="review-content">
-                            Great product, slightly smaller than expected but overall very good quality for the rental price.
-                        </div>
-                    </div>
-                    
-                    <div class="review-item">
-                        <div class="review-header">
-                            <div class="reviewer-name">Neha Patel</div>
-                            <div class="review-date">May 10, 2023</div>
-                        </div>
-                        <div class="review-rating">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                        </div>
-                        <div class="review-content">
-                            Amazing outfit! The seller was very helpful and the product was in pristine condition. Highly recommend!
-                        </div>
-                    </div>
-                    
-                    <button class="load-more-reviews">LOAD MORE REVIEWS</button>
+                    <!-- Reviews will be loaded dynamically via JavaScript -->
                 </div>
             </div>
         </div>
@@ -1278,14 +1240,9 @@
                     await fetchProductReviews(productId);
                 } catch (error) {
                     console.warn('Could not fetch reviews:', error);
-                    // Fall back to static reviews
-                    calculateStaticReviewsAverage();
+                    // Show the no reviews message
+                    document.getElementById('noReviewsMessage').style.display = 'block';
                 }
-                
-                // Initialize image slider
-                setTimeout(() => {
-                    initializeSlider();
-                }, 300);
                 
             } catch (error) {
                 console.error('Error in fetchProductDetails:', error);
@@ -1505,7 +1462,7 @@
                 
                 // Category fields
                 document.getElementById('clothCategory').textContent = 
-                    `Category: ${product.category || product.cloth_category || 'Not specified'}`;
+                    `Category: ${product.category_name || product.category || 'Not specified'}`;
                 
                 // Price fields
                 document.getElementById('clothPrice').textContent = 
@@ -1695,41 +1652,9 @@
             initPage();
             initRatingSystem();
             
-            // Update average rating based on static reviews
-            calculateStaticReviewsAverage();
+            // Initialize with 0 rating until reviews are loaded
+            document.getElementById('avgRating').textContent = '0.0';
         });
-        
-        // Calculate average rating from static reviews
-        function calculateStaticReviewsAverage() {
-            const reviewRatings = document.querySelectorAll('.review-item .review-rating');
-            let totalStars = 0;
-            let totalReviews = reviewRatings.length;
-            
-            if (totalReviews === 0) return;
-            
-            reviewRatings.forEach(ratingElement => {
-                const fullStars = ratingElement.querySelectorAll('.fas.fa-star').length;
-                totalStars += fullStars;
-            });
-            
-            const avgRating = totalStars / totalReviews;
-            document.getElementById('avgRating').textContent = avgRating.toFixed(1);
-            
-            // Update the rating stars display
-            const stars = document.querySelectorAll('.rating-container .stars i');
-            stars.forEach((star, index) => {
-                if (index < Math.floor(avgRating)) {
-                    star.classList.remove('far');
-                    star.classList.add('fas');
-                } else if (index < Math.ceil(avgRating) && avgRating % 1 >= 0.5) {
-                    star.classList.remove('far');
-                    star.classList.add('fas');
-                } else {
-                    star.classList.remove('fas');
-                    star.classList.add('far');
-                }
-            });
-        }
         
         // Product rating functionality
         function initRatingSystem() {
@@ -1875,30 +1800,33 @@
         // Function to fetch product reviews
         async function fetchProductReviews(productId) {
             try {
-                // First try to fetch actual reviews from the server
+                // Fetch reviews from the server
                 const reviewsUrl = `/ClothLoop/backend/api/getreviews.php?product_id=${productId}`;
                 const response = await fetch(reviewsUrl);
                 
                 if (response.ok) {
                     const data = await response.json();
                     
-                    if (data.status === 'success' && data.data && Array.isArray(data.data) && data.data.length > 0) {
-                        console.log('Fetched reviews:', data.data);
-                        displayReviews(data.data);
-                        updateAverageRating(data.data);
-                        return;
+                    if (data.status === 'success') {
+                        if (data.data && Array.isArray(data.data) && data.data.length > 0) {
+                            console.log('Fetched reviews:', data.data);
+                            displayReviews(data.data);
+                            updateAverageRating(data.data);
+                        } else {
+                            // No reviews found, show the message
+                            document.getElementById('noReviewsMessage').style.display = 'block';
+                        }
+                    } else {
+                        console.error('Error from API:', data.message);
+                        document.getElementById('noReviewsMessage').style.display = 'block';
                     }
+                } else {
+                    console.error('Failed to fetch reviews:', response.status);
+                    document.getElementById('noReviewsMessage').style.display = 'block';
                 }
-                
-                // If no reviews from server or API doesn't exist, use sample reviews
-                console.log('No reviews from server, using static reviews');
-                document.getElementById('noReviewsMessage').style.display = 'none';
-                calculateStaticReviewsAverage();
-                
             } catch (error) {
                 console.error('Error fetching reviews:', error);
-                // Fallback to static reviews
-                calculateStaticReviewsAverage();
+                document.getElementById('noReviewsMessage').style.display = 'block';
             }
         }
         
@@ -2190,13 +2118,43 @@
             images.push(mainImageUrl);
             
             // Try to fetch additional images from the secondary API
-            fetch(`/ClothLoop/backend/api/products/getproductimages.php?id=${product.id}`)
-                .then(response => response.json())
+            fetch(`/ClothLoop/backend/api/getproductimages.php?id=${product.id}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     console.log('Additional images API response:', data);
                     
-                    if (data && Array.isArray(data) && data.length > 0) {
-                        // Process each additional image path
+                    if (data && data.data && Array.isArray(data.data) && data.data.length > 0) {
+                        // Process each additional image path from structured response
+                        data.data.forEach(imageObj => {
+                            if (imageObj && imageObj.image_path) {
+                                const imagePath = imageObj.image_path;
+                                if (typeof imagePath === 'string' && imagePath.trim() !== '') {
+                                    // Handle base64 data
+                                    if (imagePath.startsWith('data:')) {
+                                        images.push(imagePath);
+                                    } 
+                                    // Handle full URLs
+                                    else if (imagePath.startsWith('http')) {
+                                        images.push(imagePath);
+                                    }
+                                    // Handle root-relative paths
+                                    else if (imagePath.startsWith('/')) {
+                                        images.push(imagePath);
+                                    }
+                                    // Handle relative paths
+                                    else {
+                                        images.push(`/ClothLoop/backend/${imagePath}`);
+                                    }
+                                }
+                            }
+                        });
+                    } else if (data && Array.isArray(data) && data.length > 0) {
+                        // Process each additional image path from array response
                         data.forEach(imagePath => {
                             if (typeof imagePath === 'string' && imagePath.trim() !== '') {
                                 // Handle base64 data
@@ -2219,22 +2177,25 @@
                         });
                     }
                     
-                    // If we still only have one image (or none), try the conventional path
+                    // Only add fallback image paths if we have no additional images yet
                     if (images.length <= 1) {
-                        // Try adding a conventional path for additional images
-                        images.push(`/ClothLoop/backend/uploads/products/${product.id}/${product.id}_2.jpg`);
-                        images.push(`/ClothLoop/backend/uploads/products/${product.id}/${product.id}_3.jpg`);
-                        
-                        // Also try the legacy API
-                        images.push(`/ClothLoop/backend/api/getimage.php?id=${product.id}&index=2`);
+                        // Use the direct_image.php API as it's more reliable
+                        images.push(`/ClothLoop/backend/api/products/direct_image.php?id=${product.id}`);
+                        // Only add getimage.php as fallback with no additional query params
+                        images.push(`/ClothLoop/backend/api/getimage.php?id=${product.id}`);
                     }
                     
-                console.log('Setting up slider with images:', images);
-                setupImageSlider(images);
+                    console.log('Setting up slider with images:', images);
+                    setupImageSlider(images);
                 })
                 .catch(error => {
                     console.error('Error fetching additional images:', error);
-                    setupImageSlider([mainImageUrl, '../../assets/images/placeholder.png']);
+                    // Use a minimal set of fallback images to avoid 404 errors
+                    setupImageSlider([
+                        mainImageUrl, 
+                        `/ClothLoop/backend/api/products/direct_image.php?id=${product.id}`,
+                        '../../assets/images/placeholder.png'
+                    ]);
                 });
         }
         
@@ -2252,6 +2213,8 @@
                 const sliderContainer = document.getElementById('productImageSlider');
                 const dotsContainer = document.getElementById('sliderDots');
                 const thumbnailsContainer = document.getElementById('imageThumbnails');
+                const prevButton = document.getElementById('prevSlide');
+                const nextButton = document.getElementById('nextSlide');
                 
                 if (!sliderContainer || !dotsContainer || !thumbnailsContainer) {
                     console.error('Could not find slider DOM elements');
@@ -2263,90 +2226,17 @@
                 dotsContainer.innerHTML = '';
                 thumbnailsContainer.innerHTML = '';
                 
-                // Create slides, dots and thumbnails for each image
-                imageUrls.forEach((imageUrl, index) => {
-                    // Create slide
-                    const slide = document.createElement('div');
-                    slide.className = `slider-slide ${index === 0 ? 'active' : ''}`;
-                    slide.innerHTML = `<img src="${imageUrl}" alt="Product Image ${index + 1}" onerror="if(this.src !== '../../assets/images/placeholder.png') this.src='../../assets/images/placeholder.png';">`;
-                    sliderContainer.appendChild(slide);
+                // Store valid images
+                const validImages = [];
+                let loadedCount = 0;
+                let currentSlideIndex = 0;
+                
+                // Define the goToSlide function specific to this slider
+                function goToSlide(index) {
+                    if (validImages.length === 0) return;
                     
-                    // Create dot
-                    const dot = document.createElement('span');
-                    dot.className = `slider-dot ${index === 0 ? 'active' : ''}`;
-                    dot.setAttribute('data-index', index);
-                    dot.addEventListener('click', () => goToSlide(index));
-                    dotsContainer.appendChild(dot);
+                    currentSlideIndex = index;
                     
-                    // Create thumbnail
-                    const thumbnail = document.createElement('img');
-                    thumbnail.src = imageUrl;
-                    thumbnail.alt = `Thumbnail ${index + 1}`;
-                    thumbnail.className = `thumbnail ${index === 0 ? 'active' : ''}`;
-                    thumbnail.setAttribute('data-index', index);
-                    thumbnail.addEventListener('click', () => goToSlide(index));
-                    thumbnail.onerror = function() {
-                        if (this.src !== '../../assets/images/placeholder.png') {
-                            this.src = '../../assets/images/placeholder.png';
-                        }
-                    };
-                    thumbnailsContainer.appendChild(thumbnail);
-                });
-                
-                // Set up previous and next buttons
-                const prevButton = document.getElementById('prevSlide');
-                const nextButton = document.getElementById('nextSlide');
-                
-                if (!prevButton || !nextButton) {
-                    console.error('Could not find slider navigation buttons');
-                    return;
-                }
-                
-                // Remove any existing event listeners
-                const newPrevButton = prevButton.cloneNode(true);
-                const newNextButton = nextButton.cloneNode(true);
-                prevButton.parentNode.replaceChild(newPrevButton, prevButton);
-                nextButton.parentNode.replaceChild(newNextButton, nextButton);
-                
-                // Current slide index and total number of slides
-                let currentIndex = 0;
-                const totalSlides = imageUrls.length;
-                
-                // Add navigation event listeners
-                newPrevButton.addEventListener('click', () => {
-                    currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
-                    goToSlide(currentIndex);
-                });
-                
-                newNextButton.addEventListener('click', () => {
-                    currentIndex = (currentIndex + 1) % totalSlides;
-                    goToSlide(currentIndex);
-                });
-                
-                // Auto slideshow for multiple images
-                let slideInterval;
-                
-                if (totalSlides > 1) {
-                    slideInterval = setInterval(() => {
-                        currentIndex = (currentIndex + 1) % totalSlides;
-                        goToSlide(currentIndex);
-                    }, 5000);
-                    
-                    // Pause on hover
-                    sliderContainer.addEventListener('mouseenter', () => {
-                        clearInterval(slideInterval);
-                    });
-                    
-                    sliderContainer.addEventListener('mouseleave', () => {
-                        slideInterval = setInterval(() => {
-                            currentIndex = (currentIndex + 1) % totalSlides;
-                            goToSlide(currentIndex);
-                        }, 5000);
-                    });
-                }
-                
-                // Define global function to change slides
-                window.goToSlide = function(index) {
                     // Update slides
                     const slides = sliderContainer.querySelectorAll('.slider-slide');
                     slides.forEach((slide, i) => {
@@ -2364,60 +2254,266 @@
                     thumbnails.forEach((thumb, i) => {
                         thumb.classList.toggle('active', i === index);
                     });
+                }
+                
+                // Set up navigation buttons
+                function setupNavigation() {
+                    if (!prevButton || !nextButton) return;
                     
-                    // Update current index
-                    currentIndex = index;
-                };
+                    // Remove old event listeners
+                    const newPrevButton = prevButton.cloneNode(true);
+                    const newNextButton = nextButton.cloneNode(true);
+                    prevButton.parentNode.replaceChild(newPrevButton, prevButton);
+                    nextButton.parentNode.replaceChild(newNextButton, nextButton);
+                    
+                    // Handle navigation using direct click handlers
+                    newPrevButton.onclick = function() {
+                        const newIndex = (currentSlideIndex - 1 + validImages.length) % validImages.length;
+                        goToSlide(newIndex);
+                    };
+                    
+                    newNextButton.onclick = function() {
+                        const newIndex = (currentSlideIndex + 1) % validImages.length;
+                        goToSlide(newIndex);
+                    };
+                    
+                    // Show/hide controls based on image count
+                    if (validImages.length <= 1) {
+                        newPrevButton.style.display = 'none';
+                        newNextButton.style.display = 'none';
+                    } else {
+                        newPrevButton.style.display = 'flex';
+                        newNextButton.style.display = 'flex';
+                        
+                        // Make sure the arrows are visible and properly styled
+                        newPrevButton.style.opacity = '1';
+                        newNextButton.style.opacity = '1';
+                        newPrevButton.style.pointerEvents = 'auto';
+                        newNextButton.style.pointerEvents = 'auto';
+                        newPrevButton.style.zIndex = '100';
+                        newNextButton.style.zIndex = '100';
+                        
+                        // Add more prominent styling to make them stand out
+                        const arrowStyle = {
+                            position: 'absolute',
+                            top: '50%',
+                            transform: 'translateY(-50%)',
+                            width: '40px',
+                            height: '40px',
+                            backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                            color: 'white',
+                            borderRadius: '50%',
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            cursor: 'pointer',
+                            zIndex: '100',
+                            transition: 'all 0.3s ease'
+                        };
+                        
+                        // Apply styles to both arrows
+                        Object.assign(newPrevButton.style, arrowStyle);
+                        Object.assign(newNextButton.style, arrowStyle);
+                        
+                        // Position left and right arrows
+                        newPrevButton.style.left = '20px';
+                        newNextButton.style.right = '20px';
+                        
+                        // Add hover effect
+                        newPrevButton.onmouseover = function() {
+                            this.style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
+                            this.style.transform = 'translateY(-50%) scale(1.1)';
+                        };
+                        newPrevButton.onmouseout = function() {
+                            this.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+                            this.style.transform = 'translateY(-50%)';
+                        };
+                        
+                        newNextButton.onmouseover = function() {
+                            this.style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
+                            this.style.transform = 'translateY(-50%) scale(1.1)';
+                        };
+                        newNextButton.onmouseout = function() {
+                            this.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+                            this.style.transform = 'translateY(-50%)';
+                        };
+                        
+                        // Ensure the arrow icons are visible
+                        const prevIcon = newPrevButton.querySelector('i');
+                        const nextIcon = newNextButton.querySelector('i');
+                        
+                        if (prevIcon) {
+                            prevIcon.style.fontSize = '18px';
+                            prevIcon.style.color = 'white';
+                        } else {
+                            newPrevButton.innerHTML = '<i class="fas fa-chevron-left" style="font-size: 18px; color: white;"></i>';
+                        }
+                        
+                        if (nextIcon) {
+                            nextIcon.style.fontSize = '18px';
+                            nextIcon.style.color = 'white';
+                        } else {
+                            newNextButton.innerHTML = '<i class="fas fa-chevron-right" style="font-size: 18px; color: white;"></i>';
+                        }
+                    }
+                    
+                    // Set up auto slideshow
+                    if (window.slideInterval) {
+                        clearInterval(window.slideInterval);
+                    }
+                    
+                    if (validImages.length > 1) {
+                        window.slideInterval = setInterval(function() {
+                            const newIndex = (currentSlideIndex + 1) % validImages.length;
+                            goToSlide(newIndex);
+                        }, 5000);
+                        
+                        // Pause on hover
+                        sliderContainer.onmouseenter = function() {
+                            clearInterval(window.slideInterval);
+                        };
+                        
+                        sliderContainer.onmouseleave = function() {
+                            clearInterval(window.slideInterval);
+                            window.slideInterval = setInterval(function() {
+                                const newIndex = (currentSlideIndex + 1) % validImages.length;
+                                goToSlide(newIndex);
+                            }, 5000);
+                        };
+                    }
+                }
+                
+                // Process each image
+                imageUrls.forEach((imageUrl) => {
+                    // Create a temporary image to check if it can be loaded
+                    const tempImg = new Image();
+                    
+                    tempImg.onload = function() {
+                        // Add to valid images
+                        validImages.push(imageUrl);
+                        const imageIndex = validImages.length - 1;
+                        
+                        // Create slide
+                        const slide = document.createElement('div');
+                        slide.className = `slider-slide ${imageIndex === 0 ? 'active' : ''}`;
+                        slide.innerHTML = `<img src="${imageUrl}" alt="Product Image ${imageIndex + 1}" onerror="this.src='../../assets/images/placeholder.png';">`;
+                        sliderContainer.appendChild(slide);
+                        
+                        // Create dot
+                        const dot = document.createElement('span');
+                        dot.className = `slider-dot ${imageIndex === 0 ? 'active' : ''}`;
+                        dot.setAttribute('data-index', imageIndex);
+                        dot.onclick = function() {
+                            goToSlide(imageIndex);
+                        };
+                        dotsContainer.appendChild(dot);
+                        
+                        // Create thumbnail
+                        const thumbnail = document.createElement('img');
+                        thumbnail.src = imageUrl;
+                        thumbnail.alt = `Thumbnail ${imageIndex + 1}`;
+                        thumbnail.className = `thumbnail ${imageIndex === 0 ? 'active' : ''}`;
+                        thumbnail.setAttribute('data-index', imageIndex);
+                        thumbnail.onclick = function() {
+                            goToSlide(imageIndex);
+                        };
+                        thumbnail.onerror = function() {
+                            if (this.src !== '../../assets/images/placeholder.png') {
+                                this.src = '../../assets/images/placeholder.png';
+                            }
+                        };
+                        thumbnailsContainer.appendChild(thumbnail);
+                        
+                        // Set up navigation on first image load
+                        if (imageIndex === 0) {
+                            setupNavigation();
+                        }
+                        
+                        loadedCount++;
+                        if (loadedCount === imageUrls.length) {
+                            // All images processed, update navigation
+                            setupNavigation();
+                        }
+                    };
+                    
+                    tempImg.onerror = function() {
+                        console.log(`Image ${imageUrl} failed to load, skipping.`);
+                        loadedCount++;
+                        
+                        // If all images have failed, use placeholder
+                        if (loadedCount === imageUrls.length && validImages.length === 0) {
+                            const placeholderUrl = '../../assets/images/placeholder.png';
+                            validImages.push(placeholderUrl);
+                            
+                            // Create slide with placeholder
+                            const slide = document.createElement('div');
+                            slide.className = 'slider-slide active';
+                            slide.innerHTML = `<img src="${placeholderUrl}" alt="Product Image (Placeholder)">`;
+                            sliderContainer.appendChild(slide);
+                            
+                            // Create dot
+                            const dot = document.createElement('span');
+                            dot.className = 'slider-dot active';
+                            dot.setAttribute('data-index', 0);
+                            dotsContainer.appendChild(dot);
+                            
+                            // Create thumbnail
+                            const thumbnail = document.createElement('img');
+                            thumbnail.src = placeholderUrl;
+                            thumbnail.alt = 'Thumbnail (Placeholder)';
+                            thumbnail.className = 'thumbnail active';
+                            thumbnail.setAttribute('data-index', 0);
+                            thumbnailsContainer.appendChild(thumbnail);
+                            
+                            // Set up navigation
+                            setupNavigation();
+                        }
+                    };
+                    
+                    // Start loading the image
+                    tempImg.src = imageUrl;
+                });
+                
+                // Make the goToSlide function available globally
+                window.productGoToSlide = goToSlide;
                 
                 console.log('Image slider setup completed successfully');
                 
             } catch (error) {
                 console.error('Error setting up image slider:', error);
-            }
-        }
-        
-        // Function to initialize the image slider (keeping for backward compatibility)
-        function initializeSlider() {
-            try {
-                console.log('Initializing image slider (legacy function)');
                 
-                // Get the product ID from URL parameters
-                const urlParams = new URLSearchParams(window.location.search);
-                const productId = urlParams.get('id');
-                
-                if (productId) {
-                    // Create a simple product object with just the ID
-                    const productObj = { id: productId };
-                    
-                    // Use our helper function to get the image URL
-                    const mainImageUrl = getProductImageUrl(productObj);
-                    
-                    // Set up the slider with this image
-                    setupImageSlider([mainImageUrl]);
-                } else {
-                    // No product ID, use placeholder
-                    setupImageSlider(['../../assets/images/placeholder.png']);
+                // Emergency fallback in case of complete failure
+                try {
+                    const sliderContainer = document.getElementById('productImageSlider');
+                    if (sliderContainer) {
+                        sliderContainer.innerHTML = '<div class="slider-slide active"><img src="../../assets/images/placeholder.png" alt="Product Image"></div>';
+                    }
+                } catch (e) {
+                    console.error('Complete slider failure:', e);
                 }
-            } catch (error) {
-                console.error('Error in legacy slider initialization:', error);
-                
-                // Fallback to placeholder in case of error
-                setupImageSlider(['../../assets/images/placeholder.png']);
             }
         }
 
         // Update function to submit reviews
         async function submitReview(rating, reviewText, productId) {
             try {
+                // Get current user information
+                const userId = localStorage.getItem('user_id') || sessionStorage.getItem('user_id') || '1';
+                const userName = localStorage.getItem('user_name') || sessionStorage.getItem('user_name') || 'Anonymous User';
+                
+                // Set up the review data
                 const reviewData = {
                     product_id: productId,
+                    buyer_id: userId,
                     rating: rating,
                     review: reviewText,
-                    user_name: 'You' // In a real app, this would come from user's profile
+                    user_name: userName
                 };
                 
-                // Try to submit to server
-                const reviewUrl = `/ClothLoop/backend/api/addreview.php`;
+                console.log('Submitting review data:', reviewData);
+                
+                // Submit to product reviews endpoint
+                const reviewUrl = `/ClothLoop/backend/api/submit_review.php`;
                 const response = await fetch(reviewUrl, {
                     method: 'POST',
                     headers: {
@@ -2426,25 +2522,188 @@
                     body: JSON.stringify(reviewData)
                 });
                 
-                if (response.ok) {
-                    const data = await response.json();
-                    console.log('Review submission response:', data);
-                    
-                    if (data.status === 'success') {
-                        showNotification('Your review has been submitted!');
-                        return true;
-                    }
+                if (!response.ok) {
+                    throw new Error(`Server responded with status: ${response.status}`);
                 }
                 
-                // Fall back to just showing it in UI
-                console.warn('Could not submit review to server, adding locally only');
-                return false;
+                const data = await response.json();
+                console.log('Review submission response:', data);
+                
+                if (data.status === 'success') {
+                    showNotification('Your review has been submitted!');
+                    
+                    // Reload reviews to show the newly added review
+                    await fetchProductReviews(productId);
+                    return true;
+                } else {
+                    showNotification('Error: ' + data.message);
+                    return false;
+                }
                 
             } catch (error) {
                 console.error('Error submitting review:', error);
+                showNotification('Error submitting review. Please try again later.');
                 return false;
             }
         }
+
+        // Function to add a reference to initializeSlider to prevent errors
+        function initializeSlider() {
+            console.log('Legacy initializeSlider function called - using fetchProductImages instead');
+            
+            // Get the product ID from URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const productId = urlParams.get('id');
+            
+            if (productId) {
+                // Create a simple product object with just the ID
+                const productObj = { id: productId };
+                
+                // Use our fetchProductImages function instead
+                fetchProductImages(productObj);
+            } else {
+                // No product ID, use placeholder
+                setupImageSlider(['../../assets/images/placeholder.png']);
+            }
+        }
+
+        // Create a local goToSlide function for this slider instance
+        const goToSlide = function(index) {
+            // Update slides
+            const slides = sliderContainer.querySelectorAll('.slider-slide');
+            slides.forEach((slide, i) => {
+                slide.classList.toggle('active', i === index);
+            });
+            
+            // Update dots
+            const dots = dotsContainer.querySelectorAll('.slider-dot');
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('active', i === index);
+            });
+            
+            // Update thumbnails
+            const thumbnails = thumbnailsContainer.querySelectorAll('.thumbnail');
+            thumbnails.forEach((thumb, i) => {
+                thumb.classList.toggle('active', i === index);
+            });
+        };
+        
+        // Attach the function to the window for global access
+        window.productImageGoToSlide = goToSlide;
+
+        // Function to specifically ensure the slider arrows are visible
+        function fixSliderArrows() {
+            console.log('Fixing slider arrows...');
+            const prevButton = document.getElementById('prevSlide');
+            const nextButton = document.getElementById('nextSlide');
+            
+            if (!prevButton || !nextButton) {
+                console.error('Navigation buttons not found');
+                return;
+            }
+            
+            // Ensure arrows are visible and properly styled
+            const arrowStyle = {
+                position: 'absolute',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                width: '40px',
+                height: '40px',
+                backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                color: 'white',
+                borderRadius: '50%',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                cursor: 'pointer',
+                zIndex: '100',
+                opacity: '1',
+                pointerEvents: 'auto'
+            };
+            
+            // Apply styles to both arrows
+            Object.keys(arrowStyle).forEach(key => {
+                prevButton.style[key] = arrowStyle[key];
+                nextButton.style[key] = arrowStyle[key];
+            });
+            
+            // Position left and right arrows
+            prevButton.style.left = '20px';
+            nextButton.style.right = '20px';
+            
+            // Ensure the arrow icons are visible
+            const prevIcon = prevButton.querySelector('i');
+            const nextIcon = nextButton.querySelector('i');
+            
+            if (prevIcon) {
+                prevIcon.style.fontSize = '18px';
+                prevIcon.style.color = 'white';
+            } else {
+                prevButton.innerHTML = '<i class="fas fa-chevron-left" style="font-size: 18px; color: white;"></i>';
+            }
+            
+            if (nextIcon) {
+                nextIcon.style.fontSize = '18px';
+                nextIcon.style.color = 'white';
+            } else {
+                nextButton.innerHTML = '<i class="fas fa-chevron-right" style="font-size: 18px; color: white;"></i>';
+            }
+            
+            // Add direct click handlers
+            prevButton.onclick = function() {
+                const slides = document.querySelectorAll('.slider-slide');
+                const activeSlide = document.querySelector('.slider-slide.active');
+                if (!activeSlide) return;
+                
+                const activeIndex = Array.from(slides).indexOf(activeSlide);
+                const newIndex = (activeIndex - 1 + slides.length) % slides.length;
+                
+                // Use the global goToSlide function if available, or fall back to a simple approach
+                if (window.productGoToSlide) {
+                    window.productGoToSlide(newIndex);
+                } else {
+                    slides.forEach((slide, i) => slide.classList.toggle('active', i === newIndex));
+                    
+                    const dots = document.querySelectorAll('.slider-dot');
+                    dots.forEach((dot, i) => dot.classList.toggle('active', i === newIndex));
+                    
+                    const thumbs = document.querySelectorAll('.thumbnail');
+                    thumbs.forEach((thumb, i) => thumb.classList.toggle('active', i === newIndex));
+                }
+            };
+            
+            nextButton.onclick = function() {
+                const slides = document.querySelectorAll('.slider-slide');
+                const activeSlide = document.querySelector('.slider-slide.active');
+                if (!activeSlide) return;
+                
+                const activeIndex = Array.from(slides).indexOf(activeSlide);
+                const newIndex = (activeIndex + 1) % slides.length;
+                
+                // Use the global goToSlide function if available, or fall back to a simple approach
+                if (window.productGoToSlide) {
+                    window.productGoToSlide(newIndex);
+                } else {
+                    slides.forEach((slide, i) => slide.classList.toggle('active', i === newIndex));
+                    
+                    const dots = document.querySelectorAll('.slider-dot');
+                    dots.forEach((dot, i) => dot.classList.toggle('active', i === newIndex));
+                    
+                    const thumbs = document.querySelectorAll('.thumbnail');
+                    thumbs.forEach((thumb, i) => thumb.classList.toggle('active', i === newIndex));
+                }
+            };
+            
+            console.log('Slider arrows fixed successfully');
+        }
+        
+        // Call fix arrows after page load and after a short delay to ensure all elements are rendered
+        document.addEventListener('DOMContentLoaded', function() {
+            fixSliderArrows();
+            // Call again with a delay to ensure it works even if initial elements are replaced
+            setTimeout(fixSliderArrows, 1000);
+            setTimeout(fixSliderArrows, 2000);
+        });
     </script>
 </body>
 </html>

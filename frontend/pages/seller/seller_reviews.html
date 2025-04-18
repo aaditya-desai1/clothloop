@@ -888,32 +888,18 @@
             fetch(url)
                 .then(response => {
                     console.log('Response status:', response.status);
-                    // Get the response text for debugging
-                    return response.text().then(text => {
-                        // Try to parse the text as JSON and log it
-                        try {
-                            const data = JSON.parse(text);
-                            console.log('Response body:', data);
-                            return data;
-                        } catch (e) {
-                            console.error('Failed to parse response as JSON:', text);
-                            throw new Error('Invalid JSON response: ' + text);
-                        }
-                    });
+                    return response.json();
                 })
                 .then(data => {
                     loadingSpinner.style.display = 'none';
                     
-                    if (data.status === 'success' || data.success === true) {
+                    if (data.status === 'success') {
                         // Clear any previous errors
                         clearError();
                         
                         // Update stats
                         if (data.data && data.data.stats) {
                             updateReviewStats(data.data.stats);
-                        } else if (data.summary) {
-                            // Alternative response format
-                            updateReviewStats(data.summary);
                         } else {
                             console.warn('No stats data available in response');
                         }
@@ -921,9 +907,6 @@
                         // Display reviews
                         if (data.data && data.data.reviews) {
                             displayReviews(data.data.reviews);
-                        } else if (data.reviews) {
-                            // Alternative response format
-                            displayReviews(data.reviews);
                         } else {
                             console.warn('No reviews data available in response');
                             displayReviews([]);
@@ -1217,59 +1200,39 @@
         
         // Function to submit response
         function submitResponse(reviewId, responseText) {
-            const submitBtn = document.querySelector('.submit-btn');
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Submitting...';
-            
-            console.log('Submitting response for review ID:', reviewId);
-            
-            fetch('../../../backend/api/sellers/update_review_response.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    review_id: reviewId,
-                    response: responseText
+            return new Promise((resolve, reject) => {
+                console.log('Submitting response for review ID:', reviewId);
+
+                fetch('../../../backend/api/sellers/update_review_response.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        review_id: reviewId,
+                        response: responseText,
+                        seller_id: sessionStorage.getItem('user_id')
+                    })
                 })
-            })
-            .then(response => {
-                console.log('Response status:', response.status);
-                // Get the response text for debugging
-                return response.text().then(text => {
-                    // Try to parse the text as JSON and log it
-                    try {
-                        const data = JSON.parse(text);
-                        console.log('Response body:', data);
-                        return data;
-                    } catch (e) {
-                        console.error('Failed to parse response as JSON:', text);
-                        throw new Error('Invalid JSON response: ' + text);
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        // Get seller ID from session storage
+                        const sellerId = sessionStorage.getItem('user_id');
+                        
+                        // Reload reviews
+                        fetchReviews(sellerId);
+                        resolve(data);
+                    } else {
+                        showError(data.message || 'Failed to submit response. Please try again.');
+                        reject(new Error(data.message || 'Failed to submit response'));
                     }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showError('Failed to submit response. Please try again.');
+                    reject(error);
                 });
-            })
-            .then(data => {
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Submit Response';
-                
-                if (data.success === true || data.status === 'success') {
-                    // Close modal
-                    document.getElementById('responseModal').style.display = 'none';
-                    
-                    // Get seller ID from session storage
-                    const sellerId = sessionStorage.getItem('user_id');
-                    
-                    // Reload reviews
-                    fetchReviews(sellerId);
-                } else {
-                    alert(data.message || 'Failed to submit response. Please try again.');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Submit Response';
-                alert('Failed to submit response. Please try again.');
             });
         }
         
