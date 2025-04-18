@@ -863,6 +863,41 @@
             
             // Setup modal functionality
             setupResponseModal();
+            
+            // Setup theme switcher
+            const themeToggle = document.getElementById('theme-toggle');
+            const savedTheme = localStorage.getItem('clothloop-theme');
+            
+            // Apply saved theme if any
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-theme');
+                if (themeToggle) {
+                    const themeIcon = themeToggle.querySelector('i');
+                    if (themeIcon) {
+                        themeIcon.classList.remove('fa-sun');
+                        themeIcon.classList.add('fa-moon');
+                    }
+                }
+            }
+            
+            // Add theme toggle event listener
+            if (themeToggle) {
+                themeToggle.addEventListener('click', function() {
+                    document.body.classList.toggle('light-theme');
+                    
+                    // Update icon and save preference
+                    const themeIcon = this.querySelector('i');
+                    if (document.body.classList.contains('light-theme')) {
+                        themeIcon.classList.remove('fa-sun');
+                        themeIcon.classList.add('fa-moon');
+                        localStorage.setItem('clothloop-theme', 'light');
+                    } else {
+                        themeIcon.classList.remove('fa-moon');
+                        themeIcon.classList.add('fa-sun');
+                        localStorage.setItem('clothloop-theme', 'dark');
+                    }
+                });
+            }
         });
         
         // Function to clear error message

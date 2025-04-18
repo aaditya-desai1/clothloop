@@ -567,30 +567,45 @@ $user_email = $_SESSION['user_email'] ?? '';
 
         // Update profile function
         function updateProfile() {
-            // Collect form data
-            const formData = {
-                name: document.getElementById('name').value,
-                email: document.getElementById('email').value,
-                phone_no: document.getElementById('phone').value,
-                shop_name: document.getElementById('shop-name').value,
-                description: document.getElementById('shop-description').value,
-                address: document.getElementById('shop-address').value,
-                latitude: document.getElementById('latitude').value,
-                longitude: document.getElementById('longitude').value
-            };
+            // Create FormData object to handle both form fields and file upload
+            const formData = new FormData();
+            
+            // Add seller_id from the session
+            formData.append('seller_id', <?php echo $user_id; ?>);
+            
+            // Add text field data
+            formData.append('name', document.getElementById('name').value);
+            formData.append('email', document.getElementById('email').value);
+            formData.append('phone_no', document.getElementById('phone').value);
+            formData.append('shop_name', document.getElementById('shop-name').value);
+            formData.append('description', document.getElementById('shop-description').value);
+            formData.append('address', document.getElementById('shop-address').value);
+            formData.append('latitude', document.getElementById('latitude').value);
+            formData.append('longitude', document.getElementById('longitude').value);
+            
+            // Add profile image if a file was selected
+            const profileImageInput = document.getElementById('profile-image');
+            if (profileImageInput.files.length > 0) {
+                formData.append('profile_photo', profileImageInput.files[0]);
+            }
 
-            // Send data to API
+            // Send data to API using FormData (no Content-Type header needed)
             fetch('/ClothLoop/backend/api/sellers/update_seller_profile.php', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(formData)
+                body: formData
             })
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'success') {
                     showMessage('success', 'Profile updated successfully');
+                    
+                    // Update profile image if it was returned in the response
+                    if (data.data && data.data.profile_photo) {
+                        document.getElementById('profile-image-preview').src = data.data.profile_photo;
+                    }
+                    
+                    // Refresh the profile data
+                    fetchSellerProfile();
                 } else {
                     showMessage('error', 'Failed to update profile: ' + data.message);
                 }
@@ -598,29 +613,6 @@ $user_email = $_SESSION['user_email'] ?? '';
             .catch(error => {
                 showMessage('error', 'Error updating profile: ' + error.message);
             });
-
-            // Handle profile image upload separately if a file was selected
-            const profileImageInput = document.getElementById('profile-image');
-            if (profileImageInput.files.length > 0) {
-                const imageFormData = new FormData();
-                imageFormData.append('profile_image', profileImageInput.files[0]);
-
-                fetch('/ClothLoop/backend/api/users/upload_profile_image.php', {
-                    method: 'POST',
-                    body: imageFormData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 'success') {
-                        showMessage('success', 'Profile image updated successfully');
-                    } else {
-                        showMessage('error', 'Failed to update profile image: ' + data.message);
-                    }
-                })
-                .catch(error => {
-                    showMessage('error', 'Error uploading profile image: ' + error.message);
-                });
-            }
         }
 
         // Show message function

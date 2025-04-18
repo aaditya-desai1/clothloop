@@ -22,6 +22,7 @@ require_once __DIR__ . '/../utils/response.php';
 // Get request parameters
 $type = isset($_GET['type']) ? $_GET['type'] : '';
 $id = isset($_GET['id']) ? $_GET['id'] : '';
+$file = isset($_GET['file']) ? $_GET['file'] : '';
 $debug = isset($_GET['debug']) && $_GET['debug'] === 'true';
 
 // If debug mode is on, set content type to text/html
@@ -186,12 +187,47 @@ try {
         
         // Try product directory structure
         if ($type === 'product' || $type === 'cloth') {
+            $baseDir = dirname(dirname(__DIR__)); // 2 levels up from /backend/api/image_display.php
             $productUploadDir = $baseDir . "/backend/uploads/products/{$id}";
             
             if ($debug) {
                 echo "<h3>Checking Product Upload Directory</h3>";
                 echo "<p>Directory: $productUploadDir</p>";
                 echo "<p>Directory exists: " . (is_dir($productUploadDir) ? "YES" : "NO") . "</p>";
+                if (!empty($file)) {
+                    echo "<p>Looking for specific file: $file</p>";
+                }
+            }
+            
+            // If a specific file is requested, try to serve it first
+            if (!empty($file) && is_dir($productUploadDir)) {
+                $filePath = basename($file); // Sanitize filename
+                $imagePath = $productUploadDir . '/' . $filePath;
+                
+                if ($debug) {
+                    echo "<p>Looking for file: $imagePath</p>";
+                    echo "<p>File exists: " . (file_exists($imagePath) ? "YES" : "NO") . "</p>";
+                }
+                
+                if (file_exists($imagePath)) {
+                    $ext = strtolower(pathinfo($imagePath, PATHINFO_EXTENSION));
+                    $contentType = 'image/jpeg'; // Default
+                    
+                    if ($ext === 'png') $contentType = 'image/png';
+                    elseif ($ext === 'gif') $contentType = 'image/gif';
+                    elseif ($ext === 'webp') $contentType = 'image/webp';
+                    
+                    if ($debug) {
+                        echo "<p>Found specific file: $imagePath</p>";
+                        echo "<p>Content type: $contentType</p>";
+                    } else {
+                        header("Content-Type: $contentType");
+                        readfile($imagePath);
+                        exit;
+                    }
+                } else if ($debug) {
+                    echo "<p>Specific file not found: $imagePath</p>";
+                }
             }
             
             // If the directory exists, look for any image file

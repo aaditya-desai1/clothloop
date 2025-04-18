@@ -1368,20 +1368,27 @@
                 
                 console.log("Preparing form data for submission...");
                 
-                // Prepare profile data
-                const profileData = {
-                    seller_id: userId,
-                    name: nameInput.value,
-                    email: emailInput.value,
-                    phone_no: phoneInput.value,
-                    shop_name: shopNameInput.value,
-                    description: shopDescriptionInput.value
-                };
+                // Create FormData object for handling file uploads
+                const formData = new FormData();
+                
+                // Add basic profile data
+                formData.append('seller_id', userId);
+                formData.append('name', nameInput.value);
+                formData.append('email', emailInput.value);
+                formData.append('phone_no', phoneInput.value);
+                formData.append('shop_name', shopNameInput.value);
+                formData.append('description', shopDescriptionInput.value);
                 
                 // Add location data if set
                 if (latitudeInput.value && longitudeInput.value) {
-                    profileData.latitude = latitudeInput.value;
-                    profileData.longitude = longitudeInput.value;
+                    formData.append('latitude', latitudeInput.value);
+                    formData.append('longitude', longitudeInput.value);
+                }
+                
+                // Add profile image/logo if selected
+                if (shopLogoInput.files && shopLogoInput.files[0]) {
+                    formData.append('profile_photo', shopLogoInput.files[0]);
+                    console.log('Adding profile photo to form data:', shopLogoInput.files[0].name);
                 }
                 
                 // Add password info if change password checkbox is checked
@@ -1397,8 +1404,8 @@
                         return;
                     }
                     
-                    profileData.current_password = currentPasswordInput.value;
-                    profileData.new_password = newPasswordInput.value;
+                    formData.append('current_password', currentPasswordInput.value);
+                    formData.append('new_password', newPasswordInput.value);
                 }
                 
                 console.log(`Submitting profile data for user ID: ${userId}`);
@@ -1406,10 +1413,7 @@
                 // Send data to API
                 fetch('../../../backend/api/sellers/update_seller_profile.php', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(profileData)
+                    body: formData  // No Content-Type header needed, browser sets it automatically with boundary
                 })
                 .then(response => {
                     console.log(`Response status: ${response.status}`);
@@ -1440,6 +1444,10 @@
                             changePasswordCheckbox.checked = false;
                             passwordSection.style.display = 'none';
                         }
+                        
+                        // Reset file input
+                        shopLogoInput.value = '';
+                        document.querySelector('.file-name').textContent = 'No file chosen';
                         
                         // Refresh profile data
                         setTimeout(function() {

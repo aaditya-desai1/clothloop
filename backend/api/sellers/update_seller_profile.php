@@ -14,23 +14,31 @@ header('Access-Control-Allow-Headers: Access-Control-Allow-Headers, Content-Type
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../../utils/response.php';
 
-// Get posted data
-$data = json_decode(file_get_contents("php://input"), true);
-
 // Write debug info to a log file
 $logFile = __DIR__ . '/../../logs/profile_update.log';
 $logDir = dirname($logFile);
 if (!is_dir($logDir)) {
     mkdir($logDir, 0777, true);
 }
-$logData = [
-    'timestamp' => date('Y-m-d H:i:s'),
-    'received_data' => $data
-];
-file_put_contents($logFile, json_encode($logData, JSON_PRETTY_PRINT) . "\n\n", FILE_APPEND);
+
+// Check if using form data (for file uploads) or JSON
+$data = [];
+if (!empty($_POST)) {
+    $data = $_POST;
+    file_put_contents($logFile, "Received POST data: " . json_encode($_POST, JSON_PRETTY_PRINT) . "\n\n", FILE_APPEND);
+    
+    // Log file upload information if present
+    if (!empty($_FILES)) {
+        file_put_contents($logFile, "Received FILES data: " . json_encode($_FILES, JSON_PRETTY_PRINT) . "\n\n", FILE_APPEND);
+    }
+} else {
+    // Get posted data from JSON input
+    $data = json_decode(file_get_contents("php://input"), true);
+    file_put_contents($logFile, "Received JSON data: " . json_encode($data, JSON_PRETTY_PRINT) . "\n\n", FILE_APPEND);
+}
 
 // Basic validation
-if (!$data) {
+if (empty($data)) {
     file_put_contents($logFile, "ERROR: No data provided\n\n", FILE_APPEND);
     echo json_encode(['success' => false, 'message' => 'No data provided']);
     exit;
@@ -53,9 +61,32 @@ try {
     $db->beginTransaction();
     file_put_contents($logFile, "Transaction started\n", FILE_APPEND);
     
+    // Handle profile photo upload
+    $profile_photo_path = null;
+    if (!empty($_FILES['profile_photo']) && $_FILES['profile_photo']['error'] == 0) {
+        // Create uploads directory if it doesn't exist
+        $upload_dir = __DIR__ . '/../../../uploads/seller_profiles/';
+        if (!is_dir($upload_dir)) {
+            mkdir($upload_dir, 0777, true);
+        }
+        
+        // Generate unique filename
+        $file_extension = pathinfo($_FILES['profile_photo']['name'], PATHINFO_EXTENSION);
+        $file_name = 'seller_' . $seller_id . '_' . time() . '.' . $file_extension;
+        $target_file = $upload_dir . $file_name;
+        
+        // Move uploaded file
+        if (move_uploaded_file($_FILES['profile_photo']['tmp_name'], $target_file)) {
+            $profile_photo_path = 'uploads/seller_profiles/' . $file_name;
+            file_put_contents($logFile, "File uploaded successfully to: $profile_photo_path\n", FILE_APPEND);
+        } else {
+            file_put_contents($logFile, "ERROR: Failed to upload file\n", FILE_APPEND);
+        }
+    }
+    
     // Update users table if needed
     $userUpdated = false;
-    if (isset($data['name']) || isset($data['email']) || isset($data['phone_no'])) {
+    if (isset($data['name']) || isset($data['email']) || isset($data['phone_no']) || $profile_photo_path) {
         $userFields = [];
         $userParams = [];
         
@@ -72,6 +103,11 @@ try {
         if (isset($data['phone_no'])) {
             $userFields[] = "phone_no = ?";
             $userParams[] = $data['phone_no'];
+        }
+        
+        if ($profile_photo_path) {
+            $userFields[] = "profile_photo = ?";
+            $userParams[] = $profile_photo_path;
         }
         
         if (!empty($userFields)) {
@@ -144,7 +180,7 @@ try {
     echo json_encode([
         'status' => 'success',
         'message' => 'Profile updated successfully',
-        'data' => null
+        'data' => ['profile_photo' => $profile_photo_path]
     ]);
     
 } catch (Exception $e) {
