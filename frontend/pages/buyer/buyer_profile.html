@@ -797,7 +797,7 @@
                 <li><a href="wish.html">Wishlist</a></li>
                 <li><a href="buyer_profile.html" class="active">Profile</a></li>
                 <li><a href="../about/about_us.html">About</a></li>
-                <li><a href="../account/login.html">Logout</a></li>
+                <li><a href="#" id="logoutBtn">Logout</a></li>
             </ul>
             <button class="theme-switcher" id="theme-toggle" aria-label="Toggle theme">
                 <i class="fas fa-sun"></i>
@@ -834,6 +834,9 @@
                     <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
                 </form>
                 <div style="margin-top: 15px; text-align: center;">
+                    <p style="font-size: 0.85rem; margin-bottom: 10px; color: var(--accent-color); opacity: 0.8;">
+                        Test Account: buyer@clothloop.com / password
+                    </p>
                     <a href="../../index.html" style="color: var(--text-color); text-decoration: none; opacity: 0.8; transition: opacity 0.2s;">Return to Home</a>
                 </div>
             </div>
@@ -996,6 +999,31 @@
                 }
             });
 
+            // Handle logout
+            const logoutBtn = document.getElementById('logoutBtn');
+            logoutBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Show confirmation if needed
+                if (confirm('Are you sure you want to log out?')) {
+                    // Call logout API
+                    fetch('../../../backend/api/users/logout.php', {
+                        method: 'GET',
+                        credentials: 'include'
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        // Redirect to login page regardless of result
+                        window.location.href = '../account/login.html';
+                    })
+                    .catch(error => {
+                        console.error('Logout error:', error);
+                        // Redirect anyway even if there's an error
+                        window.location.href = '../account/login.html';
+                    });
+                }
+            });
+
             // Check if user is logged in
             checkSession();
             
@@ -1065,27 +1093,7 @@
                     formData.append('profile_photo', photoFile);
                 }
                 
-                // For demo/testing purposes - simulate success without backend
-                const demoMode = true; // Set to false to use actual backend API
-                
-                if (demoMode) {
-                    // Simulate network delay
-                    setTimeout(function() {
-                        // Reset button
-                        submitBtn.innerHTML = originalBtnText;
-                        submitBtn.disabled = false;
-                        
-                        // Show success message
-                        showSuccess('Profile updated successfully');
-                        
-                        // Update session data
-                        sessionStorage.setItem('buyer_name', document.getElementById('name').value);
-                    }, 1500);
-                    
-                    return;
-                }
-                
-                // Send data to server (real API call)
+                // Send data to server
                 fetch('../../../backend/api/buyers/update_profile.php', {
                     method: 'POST',
                     body: formData,
@@ -1111,8 +1119,22 @@
                         // If profile photo URL is returned, update it
                         if (data.profile_photo_url) {
                             // Update the preview with the new URL from server
-                            photoPreview.innerHTML = `<img src="${data.profile_photo_url}" alt="Profile Photo">`;
-                            removePhotoBtn.style.display = 'block';
+                            photoPreview.innerHTML = '';
+                            const img = new Image();
+                            img.onload = function() {
+                                photoPreview.appendChild(img);
+                                removePhotoBtn.style.display = 'block';
+                            };
+                            img.onerror = function() {
+                                console.error("Failed to load profile image:", data.profile_photo_url);
+                                photoPreview.innerHTML = '<i class="fas fa-user"></i>';
+                                removePhotoBtn.style.display = 'none';
+                            };
+                            img.src = data.profile_photo_url;
+                            img.alt = "Profile Photo";
+                            img.style.width = "100%";
+                            img.style.height = "100%";
+                            img.style.objectFit = "cover";
                         }
                     } else {
                         showError(data.message || 'Failed to update profile');
@@ -1172,10 +1194,22 @@
                     
                     reader.onload = function(event) {
                         const imgSrc = event.target.result;
-                        photoPreview.innerHTML = `<img src="${imgSrc}" alt="Profile Photo">`;
-                        
-                        // Show remove button
-                        removePhotoBtn.style.display = 'block';
+                        photoPreview.innerHTML = '';
+                        const img = new Image();
+                        img.onload = function() {
+                            photoPreview.appendChild(img);
+                            removePhotoBtn.style.display = 'block';
+                        };
+                        img.onerror = function() {
+                            console.error("Failed to load profile image:", imgSrc);
+                            photoPreview.innerHTML = '<i class="fas fa-user"></i>';
+                            removePhotoBtn.style.display = 'none';
+                        };
+                        img.src = imgSrc;
+                        img.alt = "Profile Photo";
+                        img.style.width = "100%";
+                        img.style.height = "100%";
+                        img.style.objectFit = "cover";
                     };
                     
                     reader.readAsDataURL(file);
@@ -1232,10 +1266,6 @@
                 document.getElementById('profileForm').style.display = 'none';
                 document.getElementById('loginPrompt').style.display = 'none';
                 
-                // For demo purposes, you can comment out the next line to show login form first
-                // document.getElementById('loginPrompt').style.display = 'block';
-                // return;
-                
                 // Try to load profile data from the database
                 loadProfileData();
             }
@@ -1258,8 +1288,16 @@
                         throw new Error('Network response was not ok');
                     }
                     
-                    // Parse JSON response
-                    return response.json();
+                    // Try to parse JSON response
+                    return response.text().then(text => {
+                        try {
+                            return JSON.parse(text);
+                        } catch (e) {
+                            console.error('JSON Parse Error:', e);
+                            console.error('Raw response:', text);
+                            throw new Error('Invalid JSON response: ' + e.message);
+                        }
+                    });
                 })
                 .then(data => {
                     // Hide loading spinner
@@ -1267,8 +1305,6 @@
                     
                     if (data.status === 'success') {
                         const user = data.user;
-                        
-                        console.log('Profile data loaded:', user);
                         
                         // Populate form fields
                         document.getElementById('name').value = user.name || '';
@@ -1281,33 +1317,23 @@
                         const removePhotoBtn = document.getElementById('removePhoto');
                         
                         if (user.profile_photo_url) {
-                            // Create a test image to verify the URL works
-                            const testImg = new Image();
-                            testImg.onload = function() {
-                                // Image loaded successfully
-                                photoPreview.innerHTML = `<img src="${user.profile_photo_url}" alt="Profile Photo">`;
+                            // Create an image with error handling
+                            const img = new Image();
+                            img.onload = function() {
+                                photoPreview.innerHTML = '';
+                                photoPreview.appendChild(img);
                                 removePhotoBtn.style.display = 'block';
                             };
-                            testImg.onerror = function() {
-                                // Image failed to load, try alternative path
-                                console.warn('Failed to load profile image from:', user.profile_photo_url);
-                                const alternativePath = '../../../backend/uploads/profile_photos/' + user.profile_photo_url.split('/').pop();
-                                console.log('Trying alternative path:', alternativePath);
-                                
-                                // Try the alternative path
-                                const altImg = new Image();
-                                altImg.onload = function() {
-                                    photoPreview.innerHTML = `<img src="${alternativePath}" alt="Profile Photo">`;
-                                    removePhotoBtn.style.display = 'block';
-                                };
-                                altImg.onerror = function() {
-                                    console.error('Failed to load profile image from alternate path');
-                                    photoPreview.innerHTML = '<i class="fas fa-user"></i>';
-                                    removePhotoBtn.style.display = 'none';
-                                };
-                                altImg.src = alternativePath;
+                            img.onerror = function() {
+                                console.error("Failed to load profile image:", user.profile_photo_url);
+                                photoPreview.innerHTML = '<i class="fas fa-user"></i>';
+                                removePhotoBtn.style.display = 'none';
                             };
-                            testImg.src = user.profile_photo_url;
+                            img.src = user.profile_photo_url;
+                            img.alt = "Profile Photo";
+                            img.style.width = "100%";
+                            img.style.height = "100%";
+                            img.style.objectFit = "cover";
                         } else {
                             photoPreview.innerHTML = '<i class="fas fa-user"></i>';
                             removePhotoBtn.style.display = 'none';
@@ -1330,12 +1356,15 @@
                         if (data.message === 'Not authenticated' || data.message.includes('authenticated')) {
                             // Show login prompt
                             document.getElementById('loginPrompt').style.display = 'block';
+                            console.log('Authentication error: ' + data.message);
                         } else {
                             // Show error message
                             showError(data.message || 'Failed to load profile data');
                             
-                            // Show login form as fallback
-                            document.getElementById('loginPrompt').style.display = 'block';
+                            // Show login prompt as fallback
+                            setTimeout(() => {
+                                document.getElementById('loginPrompt').style.display = 'block';
+                            }, 3000);
                         }
                     }
                 })
@@ -1346,8 +1375,10 @@
                     console.error('Error:', error);
                     showError('An error occurred while loading profile data: ' + error.message);
                     
-                    // Always show login form in case of errors
-                    document.getElementById('loginPrompt').style.display = 'block';
+                    // Show login form in case of errors
+                    setTimeout(() => {
+                        document.getElementById('loginPrompt').style.display = 'block';
+                    }, 2000);
                 });
             }
             
@@ -1402,7 +1433,7 @@
                 const loginButton = loginForm.querySelector('button[type="submit"]');
                 const originalButtonText = loginButton.textContent;
                 loginButton.disabled = true;
-                loginButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
+                loginButton.innerHTML = '<i class="fas fa-spinner"></i> Logging in...';
                 
                 // Clear previous errors
                 document.getElementById('errorAlert').style.display = 'none';
@@ -1412,12 +1443,6 @@
                     email: loginEmail,
                     password: loginPassword
                 };
-                
-                // For demo, use demo@clothloop.com / password
-                // Use the demo credentials if login with user input fails
-                if (loginEmail !== 'demo@clothloop.com') {
-                    console.log('For testing, you can use: demo@clothloop.com / password');
-                }
                 
                 fetch('../../../backend/api/users/login.php', {
                     method: 'POST',
@@ -1433,14 +1458,22 @@
                     }
                     
                     // Try to parse JSON response
-                    return response.json();
+                    return response.text().then(text => {
+                        try {
+                            return JSON.parse(text);
+                        } catch (e) {
+                            console.error('JSON Parse Error:', e);
+                            console.error('Raw response:', text);
+                            throw new Error('Invalid JSON response: ' + e.message);
+                        }
+                    });
                 })
                 .then(data => {
                     // Reset button state
                     loginButton.disabled = false;
                     loginButton.textContent = originalButtonText;
                     
-                    if (data.success) {
+                    if (data.success || data.status === 'success') {
                         // Login successful
                         showSuccess('Login successful! Loading your profile...');
                         
@@ -1450,20 +1483,8 @@
                             checkSession();
                         }, 1000);
                     } else {
-                        // For demo purposes, try with demo account if login failed
-                        if (loginEmail !== 'demo@clothloop.com') {
-                            console.log('Login failed with provided credentials. Trying demo account...');
-                            
-                            // Try with demo account
-                            document.getElementById('loginEmail').value = 'demo@clothloop.com';
-                            document.getElementById('loginPassword').value = 'password';
-                            
-                            // Submit form again
-                            loginForm.dispatchEvent(new Event('submit'));
-                        } else {
-                            // Login failed with demo account
-                            showError(data.message || 'Login failed. Please check your credentials.');
-                        }
+                        // Login failed
+                        showError(data.message || 'Login failed. Please check your credentials.');
                     }
                 })
                 .catch(error => {
@@ -1472,20 +1493,7 @@
                     loginButton.textContent = originalButtonText;
                     
                     console.error('Error during login:', error);
-                    
-                    // For demo purposes, try with demo account if error occurred
-                    if (loginEmail !== 'demo@clothloop.com') {
-                        console.log('Error occurred. Trying demo account...');
-                        
-                        // Try with demo account
-                        document.getElementById('loginEmail').value = 'demo@clothloop.com';
-                        document.getElementById('loginPassword').value = 'password';
-                        
-                        // Submit form again
-                        loginForm.dispatchEvent(new Event('submit'));
-                    } else {
-                        showError('An error occurred during login. Please try again.');
-                    }
+                    showError('An error occurred during login. Please try again.');
                 });
             });
 

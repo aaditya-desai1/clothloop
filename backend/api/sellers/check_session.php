@@ -4,16 +4,46 @@
  * Validates session status and attempts to restore session if needed
  */
 
-// Headers
-header('Access-Control-Allow-Origin: *');
+// Set the appropriate CORS headers
+$origin = isset($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : '';
+$allowed_origins = [
+    'http://localhost', 
+    'http://127.0.0.1',
+    'http://localhost:8080',
+    'http://localhost:3000'
+];
+
+// Allow from any of the allowed origins
+if (in_array($origin, $allowed_origins) || strpos($origin, 'clothloop') !== false) {
+    header("Access-Control-Allow-Origin: $origin");
+    header("Access-Control-Allow-Credentials: true");
+} else {
+    // Fallback for development
+    header("Access-Control-Allow-Origin: *");
+}
+
+// Always set these headers
 header('Content-Type: application/json');
 header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
-header('Access-Control-Allow-Headers: Access-Control-Allow-Headers, Content-Type, Access-Control-Allow-Methods, Authorization, X-Requested-With');
+header('Access-Control-Allow-Headers: Content-Type, X-Requested-With, Authorization');
 
-// Handle preflight requests
+// Handle preflight OPTIONS request
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit();
+}
+
+// Set cookie parameters for better session security
+if (session_status() == PHP_SESSION_NONE) {
+    // Make sure cookies will be accessible from JavaScript and sent with requests
+    session_set_cookie_params([
+        'lifetime' => 86400, // 24 hours
+        'path' => '/',
+        'domain' => '', // current domain
+        'secure' => isset($_SERVER['HTTPS']), // secure if using HTTPS
+        'httponly' => false, // allow JavaScript access
+        'samesite' => 'Lax' // allow cross-site requests with normal navigation
+    ]);
 }
 
 // Required files

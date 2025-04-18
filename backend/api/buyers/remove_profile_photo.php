@@ -12,7 +12,7 @@ ini_set('display_errors', 0);
 error_reporting(0);
 
 // Headers
-header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Origin: http://localhost');
 header('Content-Type: application/json');
 header('Access-Control-Allow-Methods: POST');
 header('Access-Control-Allow-Headers: Access-Control-Allow-Headers, Content-Type, Access-Control-Allow-Methods, Authorization, X-Requested-With');
@@ -42,14 +42,14 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 // Check if user is logged in
-if (!isset($_SESSION['user_id'])) {
+if (!isset($_SESSION['user']) || empty($_SESSION['user']['id'])) {
     $response['message'] = 'Not authenticated';
     echo json_encode($response);
     exit;
 }
 
 // Get user ID from session
-$userId = $_SESSION['user_id'];
+$userId = $_SESSION['user']['id'];
 
 try {
     // Database connection
@@ -67,7 +67,16 @@ try {
     }
     
     // Verify user is a buyer
-    if ($user->user_type !== 'buyer') {
+    $isBuyer = false;
+    if (isset($user->user_type) && $user->user_type === 'buyer') {
+        $isBuyer = true;
+    } elseif (isset($user->role) && $user->role === 'buyer') {
+        $isBuyer = true;
+    } elseif (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] === 'buyer') {
+        $isBuyer = true;
+    }
+
+    if (!$isBuyer) {
         $response['message'] = 'Access denied. This endpoint is for buyers only.';
         echo json_encode($response);
         exit;

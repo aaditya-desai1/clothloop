@@ -238,7 +238,6 @@
             height: 40px;
             margin-right: 2rem;
             position: relative;
-            z-index: 99998; /* High z-index but below dropdown */
         }
         
         .sort-button i {
@@ -248,12 +247,10 @@
         .sort-button:hover {
             transform: translateY(-3px) skewX(-5deg);
             box-shadow: 5px 5px 0 rgba(255, 255, 255, 0.1);
-            background-color: rgba(255, 255, 255, 0.1);
         }
         
         .light-theme .sort-button:hover {
             box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.1);
-            background-color: rgba(0, 0, 0, 0.05);
         }
         
         /* Sort Dropdown */
@@ -265,10 +262,9 @@
             box-shadow: var(--box-shadow);
             border: 1px solid var(--border-color);
             min-width: 200px;
-            z-index: 99999;
+            z-index: 100;
             display: none;
             margin-top: 5px;
-            border-radius: 0;
         }
         
         .sort-dropdown.active {
@@ -323,7 +319,7 @@
             box-shadow: var(--box-shadow);
             border: 1px solid var(--border-color);
             display: none;
-            z-index: 99999;
+            z-index: 101;
         }
         
         .submenu-header {
@@ -1571,6 +1567,95 @@
             }
         };
         
+        // Extended fetchProducts function to include sorting and occasion filters
+        async function fetchProducts(category = null, searchTerm = null, sortBy = null, occasion = null) {
+            try {
+                // Show loading indicator
+                const productGrid = document.getElementById('productGrid');
+                productGrid.innerHTML = '<div class="loading-spinner" style="grid-column: 1/-1; text-align: center; padding: 50px;"><i class="fas fa-spinner fa-spin" style="font-size: 3rem; color: var(--text-color);"></i><p style="margin-top: 20px;">Loading products...</p></div>';
+                
+                // Construct the URL for the API endpoint
+                let url = '/ClothLoop/backend/api/products/get_products.php?limit=20';
+                
+                if (category) {
+                    const categoryMap = {
+                        'men': 1,
+                        'women': 2,
+                        'kids': 3
+                    };
+                    
+                    const categoryId = categoryMap[category.toLowerCase()] || category;
+                    url += `&category=${categoryId}`;
+                }
+                
+                if (searchTerm) {
+                    url += `&search=${encodeURIComponent(searchTerm)}`;
+                }
+                
+                if (sortBy) {
+                    url += `&sort_by=${sortBy}`;
+                }
+                
+                if (occasion) {
+                    url += `&occasion=${occasion}`;
+                }
+                
+                console.log('Fetching products from:', url);
+                
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch products: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('API response data:', data);
+                
+                // Check for success response and if products data exists
+                if (data && data.status === 'success') {
+                    let products = [];
+                    
+                    // Handle different response structures
+                    if (data.data && Array.isArray(data.data.products)) {
+                        // Standard response format
+                        products = data.data.products;
+                    } else if (data.data && typeof data.data === 'object') {
+                        // Alternative format - data might be the products array directly
+                        products = data.data;
+                    } else if (Array.isArray(data.products)) {
+                        // Older API format
+                        products = data.products;
+                    }
+                    
+                    console.log('Parsed products:', products);
+                    
+                    if (products.length > 0) {
+                        renderProducts(products);
+                    } else {
+                        renderNoProducts(category, occasion, sortBy);
+                    }
+                } else {
+                    console.error('Error in API response:', data);
+                    renderNoProducts(category, occasion, sortBy);
+                }
+            } catch (error) {
+                console.error('Error fetching products:', error);
+                
+                // Show error message in the product grid
+                const productGrid = document.getElementById('productGrid');
+                productGrid.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 50px;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: var(--error-color); margin-bottom: 20px;"></i>
+                        <h3>Error Loading Products</h3>
+                        <p>${error.message || 'Could not connect to the server'}</p>
+                        <button onclick="location.reload()" class="view-details-btn" style="margin-top: 20px;">Try Again</button>
+                    </div>
+                `;
+                
+                showNotification('Error loading products. Please check console for details.');
+            }
+        }
+        
         // Function to handle category selection
         function setupCategoryFilters() {
             const menCategory = document.getElementById('menCategory');
@@ -1607,36 +1692,12 @@
         function setupSearch() {
             const searchInput = document.getElementById('searchInput');
             
-            // Add keypress event for Enter key
             searchInput.addEventListener('keypress', function(e) {
                 if (e.key === 'Enter') {
                     const searchTerm = this.value.trim();
                     if (searchTerm) {
                         fetchProducts(null, searchTerm);
-                    } else {
-                        // If search is cleared, show all products
-                        fetchProducts();
                     }
-                }
-            });
-            
-            // Add search icon click event
-            const searchIcon = document.querySelector('.search-icon');
-            if (searchIcon) {
-                searchIcon.style.cursor = 'pointer'; // Make it look clickable
-                searchIcon.addEventListener('click', function() {
-                    const searchTerm = searchInput.value.trim();
-                    if (searchTerm) {
-                        fetchProducts(null, searchTerm);
-                    }
-                });
-            }
-            
-            // Add input event to handle clearing the search
-            searchInput.addEventListener('input', function(e) {
-                if (this.value.trim() === '') {
-                    // Optional: auto-refresh when search is cleared
-                    // fetchProducts();
                 }
             });
         }
@@ -1800,241 +1861,69 @@
             fetchProducts(null, null, null, occasionType);
         }
         
-        // Extended fetchProducts function to include sorting and occasion filters
-        async function fetchProducts(category = null, searchTerm = null, sortBy = null, occasion = null) {
-            try {
-                // Show loading indicator
-                const productGrid = document.getElementById('productGrid');
-                productGrid.innerHTML = '<div class="loading-spinner" style="grid-column: 1/-1; text-align: center; padding: 50px;"><i class="fas fa-spinner fa-spin" style="font-size: 3rem; color: var(--text-color);"></i><p style="margin-top: 20px;">Loading products...</p></div>';
-                
-                // For demonstration/testing purposes, create some dummy products if backend API is not available
-                const useDummyData = false; // Set this to false when backend is ready
-                
-                if (useDummyData) {
-                    // Generate dummy products for testing
-                    setTimeout(() => {
-                        const dummyProducts = generateDummyProducts(category, searchTerm, sortBy, occasion);
-                        renderProducts(dummyProducts);
-                        
-                        // Show notification based on filters
-                        let message = 'Showing';
-                        if (category) message += ` ${category}`;
-                        if (occasion) message += ` ${occasion}`;
-                        message += ' products';
-                        if (searchTerm) message += ` matching "${searchTerm}"`;
-                        if (sortBy === 'price-low-high') message += ', sorted by price low to high';
-                        if (sortBy === 'price-high-low') message += ', sorted by price high to low';
-                        
-                        showNotification(message);
-                    }, 500);
-                    return;
-                }
-                
-                // Construct the URL for the real API
-                let url = '/ClothLoop/backend/api/products/get_products.php?limit=20';
-                
-                if (category) {
-                    // Convert category from string to ID if needed
-                    const categoryMap = {
-                        'men': 1,
-                        'women': 2,
-                        'kids': 3
-                    };
-                    
-                    const categoryId = categoryMap[category.toLowerCase()] || category;
-                    url += `&category=${categoryId}`;
-                }
-                
-                if (searchTerm) {
-                    url += `&search=${encodeURIComponent(searchTerm)}`;
-                }
-                
-                if (sortBy) {
-                    url += `&sort_by=${sortBy}`;
-                }
-                
-                if (occasion) {
-                    url += `&occasion=${occasion}`;
-                }
-                
-                console.log('Fetching products from:', url);
-                
-                const response = await fetch(url);
-                
-                if (!response.ok) {
-                    throw new Error(`Failed to fetch products: ${response.status}`);
-                }
-                
-                const data = await response.json();
-                console.log('API response data:', data);
-                
-                // Check for success response and if products data exists
-                if (data && data.status === 'success') {
-                    let products = [];
-                    
-                    // Handle different response structures
-                    if (data.data && Array.isArray(data.data.products)) {
-                        // Standard response format
-                        products = data.data.products;
-                    } else if (data.data && typeof data.data === 'object') {
-                        // Alternative format - data might be the products array directly
-                        products = data.data;
-                    } else if (Array.isArray(data.products)) {
-                        // Older API format
-                        products = data.products;
-                    }
-                    
-                    console.log('Parsed products:', products);
-                    
-                    if (products.length > 0) {
-                        renderProducts(products);
-                } else {
-                        renderNoProducts(category, occasion, sortBy);
-                    }
-                } else {
-                    console.error('Error in API response:', data);
-                    renderNoProducts(category, occasion, sortBy);
-                }
-            } catch (error) {
-                console.error('Error fetching products:', error);
-                
-                // Show error message in the product grid
-                const productGrid = document.getElementById('productGrid');
-                productGrid.innerHTML = `
-                    <div style="grid-column: 1/-1; text-align: center; padding: 50px;">
-                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: var(--error-color); margin-bottom: 20px;"></i>
-                        <h3>Error Loading Products</h3>
-                        <p>${error.message || 'Could not connect to the server'}</p>
-                        <button onclick="fetchProducts()" class="view-details-btn" style="margin-top: 20px;">Try Again</button>
-                        <button onclick="window.location.reload()" class="view-details-btn" style="margin-top: 20px; margin-left: 10px;">Refresh Page</button>
-                    </div>
-                `;
-                
-                showNotification('Error loading products. Please check console for details.');
+        // Helper function to show "no products" message
+        function renderNoProducts(category, occasion, sortBy) {
+            const productGrid = document.getElementById('productGrid');
+            
+            // Create message based on filters
+            let message = 'No products found';
+            if (category) {
+                message += ` in the ${category} category`;
             }
+            if (occasion) {
+                message += ` for ${occasion} occasions`;
+            }
+            if (sortBy === 'nearby') {
+                message += ' in your area';
+            }
+            
+            // Show no products message
+            productGrid.innerHTML = `
+                <div class="no-products" style="grid-column: 1/-1; text-align: center; padding: 50px;">
+                    <i class="fas fa-search" style="font-size: 3rem; opacity: 0.5; margin-bottom: 20px;"></i>
+                    <h3>No Products Found</h3>
+                    <p>${message}.</p>
+                    <button onclick="fetchProducts()" class="view-details-btn" style="margin-top: 20px;">Show All Products</button>
+                </div>
+            `;
+            
+            showNotification(message);
         }
         
-        // Function to generate dummy products for testing
-        function generateDummyProducts(category = null, searchTerm = null, sortBy = null, occasion = null) {
-            // Base set of products
-            let products = [
-                {
-                    id: 1,
-                    title: 'Men\'s Formal Suit',
-                    rental_price: 200,
-                    seller_name: 'Fashion Hub',
-                    category: 'men',
-                    occasion: 'formal',
-                    image: 'https://images.unsplash.com/photo-1594938291221-94f18cbb5660?q=80&w=400&auto=format'
-                },
-                {
-                    id: 2,
-                    title: 'Women\'s Evening Gown',
-                    rental_price: 350,
-                    seller_name: 'Elite Rentals',
-                    category: 'women',
-                    occasion: 'formal',
-                    image: 'https://images.unsplash.com/photo-1566174053879-31528523f8ae?q=80&w=400&auto=format'
-                },
-                {
-                    id: 3,
-                    title: 'Kids Party Outfit',
-                    rental_price: 150,
-                    seller_name: 'Kids Fashion',
-                    category: 'kids',
-                    occasion: 'casual',
-                    image: 'https://images.unsplash.com/photo-1543854950-77cab969e194?q=80&w=400&auto=format'
-                },
-                {
-                    id: 4,
-                    title: 'Men\'s Casual Shirt',
-                    rental_price: 100,
-                    seller_name: 'Daily Wear',
-                    category: 'men',
-                    occasion: 'casual',
-                    image: 'https://images.unsplash.com/photo-1603252109303-2751441dd157?q=80&w=400&auto=format'
-                },
-                {
-                    id: 5,
-                    title: 'Women\'s Wedding Saree',
-                    rental_price: 500,
-                    seller_name: 'Bridal Collection',
-                    category: 'women',
-                    occasion: 'wedding',
-                    image: 'https://images.unsplash.com/photo-1610117099923-305d70b8a238?q=80&w=400&auto=format'
-                },
-                {
-                    id: 6,
-                    title: 'Men\'s Ethnic Wear',
-                    rental_price: 300,
-                    seller_name: 'Traditional Outfits',
-                    category: 'men',
-                    occasion: 'ethnic',
-                    image: 'https://images.unsplash.com/photo-1583753075968-1236ccb84c14?q=80&w=400&auto=format'
-                },
-                {
-                    id: 7,
-                    title: 'Kids School Uniform',
-                    rental_price: 120,
-                    seller_name: 'School Specials',
-                    category: 'kids',
-                    occasion: 'formal',
-                    image: 'https://images.unsplash.com/photo-1621452773781-0f992fd1f5cb?q=80&w=400&auto=format'
-                },
-                {
-                    id: 8,
-                    title: 'Women\'s Casual Jeans',
-                    rental_price: 150,
-                    seller_name: 'Street Style',
-                    category: 'women',
-                    occasion: 'casual',
-                    image: 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?q=80&w=400&auto=format'
-                },
-                {
-                    id: 9,
-                    title: 'Men\'s Wedding Sherwani',
-                    rental_price: 450,
-                    seller_name: 'Wedding Collections',
-                    category: 'men',
-                    occasion: 'wedding',
-                    image: 'https://images.unsplash.com/photo-1599654010220-5bcbf2a9fcee?q=80&w=400&auto=format'
-                }
-            ];
+        // Helper function to get product image URL
+        function getProductImageUrl(product) {
+            if (!product) return '../../assets/images/placeholder.png';
             
-            // Filter by category if provided
-            if (category) {
-                products = products.filter(product => product.category === category.toLowerCase());
+            // Use the direct image API as primary source if we have an ID
+            if (product.id) {
+                return `/ClothLoop/backend/api/products/direct_image.php?product_id=${product.id}`;
             }
             
-            // Filter by occasion if provided
-            if (occasion) {
-                products = products.filter(product => product.occasion === occasion.toLowerCase());
+            // Try standard image fields
+            if (product.primary_image) {
+                return product.primary_image.startsWith('/') || product.primary_image.startsWith('http') 
+                    ? product.primary_image 
+                    : `/ClothLoop/${product.primary_image}`;
             }
             
-            // Filter by search term if provided
-            if (searchTerm) {
-                const term = searchTerm.toLowerCase();
-                products = products.filter(product => 
-                    product.title.toLowerCase().includes(term) ||
-                    product.seller_name.toLowerCase().includes(term) ||
-                    product.occasion.toLowerCase().includes(term)
-                );
+            if (product.image_path) {
+                return product.image_path.startsWith('/') || product.image_path.startsWith('http') 
+                    ? product.image_path 
+                    : `/ClothLoop/${product.image_path}`;
             }
             
-            // Sort products if sortBy is provided
-            if (sortBy) {
-                switch (sortBy) {
-                    case 'price-low-high':
-                        products.sort((a, b) => a.rental_price - b.rental_price);
-                        break;
-                    case 'price-high-low':
-                        products.sort((a, b) => b.rental_price - a.rental_price);
-                        break;
-                    // Add more sorting options as needed
-                }
+            if (product.image_url) {
+                return product.image_url;
             }
             
-            return products;
+            if (product.image) {
+                return product.image.startsWith('/') || product.image.startsWith('http') 
+                    ? product.image 
+                    : `/ClothLoop/${product.image}`;
+            }
+            
+            // Final fallback to placeholder
+            return '../../assets/images/placeholder.png';
         }
 
         // Function to render products in grid
@@ -2092,7 +1981,7 @@
                     price.textContent = `₹${rentalPrice}/day`;
                     
                     // Set seller info
-                    seller.textContent = product.shop_name || product.seller_name || product.seller || 'ClothLoop Seller';
+                    seller.textContent = product.shop_name || product.seller_name || 'ClothLoop Seller';
                     
                     // Set link to details page
                     detailsLink.href = `details.html?id=${product.id}`;
@@ -2178,12 +2067,6 @@
             // First load profile from localStorage as fallback
             loadProfilePicture();
             
-            // Make search icon clickable
-            const searchIcon = document.querySelector('.search-icon');
-            if (searchIcon) {
-                searchIcon.style.cursor = 'pointer';
-            }
-            
             // Set up UI elements and event handlers
             setupCategoryFilters();
             setupSearch();
@@ -2266,71 +2149,6 @@
             } catch (error) {
                 console.error('Error in animateNumbers:', error);
             }
-        }
-
-        // Helper function to show "no products" message
-        function renderNoProducts(category, occasion, sortBy) {
-            const productGrid = document.getElementById('productGrid');
-            
-            // Create message based on filters
-            let message = 'No products found';
-            if (category) {
-                message += ` in the ${category} category`;
-            }
-            if (occasion) {
-                message += ` for ${occasion} occasions`;
-            }
-            if (sortBy === 'nearby') {
-                message += ' in your area';
-            }
-            
-            // Show no products message
-            productGrid.innerHTML = `
-                <div class="no-products" style="grid-column: 1/-1; text-align: center; padding: 50px;">
-                    <i class="fas fa-search" style="font-size: 3rem; opacity: 0.5; margin-bottom: 20px;"></i>
-                    <h3>No Products Found</h3>
-                    <p>${message}.</p>
-                    <button onclick="fetchProducts()" class="view-details-btn" style="margin-top: 20px;">Show All Products</button>
-                </div>
-            `;
-            
-            showNotification(message);
-        }
-        
-        // Helper function to get product image URL
-        function getProductImageUrl(product) {
-            if (!product) return '../../assets/images/placeholder.png';
-            
-            // Use the direct image API as primary source if we have an ID
-            if (product.id) {
-                return `/ClothLoop/backend/api/products/direct_image.php?product_id=${product.id}`;
-            }
-            
-            // Try standard image fields
-            if (product.primary_image) {
-                return product.primary_image.startsWith('/') || product.primary_image.startsWith('http') 
-                    ? product.primary_image 
-                    : `/ClothLoop/${product.primary_image}`;
-            }
-            
-            if (product.image_path) {
-                return product.image_path.startsWith('/') || product.image_path.startsWith('http') 
-                    ? product.image_path 
-                    : `/ClothLoop/${product.image_path}`;
-            }
-            
-            if (product.image_url) {
-                return product.image_url;
-            }
-            
-            if (product.image) {
-                return product.image.startsWith('/') || product.image.startsWith('http') 
-                    ? product.image 
-                    : `/ClothLoop/${product.image}`;
-            }
-            
-            // Final fallback to placeholder
-            return '../../assets/images/placeholder.png';
         }
     </script>
 </body>

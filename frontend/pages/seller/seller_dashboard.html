@@ -838,6 +838,25 @@
     </style>
 </head>
 <body>
+    <!-- Add this script at the beginning of the body section -->
+    <script>
+    // Basic authentication check that still allows the page to load
+    (function() {
+        // Only check if logged in, but don't redirect
+        const isLoggedIn = localStorage.getItem('is_logged_in') === 'true';
+        const userRole = localStorage.getItem('user_role');
+        
+        console.log('Auth check on page load:', { isLoggedIn, userRole });
+        
+        // If not logged in or not a seller, we'll still load the page
+        // but show a message with login option later
+        if (!isLoggedIn || userRole !== 'seller') {
+            console.warn('Not logged in as seller, will try to show login option');
+            localStorage.setItem('needs_login', 'true');
+        }
+    })();
+    </script>
+
     <!-- Navigation -->
     <nav>
         <a href="seller_dashboard.html" class="logo">
@@ -892,6 +911,16 @@
                 <div class="stat-info">
                     <div class="stat-number" id="totalProducts">0</div>
                     <div class="stat-label">Total Products</div>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-tag"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-number" id="avgProductPrice">₹0</div>
+                    <div class="stat-label">Avg. Product Price</div>
                 </div>
             </div>
             
@@ -958,45 +987,6 @@
 
     <!-- JavaScript code for functionality -->
     <script>
-        // Check authentication immediately when page loads
-        (function checkAuth() {
-            // Check if session cookies exist
-            const userRole = localStorage.getItem('user_role');
-            const userId = localStorage.getItem('user_id');
-            const isLoggedIn = localStorage.getItem('is_logged_in');
-            
-            if (!isLoggedIn || userRole !== 'seller' || !userId) {
-                console.log('Not authenticated as seller, redirecting to login');
-                window.location.href = '../account/login.html';
-                return;
-            }
-            
-            // Validate and restore server-side session if needed
-            fetch(`../../../backend/api/sellers/check_session.php?user_id=${userId}&user_role=${userRole}`, {
-                method: 'GET',
-                credentials: 'include' // Important for session cookies
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (!data.is_valid) {
-                    console.log('Server session validation failed:', data.message);
-                    window.location.href = '../account/login.html';
-                    return;
-                }
-                
-                console.log('Session validated:', data.session_restored ? 
-                    'Session was restored successfully' : 'Using existing session');
-                
-                // Session is valid, continue with page load
-                loadDashboardData();
-            })
-            .catch(error => {
-                console.error('Session validation error:', error);
-                // Continue anyway, the dashboard API will redirect if needed
-                loadDashboardData();
-            });
-        })();
-    
         // Wait for DOM to be fully loaded
         document.addEventListener('DOMContentLoaded', function() {
             // Setup theme switching
@@ -1005,8 +995,8 @@
             // Setup event listeners
             setupEventListeners();
             
-            // Dashboard data is now loaded by the auth checker
-            // to ensure session is valid first
+            // Load dashboard data
+            loadDashboardData();
         });
         
         // Theme switcher functionality
@@ -1050,6 +1040,13 @@
         
         // Function to load dashboard data
         function loadDashboardData() {
+            // Check if login is needed
+            const needsLogin = localStorage.getItem('needs_login') === 'true';
+            if (needsLogin) {
+                showLoginMessage();
+                return;
+            }
+            
             // Show loading spinner
             const loadingSpinner = document.getElementById('loadingSpinner');
             loadingSpinner.style.display = 'flex';
@@ -1066,8 +1063,17 @@
                 alertContainer.innerHTML = '';
             }
             
-            // Fetch dashboard data from API
-            fetch('../../../backend/api/sellers/dashboard_stats.php', {
+            // Get user ID and role from localStorage
+            const userId = localStorage.getItem('user_id') || '';
+            const userRole = localStorage.getItem('user_role') || '';
+            const userName = localStorage.getItem('user_name') || '';
+            const sellerId = localStorage.getItem('seller_id') || userId;
+            
+            // API URL with user data
+            const apiUrl = `../../../backend/api/sellers/dashboard_stats.php?user_id=${userId}&seller_id=${sellerId}&user_role=${userRole}&user_name=${encodeURIComponent(userName)}`;
+            
+            // Fetch dashboard data from API with user credentials
+            fetch(apiUrl, {
                 method: 'GET',
                 credentials: 'include', // Important: include cookies for session
                 headers: {
@@ -1076,15 +1082,6 @@
             })
             .then(response => {
                 if (!response.ok) {
-                    if (response.status === 401 || response.status === 403) {
-                        // Unauthorized or forbidden - clear localStorage and redirect to login
-                        localStorage.removeItem('is_logged_in');
-                        localStorage.removeItem('user_role');
-                        localStorage.removeItem('user_id');
-                        localStorage.removeItem('user_name');
-                        window.location.href = '../account/login.html';
-                        throw new Error('Authentication required');
-                    }
                     throw new Error('HTTP error ' + response.status);
                 }
                 return response.json();
@@ -1097,16 +1094,24 @@
                     // Update dashboard stats
                     updateDashboardStats(data.data);
                     
-                    // Update seller name
-                    if (data.data.seller_name) {
+                    // Update seller name if available
+                    if (data.data && data.data.seller_name) {
                         document.getElementById('sellerName').textContent = data.data.seller_name;
-                        // Update localStorage with new data
-                        localStorage.setItem('user_name', data.data.seller_name);
                     }
                     
-                    // Load interested customers
-                    if (data.data.interested_customers_list) {
+                    // Load interested customers if available
+                    if (data.data && data.data.interested_customers_list && data.data.interested_customers_list.length > 0) {
                         loadInterestedCustomers(data.data.interested_customers_list);
+                    } else {
+                        // If no interested customers, show placeholder
+                        document.getElementById('customersTableBody').innerHTML = `
+                            <tr>
+                                <td colspan="4" style="text-align: center; padding: 30px;">
+                                    <i class="fas fa-users" style="font-size: 24px; margin-bottom: 10px; color: var(--accent-color);"></i>
+                                    <p>No interested customers yet</p>
+                                </td>
+                            </tr>
+                        `;
                     }
                 } else {
                     // Show error message
@@ -1117,11 +1122,89 @@
                 // Hide loading spinner
                 loadingSpinner.style.display = 'none';
                 
-                console.error('Error:', error);
-                if (error.message !== 'Authentication required') {
-                    showAlert('Error loading dashboard data. Please try again.', 'error');
-                }
+                console.error('Error loading dashboard data:', error);
+                showAlert('Error connecting to server: ' + error.message, 'error');
             });
+        }
+        
+        // Function to show login message
+        function showLoginMessage() {
+            // Hide dashboard content
+            document.querySelectorAll('.dashboard-grid, .interested-customers-section').forEach(el => {
+                el.style.display = 'none';
+            });
+            
+            // Show alert container with login message
+            const alertContainer = document.getElementById('alertContainer');
+            if (alertContainer) {
+                alertContainer.innerHTML = `
+                    <div class="login-message">
+                        <h2>Seller Authentication Required</h2>
+                        <p>You need to be logged in as a seller to view this dashboard.</p>
+                        <div class="login-options">
+                            <button class="action-button login-btn" onclick="loginAsSeller()">
+                                <i class="fas fa-sign-in-alt"></i> Login as Seller
+                            </button>
+                            <button class="action-button demo-btn" onclick="useDemoSeller()">
+                                <i class="fas fa-user-check"></i> Use Demo Seller Account
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                // Add some basic styles for the login message
+                const style = document.createElement('style');
+                style.textContent = `
+                    .login-message {
+                        background-color: var(--card-bg);
+                        padding: 2rem;
+                        border-radius: 0;
+                        border: 2px solid var(--accent-color);
+                        text-align: center;
+                        margin: 2rem 0;
+                    }
+                    .login-options {
+                        display: flex;
+                        justify-content: center;
+                        gap: 1rem;
+                        margin-top: 1.5rem;
+                    }
+                    .login-btn, .demo-btn {
+                        display: inline-flex;
+                        align-items: center;
+                        justify-content: center;
+                    }
+                    .login-btn i, .demo-btn i {
+                        margin-right: 8px;
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            
+            // Update seller name
+            document.getElementById('sellerName').textContent = 'Guest User';
+        }
+        
+        // Function to redirect to login page
+        function loginAsSeller() {
+            window.location.href = '../account/login.html?redirect=seller';
+        }
+        
+        // Function to use demo seller account
+        function useDemoSeller() {
+            // Set demo seller data in localStorage
+            localStorage.setItem('user_id', '1');
+            localStorage.setItem('user_role', 'seller');
+            localStorage.setItem('user_name', 'Test Seller');
+            localStorage.setItem('user_email', 'seller@example.com');
+            localStorage.setItem('is_logged_in', 'true');
+            localStorage.setItem('seller_id', '1');
+            
+            // Remove needs_login flag
+            localStorage.removeItem('needs_login');
+            
+            // Reload the page
+            window.location.reload();
         }
         
         // Function to show alerts
@@ -1205,14 +1288,70 @@
         
         // Function to update dashboard stats
         function updateDashboardStats(data) {
-            // Simply update the text content directly
-            document.getElementById('totalProducts').textContent = data.total_products || 0;
-            document.getElementById('interestedCustomers').textContent = data.interested_customers || 0;
-            document.getElementById('averageRating').textContent = data.average_rating ? data.average_rating.toFixed(1) : '0.0';
+            console.log('Updating dashboard stats with:', data);
+            
+            // Use animateCounter function for a nice visual effect
+            animateCounter('totalProducts', data.total_products || 0);
+            animateCounter('interestedCustomers', data.interested_customers || 0);
+            animateCounter('averageRating', data.average_rating || 0, true);
+            
+            // Update avg product price - custom handling for currency
+            const avgPriceElement = document.getElementById('avgProductPrice');
+            if (avgPriceElement) {
+                // If we have price data
+                if (data.avg_product_price) {
+                    animateAvgPrice('avgProductPrice', data.avg_product_price);
+                } else {
+                    avgPriceElement.textContent = '₹0';
+                }
+            }
+        }
+        
+        // Function to animate average price with currency symbol
+        function animateAvgPrice(elementId, targetValue) {
+            const element = document.getElementById(elementId);
+            if (!element) return;
+            
+            // Set initial value
+            let startValue = 0;
+            
+            // Set animation duration between 1-2 seconds based on target value
+            const duration = Math.min(Math.max(1000, targetValue * 10), 2000);
+            const framesPerSecond = 60;
+            const totalFrames = Math.ceil(duration / (1000 / framesPerSecond));
+            const incrementPerFrame = targetValue / totalFrames;
+            
+            let currentValue = startValue;
+            let frame = 0;
+            
+            // Clear any existing animation
+            if (window[`counter_${elementId}`]) {
+                clearInterval(window[`counter_${elementId}`]);
+            }
+            
+            // Start animation
+            window[`counter_${elementId}`] = setInterval(() => {
+                frame++;
+                
+                // Calculate current value using easing
+                currentValue = startValue + incrementPerFrame * frame;
+                
+                // Ensure we don't exceed the target
+                if (currentValue >= targetValue) {
+                    currentValue = targetValue;
+                    clearInterval(window[`counter_${elementId}`]);
+                }
+                
+                // Update UI with currency symbol
+                element.textContent = `₹${Math.floor(currentValue).toLocaleString()}`;
+                
+            }, 1000 / framesPerSecond);
         }
         
         // Function to load interested customers data
         function loadInterestedCustomers(customers) {
+            console.log('Loading interested customers:', customers);
+            
             const tableBody = document.getElementById('customersTableBody');
             if (!tableBody) return;
             
@@ -1237,7 +1376,7 @@
                 const row = document.createElement('tr');
                 
                 // Create initials for avatar
-                const nameParts = customer.customer_name.split(' ');
+                const nameParts = (customer.customer_name || 'User').split(' ');
                 let initials = '';
                 if (nameParts.length > 0) {
                     initials += nameParts[0].charAt(0).toUpperCase();
@@ -1246,23 +1385,30 @@
                     }
                 }
                 
+                // Format date or use current date if not available
+                const interestDate = customer.interest_date 
+                    ? new Date(customer.interest_date) 
+                    : new Date();
+                
+                const formattedDate = interestDate.toLocaleDateString('en-IN', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+                
                 row.innerHTML = `
                     <td>
                         <div class="customer-info">
                             <div class="customer-avatar">${initials}</div>
-                            <div class="customer-name">${customer.customer_name}</div>
+                            <div class="customer-name">${customer.customer_name || 'Unknown Customer'}</div>
                         </div>
                     </td>
-                    <td>${customer.product_name}</td>
-                    <td>${new Date(customer.interest_date).toLocaleDateString('en-IN', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                    })}</td>
+                    <td>${customer.product_name || 'Unknown Product'}</td>
+                    <td>${formattedDate}</td>
                     <td>
                         <div class="contact-links">
-                            <a href="tel:${customer.phone_no}" class="contact-link"><i class="fas fa-phone"></i></a>
-                            <a href="https://wa.me/91${customer.phone_no}" class="contact-link"><i class="fab fa-whatsapp"></i></a>
+                            <a href="tel:${customer.phone_no || ''}" class="contact-link"><i class="fas fa-phone"></i></a>
+                            <a href="https://wa.me/91${customer.phone_no || ''}" class="contact-link"><i class="fab fa-whatsapp"></i></a>
                         </div>
                     </td>
                 `;
@@ -1292,5 +1438,8 @@
             });
         }
     </script>
+
+    <!-- Add a hidden debug output element -->
+    <div id="debugOutput" style="display: none;"></div>
 </body>
 </html>
