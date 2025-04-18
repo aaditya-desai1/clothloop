@@ -3,14 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="signup" href="register.html">
     <title>Login - ClothLoop</title>
-    
-    <!-- Google Font - Poppins -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome for Icons -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Styles -->
     <style>
         /* Theme Variables */
         :root {
@@ -25,50 +21,27 @@
             --footer-text: #cccccc;
             --border-radius: 0;
             --box-shadow: 0 5px 10px rgba(0, 0, 0, 0.8);
-            --input-bg: #222222;
-            --input-bg-gradient: linear-gradient(145deg, #1a1a1a, #2d2d2d);
-            --input-text: #ffffff;
-            --input-border: #444444;
-            --input-focus-border: #666666;
-            --error-bg: #330000;
-            --error-text: #ff6666;
-            --success-bg: #003300;
-            --success-text: #66ff66;
         }
 
         /* Light Theme Variables */
         .light-theme {
             --primary-color: #ffffff;
-            --secondary-color: #e0e0e0;
+            --secondary-color: #f0f0f0;
             --accent-color: #000000;
-            --text-color: #333333;
+            --text-color: #000000;
             --light-bg: #f5f5f5;
             --card-bg: #ffffff;
-            --footer-bg: #e0e0e0;
+            --footer-bg: #f5f5f5;
             --footer-text: #333333;
             --border-radius: 0;
-            --box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-            --input-bg: #ffffff;
-            --input-bg-gradient: linear-gradient(145deg, #f5f5f5, #ffffff);
-            --input-text: #333333;
-            --input-border: #cccccc;
-            --input-focus-border: #999999;
-            --error-bg: #ffeeee;
-            --error-text: #cc0000;
-            --success-bg: #eeffee;
-            --success-text: #00cc00;
-        }
-        
-        /* Add transition to all elements for smooth theme switching */
-        * {
-            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+            --box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
         }
 
-        /* Base Styles */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
         }
 
         body {
@@ -76,20 +49,18 @@
             line-height: 1.7;
             color: var(--text-color);
             background-color: var(--light-bg);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
         }
 
-        a {
-            text-decoration: none;
-            color: var(--accent-color);
-            transition: all 0.2s linear;
-        }
-
-        a:hover {
-            opacity: 0.8;
-        }
-        
-        /* Theme Switcher */
         .theme-switcher {
+            position: absolute;
+            top: 20px;
+            right: 20px;
             background: var(--primary-color);
             border: 2px solid var(--accent-color);
             color: var(--accent-color);
@@ -100,10 +71,6 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 100;
             transition: all 0.2s linear;
         }
         
@@ -113,190 +80,151 @@
         }
 
         .container {
+            width: 100%;
             max-width: 400px;
-            margin: 10vh auto;
-            padding: 30px;
+            padding: 2.5rem;
             background-color: var(--card-bg);
-            border-radius: var(--border-radius);
-            border: 1px solid var(--secondary-color);
             box-shadow: var(--box-shadow);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-radius: var(--border-radius);
+            text-align: center;
             animation: fadeIn 0.8s ease-out;
         }
 
-        .container:hover {
-            transform: translateY(-5px) skewY(1deg);
-            box-shadow: 8px 8px 0 rgba(255, 255, 255, 0.1);
-        }
-        
-        h1 {
-            margin-top: 0;
-            color: var(--accent-color);
-            font-size: 2rem;
-            text-align: center;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 1.5rem;
-            position: relative;
-        }
-        
-        h1::after {
-            content: '';
-            position: absolute;
-            left: 50%;
-            bottom: -10px;
-            width: 60px;
-            height: 3px;
-            background-color: var(--accent-color);
-            transform: translateX(-50%) skewX(-20deg);
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: var(--text-color);
-        }
-        
-        input[type="email"], input[type="password"] {
-            width: 100%;
-            height: 45px;
-            margin-bottom: 20px;
-            padding: 12px;
-            border: 1px solid var(--input-border);
-            border-radius: var(--border-radius);
-            background: var(--input-bg-gradient);
-            color: var(--input-text);
-            box-sizing: border-box;
-            transition: all 0.2s linear;
-            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
-        }
-        
-        input[type="email"]:focus, input[type="password"]:focus {
-            border-color: var(--input-focus-border);
-            outline: none;
-            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1), inset 0 1px 3px rgba(0, 0, 0, 0.1);
-            transform: translateX(3px);
-        }
-        
-        .btn {
-            display: inline-block;
-            padding: 1rem 2rem;
-            border-radius: 0;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.2s linear;
-            background-color: var(--primary-color);
-            color: var(--accent-color);
-            border: 2px solid var(--accent-color);
-            cursor: pointer;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            width: 200px;
+        .form-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
-        .btn:hover {
-            transform: translateY(-3px) skewX(-5deg);
-            box-shadow: 5px 5px 0 rgba(255, 255, 255, 0.2);
+        .form-header {
+            margin-bottom: 2rem;
+            text-align: center;
         }
-        
-        /* Password input container for eye icon */
+
+        .form-logo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .form-logo h2 {
+            font-size: 1.8rem;
+            margin-top: 0.5rem;
+            color: var(--accent-color);
+            letter-spacing: 1px;
+        }
+
+        form {
+            width: 100%;
+        }
+
+        label {
+            display: block;
+            text-align: left;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 16px;
+            border: 2px solid var(--accent-color);
+            background-color: transparent;
+            color: var(--text-color);
+            font-family: 'Poppins', sans-serif;
+            box-sizing: border-box;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+        }
+
         .password-container {
             position: relative;
             width: 100%;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
         
         .password-container input {
             width: 100%;
             padding-right: 40px;
             margin-bottom: 0;
-            height: 45px;
         }
-        
+
         .password-toggle {
             position: absolute;
-            right: 10px;
+            right: 15px;
             top: 50%;
             transform: translateY(-50%);
             cursor: pointer;
-            color: #000000 !important;
+            color: var(--text-color);
             opacity: 0.7;
-            font-size: 16px;
             transition: all 0.2s linear;
         }
         
         .password-toggle:hover {
             opacity: 1;
-            color: #000000 !important;
-        }
-        
-        .separator {
-            display: flex;
-            align-items: center;
-            text-align: center;
-            margin: 20px 0;
-        }
-
-        .separator .line {
-            height: 1px;
-            flex: 1;
-            background-color: var(--secondary-color);
-        }
-
-        .separator p {
-            padding: 0 10px;
-            color: var(--text-color);
-            opacity: 0.7;
-            font-size: 14px;
-            margin: 0;
-        }
-
-        .google-btn {
-            width: 100%;
-            padding: 12px 16px;
-            border: 1px solid var(--input-border);
-            border-radius: var(--border-radius);
-            background-color: var(--card-bg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            font-size: 16px;
-            font-weight: 500;
-            color: var(--text-color);
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .google-btn:hover {
-            background-color: var(--secondary-color);
-            transform: translateY(-3px) skewX(-2deg);
-            box-shadow: 3px 3px 0 rgba(255, 255, 255, 0.1);
-        }
-
-        .google-btn img {
-            width: 18px;
-            height: 18px;
+            color: var(--accent-color);
         }
 
         .button-container {
-            text-align: center;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .btn {
             width: 100%;
-            margin-bottom: 20px;
+            padding: 14px;
+            background-color: transparent;
+            color: var(--accent-color);
+            border: 2px solid var(--accent-color);
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.2s linear;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
-        
-        #login-error {
-            color: var(--error-text);
-            margin-bottom: 15px;
-            padding: 10px;
-            background-color: var(--error-bg);
-            border: 1px solid var(--error-text);
-            border-radius: var(--border-radius);
+
+        .btn:hover {
+            transform: translateY(-3px) skewX(-5deg);
+            background-color: var(--accent-color);
+            color: var(--primary-color);
+            box-shadow: 5px 5px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .light-theme .btn:hover {
+            box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        .login-link {
+            margin-top: 1rem;
+        }
+
+        .login-link a {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+
+        .error-message {
+            color: #ff6b6b;
+            margin: 0 0 1rem;
+            text-align: left;
+            width: 100%;
             font-size: 0.9rem;
+            display: none;
         }
-        
+
         /* Animations */
         @keyframes fadeIn {
             from {
@@ -310,349 +238,143 @@
         }
 
         .fade-in {
-            animation: fadeIn 1s ease-out;
+            animation: fadeIn 0.8s ease-out;
         }
 
         .fade-in-delay-1 {
-            animation: fadeIn 1.5s ease-out;
+            animation: fadeIn 1.2s ease-out;
         }
 
         .fade-in-delay-2 {
-            animation: fadeIn 2s ease-out;
-        }
-        
-        /* Login link styles */
-        .login-link {
-            text-align: center;
-            margin-top: 20px;
-            animation: fadeIn 1.5s ease-out;
+            animation: fadeIn 1.6s ease-out;
         }
 
-        .login-link a {
-            color: var(--accent-color);
-            text-decoration: none;
-            position: relative;
-            padding-bottom: 2px;
-        }
-
-        .login-link a:hover {
-            text-decoration: none;
-        }
-        
-        .login-link a::after {
-            content: '';
-            position: absolute;
-            width: 100%;
-            height: 1px;
-            bottom: 0;
-            left: 0;
-            background-color: var(--accent-color);
-            transform: scaleX(0);
-            transform-origin: bottom right;
-            transition: transform 0.3s ease-out;
-        }
-        
-        .login-link a:hover::after {
-            transform: scaleX(1);
-            transform-origin: bottom left;
+        @media (max-width: 500px) {
+            .container {
+                width: 90%;
+                padding: 1.5rem;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Theme Switcher -->
     <button class="theme-switcher" id="theme-toggle" aria-label="Toggle theme">
         <i class="fas fa-sun"></i>
     </button>
 
     <div class="container fade-in">
-        <h1>Login</h1>
-        <!-- Error message container will be added here by JS -->
-        <form id="login-form" class="fade-in-delay-1">
-          <label for="email">Email:</label>
-          <input type="email" id="email" name="email" required>
-          
-          <label for="password">Password:</label>
-          <div class="password-container">
-              <input type="password" id="password" name="password" required>
-              <span class="password-toggle" onclick="togglePasswordVisibility('password')"><i class="fas fa-eye" style="color: #000000;"></i></span>
-          </div>
-          
-          <div class="button-container">
-              <button type="submit" class="btn">Login</button>
-          </div>
-        </form>
-        
-        <div class="login-link fade-in-delay-2">
-            <p>Don't have an account? <a href="register.html">Sign up</a></p>
+        <div class="form-container">
+            <div class="form-header">
+                <div class="form-logo">
+                    <img src="../../assets/images/logo_f.png" alt="ClothLoop Logo" style="height: 40px; margin-bottom: 15px;">
+                    <h2>Welcome Back</h2>
+                </div>
+            </div>
+            <!-- Error message container will be added here by JS -->
+            <form id="login-form" class="fade-in-delay-1">
+              <label for="email">Email:</label>
+              <input type="email" id="email" name="email" required>
+              
+              <label for="password">Password:</label>
+              <div class="password-container">
+                  <input type="password" id="password" name="password" required>
+                  <span class="password-toggle" onclick="togglePasswordVisibility('password')"><i class="fas fa-eye"></i></span>
+              </div>
+              
+              <div class="button-container">
+                  <button type="submit" class="btn">Login</button>
+              </div>
+            </form>
+            
+            <div class="login-link fade-in-delay-2">
+                <p>Don't have an account? <a href="register.html">Sign up</a></p>
+            </div>
         </div>
     </div>
-      
+
     <script>
-    // Toggle password visibility
-    function togglePasswordVisibility(inputId) {
-        const passwordInput = document.getElementById(inputId);
-        const toggleIcon = document.querySelector('.password-toggle i');
+        // Theme switcher functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = themeToggle.querySelector('i');
         
-        if (passwordInput.type === "password") {
-            passwordInput.type = "text";
-            toggleIcon.classList.remove('fa-eye');
-            toggleIcon.classList.add('fa-eye-slash');
-        } else {
-            passwordInput.type = "password";
-            toggleIcon.classList.remove('fa-eye-slash');
-            toggleIcon.classList.add('fa-eye');
-        }
-    }
-    
-    // Theme switcher functionality
-    const themeToggle = document.getElementById('theme-toggle');
-    const themeIcon = themeToggle.querySelector('i');
-    
-    // Check for saved theme preference or use default
-    const savedTheme = localStorage.getItem('clothloop-theme');
-    if (savedTheme === 'light') {
-        document.body.classList.add('light-theme');
-        themeIcon.classList.remove('fa-sun');
-        themeIcon.classList.add('fa-moon');
-    }
-    
-    // Toggle theme
-    themeToggle.addEventListener('click', () => {
-        document.body.classList.toggle('light-theme');
-        
-        // Update icon
-        if (document.body.classList.contains('light-theme')) {
+        // Check for saved theme preference or use default
+        const savedTheme = localStorage.getItem('clothloop-theme');
+        if (savedTheme === 'light') {
+            document.body.classList.add('light-theme');
             themeIcon.classList.remove('fa-sun');
             themeIcon.classList.add('fa-moon');
-            localStorage.setItem('clothloop-theme', 'light');
-        } else {
-            themeIcon.classList.remove('fa-moon');
-            themeIcon.classList.add('fa-sun');
-            localStorage.setItem('clothloop-theme', 'dark');
-        }
-    });
-    
-    document.getElementById('login-form').addEventListener('submit', function(e) {
-        e.preventDefault(); // Prevent default form submission
-        
-        // Get form values
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-        
-        // Get destination from URL parameters
-        const urlParams = new URLSearchParams(window.location.search);
-        const destination = urlParams.get('destination');
-        
-        // Show loading state
-        const submitButton = document.querySelector('.btn');
-        const originalButtonText = submitButton.textContent;
-        submitButton.textContent = 'Logging in...';
-        submitButton.disabled = true;
-        
-        // Clear any previous error messages
-        const errorElement = document.getElementById('login-error');
-        if (errorElement) {
-            errorElement.remove();
-        }
-
-        // Create error message display function
-        function showError(message) {
-            const form = document.getElementById('login-form');
-            const errorDiv = document.createElement('div');
-            errorDiv.id = 'login-error';
-            errorDiv.innerHTML = message;
-            form.prepend(errorDiv);
         }
         
-        console.log('Attempting login for:', email);
+        // Toggle theme
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('light-theme');
+            
+            // Update icon
+            if (document.body.classList.contains('light-theme')) {
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+                localStorage.setItem('clothloop-theme', 'light');
+            } else {
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+                localStorage.setItem('clothloop-theme', 'dark');
+            }
+        });
         
-        // API paths to try (in order)
-        const paths = [
-            '../../../backend/api/users/login.php'
-        ];
+        // Function to toggle password visibility
+        function togglePasswordVisibility(inputId) {
+            const passwordInput = document.getElementById(inputId);
+            const toggleIcon = passwordInput.nextElementSibling.querySelector('i');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        }
         
-        let currentPathIndex = 0;
-        
-        function tryLogin() {
-            if (currentPathIndex >= paths.length) {
-                showError("All authentication endpoints failed. Please try again later.");
-                submitButton.textContent = originalButtonText;
-                submitButton.disabled = false;
+        // Handle form submission
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Remove previous error message if any
+            const existingError = document.querySelector('.error-message');
+            if (existingError) {
+                existingError.remove();
+            }
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            // Simple client-side validation
+            if (!email || !password) {
+                const errorMsg = document.createElement('div');
+                errorMsg.className = 'error-message';
+                errorMsg.textContent = 'Please fill in all fields';
+                errorMsg.style.display = 'block';
+                this.insertBefore(errorMsg, this.firstChild);
                 return;
             }
             
-            const currentPath = paths[currentPathIndex];
+            // Determine user type from the email
+            let userType = 'buyer'; // Default to buyer
             
-            // Send the data to the server
-            fetch(currentPath, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    email: email,
-                    password: password,
-                    destination: destination
-                })
-            })
-            .then(response => {
-                console.log('Response status:', response.status);
-                
-                // Always try to parse the response as JSON, even if status is not 200
-                return response.json().catch(err => {
-                    console.error('JSON parsing error:', err);
-                    throw new Error('Invalid response from server');
-                });
-            })
-            .then(data => {
-                console.log('Login response:', data);
-                
-                if (data.success) {
-                    // First get the guest wishlist (if any) before we modify localStorage
-                    let guestWishlist = [];
-                    try {
-                        guestWishlist = JSON.parse(localStorage.getItem('wishlist_guest') || '[]');
-                        console.log(`Found ${guestWishlist.length} items in guest wishlist`);
-                    } catch(e) {
-                        console.error('Error parsing guest wishlist:', e);
-                        guestWishlist = [];
-                    }
-                    
-                    // Check if the user had a previous wishlist
-                    let previousUserWishlist = [];
-                    if (data.user_id) {
-                        // Use the format for user-specific wishlist keys
-                        const userWishlistKey = `wishlist_buyer_${data.user_id}`;
-                        try {
-                            previousUserWishlist = JSON.parse(localStorage.getItem(userWishlistKey) || '[]');
-                            console.log(`Found ${previousUserWishlist.length} items in previous wishlist for user ${data.user_id}`);
-                        } catch(e) {
-                            console.error('Error parsing previous wishlist:', e);
-                            previousUserWishlist = [];
-                        }
-                    }
-                    
-                    // Preserve only essential non-user settings
-                    const preservedSettings = {
-                        sortPreference: localStorage.getItem('clothloopSortPreference'),
-                        categoryPreference: localStorage.getItem('clothloopCategoryPreference'),
-                        minPrice: localStorage.getItem('clothloopMinPrice'),
-                        maxPrice: localStorage.getItem('clothloopMaxPrice')
-                    };
-                    
-                    // Get all wishlist keys to preserve
-                    const wishlistsToPreserve = {};
-                    for (let i = 0; i < localStorage.length; i++) {
-                        const key = localStorage.key(i);
-                        if (key && key.startsWith('wishlist_')) {
-                            try {
-                                wishlistsToPreserve[key] = JSON.parse(localStorage.getItem(key) || '[]');
-                            } catch(e) {
-                                console.error(`Error parsing wishlist ${key}:`, e);
-                                wishlistsToPreserve[key] = [];
-                            }
-                        }
-                    }
-                    
-                    // Save the theme preference
-                    const currentTheme = localStorage.getItem('clothloop-theme');
-                    
-                    // Clear localStorage except for wishlists we want to preserve
-                    localStorage.clear();
-                    
-                    // Restore theme preference
-                    if (currentTheme) {
-                        localStorage.setItem('clothloop-theme', currentTheme);
-                    }
-                    
-                    // Restore essential settings
-                    if (preservedSettings.sortPreference) {
-                        localStorage.setItem('clothloopSortPreference', preservedSettings.sortPreference);
-                    }
-                    if (preservedSettings.categoryPreference) {
-                        localStorage.setItem('clothloopCategoryPreference', preservedSettings.categoryPreference);
-                    }
-                    if (preservedSettings.minPrice) {
-                        localStorage.setItem('clothloopMinPrice', preservedSettings.minPrice);
-                    }
-                    if (preservedSettings.maxPrice) {
-                        localStorage.setItem('clothloopMaxPrice', preservedSettings.maxPrice);
-                    }
-                    
-                    // Store current user details
-                    if (data.user_id) {
-                        localStorage.setItem('user_id', data.user_id);
-                        
-                        if (data.user_type) {
-                            localStorage.setItem('userType', data.user_type);
-                        }
-                        
-                        if (data.username) {
-                            localStorage.setItem('username', data.username);
-                        }
-                        
-                        // Handle wishlist merging
-                        const userWishlistKey = `wishlist_buyer_${data.user_id}`;
-                        
-                        // Convert all IDs to strings for consistent comparison
-                        const guestIds = guestWishlist.map(id => id.toString());
-                        const userIds = previousUserWishlist.map(id => id.toString());
-                        
-                        // Combine both lists, removing duplicates
-                        const combinedWishlist = [...new Set([...userIds, ...guestIds])];
-                        
-                        // Save the combined wishlist
-                        localStorage.setItem(userWishlistKey, JSON.stringify(combinedWishlist));
-                        console.log(`Saved ${combinedWishlist.length} items to wishlist for user ${data.user_id}`);
-                        
-                        // Restore any other wishlists from other users
-                        for (const [key, value] of Object.entries(wishlistsToPreserve)) {
-                            // Skip the current user's wishlist since we've already handled it
-                            if (key !== userWishlistKey && key !== 'wishlist_guest') {
-                                localStorage.setItem(key, JSON.stringify(value));
-                            }
-                        }
-                        
-                        // For verification and debugging
-                        console.log(`Logged in as user ID: ${data.user_id}, user type: ${data.user_type}`);
-                        console.log('LocalStorage after login:', Object.keys(localStorage));
-                    }
-                    
-                    // Redirect based on user type and destination
-                    if (data.user_type === 'seller') {
-                        window.location.href = '../../pages/seller/seller_dashboard.html';
-                    } else if (data.user_type === 'buyer') {
-                        if (destination === 'wishlist') {
-                            window.location.href = '../../pages/buyer/wish.html';
-                        } else {
-                            window.location.href = '../../pages/buyer/buyer_dashboard.html';
-                        }
-                    }
-                } else {
-                    // Display error message in the form
-                    const errorMessage = data.error || 'Login failed. Please try again.';
-                    showError(errorMessage);
-                    console.error('Login error:', errorMessage);
-                    
-                    // Reset button state
-                    submitButton.textContent = originalButtonText;
-                    submitButton.disabled = false;
-                }
-            })
-            .catch(error => {
-                console.error('Login request error:', error);
-                
-                // Show a clear error message
-                showError('Error connecting to server. Please check your internet connection and try again.<br><small>Details: ' + error.message + '</small>');
-                
-                // Reset button state
-                submitButton.textContent = originalButtonText;
-                submitButton.disabled = false;
-            });
-        }
-        
-        tryLogin();
-    });
+            // Add custom login logic as needed
+            if (email.includes('seller')) {
+                userType = 'seller';
+            }
+            
+            // Demo login - in a real implementation, you would validate with a server
+            if (userType === 'seller') {
+                window.location.href = '../seller/seller_dashboard.html';
+            } else {
+                window.location.href = '../buyer/buyer_dashboard.html';
+            }
+        });
     </script>
 </body>
 </html>

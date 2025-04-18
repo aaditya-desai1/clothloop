@@ -233,31 +233,9 @@
         .dashboard-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            margin-bottom: 20px;
-            width: 100%;
-        }
-        
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
             gap: 25px;
-            margin-bottom: 40px;
+            margin: 40px 0;
             width: 100%;
-            animation: fadeInStaggered 1.5s ease-out;
-        }
-        
-        .stat-card {
-            background-color: var(--card-bg);
-            border-radius: 0;
-            padding: 30px;
-            box-shadow: var(--box-shadow);
-            transition: all 0.3s ease;
-            border: 1px solid var(--border-color);
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
         }
         
         .stat-card {
@@ -265,65 +243,22 @@
             border-radius: 0;
             padding: 35px;
             box-shadow: var(--box-shadow);
-            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: all 0.3s ease;
             border: 1px solid var(--border-color);
-            width: 100%;
             display: flex;
             align-items: center;
             justify-content: flex-start;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .stat-card:nth-child(1) {
-            animation-delay: 0.2s;
-        }
-        
-        .stat-card:nth-child(2) {
-            animation-delay: 0.4s;
-        }
-        
-        .stat-card:nth-child(3) {
-            animation-delay: 0.6s;
-        }
-        
-        .stat-card::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(to bottom right, rgba(255, 255, 255, 0.05), transparent);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        
-        .stat-card:hover::after {
-            opacity: 1;
+            min-height: 180px;
         }
         
         .stat-card:hover {
-            transform: translateY(-15px) skewX(-3deg);
-            box-shadow: 12px 12px 0 rgba(255, 255, 255, 0.15);
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            border-color: var(--accent-color);
         }
         
         .light-theme .stat-card:hover {
-            box-shadow: 12px 12px 0 rgba(0, 0, 0, 0.1);
-        }
-        
-        .stat-icon {
-            margin-right: 20px;
-            font-size: 40px;
-            color: var(--accent-color);
-            background-color: rgba(255, 255, 255, 0.05);
-            width: 80px;
-            height: 80px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 0;
-            border: 1px solid var(--border-color);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
         }
         
         .stat-icon {
@@ -333,67 +268,72 @@
             background-color: rgba(255, 255, 255, 0.05);
             width: 80px;
             height: 80px;
+            min-width: 80px;
             display: flex;
             align-items: center;
             justify-content: center;
             border-radius: 0;
             border: 2px solid var(--accent-color);
-            transition: all 0.5s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .stat-icon::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 50%);
-            opacity: 0;
-            transform: scale(0.5);
-            transition: opacity 0.4s ease, transform 0.4s ease;
-        }
-        
-        .stat-card:hover .stat-icon::before {
-            opacity: 1;
-            transform: scale(1);
+            transition: all 0.3s ease;
         }
         
         .stat-card:hover .stat-icon {
-            transform: scale(1.1) rotate(10deg);
+            transform: scale(1.1);
+            background-color: rgba(255, 255, 255, 0.1);
         }
         
-        .stat-card:hover .stat-number {
-            transform: scale(1.2);
-            text-shadow: 3px 3px 5px rgba(0, 0, 0, 0.3);
+        .stat-info {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
         }
         
-        .light-theme .stat-card:hover .stat-number {
-            text-shadow: 3px 3px 5px rgba(0, 0, 0, 0.1);
-        }
-        
-        /* Add animation to number counters */
         .stat-number {
             font-size: 48px;
             font-weight: 700;
             margin-bottom: 10px;
             color: var(--accent-color);
             transition: all 0.3s ease;
+            line-height: 1;
+        }
+        
+        .stat-card:hover .stat-number {
+            transform: scale(1.1);
         }
         
         .stat-label {
             font-size: 16px;
+            font-weight: 500;
             color: var(--text-color);
             text-transform: uppercase;
             letter-spacing: 1px;
             opacity: 0.8;
+            white-space: nowrap;
         }
         
-        .stat-info {
-            display: flex;
-            flex-direction: column;
+        /* Responsive adjustments for stat cards */
+        @media (max-width: 991px) {
+            .dashboard-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stat-card {
+                padding: 25px;
+            }
+            
+            .stat-number {
+                font-size: 36px;
+            }
+            
+            .stat-label {
+                font-size: 14px;
+            }
         }
 
         /* Loading Spinner */
@@ -676,106 +616,6 @@
             color: var(--accent-color) !important;
         }
 
-        /* Responsive Styles */
-        @media (max-width: 992px) {
-            .products-grid {
-                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            }
-        }
-
-        @media (max-width: 768px) {
-            nav {
-                padding: 1rem;
-            }
-
-            .content-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .content-title {
-                margin-bottom: 15px;
-                margin-right: 0;
-            }
-
-            .action-button {
-                margin-top: 15px;
-                margin-left: 0;
-            }
-            
-            .dashboard-grid {
-                grid-template-columns: repeat(3, 1fr);
-                gap: 10px;
-            }
-            
-            .stat-card {
-                margin-bottom: 10px;
-                padding: 15px;
-            }
-            
-            .stat-icon {
-                margin-right: 10px;
-                font-size: 30px;
-                width: 60px;
-                height: 60px;
-            }
-            
-            .stat-number {
-                font-size: 28px;
-            }
-            
-            .stat-label {
-                font-size: 12px;
-            }
-            
-            .shop-profile {
-                flex-direction: column;
-                align-items: center;
-                text-align: center;
-            }
-            
-            .shop-logo {
-                margin-right: 0;
-                margin-bottom: 20px;
-            }
-        }
-
-        @media (max-width: 576px) {
-            .main-content {
-                padding: 0 1rem;
-            }
-            
-            .user-actions {
-                margin-left: auto;
-            }
-            
-            .action-item {
-                margin: 0 0.5rem;
-            }
-            
-            .action-item span {
-                display: none;
-            }
-            
-            .dashboard-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .customers-table th,
-            .customers-table td {
-                padding: 10px;
-            }
-            
-            .customer-name {
-                font-size: 14px;
-            }
-            
-            .view-details-btn {
-                padding: 0.6rem 1rem;
-                font-size: 0.7rem;
-            }
-        }
-
         /* Interested Customers Section Styles */
         .interested-customers-section {
             margin-top: 40px;
@@ -939,72 +779,6 @@
             100% { left: 100%; }
         }
 
-        /* Stats Cards Animation and Enhancement */
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            margin-bottom: 20px;
-            width: 100%;
-        }
-        
-        .stat-card {
-            background-color: var(--card-bg);
-            border-radius: 0;
-            padding: 30px;
-            box-shadow: var(--box-shadow);
-            transition: all 0.3s ease;
-            border: 1px solid var(--border-color);
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-        }
-        
-        .stat-card:hover {
-            transform: translateY(-15px) skewX(-3deg);
-            box-shadow: 12px 12px 0 rgba(255, 255, 255, 0.15);
-        }
-        
-        .light-theme .stat-card:hover {
-            box-shadow: 12px 12px 0 rgba(0, 0, 0, 0.1);
-        }
-        
-        .stat-icon {
-            margin-right: 20px;
-            font-size: 40px;
-            color: var(--accent-color);
-            background-color: rgba(255, 255, 255, 0.05);
-            width: 80px;
-            height: 80px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 0;
-            border: 1px solid var(--border-color);
-        }
-        
-        .stat-number {
-            font-size: 48px;
-            font-weight: 700;
-            margin-bottom: 10px;
-            color: var(--accent-color);
-            transition: all 0.3s ease;
-        }
-        
-        .stat-label {
-            font-size: 16px;
-            color: var(--text-color);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            opacity: 0.8;
-        }
-        
-        .stat-info {
-            display: flex;
-            flex-direction: column;
-        }
-
         /* Add more animations */
         @keyframes fadeInStaggered {
             from {
@@ -1039,18 +813,6 @@
             }
         }
         
-        @keyframes pulse {
-            0% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.1);
-            }
-            100% {
-                transform: scale(1);
-            }
-        }
-        
         /* Enhanced table styling */
         .customers-table tr {
             transition: all 0.3s ease;
@@ -1074,75 +836,78 @@
             transform: scale(1.2) rotate(10deg);
         }
 
-        /* Function to animate number counting */
-        function animateNumbers() {
-            const statNumbers = document.querySelectorAll('.stat-number');
+        /* Function to animate counter */
+        function animateCounter(elementId, targetValue, isDecimal = false) {
+            const element = document.getElementById(elementId);
+            if (!element) return;
             
-            statNumbers.forEach(element => {
-                const finalValue = parseInt(element.textContent);
-                let startValue = 0;
-                const duration = 2000; // 2 seconds
-                const frameDuration = 1000 / 60; // 60fps
-                const totalFrames = Math.round(duration / frameDuration);
-                const increment = finalValue / totalFrames;
+            // Set initial value
+            let startValue = 0;
+            let increment = targetValue > 100 ? 1 : 0.1;
+            
+            // Adjust for decimal values
+            if (isDecimal) {
+                increment = 0.1;
+            }
+            
+            // Ensure we don't exceed the target
+            increment = Math.min(increment, targetValue / 10);
+            
+            // Set animation duration between 1-2 seconds based on target value
+            const duration = Math.min(Math.max(1000, targetValue * 100), 2000);
+            const framesPerSecond = 60;
+            const totalFrames = Math.ceil(duration / (1000 / framesPerSecond));
+            const incrementPerFrame = targetValue / totalFrames;
+            
+            let currentValue = startValue;
+            let frame = 0;
+            
+            // Clear any existing animation
+            if (window[`counter_${elementId}`]) {
+                clearInterval(window[`counter_${elementId}`]);
+            }
+            
+            // Start animation
+            window[`counter_${elementId}`] = setInterval(() => {
+                frame++;
                 
-                // Skip animation for zero values
-                if (finalValue === 0) {
-                    return;
+                // Calculate current value using easing
+                currentValue = startValue + incrementPerFrame * frame;
+                
+                // Ensure we don't exceed the target
+                if (currentValue >= targetValue) {
+                    currentValue = targetValue;
+                    clearInterval(window[`counter_${elementId}`]);
                 }
                 
-                let currentFrame = 0;
+                // Update UI
+                if (isDecimal) {
+                    element.textContent = currentValue.toFixed(1);
+                } else {
+                    element.textContent = Math.floor(currentValue);
+                }
                 
-                const counter = setInterval(() => {
-                    currentFrame++;
-                    const progress = Math.min(currentFrame / totalFrames, 1);
-                    const value = Math.floor(progress * finalValue);
-                    
-                    element.textContent = value;
-                    
-                    if (currentFrame === totalFrames) {
-                        clearInterval(counter);
-                    }
-                }, frameDuration);
-            });
+            }, 1000 / framesPerSecond);
         }
         
         // Function to update dashboard stats
-        function updateDashboardStats(stats) {
-            const totalProductsElement = document.getElementById('totalProducts');
-            const interestedCustomersElement = document.getElementById('interestedCustomers');
-            const averageRatingElement = document.getElementById('averageRating');
+        function updateDashboardStats(data) {
+            // Animate total products counter
+            animateCounter('totalProducts', data.total_products || 8);
             
-            if (totalProductsElement) {
-                totalProductsElement.textContent = stats.total_products || 0;
-            }
+            // Animate interested customers counter
+            animateCounter('interestedCustomers', data.interested_customers || 3);
             
-            if (interestedCustomersElement) {
-                interestedCustomersElement.textContent = stats.interested_customers || 0;
-            }
-            
-            if (averageRatingElement) {
-                averageRatingElement.textContent = stats.average_rating || '0.0';
-            }
-            
-            // Update seller name in welcome section
-            const sellerNameElement = document.getElementById('sellerName');
-            if (sellerNameElement) {
-                // Use stored name or default
-                const storedName = localStorage.getItem('seller_shop_name');
-                sellerNameElement.textContent = storedName || 'Bridal Elegance';
-            }
-            
-            // After updating stats, animate the numbers
-            animateNumbers();
+            // Animate average rating counter
+            animateCounter('averageRating', data.average_rating || 4.7, true);
         }
     </style>
 </head>
 <body>
     <!-- Navigation -->
     <nav>
-        <a href="../../../home.html" class="logo">
-            <i class="fas fa-recycle"></i> ClothLoop
+        <a href="seller_dashboard.html" class="logo">
+            <img src="../../assets/images/logo_f.png" alt="ClothLoop Logo" style="height: 40px; margin-right: 10px;"> ClothLoop
             <span class="seller-badge">Seller</span>
         </a>
         <div style="display: flex; align-items: center;">
@@ -1297,7 +1062,7 @@
     <footer class="footer">
         <div class="footer-bottom">
             <div class="footer-logo">
-                <i class="fas fa-recycle"></i> ClothLoop
+                <img src="../../assets/images/logo_f.png" alt="ClothLoop Logo" style="height: 40px; margin-right: 10px;"> ClothLoop
             </div>
             <p>&copy; 2024 ClothLoop. All rights reserved.</p>
         </div>
@@ -1396,75 +1161,57 @@
                 
                 // Update dashboard stats with static data
                 updateDashboardStats({
-                    total_products: staticProducts.length,
+                    total_products: 8,
                     interested_customers: 3,
                     average_rating: 4.7
                 });
                 
-            }, 500); // Simulate loading delay
+                // Show success message
+                showAlert('Dashboard data loaded successfully!', 'success');
+            }, 1000);
             
-            // Comment out the actual API call for now
+            // Actual API call (commented out for testing)
             /*
-            // Fetch dashboard data from backend API
             fetch('../../../backend/api/sellers/dashboard_stats.php')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
+                .then(response => response.json())
                 .then(data => {
                     // Hide loading spinner
                     loadingSpinner.style.display = 'none';
                     
                     if (data.status === 'success') {
                         // Update dashboard stats
-                        updateDashboardStats(data.stats);
+                        updateDashboardStats(data);
                     } else {
+                        // Show error message
                         showAlert(data.message || 'Error loading dashboard data', 'error');
                     }
                 })
                 .catch(error => {
-                    console.error('Error fetching dashboard data:', error);
+                    // Hide loading spinner
                     loadingSpinner.style.display = 'none';
-                    showAlert('Error loading dashboard data. Please try again later.', 'error');
+                    
+                    console.error('Error:', error);
+                    showAlert('Error loading dashboard data. Please try again.', 'error');
                 });
             */
         }
         
         // Function to update dashboard stats
-        function updateDashboardStats(stats) {
-            const totalProductsElement = document.getElementById('totalProducts');
-            const interestedCustomersElement = document.getElementById('interestedCustomers');
-            const averageRatingElement = document.getElementById('averageRating');
+        function updateDashboardStats(data) {
+            // Animate total products counter
+            animateCounter('totalProducts', data.total_products || 8);
             
-            if (totalProductsElement) {
-                totalProductsElement.textContent = stats.total_products || 0;
-            }
+            // Animate interested customers counter
+            animateCounter('interestedCustomers', data.interested_customers || 3);
             
-            if (interestedCustomersElement) {
-                interestedCustomersElement.textContent = stats.interested_customers || 0;
-            }
-            
-            if (averageRatingElement) {
-                averageRatingElement.textContent = stats.average_rating || '0.0';
-            }
-            
-            // Update seller name in welcome section
-            const sellerNameElement = document.getElementById('sellerName');
-            if (sellerNameElement) {
-                // Use stored name or default
-                const storedName = localStorage.getItem('seller_shop_name');
-                sellerNameElement.textContent = storedName || 'Bridal Elegance';
-            }
-            
-            // After updating stats, animate the numbers
-            animateNumbers();
+            // Animate average rating counter
+            animateCounter('averageRating', data.average_rating || 4.7, true);
         }
         
         // Function to show alerts
         function showAlert(message, type) {
             const alertContainer = document.getElementById('alertContainer');
+            if (!alertContainer) return;
             
             // Create alert element
             const alert = document.createElement('div');
@@ -1481,7 +1228,7 @@
                 alert.style.opacity = '0';
                 alert.style.transition = 'opacity 0.5s ease';
                 setTimeout(() => {
-                    alert.remove();
+                    alertContainer.innerHTML = '';
                 }, 500);
             }, 3000);
         }

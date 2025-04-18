@@ -421,118 +421,156 @@
     </button>
 
     <div class="container fade-in">
-        <h1>Create Your Account</h1>
-        
-        <div id="success-message" class="success-message"></div>
-        
-        <form id="signup-form" action="../../../backend/api/users/signup_process.php" method="POST" enctype="multipart/form-data" class="fade-in-delay-1">
-            <div class="form-group">
-                <label for="username">Username:</label>
-                <input type="text" id="username" name="username" required>
-                <div id="username-error" class="error-message"></div>
+        <div class="form-container">
+            <div class="form-header">
+                <img src="../../assets/images/logo_f.png" alt="ClothLoop Logo" style="height: 40px; margin-bottom: 15px;">
+                <h1>Create an Account</h1>
             </div>
             
-            <div class="form-group">
-                <label for="email">Email:</label>
-                <input type="email" id="email" name="email" required>
-                <div id="email-error" class="error-message"></div>
-            </div>
+            <div id="success-message" class="success-message"></div>
             
-            <div class="form-group">
-                <label for="password">Password:</label>
-                <div class="password-container">
-                    <input type="password" id="password" name="password" required>
-                    <span class="password-toggle" onclick="togglePasswordVisibility('password')"><i class="fas fa-eye" style="color: #000000;"></i></span>
+            <form id="signup-form" action="../../../backend/api/users/signup_process.php" method="POST" enctype="multipart/form-data" class="fade-in-delay-1">
+                <div class="form-group">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" name="username" required>
+                    <div id="username-error" class="error-message"></div>
                 </div>
-                <div class="password-strength-bar" id="password-strength"></div>
-                <div class="password-error" id="password-error"></div>
-            </div>
-            
-            <div class="form-group">
-                <label for="confirm_password">Confirm Password:</label>
-                <div class="password-container">
-                    <input type="password" id="confirm_password" name="confirm_password" required>
-                    <span class="password-toggle" onclick="togglePasswordVisibility('confirm_password')"><i class="fas fa-eye" style="color: #000000;"></i></span>
+                
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" required>
+                    <div id="email-error" class="error-message"></div>
                 </div>
-                <div id="confirm-password-error" class="error-message"></div>
-            </div>
-            
-            <div class="form-group">
-                <label for="phone">Phone Number:</label>
-                <input type="tel" id="phone" name="phone" required>
-                <div id="phone-error" class="error-message"></div>
-            </div>
-            
-            <div class="form-group">
-                <label>User Type:</label>
-                <div class="radio-group">
-                    <label class="radio-option">
-                        <input type="radio" name="user_type" value="buyer" checked> Buyer
-                    </label>
-                    <label class="radio-option">
-                        <input type="radio" name="user_type" value="seller" id="seller-radio"> Seller
-                    </label>
+                
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <div class="password-container">
+                        <input type="password" id="password" name="password" required>
+                        <span class="password-toggle" onclick="togglePasswordVisibility('password')"><i class="fas fa-eye"></i></span>
+                    </div>
+                    <div class="password-strength-bar" id="password-strength"></div>
+                    <div class="password-error" id="password-error"></div>
                 </div>
-            </div>
+                
+                <div class="form-group">
+                    <label for="confirm_password">Confirm Password:</label>
+                    <div class="password-container">
+                        <input type="password" id="confirm_password" name="confirm_password" required>
+                        <span class="password-toggle" onclick="togglePasswordVisibility('confirm_password')"><i class="fas fa-eye"></i></span>
+                    </div>
+                    <div id="confirm-password-error" class="error-message"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="phone">Phone Number:</label>
+                    <input type="tel" id="phone" name="phone" required>
+                    <div id="phone-error" class="error-message"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label>User Type:</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="user_type" value="buyer" checked> Buyer
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="user_type" value="seller" id="seller-radio"> Seller
+                        </label>
+                    </div>
+                </div>
 
-            <!-- Seller specific fields (hidden by default) -->
-            <div id="seller-fields" style="display: none;">
-                <h3 style="font-size: 18px; margin-bottom: 15px;">Shop Information</h3>
-                
-                <div class="form-group">
-                    <label for="shop_name">Shop Name:</label>
-                    <input type="text" id="shop_name" name="shop_name">
-                    <div id="shop-name-error" class="error-message"></div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="shop_address">Shop Address:</label>
-                    <textarea id="shop_address" name="shop_address"></textarea>
-                    <div id="shop-address-error" class="error-message"></div>
-                </div>
-                
-                <div class="form-group">
-                    <label>Shop Location:</label>
-                    <div class="location-status" id="location_status">Location not set yet</div>
-                    <button type="button" id="get_location" class="btn" style="width: 100%; margin-bottom: 10px;">
-                        <i class="fas fa-map-marker-alt"></i> Get Current Location
-                    </button>
-                    
-                    <p id="manual_location_toggle" style="cursor: pointer; text-decoration: underline; text-align: center; margin-top: 10px;">
-                        Enter location manually
-                    </p>
-                    
-                    <div id="manual_location_fields" style="display: none; margin-top: 15px;">
-                        <div class="form-group">
-                            <label for="manual_latitude">Latitude:</label>
-                            <input type="text" id="manual_latitude" placeholder="e.g. 40.7128">
-                        </div>
-                        <div class="form-group">
-                            <label for="manual_longitude">Longitude:</label>
-                            <input type="text" id="manual_longitude" placeholder="e.g. -74.0060">
-                        </div>
-                        <button type="button" id="set_manual_location" class="btn" style="width: 100%;">
-                            <i class="fas fa-check"></i> Set Manual Location
+                <!-- Buyer specific fields -->
+                <div id="buyer-fields">
+                    <div class="form-group">
+                        <label>Your Current Location:</label>
+                        <div class="location-status" id="buyer_location_status">Location not set yet</div>
+                        <button type="button" id="get_buyer_location" class="btn" style="width: 100%; margin-bottom: 10px;">
+                            <i class="fas fa-map-marker-alt"></i> Get Current Location
                         </button>
+                        
+                        <p id="buyer_manual_location_toggle" style="cursor: pointer; text-decoration: underline; text-align: center; margin-top: 10px;">
+                            Enter location manually
+                        </p>
+                        
+                        <div id="buyer_manual_location_fields" style="display: none; margin-top: 15px;">
+                            <div class="form-group">
+                                <label for="buyer_manual_latitude">Latitude:</label>
+                                <input type="text" id="buyer_manual_latitude" placeholder="e.g. 40.7128">
+                            </div>
+                            <div class="form-group">
+                                <label for="buyer_manual_longitude">Longitude:</label>
+                                <input type="text" id="buyer_manual_longitude" placeholder="e.g. -74.0060">
+                            </div>
+                            <button type="button" id="set_buyer_manual_location" class="btn" style="width: 100%;">
+                                <i class="fas fa-check"></i> Set Manual Location
+                            </button>
+                        </div>
+                        
+                        <input type="hidden" id="buyer_latitude" name="buyer_latitude">
+                        <input type="hidden" id="buyer_longitude" name="buyer_longitude">
+                        <div id="buyer-location-error" class="error-message"></div>
+                    </div>
+                </div>
+
+                <!-- Seller specific fields (hidden by default) -->
+                <div id="seller-fields" style="display: none;">
+                    <h3 style="font-size: 18px; margin-bottom: 15px;">Shop Information</h3>
+                    
+                    <div class="form-group">
+                        <label for="shop_name">Shop Name:</label>
+                        <input type="text" id="shop_name" name="shop_name">
+                        <div id="shop-name-error" class="error-message"></div>
                     </div>
                     
-                    <input type="hidden" id="shop_latitude" name="shop_latitude">
-                    <input type="hidden" id="shop_longitude" name="shop_longitude">
-                    <div id="location-error" class="error-message"></div>
+                    <div class="form-group">
+                        <label for="shop_address">Shop Address:</label>
+                        <textarea id="shop_address" name="shop_address"></textarea>
+                        <div id="shop-address-error" class="error-message"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Shop Location:</label>
+                        <div class="location-status" id="location_status">Location not set yet</div>
+                        <button type="button" id="get_location" class="btn" style="width: 100%; margin-bottom: 10px;">
+                            <i class="fas fa-map-marker-alt"></i> Get Current Location
+                        </button>
+                        
+                        <p id="manual_location_toggle" style="cursor: pointer; text-decoration: underline; text-align: center; margin-top: 10px;">
+                            Enter location manually
+                        </p>
+                        
+                        <div id="manual_location_fields" style="display: none; margin-top: 15px;">
+                            <div class="form-group">
+                                <label for="manual_latitude">Latitude:</label>
+                                <input type="text" id="manual_latitude" placeholder="e.g. 40.7128">
+                            </div>
+                            <div class="form-group">
+                                <label for="manual_longitude">Longitude:</label>
+                                <input type="text" id="manual_longitude" placeholder="e.g. -74.0060">
+                            </div>
+                            <button type="button" id="set_manual_location" class="btn" style="width: 100%;">
+                                <i class="fas fa-check"></i> Set Manual Location
+                            </button>
+                        </div>
+                        
+                        <input type="hidden" id="shop_latitude" name="shop_latitude">
+                        <input type="hidden" id="shop_longitude" name="shop_longitude">
+                        <div id="location-error" class="error-message"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <p style="color: var(--text-color); font-style: italic; margin-top: 20px;">You can update your shop logo and shop bio later in your seller profile settings.</p>
+                    </div>
                 </div>
                 
-                <div class="form-group">
-                    <p style="color: var(--text-color); font-style: italic; margin-top: 20px;">You can update your shop logo and shop bio later in your seller profile settings.</p>
+                <div class="button-container">
+                    <button type="submit" id="submit-btn" class="btn">Sign Up</button>
                 </div>
-            </div>
+            </form>
             
-            <div class="button-container">
-                <button type="submit" id="submit-btn" class="btn">Sign Up</button>
+            <div class="login-link fade-in-delay-2">
+                Already have an account? <a href="login.html">Login</a>
             </div>
-        </form>
-        
-        <div class="login-link fade-in-delay-2">
-            Already have an account? <a href="login.html">Login</a>
         </div>
     </div>
 
@@ -656,10 +694,12 @@
             const buyerRadio = document.querySelector('input[name="user_type"][value="buyer"]');
             const sellerRadio = document.querySelector('input[name="user_type"][value="seller"]');
             const sellerFields = document.getElementById('seller-fields');
+            const buyerFields = document.getElementById('buyer-fields');
             
-            if (buyerRadio && sellerRadio && sellerFields) {
-                function toggleSellerFields() {
+            if (buyerRadio && sellerRadio && sellerFields && buyerFields) {
+                function toggleUserTypeFields() {
                     sellerFields.style.display = sellerRadio.checked ? 'block' : 'none';
+                    buyerFields.style.display = buyerRadio.checked ? 'block' : 'none';
                     
                     // Make seller fields required only when seller is selected
                     const sellerInputs = sellerFields.querySelectorAll('input:not([type="hidden"]):not([type="button"]), textarea');
@@ -673,135 +713,156 @@
                 }
                 
                 // Initial toggle
-                toggleSellerFields();
+                toggleUserTypeFields();
                 
                 // Add event listeners to radio buttons
-                buyerRadio.addEventListener('change', toggleSellerFields);
-                sellerRadio.addEventListener('change', toggleSellerFields);
+                buyerRadio.addEventListener('change', toggleUserTypeFields);
+                sellerRadio.addEventListener('change', toggleUserTypeFields);
             }
             
-            // Get location button functionality
-            const getLocationBtn = document.getElementById('get_location');
-            const latitudeInput = document.getElementById('shop_latitude');
-            const longitudeInput = document.getElementById('shop_longitude');
-            const locationStatus = document.getElementById('location_status');
-            const locationError = document.getElementById('location-error');
-            
-            // Manual location elements
-            const manualLocationToggle = document.getElementById('manual_location_toggle');
-            const manualLocationFields = document.getElementById('manual_location_fields');
-            const manualLatitude = document.getElementById('manual_latitude');
-            const manualLongitude = document.getElementById('manual_longitude');
-            const setManualLocationBtn = document.getElementById('set_manual_location');
-            
-            // Toggle manual location fields
-            manualLocationToggle.addEventListener('click', function() {
-                manualLocationFields.style.display = manualLocationFields.style.display === 'none' ? 'block' : 'none';
-            });
-            
-            // Set manual location button
-            setManualLocationBtn.addEventListener('click', function() {
-                const lat = manualLatitude.value.trim();
-                const lng = manualLongitude.value.trim();
+            // Seller Location Functionality
+            setupLocationFunctionality('get_location', 'shop_latitude', 'shop_longitude', 'location_status', 
+                'location-error', 'manual_location_toggle', 'manual_location_fields', 
+                'manual_latitude', 'manual_longitude', 'set_manual_location');
                 
-                // Basic validation
-                if (!lat || !lng) {
-                    locationError.textContent = "Please enter both latitude and longitude values";
+            // Buyer Location Functionality
+            setupLocationFunctionality('get_buyer_location', 'buyer_latitude', 'buyer_longitude', 'buyer_location_status', 
+                'buyer-location-error', 'buyer_manual_location_toggle', 'buyer_manual_location_fields', 
+                'buyer_manual_latitude', 'buyer_manual_longitude', 'set_buyer_manual_location');
+            
+            // Function to setup location functionality
+            function setupLocationFunctionality(getLocationBtnId, latitudeInputId, longitudeInputId, locationStatusId, 
+                locationErrorId, manualLocationToggleId, manualLocationFieldsId, manualLatitudeId, manualLongitudeId, setManualLocationBtnId) {
+                
+                // Get elements
+                const getLocationBtn = document.getElementById(getLocationBtnId);
+                const latitudeInput = document.getElementById(latitudeInputId);
+                const longitudeInput = document.getElementById(longitudeInputId);
+                const locationStatus = document.getElementById(locationStatusId);
+                const locationError = document.getElementById(locationErrorId);
+                const manualLocationToggle = document.getElementById(manualLocationToggleId);
+                const manualLocationFields = document.getElementById(manualLocationFieldsId);
+                const manualLatitude = document.getElementById(manualLatitudeId);
+                const manualLongitude = document.getElementById(manualLongitudeId);
+                const setManualLocationBtn = document.getElementById(setManualLocationBtnId);
+                
+                if (!getLocationBtn || !latitudeInput || !longitudeInput || !locationStatus || 
+                    !locationError || !manualLocationToggle || !manualLocationFields || 
+                    !manualLatitude || !manualLongitude || !setManualLocationBtn) {
+                    console.error('Missing required elements for location functionality');
                     return;
                 }
                 
-                // Check if values are valid numbers
-                const latNum = parseFloat(lat);
-                const lngNum = parseFloat(lng);
+                // Toggle manual location fields
+                manualLocationToggle.addEventListener('click', function() {
+                    manualLocationFields.style.display = manualLocationFields.style.display === 'none' ? 'block' : 'none';
+                });
                 
-                if (isNaN(latNum) || isNaN(lngNum)) {
-                    locationError.textContent = "Please enter valid numeric values";
-                    return;
-                }
-                
-                // Check if values are in valid range
-                if (latNum < -90 || latNum > 90 || lngNum < -180 || lngNum > 180) {
-                    locationError.textContent = "Please enter valid latitude (-90 to 90) and longitude (-180 to 180) values";
-                    return;
-                }
-                
-                // Update the hidden inputs
-                latitudeInput.value = latNum;
-                longitudeInput.value = lngNum;
-                
-                // Update status
-                locationStatus.textContent = "✓ Location manually set";
-                locationStatus.classList.add('location-success');
-                locationError.textContent = '';
-                
-                // Update button
-                setManualLocationBtn.innerHTML = '<i class="fas fa-check"></i> Location Set';
-                setManualLocationBtn.style.backgroundColor = 'var(--accent-color)';
-            });
-            
-            getLocationBtn.addEventListener('click', function() {
-                if (!navigator.geolocation) {
-                    locationError.textContent = "Geolocation is not supported by your browser";
-                    manualLocationFields.style.display = 'block'; // Show manual fields as fallback
-                    return;
-                }
-                
-                locationStatus.textContent = "Retrieving your location...";
-                locationStatus.classList.remove('location-success');
-                getLocationBtn.disabled = true;
-                getLocationBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Getting location...';
-                
-                navigator.geolocation.getCurrentPosition(
-                    // Success callback
-                    function(position) {
-                        latitudeInput.value = position.coords.latitude;
-                        longitudeInput.value = position.coords.longitude;
-                        
-                        // Also update the manual fields
-                        manualLatitude.value = position.coords.latitude;
-                        manualLongitude.value = position.coords.longitude;
-                        
-                        locationStatus.textContent = "✓ Location successfully retrieved";
-                        locationStatus.classList.add('location-success');
-                        
-                        getLocationBtn.innerHTML = '<i class="fas fa-check"></i> Location Retrieved';
-                        getLocationBtn.style.backgroundColor = 'var(--accent-color)';
-                        locationError.textContent = '';
-                        getLocationBtn.disabled = false;
-                    },
-                    // Error callback
-                    function(error) {
-                        getLocationBtn.innerHTML = '<i class="fas fa-map-marker-alt"></i> Try Again';
-                        getLocationBtn.disabled = false;
-                        locationStatus.textContent = "Automatic location failed - please use manual input";
-                        locationStatus.classList.remove('location-success');
-                        
-                        // Show manual input fields when auto location fails
-                        manualLocationFields.style.display = 'block';
-                        
-                        switch(error.code) {
-                            case error.PERMISSION_DENIED:
-                                locationError.textContent = "Location permission denied. Please enter your location manually below.";
-                                break;
-                            case error.POSITION_UNAVAILABLE:
-                                locationError.textContent = "Location information is unavailable. Please enter manually.";
-                                break;
-                            case error.TIMEOUT:
-                                locationError.textContent = "Location request timed out. Please enter manually.";
-                                break;
-                            default:
-                                locationError.textContent = "An unknown error occurred. Please enter manually.";
-                                break;
-                        }
-                    },
-                    // Options
-                    {
-                        enableHighAccuracy: true,
-                        timeout: 10000,
-                        maximumAge: 0
+                // Set manual location button
+                setManualLocationBtn.addEventListener('click', function() {
+                    const lat = manualLatitude.value.trim();
+                    const lng = manualLongitude.value.trim();
+                    
+                    // Basic validation
+                    if (!lat || !lng) {
+                        locationError.textContent = "Please enter both latitude and longitude values";
+                        return;
                     }
-                );
-            });
+                    
+                    // Check if values are valid numbers
+                    const latNum = parseFloat(lat);
+                    const lngNum = parseFloat(lng);
+                    
+                    if (isNaN(latNum) || isNaN(lngNum)) {
+                        locationError.textContent = "Please enter valid numeric values";
+                        return;
+                    }
+                    
+                    // Check if values are in valid range
+                    if (latNum < -90 || latNum > 90 || lngNum < -180 || lngNum > 180) {
+                        locationError.textContent = "Please enter valid latitude (-90 to 90) and longitude (-180 to 180) values";
+                        return;
+                    }
+                    
+                    // Update the hidden inputs
+                    latitudeInput.value = latNum;
+                    longitudeInput.value = lngNum;
+                    
+                    // Update status
+                    locationStatus.textContent = "✓ Location manually set";
+                    locationStatus.classList.add('location-success');
+                    locationError.textContent = '';
+                    
+                    // Update button
+                    setManualLocationBtn.innerHTML = '<i class="fas fa-check"></i> Location Set';
+                    setManualLocationBtn.style.backgroundColor = 'var(--accent-color)';
+                });
+                
+                // Get location button
+                getLocationBtn.addEventListener('click', function() {
+                    if (!navigator.geolocation) {
+                        locationError.textContent = "Geolocation is not supported by your browser";
+                        manualLocationFields.style.display = 'block'; // Show manual fields as fallback
+                        return;
+                    }
+                    
+                    locationStatus.textContent = "Retrieving your location...";
+                    locationStatus.classList.remove('location-success');
+                    getLocationBtn.disabled = true;
+                    getLocationBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Getting location...';
+                    
+                    navigator.geolocation.getCurrentPosition(
+                        // Success callback
+                        function(position) {
+                            latitudeInput.value = position.coords.latitude;
+                            longitudeInput.value = position.coords.longitude;
+                            
+                            // Also update the manual fields
+                            manualLatitude.value = position.coords.latitude;
+                            manualLongitude.value = position.coords.longitude;
+                            
+                            locationStatus.textContent = "✓ Location successfully retrieved";
+                            locationStatus.classList.add('location-success');
+                            
+                            getLocationBtn.innerHTML = '<i class="fas fa-check"></i> Location Retrieved';
+                            getLocationBtn.style.backgroundColor = 'var(--accent-color)';
+                            locationError.textContent = '';
+                            getLocationBtn.disabled = false;
+                        },
+                        // Error callback
+                        function(error) {
+                            getLocationBtn.innerHTML = '<i class="fas fa-map-marker-alt"></i> Try Again';
+                            getLocationBtn.disabled = false;
+                            locationStatus.textContent = "Automatic location failed - please use manual input";
+                            locationStatus.classList.remove('location-success');
+                            
+                            // Show manual input fields when auto location fails
+                            manualLocationFields.style.display = 'block';
+                            
+                            switch(error.code) {
+                                case error.PERMISSION_DENIED:
+                                    locationError.textContent = "Location permission denied. Please enter your location manually below.";
+                                    break;
+                                case error.POSITION_UNAVAILABLE:
+                                    locationError.textContent = "Location information is unavailable. Please enter manually.";
+                                    break;
+                                case error.TIMEOUT:
+                                    locationError.textContent = "Location request timed out. Please enter manually.";
+                                    break;
+                                default:
+                                    locationError.textContent = "An unknown error occurred. Please enter manually.";
+                                    break;
+                            }
+                        },
+                        // Options
+                        {
+                            enableHighAccuracy: true,
+                            timeout: 10000,
+                            maximumAge: 0
+                        }
+                    );
+                });
+            }
             
             // Form submission handler
             const signupForm = document.getElementById('signup-form');
@@ -864,6 +925,19 @@
                             return;
                         } else {
                             document.getElementById('location-error').textContent = '';
+                        }
+                    }
+                    
+                    // Validate buyer location if buyer is selected
+                    if (userType === 'buyer') {
+                        const latitude = document.getElementById('buyer_latitude').value;
+                        const longitude = document.getElementById('buyer_longitude').value;
+                        
+                        if (!latitude || !longitude) {
+                            document.getElementById('buyer-location-error').textContent = 'Please get your current location';
+                            return;
+                        } else {
+                            document.getElementById('buyer-location-error').textContent = '';
                         }
                     }
                     

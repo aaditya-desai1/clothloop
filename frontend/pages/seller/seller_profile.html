@@ -784,13 +784,89 @@
         .remove-image.visible {
             display: flex;
         }
+
+        /* Shop Logo Styles */
+        .logo-preview-container {
+            margin-top: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .logo-preview {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: var(--light-bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            box-shadow: var(--box-shadow);
+            border: 2px solid var(--accent-color);
+            transition: all 0.3s ease;
+        }
+        
+        .logo-preview i {
+            font-size: 40px;
+            color: var(--accent-color);
+        }
+        
+        .logo-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .preview-label {
+            margin-top: 8px;
+            font-size: 0.8rem;
+            color: var(--secondary-text);
+        }
+        
+        .logo-preview:hover {
+            transform: scale(1.05);
+            border-color: var(--primary-color);
+        }
+
+        /* Footer Styles */
+        .footer {
+            background-color: var(--footer-bg);
+            color: var(--footer-text);
+            padding: 1rem 0 1rem;
+            clip-path: polygon(0 10%, 100% 0, 100% 100%, 0 100%);
+            padding-top: 1rem !important;
+            margin-top: auto;
+            width: 100%;
+        }
+
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem 0;
+            border-top: none;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .footer-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--accent-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
     </style>
 </head>
 <body>
     <!-- Navigation -->
     <nav>
-        <a href="../../../home.html" class="logo">
-            <i class="fas fa-recycle"></i> ClothLoop
+        <a href="seller_dashboard.html" class="logo">
+            <img src="../../assets/images/logo_f.png" alt="ClothLoop Logo" style="height: 40px; margin-right: 10px;"> ClothLoop
             <span class="seller-badge">Seller</span>
         </a>
         <div style="display: flex; align-items: center;">
@@ -875,22 +951,16 @@
                         <h3>Shop Information</h3>
                         <div class="form-group">
                             <label for="shopLogo">Shop Logo</label>
-                            <div class="image-preview-container" id="logoPreviewContainer">
-                                <div class="image-preview-placeholder">
-                                    <i class="fas fa-store" style="font-size: 30px; margin-bottom: 10px;"></i>
-                                    <p>Click to upload your shop logo</p>
+                            <div class="logo-preview-container">
+                                <div class="logo-preview">
+                                    <i class="fas fa-store"></i>
                                 </div>
-                                <img id="logoPreview" src="#" alt="Shop logo preview">
-                                <div class="remove-image" id="removeLogoBtn">
-                                    <i class="fas fa-times"></i>
-                                </div>
+                                <span class="preview-label">Logo Preview</span>
                             </div>
-                            <div class="custom-file-input-container">
-                                <div class="custom-file-input">
-                                    <span class="file-button">Choose File</span>
-                                    <span class="file-name" id="fileName">No file chosen</span>
-                                    <input type="file" id="shopLogo" name="shopLogo" accept="image/*">
-                                </div>
+                            <div class="custom-file-input">
+                                <input type="file" id="shopLogo" name="shopLogo" accept="image/*">
+                                <div class="file-button">Choose File</div>
+                                <div class="file-name">No file chosen</div>
                             </div>
                         </div>
                     </div>
@@ -977,14 +1047,12 @@
     </main>
 
     <!-- Footer -->
-    <footer class="footer" style="background-color: var(--footer-bg); color: var(--footer-text); padding: 1rem 0; margin-top: 50px; text-align: center;">
-        <div style="max-width: 1200px; margin: 0 auto; padding: 1rem 2rem;">
-            <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 0.5rem;">
-                <span style="font-size: 1.8rem; font-weight: 700; letter-spacing: 3px; text-transform: uppercase;">
-                    <i class="fas fa-recycle" style="margin-right: 10px; color: var(--accent-color);"></i> ClothLoop
-                </span>
+    <footer class="footer">
+        <div class="footer-bottom">
+            <div class="footer-logo">
+                <img src="../../assets/images/logo_f.png" alt="ClothLoop Logo" style="height: 40px; margin-right: 10px;"> ClothLoop
             </div>
-            <p style="font-size: 0.9rem;">&copy; 2024 ClothLoop. All rights reserved.</p>
+            <p>&copy; 2024 ClothLoop. All rights reserved.</p>
         </div>
     </footer>
     
@@ -1049,59 +1117,41 @@
             }, 1000);
             
             // Shop logo upload functionality
-            const fileInput = document.getElementById('shopLogo');
-            const fileName = document.getElementById('fileName');
-            const logoPreview = document.getElementById('logoPreview');
-            const logoPreviewContainer = document.getElementById('logoPreviewContainer');
-            const removeLogoBtn = document.getElementById('removeLogoBtn');
+            const shopLogoInput = document.getElementById('shopLogo');
+            const logoPreview = document.querySelector('.logo-preview');
+            const fileName = document.querySelector('.file-name');
             
-            // Shop logo upload handling
-            fileInput.addEventListener('change', function(e) {
+            // Initialize with stored logo if available
+            const storedLogo = localStorage.getItem('shopLogo');
+            if (storedLogo) {
+                logoPreview.innerHTML = '';
+                const img = document.createElement('img');
+                img.src = storedLogo;
+                logoPreview.appendChild(img);
+            }
+            
+            shopLogoInput.addEventListener('change', function(e) {
                 if (this.files && this.files[0]) {
                     const file = this.files[0];
                     fileName.textContent = file.name;
                     
                     const reader = new FileReader();
                     reader.onload = function(e) {
-                        logoPreview.src = e.target.result;
-                        logoPreview.classList.add('visible');
-                        removeLogoBtn.classList.add('visible');
+                        logoPreview.innerHTML = '';
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        logoPreview.appendChild(img);
                         
-                        // Store logo in localStorage (for demo purposes)
+                        // Store in localStorage for demo purposes
                         localStorage.setItem('shopLogo', e.target.result);
-                    }
+                    };
                     reader.readAsDataURL(file);
+                } else {
+                    fileName.textContent = 'No file chosen';
+                    logoPreview.innerHTML = '<i class="fas fa-store"></i>';
+                    localStorage.removeItem('shopLogo');
                 }
             });
-            
-            // Alternative way to trigger file input
-            logoPreviewContainer.addEventListener('click', function(e) {
-                if (!e.target.closest('.remove-image')) {
-                    fileInput.click();
-                }
-            });
-            
-            // Remove logo functionality
-            removeLogoBtn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                logoPreview.src = '#';
-                logoPreview.classList.remove('visible');
-                this.classList.remove('visible');
-                fileName.textContent = 'No file chosen';
-                fileInput.value = '';
-                
-                // Remove from localStorage
-                localStorage.removeItem('shopLogo');
-            });
-            
-            // Load logo from localStorage if exists
-            const savedLogo = localStorage.getItem('shopLogo');
-            if (savedLogo) {
-                logoPreview.src = savedLogo;
-                logoPreview.classList.add('visible');
-                removeLogoBtn.classList.add('visible');
-                fileName.textContent = 'Saved logo';
-            }
             
             profileForm.addEventListener('submit', function(e) {
                 e.preventDefault();

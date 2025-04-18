@@ -135,37 +135,199 @@
             background-color: var(--card-bg);
             box-shadow: var(--box-shadow);
             display: flex;
+            flex-direction: column;
             min-height: 80vh;
         }
 
         .image-section {
-            flex: 1;
+            width: 100%;
+            height: 500px;
             background-color: var(--light-bg);
             display: flex;
             justify-content: center;
             align-items: center;
             overflow: hidden;
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 30px;
+            position: relative;
         }
 
         .light-theme .image-section {
-            border-right: 1px solid rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        /* Remove the vignette effect */
+        .image-section::after {
+            display: none;
         }
 
         .image-section img {
             width: 100%;
             height: 100%;
             object-fit: contain;
-            transition: transform 0.3s ease;
+            transition: transform 0.5s ease;
         }
 
         .image-section:hover img {
             transform: scale(1.05);
         }
 
+        /* Image Slider Styles */
+        .image-slider-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .image-slider {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slider-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .slider-slide.active {
+            opacity: 1;
+            z-index: 1;
+        }
+
+        .slider-controls {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .slider-dots {
+            display: flex;
+            justify-content: center;
+            margin: 0 15px;
+        }
+
+        .slider-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.5);
+            margin: 0 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .light-theme .slider-dot {
+            background-color: rgba(0, 0, 0, 0.3);
+        }
+
+        .slider-dot.active {
+            background-color: var(--accent-color);
+            transform: scale(1.2);
+        }
+
+        .slider-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 40px;
+            height: 40px;
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 10;
+            transition: all 0.3s ease;
+            color: white;
+            font-size: 20px;
+        }
+
+        .slider-arrow:hover {
+            background-color: rgba(0, 0, 0, 0.8);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .slider-arrow.left {
+            left: 20px;
+        }
+
+        .slider-arrow.right {
+            right: 20px;
+        }
+
+        .light-theme .slider-arrow {
+            background-color: rgba(0, 0, 0, 0.3);
+        }
+
+        .light-theme .slider-arrow:hover {
+            background-color: rgba(0, 0, 0, 0.6);
+        }
+
+        .thumbnails-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 15px;
+            margin-bottom: 30px;
+            padding: 15px;
+            background-color: var(--card-bg);
+            border-top: 1px solid var(--border-color);
+            overflow-x: auto;
+            scrollbar-width: thin;
+        }
+
+        .thumbnails-container::-webkit-scrollbar {
+            height: 5px;
+        }
+
+        .thumbnails-container::-webkit-scrollbar-thumb {
+            background-color: var(--accent-color);
+        }
+
+        .thumbnails-container::-webkit-scrollbar-track {
+            background-color: var(--card-bg);
+        }
+
+        .thumbnail {
+            width: 60px;
+            height: 60px;
+            margin: 0 8px;
+            object-fit: cover;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            opacity: 0.6;
+        }
+
+        .thumbnail:hover {
+            opacity: 1;
+            transform: translateY(-3px);
+        }
+
+        .thumbnail.active {
+            border-color: var(--accent-color);
+            opacity: 1;
+            transform: translateY(-3px);
+        }
+
         .info-section {
-            flex: 1;
-            padding: 40px;
+            width: 100%;
+            padding: 0 40px 40px 40px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
@@ -274,9 +436,21 @@
         }
 
         .shop-info-section {
-            margin-bottom: 30px;
-            font-size: 1rem;
+            width: 100%;
+            margin: 30px 0;
+            padding: 20px;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 0;
+            box-shadow: var(--box-shadow);
             animation: fadeIn 2.2s ease-out;
+        }
+
+        .shop-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 15px;
         }
 
         .shop-info-item {
@@ -450,7 +624,7 @@
             }
 
             .image-section {
-                height: 50vh;
+                height: 400px;
             }
 
             .info-section {
@@ -483,6 +657,104 @@
             .info-section {
                 padding: 15px;
             }
+
+            .image-section {
+                height: 300px;
+            }
+        }
+
+        /* Customer Reviews Styles */
+        .customer-reviews-section {
+            margin-top: 30px;
+            animation: fadeIn 2.8s ease-out;
+        }
+        
+        .reviews-list {
+            margin-top: 15px;
+        }
+        
+        .review-item {
+            padding: 15px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        .light-theme .review-item {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .reviewer-name {
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        .review-date {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .light-theme .review-date {
+            color: rgba(0, 0, 0, 0.6);
+        }
+        
+        .review-rating {
+            margin-bottom: 10px;
+        }
+        
+        .review-rating i {
+            color: var(--accent-color);
+            font-size: 14px;
+            margin-right: 2px;
+        }
+        
+        .review-content {
+            line-height: 1.6;
+            font-size: 15px;
+        }
+        
+        .review-placeholder {
+            padding: 20px;
+            text-align: center;
+            font-style: italic;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .light-theme .review-placeholder {
+            color: rgba(0, 0, 0, 0.6);
+        }
+        
+        .load-more-reviews {
+            background-color: transparent;
+            color: var(--accent-color);
+            border: 2px solid var(--accent-color);
+            padding: 10px 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            margin-top: 15px;
+            transition: all 0.2s linear;
+            width: 100%;
+        }
+        
+        .load-more-reviews:hover {
+            transform: translateY(-2px) skewX(-5deg);
+            background-color: var(--accent-color);
+            color: var(--primary-color);
+            box-shadow: 3px 3px 0 rgba(255, 255, 255, 0.1);
+        }
+        
+        .light-theme .load-more-reviews:hover {
+            box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
@@ -490,7 +762,7 @@
     <!-- Navigation -->
     <nav>
         <a href="buyer_dashboard.html" class="logo">
-            <i class="fas fa-recycle"></i> ClothLoop
+            <img src="../../assets/images/logo_f.png" alt="ClothLoop Logo" style="height: 40px; margin-right: 10px;"> ClothLoop
         </a>
         <div style="display: flex; align-items: center;">
             <ul>
@@ -510,7 +782,31 @@
     <!-- Product Detail Container -->
     <div class="product-container">
         <div class="image-section">
-            <img id="clothImage" src="" alt="Product Image">
+            <div class="image-slider-container">
+                <div class="image-slider" id="productImageSlider">
+                    <!-- Main slider images will be added dynamically -->
+                    <div class="slider-slide active">
+                        <img id="mainProductImage" src="" alt="Product Image">
+                    </div>
+                </div>
+                <div class="slider-controls">
+                    <div class="slider-arrow left" id="prevSlide">
+                        <i class="fas fa-chevron-left"></i>
+                    </div>
+                    <div class="slider-dots" id="sliderDots">
+                        <!-- Dots will be added dynamically -->
+                        <span class="slider-dot active"></span>
+                    </div>
+                    <div class="slider-arrow right" id="nextSlide">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Thumbnails below main image -->
+        <div class="thumbnails-container" id="imageThumbnails">
+            <!-- Thumbnails will be added dynamically -->
+            <img src="" alt="Thumbnail" class="thumbnail active" data-index="0">
         </div>
         <div class="info-section">
             <button class="close-btn" onclick="closeModal()">&times;</button>
@@ -539,28 +835,30 @@
             
             <div class="shop-info-section">
                 <div class="section-title">Shop Information</div>
-                <div class="shop-info-item">
-                    <i class="fas fa-store"></i>
-                    <span id="shopName">Shop Name</span>
-                </div>
-                <div class="shop-info-item">
-                    <i class="fas fa-map-marker-alt"></i>
-                    <span id="shopAddress">Shop Address</span>
-                </div>
-                <div class="shop-info-item">
-                    <i class="fas fa-phone"></i>
-                    <a href="tel:" id="contactNumberLink" class="contact-link">
-                        <span id="contactNumber">1234567890</span>
-                    </a>
-                </div>
-                <div class="shop-info-item">
-                    <i class="fab fa-whatsapp"></i>
-                    <a href="https://wa.me/" id="whatsappNumberLink" class="contact-link">
-                        <span id="whatsappNumber">1234567890</span>
-                    </a>
+                <div class="shop-info-grid">
+                    <div class="shop-info-item">
+                        <i class="fas fa-store"></i>
+                        <span id="shopName">Shop Name</span>
+                    </div>
+                    <div class="shop-info-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span id="shopAddress">Shop Address</span>
+                    </div>
+                    <div class="shop-info-item">
+                        <i class="fas fa-phone"></i>
+                        <a href="tel:" id="contactNumberLink" class="contact-link">
+                            <span id="contactNumber">1234567890</span>
+                        </a>
+                    </div>
+                    <div class="shop-info-item">
+                        <i class="fab fa-whatsapp"></i>
+                        <a href="https://wa.me/" id="whatsappNumberLink" class="contact-link">
+                            <span id="whatsappNumber">1234567890</span>
+                        </a>
+                    </div>
                 </div>
                 
-                <a href="#" class="view-map-button" id="locationBtn" onclick="openLocation()">
+                <a href="#" class="view-map-button" id="locationBtn" onclick="openLocation()" style="margin-top: 15px; display: inline-block;">
                     <i class="fas fa-map-marker-alt"></i> View on Map
                 </a>
             </div>
@@ -589,6 +887,66 @@
                 <div id="reviewFormContainer" style="display: none; margin-top: 15px;">
                     <textarea id="reviewText" placeholder="Write a review..." class="review-textarea"></textarea>
                     <button id="submitReview" class="review-button">SEND</button>
+                </div>
+            </div>
+            
+            <!-- Customer Reviews Section -->
+            <div class="customer-reviews-section">
+                <div class="section-title">Customer Reviews</div>
+                <div id="reviewsList" class="reviews-list">
+                    <!-- Static reviews -->
+                    <div class="review-item">
+                        <div class="review-header">
+                            <div class="reviewer-name">Priya Sharma</div>
+                            <div class="review-date">Jun 15, 2023</div>
+                        </div>
+                        <div class="review-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="review-content">
+                            Excellent quality! This dress was perfect for my event. The material is very comfortable and the fit was exactly as described.
+                        </div>
+                    </div>
+                    
+                    <div class="review-item">
+                        <div class="review-header">
+                            <div class="reviewer-name">Amit Kumar</div>
+                            <div class="review-date">May 28, 2023</div>
+                        </div>
+                        <div class="review-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="far fa-star"></i>
+                        </div>
+                        <div class="review-content">
+                            Great product, slightly smaller than expected but overall very good quality for the rental price.
+                        </div>
+                    </div>
+                    
+                    <div class="review-item">
+                        <div class="review-header">
+                            <div class="reviewer-name">Neha Patel</div>
+                            <div class="review-date">May 10, 2023</div>
+                        </div>
+                        <div class="review-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="review-content">
+                            Amazing outfit! The seller was very helpful and the product was in pristine condition. Highly recommend!
+                        </div>
+                    </div>
+                    
+                    <button class="load-more-reviews">LOAD MORE REVIEWS</button>
                 </div>
             </div>
         </div>
@@ -876,7 +1234,7 @@
         // Populate details from server data
         function populateProductDetails(product) {
             // Set image source - try to use the image from the database first
-            const imageEl = document.getElementById('clothImage');
+            const imageEl = document.getElementById('mainProductImage');
             
             // First attempt with the image data from the response
             if (product.image && product.image.startsWith('data:image/')) {
@@ -1026,7 +1384,7 @@
             const params = getQueryParams();
             
             // Set image source
-            const imageEl = document.getElementById('clothImage');
+            const imageEl = document.getElementById('mainProductImage');
             
             // Try to load image from URL params first
             if (params.image) {
@@ -1130,6 +1488,9 @@
                 populateFromUrlParams();
             }
 
+            // Initialize image slider
+            initImageSlider();
+
             // Handle ESC key to close modal
             document.addEventListener('keydown', function(event) {
                 if (event.key === 'Escape') {
@@ -1138,11 +1499,174 @@
             });
         }
         
+        // Image slider functionality
+        function initImageSlider() {
+            // Sample images for demo - in a real app, these would come from the product data
+            const sampleImages = [
+                '/ClothLoop/assets/images/slider/product1_1.jpg',
+                '/ClothLoop/assets/images/slider/product1_2.jpg',
+                '/ClothLoop/assets/images/slider/product1_3.jpg',
+                '/ClothLoop/assets/images/slider/product1_4.jpg'
+            ];
+            
+            // Fallback images if product-specific ones aren't available
+            const fallbackImages = [
+                'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=800',
+                'https://images.unsplash.com/photo-1593032465175-481ac7f401a0?w=800',
+                'https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?w=800',
+                'https://images.unsplash.com/photo-1598033129183-c4f50c736f10?w=800'
+            ];
+            
+            // Get URL parameters
+            const params = getQueryParams();
+            
+            // Decide which images to use
+            let productImages = [];
+            
+            // If we have a product image from URL params, use it as the first image
+            if (params.image) {
+                productImages.push(params.image);
+                // Add fallback images for demonstration
+                productImages = productImages.concat(fallbackImages.slice(0, 3));
+            } else {
+                // Use all fallback images
+                productImages = fallbackImages;
+            }
+            
+            // Clear existing slider content
+            const sliderContainer = document.getElementById('productImageSlider');
+            const dotsContainer = document.getElementById('sliderDots');
+            const thumbnailsContainer = document.getElementById('imageThumbnails');
+            
+            sliderContainer.innerHTML = '';
+            dotsContainer.innerHTML = '';
+            thumbnailsContainer.innerHTML = '';
+            
+            // Generate slides, dots and thumbnails
+            productImages.forEach((image, index) => {
+                // Create slide
+                const slide = document.createElement('div');
+                slide.className = `slider-slide ${index === 0 ? 'active' : ''}`;
+                slide.innerHTML = `<img src="${image}" alt="Product Image ${index + 1}">`;
+                sliderContainer.appendChild(slide);
+                
+                // Create dot
+                const dot = document.createElement('span');
+                dot.className = `slider-dot ${index === 0 ? 'active' : ''}`;
+                dot.setAttribute('data-index', index);
+                dot.addEventListener('click', () => goToSlide(index));
+                dotsContainer.appendChild(dot);
+                
+                // Create thumbnail
+                const thumbnail = document.createElement('img');
+                thumbnail.src = image;
+                thumbnail.alt = `Thumbnail ${index + 1}`;
+                thumbnail.className = `thumbnail ${index === 0 ? 'active' : ''}`;
+                thumbnail.setAttribute('data-index', index);
+                thumbnail.addEventListener('click', () => goToSlide(index));
+                thumbnailsContainer.appendChild(thumbnail);
+            });
+            
+            // Set up previous and next buttons
+            const prevButton = document.getElementById('prevSlide');
+            const nextButton = document.getElementById('nextSlide');
+            
+            let currentIndex = 0;
+            const totalSlides = productImages.length;
+            
+            prevButton.addEventListener('click', () => {
+                currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
+                goToSlide(currentIndex);
+            });
+            
+            nextButton.addEventListener('click', () => {
+                currentIndex = (currentIndex + 1) % totalSlides;
+                goToSlide(currentIndex);
+            });
+            
+            // Autoplay
+            let slideInterval = setInterval(() => {
+                currentIndex = (currentIndex + 1) % totalSlides;
+                goToSlide(currentIndex);
+            }, 5000);
+            
+            // Pause autoplay on hover
+            sliderContainer.addEventListener('mouseenter', () => {
+                clearInterval(slideInterval);
+            });
+            
+            sliderContainer.addEventListener('mouseleave', () => {
+                slideInterval = setInterval(() => {
+                    currentIndex = (currentIndex + 1) % totalSlides;
+                    goToSlide(currentIndex);
+                }, 5000);
+            });
+            
+            // Function to go to a specific slide
+            function goToSlide(index) {
+                // Update slides
+                const slides = sliderContainer.querySelectorAll('.slider-slide');
+                slides.forEach((slide, i) => {
+                    slide.classList.toggle('active', i === index);
+                });
+                
+                // Update dots
+                const dots = dotsContainer.querySelectorAll('.slider-dot');
+                dots.forEach((dot, i) => {
+                    dot.classList.toggle('active', i === index);
+                });
+                
+                // Update thumbnails
+                const thumbnails = thumbnailsContainer.querySelectorAll('.thumbnail');
+                thumbnails.forEach((thumb, i) => {
+                    thumb.classList.toggle('active', i === index);
+                });
+                
+                // Update current index
+                currentIndex = index;
+            }
+        }
+        
         // Call initialize when page loads
         document.addEventListener('DOMContentLoaded', function() {
             initPage();
             initRatingSystem();
+            
+            // Update average rating based on static reviews
+            calculateStaticReviewsAverage();
         });
+        
+        // Calculate average rating from static reviews
+        function calculateStaticReviewsAverage() {
+            const reviewRatings = document.querySelectorAll('.review-item .review-rating');
+            let totalStars = 0;
+            let totalReviews = reviewRatings.length;
+            
+            if (totalReviews === 0) return;
+            
+            reviewRatings.forEach(ratingElement => {
+                const fullStars = ratingElement.querySelectorAll('.fas.fa-star').length;
+                totalStars += fullStars;
+            });
+            
+            const avgRating = totalStars / totalReviews;
+            document.getElementById('avgRating').textContent = avgRating.toFixed(1);
+            
+            // Update the rating stars display
+            const stars = document.querySelectorAll('.rating-container .stars i');
+            stars.forEach((star, index) => {
+                if (index < Math.floor(avgRating)) {
+                    star.classList.remove('far');
+                    star.classList.add('fas');
+                } else if (index < Math.ceil(avgRating) && avgRating % 1 >= 0.5) {
+                    star.classList.remove('far');
+                    star.classList.add('fas');
+                } else {
+                    star.classList.remove('fas');
+                    star.classList.add('far');
+                }
+            });
+        }
         
         // Product rating functionality
         function initRatingSystem() {
@@ -1151,6 +1675,20 @@
             const submitReviewBtn = document.getElementById('submitReview');
             let selectedRating = 0;
             
+            // Setup load more reviews button
+            const loadMoreBtn = document.querySelector('.load-more-reviews');
+            if (loadMoreBtn) {
+                loadMoreBtn.addEventListener('click', function() {
+                    // In a real app, this would fetch more reviews from the server
+                    // For demo, just show a message
+                    this.textContent = 'NO MORE REVIEWS';
+                    this.disabled = true;
+                    setTimeout(() => {
+                        this.style.display = 'none';
+                    }, 2000);
+                });
+            }
+
             // Function to update stars appearance
             function updateStars(rating) {
                 stars.forEach(star => {
@@ -1206,6 +1744,17 @@
                 // For demo, just show a confirmation
                 alert(`Thank you for your review! You rated this product ${selectedRating} stars.`);
                 
+                // Add the review to the reviews list for immediate feedback
+                addReviewToList({
+                    reviewer_name: 'You',
+                    rating: selectedRating,
+                    review_text: reviewText,
+                    date: new Date().toISOString()
+                });
+                
+                // Hide the "no reviews" message if it's visible
+                document.getElementById('noReviewsMessage').style.display = 'none';
+                
                 // Reset the form
                 document.getElementById('reviewText').value = '';
                 reviewFormContainer.style.display = 'none';
@@ -1225,6 +1774,184 @@
             const currentAvg = parseFloat(document.getElementById('avgRating').textContent);
             const newAvg = ((currentAvg * 5) + newRating) / 6; // Assuming there were 5 previous ratings
             document.getElementById('avgRating').textContent = newAvg.toFixed(1);
+        }
+        
+        // Function to fetch product reviews
+        async function fetchProductReviews(productId) {
+            try {
+                // In a real implementation, you would fetch reviews from the server
+                // For demo purposes, we'll use sample data
+                const sampleReviews = [
+                    {
+                        id: 1,
+                        reviewer_name: 'Priya Sharma',
+                        rating: 5,
+                        review_text: 'Excellent quality! This dress was perfect for my event. The material is very comfortable and the fit was exactly as described.',
+                        date: '2023-06-15T10:30:00'
+                    },
+                    {
+                        id: 2,
+                        reviewer_name: 'Amit Kumar',
+                        rating: 4,
+                        review_text: 'Great product, slightly smaller than expected but overall very good quality for the rental price.',
+                        date: '2023-05-28T14:22:10'
+                    },
+                    {
+                        id: 3,
+                        reviewer_name: 'Neha Patel',
+                        rating: 5,
+                        review_text: 'Amazing outfit! The seller was very helpful and the product was in pristine condition. Highly recommend!',
+                        date: '2023-05-10T09:15:30'
+                    }
+                ];
+                
+                // Display the reviews
+                displayReviews(sampleReviews);
+                
+                // Update average rating based on these reviews
+                updateAverageRating(sampleReviews);
+                
+            } catch (error) {
+                console.error('Error fetching reviews:', error);
+                document.getElementById('noReviewsMessage').textContent = 'Failed to load reviews. Please try again later.';
+            }
+        }
+        
+        // Function to display reviews in the UI
+        function displayReviews(reviews) {
+            const reviewsList = document.getElementById('reviewsList');
+            const noReviewsMessage = document.getElementById('noReviewsMessage');
+            
+            // Clear any existing content (except the no reviews message)
+            const loadMoreButton = reviewsList.querySelector('.load-more-reviews');
+            if (loadMoreButton) {
+                reviewsList.removeChild(loadMoreButton);
+            }
+            
+            if (reviews.length === 0) {
+                noReviewsMessage.style.display = 'block';
+                return;
+            }
+            
+            // Hide the no reviews message
+            noReviewsMessage.style.display = 'none';
+            
+            // Add each review to the list
+            reviews.forEach(review => {
+                addReviewToList(review);
+            });
+            
+            // Add "Load More" button if there are many reviews
+            if (reviews.length >= 3) {
+                const loadMoreBtn = document.createElement('button');
+                loadMoreBtn.className = 'load-more-reviews';
+                loadMoreBtn.textContent = 'LOAD MORE REVIEWS';
+                loadMoreBtn.addEventListener('click', () => {
+                    // In a real app, this would fetch more reviews from the server
+                    // For demo, we'll just show a message
+                    loadMoreBtn.textContent = 'NO MORE REVIEWS';
+                    loadMoreBtn.disabled = true;
+                    setTimeout(() => {
+                        reviewsList.removeChild(loadMoreBtn);
+                    }, 2000);
+                });
+                reviewsList.appendChild(loadMoreBtn);
+            }
+        }
+        
+        // Function to add a single review to the list
+        function addReviewToList(review) {
+            const reviewsList = document.getElementById('reviewsList');
+            const noReviewsMessage = document.getElementById('noReviewsMessage');
+            
+            // Create review item container
+            const reviewItem = document.createElement('div');
+            reviewItem.className = 'review-item';
+            
+            // Format date
+            const reviewDate = new Date(review.date);
+            const formattedDate = reviewDate.toLocaleDateString('en-IN', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+            
+            // Create review header
+            const reviewHeader = document.createElement('div');
+            reviewHeader.className = 'review-header';
+            reviewHeader.innerHTML = `
+                <div class="reviewer-name">${review.reviewer_name}</div>
+                <div class="review-date">${formattedDate}</div>
+            `;
+            
+            // Create rating stars
+            const ratingContainer = document.createElement('div');
+            ratingContainer.className = 'review-rating';
+            
+            let starsHTML = '';
+            for (let i = 1; i <= 5; i++) {
+                if (i <= review.rating) {
+                    starsHTML += '<i class="fas fa-star"></i>';
+                } else {
+                    starsHTML += '<i class="far fa-star"></i>';
+                }
+            }
+            ratingContainer.innerHTML = starsHTML;
+            
+            // Create review content
+            const reviewContent = document.createElement('div');
+            reviewContent.className = 'review-content';
+            reviewContent.textContent = review.review_text;
+            
+            // Assemble the review item
+            reviewItem.appendChild(reviewHeader);
+            reviewItem.appendChild(ratingContainer);
+            reviewItem.appendChild(reviewContent);
+            
+            // Add to the list - before the "Load More" button if it exists
+            const loadMoreButton = reviewsList.querySelector('.load-more-reviews');
+            if (loadMoreButton) {
+                reviewsList.insertBefore(reviewItem, loadMoreButton);
+            } else {
+                reviewsList.appendChild(reviewItem);
+            }
+            
+            // Make sure the "no reviews" message is hidden
+            noReviewsMessage.style.display = 'none';
+        }
+        
+        // Function to calculate and update average rating
+        function updateAverageRating(reviews) {
+            if (reviews.length === 0) return;
+            
+            // Calculate average rating
+            const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
+            const avgRating = totalRating / reviews.length;
+            
+            // Update the displayed average rating
+            document.getElementById('avgRating').textContent = avgRating.toFixed(1);
+            
+            // Update the rating stars
+            updateStarsDisplay(avgRating);
+        }
+        
+        // Helper function to update stars display for average rating
+        function updateStarsDisplay(rating) {
+            const stars = document.querySelectorAll('.rating-container .stars i');
+            stars.forEach((star, index) => {
+                const starValue = index + 1;
+                if (starValue <= rating) {
+                    star.classList.remove('far');
+                    star.classList.add('fas');
+                } else if (starValue <= rating + 0.5) {
+                    // Could implement half stars, but keeping it simple for now
+                    star.classList.remove('far');
+                    star.classList.add('fas');
+                } else {
+                    star.classList.remove('fas');
+                    star.classList.add('far');
+                }
+            });
         }
     </script>
 </body>

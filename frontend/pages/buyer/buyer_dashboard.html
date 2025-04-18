@@ -489,43 +489,132 @@
 
         .view-details-btn {
             display: inline-block;
-            background-color: var(--accent-color);
-            color: var(--primary-color);
+            background-color: #ffffff;
+            color: #000000;
             padding: 0.7rem 1.5rem;
             border-radius: 0;
             text-decoration: none;
             font-weight: 600;
             transition: all 0.3s ease;
-            border: 2px solid var(--accent-color);
+            border: 2px solid #000000;
             font-size: 0.8rem;
             text-transform: uppercase;
             letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        /* Dark theme button style (default theme) */
+        body:not(.light-theme) .view-details-btn {
+            background-color: #000000;
+            color: #ffffff;
+            border: 2px solid #ffffff;
+        }
+
+        .view-details-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background-color: #000000;
+            transition: all 0.4s cubic-bezier(0.42, 0, 0.58, 1);
+            z-index: -1;
+        }
+        
+        /* Dark theme button hover */
+        body:not(.light-theme) .view-details-btn::before {
+            background-color: #ffffff;
+        }
+
+        .view-details-btn:hover::before {
+            left: 0;
         }
 
         .view-details-btn:hover {
-            transform: translateY(-5px) skewX(-5deg);
-            box-shadow: 8px 8px 0 rgba(255, 255, 255, 0.2);
-            background-color: var(--primary-color);
-            color: var(--accent-color);
-        }
-
-        .view-details-btn:hover {
+            color: #ffffff;
             transform: translateY(-3px) skewX(-5deg);
             box-shadow: 5px 5px 0 rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Dark theme button hover text color */
+        body:not(.light-theme) .view-details-btn:hover {
+            color: #000000;
+            box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.2);
         }
 
         .wishlist-btn {
             background-color: transparent;
-            border: none;
-            color: var(--accent-color);
+            border: 1px solid transparent;
             font-size: 1.5rem;
             cursor: pointer;
             transition: all 0.3s ease;
+            position: relative;
+            overflow: visible;
+            width: 46px;
+            height: 46px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            z-index: 10;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+            padding: 0;
+            margin: 0;
+            touch-action: manipulation;
+            text-decoration: none;
+        }
+        
+        .wishlist-btn:hover, .wishlist-btn:active, .wishlist-btn:focus {
+            text-decoration: none;
+            outline: none;
+        }
+        
+        /* Light theme heart color */
+        .light-theme .wishlist-btn i {
+            color: #000000;
+            pointer-events: none;
+        }
+        
+        /* Dark theme heart color */
+        body:not(.light-theme) .wishlist-btn i {
+            color: #ffffff;
+            pointer-events: none;
+        }
+
+        .wishlist-btn i {
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), color 0.3s ease;
+            font-size: 1.6rem;
+            display: block;
+            pointer-events: none;
         }
 
         .wishlist-btn:hover {
-            color: #ff3e6c;
+            background-color: rgba(255, 255, 255, 0.2);
             transform: scale(1.1);
+        }
+        
+        .light-theme .wishlist-btn:hover {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+
+        .wishlist-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Active state for light theme */
+        .light-theme .wishlist-btn.active i {
+            color: #ff3e6c;
+            animation: heartBeat 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        /* Active state for dark theme */
+        body:not(.light-theme) .wishlist-btn.active i {
+            color: #ff3e6c;
+            animation: heartBeat 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         /* User Actions */
@@ -945,13 +1034,54 @@
                 left: 100%;
             }
         }
+
+        /* Ripple effect for buttons */
+        .ripple {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: scale(0);
+            animation: ripple 0.6s linear;
+            pointer-events: none;
+        }
+
+        @keyframes ripple {
+            to {
+                transform: scale(2.5);
+                opacity: 0;
+            }
+        }
+
+        /* Active state for dark theme */
+        body:not(.light-theme) .wishlist-btn.active i {
+            color: #ff3e6c;
+            animation: heartBeat 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        @keyframes heartBeat {
+            0% {
+                transform: scale(1);
+            }
+            25% {
+                transform: scale(1.3);
+            }
+            50% {
+                transform: scale(1);
+            }
+            75% {
+                transform: scale(1.3);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
     </style>
 </head>
 <body>
     <!-- Navigation -->
     <nav>
         <a href="buyer_dashboard.html" class="logo">
-            <i class="fas fa-recycle"></i> ClothLoop
+            <img src="../../assets/images/logo_f.png" alt="ClothLoop Logo" style="height: 40px; margin-right: 10px;"> ClothLoop
         </a>
         <div style="display: flex; align-items: center;">
             <ul>
@@ -1037,79 +1167,79 @@
     <div class="product-grid" id="productGrid">
         <!-- Static Product Examples -->
         <div class="product-card">
-            <img class="product-image" src="https://via.placeholder.com/300x400/111111/ffffff?text=Men's+Casual+Shirt" alt="Men's Casual Shirt">
+            <img class="product-image" src="https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=870&q=80" alt="Men's Casual Shirt">
             <div class="product-details">
                 <h3 class="product-title">Men's Casual Shirt</h3>
                 <div class="product-price">₹199/day</div>
                 <div class="product-seller">Fashion Store</div>
                 <div class="product-actions">
-                    <a href="details.html?id=1&title=Men's Casual Shirt&price=199&image=https://via.placeholder.com/300x400/111111/ffffff?text=Men's+Casual+Shirt&shop=Fashion Store" class="view-details-btn">View Details</a>
-                    <button class="wishlist-btn" title="Add to Wishlist"><i class="far fa-heart"></i></button>
+                    <a href="details.html?id=1&title=Men's Casual Shirt&price=199&image=https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=870&q=80&shop=Fashion Store" class="view-details-btn">View Details</a>
+                    <a href="javascript:void(0);" class="wishlist-btn" title="Add to Wishlist" onclick="toggleWishlist(this, event); return false;"><i class="far fa-heart"></i></a>
                 </div>
             </div>
         </div>
         
         <div class="product-card">
-            <img class="product-image" src="https://via.placeholder.com/300x400/111111/ffffff?text=Formal+Blazer" alt="Formal Blazer">
+            <img class="product-image" src="https://images.unsplash.com/photo-1593032465175-481ac7f401a0?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=870&q=80" alt="Formal Blazer">
             <div class="product-details">
                 <h3 class="product-title">Formal Blazer</h3>
                 <div class="product-price">₹349/day</div>
                 <div class="product-seller">Premium Outfits</div>
                 <div class="product-actions">
-                    <a href="details.html?id=2&title=Formal Blazer&price=349&image=https://via.placeholder.com/300x400/111111/ffffff?text=Formal+Blazer&shop=Premium Outfits" class="view-details-btn">View Details</a>
-                    <button class="wishlist-btn" title="Add to Wishlist"><i class="far fa-heart"></i></button>
+                    <a href="details.html?id=2&title=Formal Blazer&price=349&image=https://images.unsplash.com/photo-1593032465175-481ac7f401a0?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=870&q=80&shop=Premium Outfits" class="view-details-btn">View Details</a>
+                    <a href="javascript:void(0);" class="wishlist-btn" title="Add to Wishlist" onclick="toggleWishlist(this, event); return false;"><i class="far fa-heart"></i></a>
                 </div>
             </div>
         </div>
         
         <div class="product-card">
-            <img class="product-image" src="https://via.placeholder.com/300x400/111111/ffffff?text=Women's+Party+Dress" alt="Women's Party Dress">
+            <img class="product-image" src="https://images.unsplash.com/photo-1595777457583-95e059d581b8?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=783&q=80" alt="Women's Party Dress">
             <div class="product-details">
                 <h3 class="product-title">Women's Party Dress</h3>
                 <div class="product-price">₹299/day</div>
                 <div class="product-seller">Glamour Collection</div>
                 <div class="product-actions">
-                    <a href="details.html?id=3&title=Women's Party Dress&price=299&image=https://via.placeholder.com/300x400/111111/ffffff?text=Women's+Party+Dress&shop=Glamour Collection" class="view-details-btn">View Details</a>
-                    <button class="wishlist-btn" title="Add to Wishlist"><i class="far fa-heart"></i></button>
+                    <a href="details.html?id=3&title=Women's Party Dress&price=299&image=https://images.unsplash.com/photo-1595777457583-95e059d581b8?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=783&q=80&shop=Glamour Collection" class="view-details-btn">View Details</a>
+                    <a href="javascript:void(0);" class="wishlist-btn" title="Add to Wishlist" onclick="toggleWishlist(this, event); return false;"><i class="far fa-heart"></i></a>
                 </div>
             </div>
         </div>
         
         <div class="product-card">
-            <img class="product-image" src="https://via.placeholder.com/300x400/111111/ffffff?text=Designer+Saree" alt="Designer Saree">
+            <img class="product-image" src="../../assets/images/p3.jpg" alt="Designer Saree">
             <div class="product-details">
                 <h3 class="product-title">Designer Saree</h3>
                 <div class="product-price">₹399/day</div>
                 <div class="product-seller">Traditional Attires</div>
                 <div class="product-actions">
-                    <a href="details.html?id=4&title=Designer Saree&price=399&image=https://via.placeholder.com/300x400/111111/ffffff?text=Designer+Saree&shop=Traditional Attires" class="view-details-btn">View Details</a>
-                    <button class="wishlist-btn" title="Add to Wishlist"><i class="far fa-heart"></i></button>
+                    <a href="details.html?id=4&title=Designer Saree&price=399&image=../../assets/images/p3.jpg&shop=Traditional Attires" class="view-details-btn">View Details</a>
+                    <a href="javascript:void(0);" class="wishlist-btn" title="Add to Wishlist" onclick="toggleWishlist(this, event); return false;"><i class="far fa-heart"></i></a>
                 </div>
             </div>
         </div>
         
         <div class="product-card">
-            <img class="product-image" src="https://via.placeholder.com/300x400/111111/ffffff?text=Kids+Festival+Outfit" alt="Kids Festival Outfit">
+            <img class="product-image" src="https://images.unsplash.com/photo-1543076447-215ad9ba6923?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=774&q=80" alt="Kids Festival Outfit">
             <div class="product-details">
                 <h3 class="product-title">Kids Festival Outfit</h3>
                 <div class="product-price">₹149/day</div>
                 <div class="product-seller">Little Angels</div>
                 <div class="product-actions">
-                    <a href="details.html?id=5&title=Kids Festival Outfit&price=149&image=https://via.placeholder.com/300x400/111111/ffffff?text=Kids+Festival+Outfit&shop=Little Angels" class="view-details-btn">View Details</a>
-                    <button class="wishlist-btn" title="Add to Wishlist"><i class="far fa-heart"></i></button>
+                    <a href="details.html?id=5&title=Kids Festival Outfit&price=149&image=https://images.unsplash.com/photo-1543076447-215ad9ba6923?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=774&q=80&shop=Little Angels" class="view-details-btn">View Details</a>
+                    <a href="javascript:void(0);" class="wishlist-btn" title="Add to Wishlist" onclick="toggleWishlist(this, event); return false;"><i class="far fa-heart"></i></a>
                 </div>
             </div>
         </div>
         
         <div class="product-card">
-            <img class="product-image" src="https://via.placeholder.com/300x400/111111/ffffff?text=Stylish+Denim+Jacket" alt="Stylish Denim Jacket">
+            <img class="product-image" src="https://images.unsplash.com/photo-1599447292180-45fd84092ef0?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=774&q=80" alt="Stylish Denim Jacket">
             <div class="product-details">
                 <h3 class="product-title">Stylish Denim Jacket</h3>
                 <div class="product-price">₹249/day</div>
                 <div class="product-seller">Urban Trends</div>
                 <div class="product-actions">
-                    <a href="details.html?id=6&title=Stylish Denim Jacket&price=249&image=https://via.placeholder.com/300x400/111111/ffffff?text=Stylish+Denim+Jacket&shop=Urban Trends" class="view-details-btn">View Details</a>
-                    <button class="wishlist-btn" title="Add to Wishlist"><i class="far fa-heart"></i></button>
+                    <a href="details.html?id=6&title=Stylish Denim Jacket&price=249&image=https://images.unsplash.com/photo-1599447292180-45fd84092ef0?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=774&q=80&shop=Urban Trends" class="view-details-btn">View Details</a>
+                    <a href="javascript:void(0);" class="wishlist-btn" title="Add to Wishlist" onclick="toggleWishlist(this, event); return false;"><i class="far fa-heart"></i></a>
                 </div>
             </div>
         </div>
@@ -1119,7 +1249,7 @@
     <footer class="footer">
         <div class="footer-bottom">
             <div class="footer-logo">
-                <i class="fas fa-recycle"></i> ClothLoop
+                <img src="../../assets/images/logo_f.png" alt="ClothLoop Logo" style="height: 40px; margin-right: 10px;"> ClothLoop
             </div>
             <p>&copy; 2024 ClothLoop. All rights reserved.</p>
         </div>
@@ -1135,33 +1265,242 @@
                 <div class="product-seller">Seller Name</div>
                 <div class="product-actions">
                     <a href="#" class="view-details-btn">View Details</a>
-                    <button class="wishlist-btn" title="Add to Wishlist"><i class="far fa-heart"></i></button>
+                    <a href="javascript:void(0);" class="wishlist-btn" title="Add to Wishlist" onclick="toggleWishlist(this, event); return false;"><i class="far fa-heart"></i></a>
                 </div>
             </div>
         </div>
     </template>
 
     <script>
+        // Global function for toggling wishlist state directly from HTML
+        function toggleWishlist(button, event) {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            
+            const productCard = button.closest('.product-card');
+            const detailsLink = productCard.querySelector('.view-details-btn');
+            const productIdMatch = detailsLink.href.match(/id=(\d+)/);
+            const productId = productIdMatch ? productIdMatch[1] : '1';
+            const heartIcon = button.querySelector('i');
+            
+            console.log('ToggleWishlist called for product ID:', productId);
+            
+            // Toggle heart icon
+            if (heartIcon.classList.contains('far')) {
+                // Change to filled heart
+                heartIcon.className = 'fas fa-heart';
+                button.classList.add('active');
+                
+                // Get product info
+                const productInfo = {
+                    id: productId,
+                    title: productCard.querySelector('.product-title').textContent,
+                    price: productCard.querySelector('.product-price').textContent.replace('₹', '').replace('/day', '').trim(),
+                    seller: productCard.querySelector('.product-seller').textContent,
+                    image: productCard.querySelector('.product-image').src
+                };
+                
+                // Add to wishlist
+                addToWishlist(productId, productInfo);
+                showNotification('Added to wishlist!');
+            } else {
+                // Change to outline heart
+                heartIcon.className = 'far fa-heart';
+                button.classList.remove('active');
+                
+                // Remove from wishlist
+                removeFromWishlist(productId);
+                showNotification('Removed from wishlist');
+            }
+            
+            return false;
+        }
+
         // Theme switcher functionality
         const themeToggle = document.getElementById('theme-toggle');
         const themeIcon = themeToggle.querySelector('i');
         
-        // Load profile picture if available
-        const loadProfilePicture = () => {
-            const userAvatar = document.getElementById('userAvatar');
-            const savedPhoto = localStorage.getItem('buyer_profile_photo');
-            
-            if (savedPhoto) {
-                userAvatar.innerHTML = `<img src="${savedPhoto}" alt="User Profile">`;
+        // Wishlist helper functions
+        function addToWishlist(productId, productInfo) {
+            try {
+                const userId = localStorage.getItem('user_id') || 'guest';
+                const wishlistKey = userId !== 'guest' ? `wishlist_${userId}` : 'wishlist';
+                
+                let wishlist = [];
+                try {
+                    wishlist = JSON.parse(localStorage.getItem(wishlistKey) || '[]');
+                } catch (e) {
+                    console.error('Error parsing wishlist:', e);
+                    wishlist = [];
+                }
+                
+                // Check if product is already in wishlist
+                if (!wishlist.includes(productId.toString())) {
+                    wishlist.push(productId.toString());
+                    
+                    // Save product info
+                    if (productInfo) {
+                        localStorage.setItem(`product_${productId}`, JSON.stringify(productInfo));
+                    }
+                    
+                    // Save updated wishlist
+                    localStorage.setItem(wishlistKey, JSON.stringify(wishlist));
+                    return true;
+                } else {
+                    // Item is already in wishlist
+                    return false;
+                }
+            } catch (e) {
+                console.error('Error adding to wishlist:', e);
+                return false;
             }
-            
-            // Set user name if available
-            const userName = document.getElementById('userName');
-            const savedName = localStorage.getItem('user_name');
-            if (savedName) {
-                userName.textContent = savedName;
+        }
+        
+        function removeFromWishlist(productId) {
+            try {
+                const userId = localStorage.getItem('user_id') || 'guest';
+                const wishlistKey = userId !== 'guest' ? `wishlist_${userId}` : 'wishlist';
+                
+                let wishlist = [];
+                try {
+                    wishlist = JSON.parse(localStorage.getItem(wishlistKey) || '[]');
+                } catch (e) {
+                    console.error('Error parsing wishlist:', e);
+                    wishlist = [];
+                }
+                
+                // Filter out the product
+                wishlist = wishlist.filter(id => id !== productId.toString());
+                
+                // Save updated wishlist
+                localStorage.setItem(wishlistKey, JSON.stringify(wishlist));
+                return true;
+            } catch (e) {
+                console.error('Error removing from wishlist:', e);
+                return false;
             }
-        };
+        }
+        
+        function isInWishlist(productId) {
+            try {
+                const userId = localStorage.getItem('user_id') || 'guest';
+                const wishlistKey = userId !== 'guest' ? `wishlist_${userId}` : 'wishlist';
+                
+                let wishlist = [];
+                try {
+                    wishlist = JSON.parse(localStorage.getItem(wishlistKey) || '[]');
+                } catch (e) {
+                    wishlist = [];
+                }
+                
+                return wishlist.includes(productId.toString());
+            } catch (e) {
+                console.error('Error checking wishlist:', e);
+                return false;
+            }
+        }
+        
+        // Fix wishlist button functionality by adding direct click handlers
+        function initializeWishlistButtons() {
+            // Get all wishlist buttons on the page (now they are <a> tags)
+            const wishlistButtons = document.querySelectorAll('.wishlist-btn');
+            
+            // Add click handler to each button
+            wishlistButtons.forEach(button => {
+                // First, set the initial state
+                const productCard = button.closest('.product-card');
+                const detailsLink = productCard.querySelector('.view-details-btn');
+                const productId = detailsLink && detailsLink.href ? 
+                    (detailsLink.href.split('id=')[1] ? detailsLink.href.split('id=')[1].split('&')[0] : '1') : '1';
+                const heartIcon = button.querySelector('i');
+                
+                // Set initial state
+                if (isInWishlist(productId)) {
+                    heartIcon.className = 'fas fa-heart';
+                    button.classList.add('active');
+                } else {
+                    heartIcon.className = 'far fa-heart';
+                    button.classList.remove('active');
+                }
+                
+                // Clear existing event listeners by creating a new handler
+                button.onclick = function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    // Get all references
+                    const heartIcon = this.querySelector('i');
+                    const productCard = this.closest('.product-card');
+                    const detailsLink = productCard.querySelector('.view-details-btn');
+                    const productId = detailsLink && detailsLink.href ? 
+                        (detailsLink.href.split('id=')[1] ? detailsLink.href.split('id=')[1].split('&')[0] : '1') : '1';
+                    
+                    console.log('Wishlist button clicked:', productId);
+                    
+                    // Toggle heart icon
+                    if (heartIcon.classList.contains('far')) {
+                        // Change to filled heart
+                        heartIcon.className = 'fas fa-heart';
+                        this.classList.add('active');
+                        
+                        // Get product info
+                        const productInfo = {
+                            id: productId,
+                            title: productCard.querySelector('.product-title').textContent,
+                            price: productCard.querySelector('.product-price').textContent.replace('₹', '').replace('/day', '').trim(),
+                            seller: productCard.querySelector('.product-seller').textContent,
+                            image: productCard.querySelector('.product-image').src
+                        };
+                        
+                        // Add to wishlist
+                        addToWishlist(productId, productInfo);
+                        showNotification('Added to wishlist!');
+                    } else {
+                        // Change to outline heart
+                        heartIcon.className = 'far fa-heart';
+                        this.classList.remove('active');
+                        
+                        // Remove from wishlist
+                        removeFromWishlist(productId);
+                        showNotification('Removed from wishlist');
+                    }
+                    
+                    return false;
+                };
+            });
+        }
+        
+        // Function to show a temporary notification
+        function showNotification(message) {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.style.position = 'fixed';
+            notification.style.top = '120px';
+            notification.style.left = '50%';
+            notification.style.transform = 'translateX(-50%)';
+            notification.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+            notification.style.color = 'white';
+            notification.style.padding = '10px 20px';
+            notification.style.borderRadius = '4px';
+            notification.style.zIndex = '1000';
+            notification.style.textAlign = 'center';
+            notification.style.maxWidth = '80%';
+            notification.textContent = message;
+            
+            // Add to body
+            document.body.appendChild(notification);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transition = 'opacity 0.5s ease';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 500);
+            }, 3000);
+        }
         
         // Check for saved theme preference or use default
         const savedTheme = localStorage.getItem('clothloop-theme');
@@ -1186,6 +1525,23 @@
                 localStorage.setItem('clothloop-theme', 'dark');
             }
         });
+        
+        // Load profile picture if available
+        const loadProfilePicture = () => {
+            const userAvatar = document.getElementById('userAvatar');
+            const savedPhoto = localStorage.getItem('buyer_profile_photo');
+            
+            if (savedPhoto) {
+                userAvatar.innerHTML = `<img src="${savedPhoto}" alt="User Profile">`;
+            }
+            
+            // Set user name if available
+            const userName = document.getElementById('userName');
+            const savedName = localStorage.getItem('user_name');
+            if (savedName) {
+                userName.textContent = savedName;
+            }
+        };
         
         // Function to handle category selection
         function setupCategoryFilters() {
@@ -1443,36 +1799,6 @@
             }
         }
         
-        // Function to show a temporary notification
-        function showNotification(message) {
-            // Create notification element
-            const notification = document.createElement('div');
-            notification.style.position = 'fixed';
-            notification.style.top = '120px';
-            notification.style.left = '50%';
-            notification.style.transform = 'translateX(-50%)';
-            notification.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
-            notification.style.color = 'white';
-            notification.style.padding = '10px 20px';
-            notification.style.borderRadius = '4px';
-            notification.style.zIndex = '1000';
-            notification.style.textAlign = 'center';
-            notification.style.maxWidth = '80%';
-            notification.textContent = message;
-            
-            // Add to body
-            document.body.appendChild(notification);
-            
-            // Remove after 3 seconds
-            setTimeout(() => {
-                notification.style.opacity = '0';
-                notification.style.transition = 'opacity 0.5s ease';
-                setTimeout(() => {
-                    document.body.removeChild(notification);
-                }, 500);
-            }, 3000);
-        }
-        
         // Function to render products in grid
         function renderProducts(products) {
             // Don't clear existing static products if we're just doing a category filter
@@ -1497,6 +1823,10 @@
                 const price = productNode.querySelector('.product-price');
                 const seller = productNode.querySelector('.product-seller');
                 const detailsLink = productNode.querySelector('.view-details-btn');
+                const wishlistBtn = productNode.querySelector('.wishlist-btn');
+                
+                // Make sure wishlist button has the correct onclick handler
+                wishlistBtn.setAttribute('onclick', 'toggleWishlist(this, event); return false;');
                 
                 // Set content
                 if (product.image && product.image.startsWith('data:image/')) {
@@ -1519,17 +1849,27 @@
                 // Set link to details page
                 detailsLink.href = `details.html?id=${product.id}`;
                 
+                // Check if the product is in wishlist and update UI accordingly
+                if (isInWishlist(product.id)) {
+                    const heartIcon = wishlistBtn.querySelector('i');
+                    heartIcon.className = 'fas fa-heart';
+                    wishlistBtn.classList.add('active');
+                }
+                
                 // Append to grid
                 productGrid.appendChild(productNode);
             });
         }
         
-        // Initialize
+        // Initialize page on load
         document.addEventListener('DOMContentLoaded', function() {
             loadProfilePicture();
             setupCategoryFilters();
             setupSearch();
             setupSorting();
+            
+            // Initialize wishlist buttons for any that might be in the initial HTML
+            initializeWishlistButtons();
             
             // Add initial animations
             setTimeout(() => {

@@ -113,167 +113,6 @@
         height: auto;
     }
 
-    /* Header styles */
-    .header {
-        background-color: var(--header-bg);
-        padding: 0;
-        box-shadow: var(--shadow-sm);
-        position: sticky;
-        top: 0;
-        z-index: 1000;
-        height: 80px;
-        display: flex;
-        align-items: center;
-    }
-
-    .header-container {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        width: 100%;
-        max-width: 1400px;
-        margin: 0 auto;
-        padding: 0 30px;
-        position: relative;
-    }
-
-    .header-left {
-        display: flex;
-        align-items: center;
-        z-index: 2;
-    }
-    
-    .header-right {
-        display: flex;
-        align-items: center;
-        z-index: 2;
-    }
-    
-    .logo {
-        display: flex;
-        align-items: center;
-        margin-right: 30px;
-        position: relative;
-    }
-
-    .logo-name {
-        font-size: 24px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 3px;
-        color: var(--accent-color);
-    }
-    
-    /* Seller badge */
-    .seller-badge {
-        position: absolute;
-        top: -10px;
-        right: -10px;
-        background-color: var(--accent-color);
-        color: var(--primary-color);
-        font-size: 10px;
-        font-weight: bold;
-        padding: 3px 8px;
-        border-radius: 10px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        animation: pulse 2s infinite;
-    }
-    
-    @keyframes pulse {
-        0% {
-            transform: scale(1);
-        }
-        50% {
-            transform: scale(1.1);
-        }
-        100% {
-            transform: scale(1);
-        }
-    }
-
-    /* Navigation styles */
-    .nav-container {
-        display: flex;
-        align-items: center;
-    }
-
-    .nav-items {
-        display: flex;
-        list-style: none;
-        margin: 0;
-        padding: 0;
-        height: 100%;
-    }
-
-    .nav-items li {
-        height: 80px;
-        display: flex;
-        align-items: center;
-        margin: 0 15px;
-    }
-
-    .nav-items li a {
-        text-decoration: none;
-        color: var(--accent-color);
-        font-weight: 500;
-        font-size: 14px;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        height: 100%;
-        display: flex;
-        align-items: center;
-        position: relative;
-        padding: 0 10px;
-        border-bottom: 2px solid transparent;
-        transition: all 0.2s linear;
-    }
-
-    .nav-items li a:hover {
-        color: var(--accent-color);
-        border-bottom: 2px solid var(--accent-color);
-    }
-
-    .nav-items li a.active {
-        font-weight: 700;
-        border-bottom: 2px solid var(--accent-color);
-    }
-
-    /* User actions */
-    .actions {
-        display: flex;
-        align-items: center;
-    }
-
-    .action-item {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        margin: 0 15px;
-        cursor: pointer;
-        position: relative;
-        transition: all 0.2s linear;
-    }
-
-    .action-item:hover {
-        transform: translateY(-3px);
-    }
-
-    .action-item i {
-        font-size: 20px;
-        margin-bottom: 4px;
-        color: var(--accent-color);
-    }
-
-    .action-item span {
-        font-size: 12px;
-        color: var(--accent-color);
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
     /* Main Content */
     .main-content {
         max-width: 1200px;
@@ -647,61 +486,136 @@
         height: 450px;
         border-top-left-radius: 5px;
     }
+
+    /* Image Slider Styles */
+    .image-slider-container {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .main-image-container {
+        width: 100%;
+        height: 450px;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: var(--light-bg);
+        margin-bottom: 15px;
+    }
+
+    .main-image {
+        max-width: 100%;
+        max-height: 450px;
+        object-fit: contain;
+        transition: opacity 0.5s ease;
+    }
+
+    .image-slider-nav {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .slide-arrow {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 40px;
+        height: 40px;
+        background-color: rgba(0, 0, 0, 0.5);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        z-index: 10;
+        transition: all 0.3s ease;
+        border: none;
+        font-size: 18px;
+    }
+
+    .slide-arrow:hover {
+        background-color: rgba(0, 0, 0, 0.8);
+    }
+
+    .prev-slide {
+        left: 10px;
+    }
+
+    .next-slide {
+        right: 10px;
+    }
+
+    .image-thumbnail-container {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        overflow-x: auto;
+        padding: 5px 0;
+        margin-top: 10px;
+        scrollbar-width: thin;
+    }
+
+    .image-thumbnail {
+        width: 60px;
+        height: 60px;
+        border: 2px solid transparent;
+        object-fit: cover;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        opacity: 0.7;
+    }
+
+    .image-thumbnail:hover {
+        opacity: 1;
+    }
+
+    .image-thumbnail.active {
+        border-color: var(--accent-color);
+        opacity: 1;
+    }
+
+    /* Hide scrollbar for Chrome, Safari and Opera */
+    .image-thumbnail-container::-webkit-scrollbar {
+        height: 5px;
+    }
+
+    .image-thumbnail-container::-webkit-scrollbar-track {
+        background: var(--light-bg);
+    }
+
+    .image-thumbnail-container::-webkit-scrollbar-thumb {
+        background: var(--accent-color);
+    }
+
+    .fade {
+        animation: fadeEffect 0.5s;
+    }
+
+    @keyframes fadeEffect {
+        from {opacity: 0.4}
+        to {opacity: 1}
+    }
   </style>
 </head>
 <body>
-    <!-- Header Section -->
-    <header class="header">
-        <div class="header-container">
-            <div class="header-left">
-                <div class="logo">
-                    <span class="logo-name">CLOTHLOOP</span>
-                    <span class="seller-badge">Seller</span>
-                </div>
-                
-                <nav class="nav-container">
-                    <ul class="nav-items">
-                        <li><a href="seller_dashboard.html">Dashboard</a></li>
-                        <li><a href="product_listings.html">Listings</a></li>
-                        <li><a href="seller_reviews.html">Reviews</a></li>
-                        <li><a href="seller_profile.html">Profile</a></li>
-                        <li><a href="../about/about_us.html">About</a></li>
-                        <li><a href="../account/login.html">Logout</a></li>
-                    </ul>
-                </nav>
-            </div>
-            
-            <div class="header-right">
-                <div class="actions">
-                    <div class="action-item" id="logoutBtn">
-                        <i class="fas fa-sign-out-alt"></i>
-                        <span>LOGOUT</span>
-                    </div>
-                    
-                    <div class="action-item" id="statisticsBtn">
-                        <i class="fas fa-chart-bar"></i>
-                        <span>STATS</span>
-                    </div>
-                    
-                    <div class="action-item" id="helpBtn">
-                        <i class="fas fa-question-circle"></i>
-                        <span>ABOUT US</span>
-                    </div>
-                    
-                    <button class="theme-switcher" id="theme-toggle" aria-label="Toggle theme">
-                        <i class="fas fa-sun"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </header>
-
     <!-- Main Content -->
     <main class="main-content">
         <div class="content-header">
             <a href="product_listings.html" class="back-button">
             <i class="fas fa-arrow-left"></i> Back to Listings
-        </a>
+            </a>
+            <button class="theme-switcher" id="theme-toggle" aria-label="Toggle theme" style="position: absolute; top: 20px; right: 20px;">
+                <i class="fas fa-sun"></i>
+            </button>
         </div>
         
         <div id="alertContainer"></div>
@@ -756,51 +670,40 @@
                     }
                 });
             }
+            
+            // Setup keyboard navigation for image slider
+            document.addEventListener('keydown', function(event) {
+                if (!window.sliderImages) return; // Slider not initialized yet
+                
+                if (event.key === 'ArrowLeft') {
+                    prevSlide();
+                } else if (event.key === 'ArrowRight') {
+                    nextSlide();
+                }
+            });
         });
         
         // Function to setup all event listeners
         function setupEventListeners() {
-            // Logout button
-            const logoutBtn = document.getElementById('logoutBtn');
-            if (logoutBtn) {
-            logoutBtn.addEventListener('click', function() {
-                    logout();
+            // Theme toggle functionality 
+            const themeToggle = document.getElementById('theme-toggle');
+            if (themeToggle) {
+                themeToggle.addEventListener('click', function() {
+                    document.body.classList.toggle('light-theme');
+                    
+                    // Update icon and save preference
+                    const themeIcon = this.querySelector('i');
+                    if (document.body.classList.contains('light-theme')) {
+                        themeIcon.classList.remove('fa-sun');
+                        themeIcon.classList.add('fa-moon');
+                        localStorage.setItem('clothloop-theme', 'light');
+                    } else {
+                        themeIcon.classList.remove('fa-moon');
+                        themeIcon.classList.add('fa-sun');
+                        localStorage.setItem('clothloop-theme', 'dark');
+                    }
                 });
             }
-            
-            // Statistics button
-            const statisticsBtn = document.getElementById('statisticsBtn');
-            if (statisticsBtn) {
-                statisticsBtn.addEventListener('click', function() {
-                    window.location.href = 'seller_statistics.html';
-                });
-            }
-            
-            // Help button
-            const helpBtn = document.getElementById('helpBtn');
-            if (helpBtn) {
-                helpBtn.addEventListener('click', function() {
-                    window.location.href = '../about/about_us.html';
-                });
-            }
-        }
-        
-        // Function to handle logout
-        function logout() {
-                // Call logout API
-                fetch('../../../backend/api/users/logout.php')
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.status === 'success') {
-                            window.location.href = '../../pages/account/login.html';
-                        } else {
-                            showAlert('Error logging out. Please try again.', 'error');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        showAlert('Error logging out. Please try again.', 'error');
-                    });
         }
         
         // Function to get URL parameters
@@ -870,6 +773,31 @@
                 });
         }
         
+        // Function to fetch multiple images from API response
+        function getProductImages(product) {
+            const images = [];
+            
+            // Main product image
+            const mainImageUrl = `../../../backend/api/sellers/get_cloth_image.php?id=${product.id}`;
+            images.push(mainImageUrl);
+            
+            // If the API provides additional images, add them
+            // This is a placeholder for real API implementation
+            if (product.additional_images && Array.isArray(product.additional_images)) {
+                product.additional_images.forEach(img => {
+                    images.push(img);
+                });
+            } else {
+                // For demonstration, add sample images
+                // In a real implementation, these would come from the API
+                images.push(`../../assets/images/p1.jpg`);
+                images.push(`../../assets/images/p2.jpg`);
+                images.push(`../../assets/images/p3.jpg`);
+            }
+            
+            return images;
+        }
+        
         // Function to display product details
         function displayProductDetails(product) {
             console.log('Displaying product:', product);
@@ -878,15 +806,35 @@
             // Update page title
             document.title = `${product.name} | Product Details | ClothLoop`;
             
-            // Create image URL using the cloth image API endpoint
-            const imageUrl = `../../../backend/api/sellers/get_cloth_image.php?id=${product.id}`;
-            console.log('Image URL:', imageUrl);
+            // Get all product images
+            const productImages = getProductImages(product);
+            
+            // Set up global slider images before rendering
+            window.sliderImages = productImages;
+            
+            // Create thumbnails HTML
+            const thumbnailsHtml = productImages.map((img, index) => {
+                return `<img src="${img}" alt="Thumbnail ${index + 1}" class="image-thumbnail ${index === 0 ? 'active' : ''}" onclick="changeSlide(${index})">`;
+            }).join('');
             
             // Create HTML for product details
             const html = `
                 <div class="product-detail">
                     <div class="product-image">
-                        <img src="${imageUrl}" alt="${product.name || 'Product Image'}" id="productImg" onload="adjustImageSize()">
+                        <div class="image-slider-container">
+                            <div class="main-image-container">
+                                <button class="slide-arrow prev-slide" onclick="prevSlide()">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <img src="${productImages[0]}" alt="${product.name || 'Product Image'}" id="mainProductImg" class="main-image fade">
+                                <button class="slide-arrow next-slide" onclick="nextSlide()">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+                            <div class="image-thumbnail-container" id="imageThumbnails">
+                                ${thumbnailsHtml}
+                            </div>
+                        </div>
                     </div>
                     
                     <div class="product-info">
@@ -959,36 +907,135 @@
             // Update the container
             productDetailsContainer.innerHTML = html;
             console.log('Product details HTML updated');
+            
+            // Initialize image slider
+            setTimeout(() => {
+                initializeImageSlider();
+            }, 100);
         }
         
-        // Function to adjust image size based on aspect ratio
-        function adjustImageSize() {
-            const img = document.getElementById('productImg');
-            if (!img) return;
+        // Initialize image slider
+        function initializeImageSlider() {
+            if (!window.sliderImages || window.sliderImages.length <= 1) return;
             
-            const container = img.parentElement;
-            if (!container) return;
+            window.currentSlide = 0;
+            window.totalSlides = window.sliderImages.length;
             
-            // Ensure the image is loaded
-            if (img.complete) {
-                const imgRatio = img.naturalWidth / img.naturalHeight;
-                
-                // If the image is portrait (taller than wide)
-                if (imgRatio < 0.8) {
-                    img.style.maxHeight = '500px';
-                    img.style.maxWidth = '80%';
-                }
-                // If the image is landscape or square
-                else {
-                    img.style.maxWidth = '95%';
-                    img.style.maxHeight = '95%';
-                }
-            } else {
-                // If not loaded yet, wait for it to load
-                img.onload = function() {
-                    adjustImageSize();
-                };
+            // Setup autoplay if needed
+            if (window.autoplayEnabled) {
+                clearInterval(window.autoplayInterval);
             }
+            
+            window.autoplayEnabled = false; // Set to true to enable autoplay
+            window.autoplayInterval = null;
+            window.autoplayDelay = 5000; // 5 seconds
+            
+            if (window.autoplayEnabled) {
+                startAutoplay();
+            }
+            
+            // Setup touch events for mobile
+            const mainImageContainer = document.querySelector('.main-image-container');
+            if (mainImageContainer) {
+                let touchStartX = 0;
+                let touchEndX = 0;
+                
+                mainImageContainer.addEventListener('touchstart', function(e) {
+                    touchStartX = e.changedTouches[0].screenX;
+                });
+                
+                mainImageContainer.addEventListener('touchend', function(e) {
+                    touchEndX = e.changedTouches[0].screenX;
+                    handleSwipe();
+                });
+                
+                function handleSwipe() {
+                    const swipeThreshold = 50; // Minimum distance for swipe detection
+                    if (touchEndX < touchStartX - swipeThreshold) {
+                        // Swipe left - next slide
+                        nextSlide();
+                    } else if (touchEndX > touchStartX + swipeThreshold) {
+                        // Swipe right - previous slide
+                        prevSlide();
+                    }
+                }
+            }
+            
+            // Preload images
+            preloadImages();
+            
+            updateSliderUI();
+        }
+        
+        function startAutoplay() {
+            if (window.autoplayInterval) {
+                clearInterval(window.autoplayInterval);
+            }
+            
+            window.autoplayInterval = setInterval(() => {
+                nextSlide();
+            }, window.autoplayDelay);
+        }
+        
+        function stopAutoplay() {
+            if (window.autoplayInterval) {
+                clearInterval(window.autoplayInterval);
+                window.autoplayInterval = null;
+            }
+        }
+        
+        function preloadImages() {
+            window.sliderImages.forEach((src) => {
+                const img = new Image();
+                img.src = src;
+            });
+        }
+        
+        // Functions for image slider
+        function changeSlide(index) {
+            if (index < 0 || index >= window.totalSlides) return;
+            
+            // Reset autoplay if user interacts
+            if (window.autoplayEnabled) {
+                stopAutoplay();
+                startAutoplay();
+            }
+            
+            window.currentSlide = index;
+            updateSliderUI();
+        }
+        
+        function nextSlide() {
+            window.currentSlide = (window.currentSlide + 1) % window.totalSlides;
+            updateSliderUI();
+        }
+        
+        function prevSlide() {
+            window.currentSlide = (window.currentSlide - 1 + window.totalSlides) % window.totalSlides;
+            updateSliderUI();
+        }
+        
+        function updateSliderUI() {
+            // Update main image
+            const mainImage = document.getElementById('mainProductImg');
+            if (!mainImage) return;
+            
+            mainImage.src = window.sliderImages[window.currentSlide];
+            
+            // Remove fade class and re-add it to restart animation
+            mainImage.classList.remove('fade');
+            void mainImage.offsetWidth; // Trigger reflow
+            mainImage.classList.add('fade');
+            
+            // Update thumbnails
+            const thumbnails = document.querySelectorAll('.image-thumbnail');
+            thumbnails.forEach((thumb, index) => {
+                if (index === window.currentSlide) {
+                    thumb.classList.add('active');
+                } else {
+                    thumb.classList.remove('active');
+                }
+            });
         }
         
         // Function to navigate to edit product page

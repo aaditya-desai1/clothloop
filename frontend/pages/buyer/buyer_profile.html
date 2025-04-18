@@ -718,13 +718,78 @@
                 margin-bottom: 15px;
             }
         }
+
+        /* Login link a:hover::after */
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 1s ease-out;
+        }
+
+        .fade-in-delay-1 {
+            animation: fadeIn 1.5s ease-out;
+        }
+
+        .fade-in-delay-2 {
+            animation: fadeIn 2s ease-out;
+        }
+
+        /* Footer Styles */
+        .footer {
+            background-color: var(--footer-bg);
+            color: var(--footer-text);
+            padding: 1rem 0 1rem;
+            clip-path: polygon(0 10%, 100% 0, 100% 100%, 0 100%);
+            padding-top: 1rem !important;
+            margin-top: auto;
+            width: 100%;
+        }
+
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem 0;
+            border-top: none;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .footer-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--accent-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        @media (max-width: 500px) {
+            .container {
+                width: 90%;
+                padding: 1.5rem;
+            }
+        }
     </style>
 </head>
 <body>
     <!-- Navigation -->
     <nav>
         <a href="buyer_dashboard.html" class="logo">
-            <i class="fas fa-recycle"></i> ClothLoop
+            <img src="../../assets/images/logo_f.png" alt="ClothLoop Logo" style="height: 40px; margin-right: 10px;"> ClothLoop
         </a>
         <div style="display: flex; align-items: center;">
             <ul>
@@ -885,14 +950,12 @@
     </main>
 
     <!-- Footer -->
-    <footer class="footer" style="background-color: var(--footer-bg); color: var(--footer-text); padding: 1rem 0; margin-top: 50px; text-align: center;">
-        <div style="max-width: 1200px; margin: 0 auto; padding: 1rem 2rem;">
-            <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 0.5rem;">
-                <span style="font-size: 1.8rem; font-weight: 700; letter-spacing: 3px; text-transform: uppercase;">
-                    <i class="fas fa-recycle" style="margin-right: 10px; color: var(--accent-color);"></i> ClothLoop
-                </span>
+    <footer class="footer">
+        <div class="footer-bottom">
+            <div class="footer-logo">
+                <img src="../../assets/images/logo_f.png" alt="ClothLoop Logo" style="height: 40px; margin-right: 10px;"> ClothLoop
             </div>
-            <p style="font-size: 0.9rem;">&copy; 2024 ClothLoop. All rights reserved.</p>
+            <p>&copy; 2024 ClothLoop. All rights reserved.</p>
         </div>
     </footer>
     

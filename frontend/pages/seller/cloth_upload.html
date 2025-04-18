@@ -80,65 +80,10 @@
             transform: skewX(-5deg);
             box-shadow: 3px 3px 0 rgba(128, 128, 128, 0.3);
         }
-
-        /* Navigation */
-        nav {
-            background-color: var(--primary-color);
-            padding: 1.2rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 1px 3px rgba(255, 255, 255, 0.1);
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-        }
-
-        nav .logo {
-            color: var(--accent-color);
-            font-size: 1.8rem;
-            font-weight: 700;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-        }
-
-        nav .logo i {
-            margin-right: 10px;
-        }
-
-        nav ul {
-            display: flex;
-            list-style: none;
-        }
-
-        nav ul li {
-            margin-left: 1.5rem;
-        }
-
-        nav ul li a {
-            color: var(--accent-color);
-            text-decoration: none;
-            padding: 0.5rem 1rem;
-            border-radius: 0;
-            transition: all 0.2s linear;
-            font-weight: 500;
-            border-bottom: 2px solid transparent;
-        }
-
-        nav ul li a:hover, nav ul li a.active {
-            background-color: transparent;
-            color: var(--accent-color);
-            border-bottom: 2px solid var(--accent-color);
-        }
         
         .page-container {
             max-width: 1200px;
-            margin: 120px auto 30px;
+            margin: 30px auto;
             padding: 0 20px;
         }
         
@@ -573,33 +518,18 @@
     </style>
 </head>
 <body>
-    <!-- Navigation -->
-    <nav>
-        <a href="../../home.html" class="logo">
-            <i class="fas fa-recycle"></i> ClothLoop
-        </a>
-        <div style="display: flex; align-items: center;">
-            <ul>
-                <li><a href="seller_dashboard.html">Dashboard</a></li>
-                <li><a href="product_listings.html">Listings</a></li>
-                <li><a href="seller_reviews.html">Reviews</a></li>
-                <li><a href="seller_profile.html">Profile</a></li>
-                <li><a href="../about/about_us.html">About</a></li>
-                <li><a href="../account/login.html">Logout</a></li>
-            </ul>
-            <button class="theme-switcher" id="theme-toggle" aria-label="Toggle theme">
-                <i class="fas fa-sun"></i>
-            </button>
-        </div>
-    </nav>
-
     <div class="page-container">
         <!-- Page Header -->
         <div class="page-header">
             <h1 class="page-title">Add New Product</h1>
-            <a href="product_listings.html" class="back-button">
-                <i class="fas fa-arrow-left"></i> Back to Listings
-            </a>
+            <div style="display: flex; align-items: center;">
+                <a href="product_listings.html" class="back-button">
+                    <i class="fas fa-arrow-left"></i> Back to Listings
+                </a>
+                <button class="theme-switcher" id="theme-toggle" aria-label="Toggle theme" style="margin-left: 15px;">
+                    <i class="fas fa-sun"></i>
+                </button>
+            </div>
         </div>
         
         <!-- Alert Messages -->
