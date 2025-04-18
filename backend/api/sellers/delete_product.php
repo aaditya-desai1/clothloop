@@ -49,9 +49,10 @@ try {
     
     // Check if product exists and belongs to this seller
     $stmt = $db->prepare("
-        SELECT id, image_url 
-        FROM products 
-        WHERE id = :id AND seller_id = :seller_id
+        SELECT p.id
+        FROM products p
+        LEFT JOIN product_images pi ON p.id = pi.product_id AND pi.is_primary = TRUE
+        WHERE p.id = :id AND p.seller_id = :seller_id
     ");
     $stmt->bindParam(':id', $productId);
     $stmt->bindParam(':seller_id', $sellerId);
@@ -67,15 +68,29 @@ try {
     $db->beginTransaction();
     
     // Delete related records first (maintain referential integrity)
-    // Delete customer interests for this product
-    $stmt = $db->prepare("DELETE FROM customer_interests WHERE product_id = :product_id");
+    
+    // Delete product images
+    $stmt = $db->prepare("DELETE FROM product_images WHERE product_id = :product_id");
     $stmt->bindParam(':product_id', $productId);
     $stmt->execute();
     
-    // Delete product reviews
-    $stmt = $db->prepare("DELETE FROM product_reviews WHERE product_id = :product_id");
-    $stmt->bindParam(':product_id', $productId);
-    $stmt->execute();
+    // Delete customer interests for this product if the table exists
+    $checkInterestsTable = $db->prepare("SHOW TABLES LIKE 'customer_interests'");
+    $checkInterestsTable->execute();
+    if ($checkInterestsTable->rowCount() > 0) {
+        $stmt = $db->prepare("DELETE FROM customer_interests WHERE product_id = :product_id");
+        $stmt->bindParam(':product_id', $productId);
+        $stmt->execute();
+    }
+    
+    // Delete product reviews if the table exists
+    $checkReviewsTable = $db->prepare("SHOW TABLES LIKE 'product_reviews'");
+    $checkReviewsTable->execute();
+    if ($checkReviewsTable->rowCount() > 0) {
+        $stmt = $db->prepare("DELETE FROM product_reviews WHERE product_id = :product_id");
+        $stmt->bindParam(':product_id', $productId);
+        $stmt->execute();
+    }
     
     // Finally delete the product
     $stmt = $db->prepare("DELETE FROM products WHERE id = :id AND seller_id = :seller_id");
@@ -85,14 +100,6 @@ try {
     
     // Commit transaction
     $db->commit();
-    
-    // Delete product image if it exists
-    if (!empty($product['image_url'])) {
-        $imagePath = __DIR__ . '/../../../' . $product['image_url'];
-        if (file_exists($imagePath)) {
-            unlink($imagePath);
-        }
-    }
     
     // Return success response
     Response::success('Product deleted successfully');
