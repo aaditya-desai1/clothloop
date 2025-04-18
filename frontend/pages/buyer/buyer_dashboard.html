@@ -1185,7 +1185,8 @@
     <!-- Product Template -->
     <template id="product-template">
         <div class="product-card">
-            <img class="product-image" src="" alt="Product Image" loading="lazy">
+            <img class="product-image" src="" alt="Product Image" loading="lazy" 
+                 onerror="this.onerror=null; this.src='../../assets/images/placeholder.png';">
             <div class="product-details">
                 <h3 class="product-title">Product Title</h3>
                 <div class="product-price">₹0/day</div>
@@ -1258,16 +1259,20 @@
                     const seller = productCard.querySelector('.product-seller');
                     const image = productCard.querySelector('.product-image');
                     
-                    const productInfo = {
+                    // Construct product object
+                    const productObj = {
                         id: productId,
                         title: title ? title.textContent : 'Product',
                         price: price ? price.textContent.replace('₹', '').replace('/day', '').trim() : '0',
-                        seller: seller ? seller.textContent : 'Seller',
-                        image: image ? image.src : ''
+                        seller: seller ? seller.textContent : 'Seller'
                     };
                     
+                    // Always use the direct image API for reliable image access
+                    const imageUrl = `/ClothLoop/backend/api/products/direct_image.php?id=${productId}`;
+                    productObj.image = imageUrl;
+                    
                     // Add to wishlist
-                    addToWishlist(productId, productInfo);
+                    addToWishlist(productId, productObj);
                     showNotification('Added to wishlist!');
                 } else {
                     // Change to outline heart
@@ -1383,6 +1388,7 @@
                 const productId = detailsLink && detailsLink.href ? 
                     (detailsLink.href.split('id=')[1] ? detailsLink.href.split('id=')[1].split('&')[0] : '1') : '1';
                 const heartIcon = button.querySelector('i');
+                
                 
                 // Set initial state
                 if (isInWishlist(productId)) {
@@ -1886,6 +1892,42 @@
             showNotification(message);
         }
         
+        // Helper function to get product image URL
+        function getProductImageUrl(product) {
+            if (!product) return '../../assets/images/placeholder.png';
+            
+            // Use the direct image API as primary source if we have an ID
+            if (product.id) {
+                return `/ClothLoop/backend/api/products/direct_image.php?id=${product.id}`;
+            }
+            
+            // Try standard image fields
+            if (product.primary_image) {
+                return product.primary_image.startsWith('/') || product.primary_image.startsWith('http') 
+                    ? product.primary_image 
+                    : `/ClothLoop/${product.primary_image}`;
+            }
+            
+            if (product.image_path) {
+                return product.image_path.startsWith('/') || product.image_path.startsWith('http') 
+                    ? product.image_path 
+                    : `/ClothLoop/${product.image_path}`;
+            }
+            
+            if (product.image_url) {
+                return product.image_url;
+            }
+            
+            if (product.image) {
+                return product.image.startsWith('/') || product.image.startsWith('http') 
+                    ? product.image 
+                    : `/ClothLoop/${product.image}`;
+            }
+            
+            // Final fallback to placeholder
+            return '../../assets/images/placeholder.png';
+        }
+
         // Function to render products in grid
         function renderProducts(products) {
             const productGrid = document.getElementById('productGrid');
@@ -1946,40 +1988,25 @@
                     // Set link to details page
                     detailsLink.href = `details.html?id=${product.id}`;
                     
-                    // Handle product image with multiple fallbacks
-                    if (product.primary_image) {
-                        // Primary image from the product_images table
-                        image.src = `/ClothLoop/${product.primary_image}`;
-                        console.log(`Setting image for product ${product.id} from primary_image:`, product.primary_image);
-                    } else if (product.image_path) {
-                        // Direct image path
-                        image.src = `/ClothLoop/${product.image_path}`;
-                        console.log(`Setting image for product ${product.id} from image_path:`, product.image_path);
-                    } else if (product.image_url) {
-                        // Image URL
-                        image.src = product.image_url;
-                        console.log(`Setting image for product ${product.id} from image_url:`, product.image_url);
-                    } else {
-                        // Universal fallback
-                        image.src = `/ClothLoop/backend/api/image_display.php?type=product&id=${product.id}`;
-                        console.log(`Setting image for product ${product.id} from API endpoint`);
-                    }
+                    // Set image using our helper function
+                    image.src = getProductImageUrl(product);
+                    console.log(`Setting image for product ${product.id} to ${image.src}`);
                     
                     // Handle image loading errors
                     image.onerror = function() {
                         console.log(`Image load error for product ${product.id}, trying fallback`);
                         
-                        // First fallback
                         this.onerror = function() {
-                            // Second fallback
-                            this.onerror = function() {
-                                // Final fallback - placeholder
-                                this.src = 'https://via.placeholder.com/300x400/111111/ffffff?text=Product+Image';
-                                console.log(`Using placeholder for product ${product.id}`);
-                            };
-                            this.src = `/ClothLoop/frontend/assets/images/Clothify.png`;
+                            console.log(`Second image load error for product ${product.id}, using placeholder`);
+                            this.src = '../../assets/images/placeholder.png';
                         };
-                        this.src = `/ClothLoop/backend/api/products/direct_image.php?product_id=${product.id}`;
+                        
+                        // Try a direct path to product folder
+                        if (product.id) {
+                            this.src = `/ClothLoop/backend/uploads/products/${product.id}/${product.id}.jpg`;
+                        } else {
+                            this.src = '../../assets/images/placeholder.png';
+                        }
                     };
                     
                     // Check if product is in wishlist

@@ -626,7 +626,7 @@
                                 rental_price: product.rental_price || product.price || 0,
                                 seller_id: product.seller_id || 0,
                                 shop_name: product.shop_name || product.seller_name || 'ClothLoop Seller',
-                                image: product.primary_image || '../../assets/images/placeholder.png'
+                                image: formatImagePath(product.primary_image, product.id)
                             };
                             
                             // Create wishlist item element
@@ -726,7 +726,10 @@
                     if (savedProduct) {
                         const productInfo = JSON.parse(savedProduct);
                         productTitle = productInfo.title || productTitle;
-                        productImage = productInfo.image || productImage;
+                        
+                        // Use the formatImagePath helper
+                        productImage = formatImagePath(productInfo.image, id);
+                        
                         productDetails = `
                             <p class="wishlist-price">₹${productInfo.price || '0'} / day</p>
                             <p class="wishlist-seller">${productInfo.seller || 'ClothLoop Seller'}</p>
@@ -817,6 +820,35 @@
         document.addEventListener('DOMContentLoaded', function() {
             loadWishlistItems();
         });
+
+        // Function to format image paths correctly
+        function formatImagePath(imagePath, productId) {
+            // First try the direct image API
+            if (productId) {
+                return `/ClothLoop/backend/api/products/direct_image.php?id=${productId}`;
+            }
+            
+            // If no product ID, fall back to other methods
+            if (!imagePath) {
+                return '../../assets/images/placeholder.png';
+            }
+            
+            // Check if path is already absolute or relative
+            if (imagePath.startsWith('http') || imagePath.startsWith('/')) {
+                return imagePath;
+            } 
+            
+            // Fix the path by prepending backend path if needed
+            if (!imagePath.includes('/backend/')) {
+                if (imagePath.includes('uploads/')) {
+                    return `/ClothLoop/backend/${imagePath}`;
+                } else {
+                    return `/ClothLoop/backend/uploads/products/${imagePath}`;
+                }
+            } else {
+                return `/ClothLoop/${imagePath}`;
+            }
+        }
     </script>
 </body>
 </html>
