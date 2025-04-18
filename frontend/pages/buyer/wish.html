@@ -405,7 +405,7 @@
                 <li><a href="wish.html" class="active">Wishlist</a></li>
                 <li><a href="buyer_profile.html">Profile</a></li>
                 <li><a href="../about/about_us.html">About</a></li>
-                <li><a href="../account/login.html">Logout</a></li>
+                <li><a href="../account/login.html" id="logout-link">Logout</a></li>
             </ul>
             <button class="theme-switcher" id="theme-toggle" aria-label="Toggle theme">
                 <i class="fas fa-sun"></i>
@@ -419,58 +419,7 @@
 
         <div id="wishlist-container">
             <div class="wishlist-grid" id="wishlist-grid">
-                <!-- Static placeholder wishlist items -->
-                <div class="wishlist-item" style="animation-delay: 0.1s;">
-                    <img src="https://images.unsplash.com/photo-1599447292180-45fd84092ef0?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=774&q=80" alt="Denim Jacket" class="wishlist-img">
-                    <div class="wishlist-details">
-                        <h3 class="wishlist-title">Denim Jacket</h3>
-                        <p class="wishlist-price">₹150 / day</p>
-                        <p class="wishlist-seller">Urban Styles</p>
-                        <div class="wishlist-actions">
-                            <a href="#" class="view-btn">View Details</a>
-                            <button class="remove-btn" data-product-id="static1">Remove</button>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="wishlist-item" style="animation-delay: 0.2s;">
-                    <img src="https://images.unsplash.com/photo-1595777457583-95e059d581b8?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=783&q=80" alt="Floral Dress" class="wishlist-img">
-                    <div class="wishlist-details">
-                        <h3 class="wishlist-title">Floral Dress</h3>
-                        <p class="wishlist-price">₹120 / day</p>
-                        <p class="wishlist-seller">Fashion Forward</p>
-                        <div class="wishlist-actions">
-                            <a href="#" class="view-btn">View Details</a>
-                            <button class="remove-btn" data-product-id="static2">Remove</button>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="wishlist-item" style="animation-delay: 0.3s;">
-                    <img src="https://images.unsplash.com/photo-1593032465175-481ac7f401a0?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=870&q=80" alt="Formal Suit" class="wishlist-img">
-                    <div class="wishlist-details">
-                        <h3 class="wishlist-title">Formal Suit</h3>
-                        <p class="wishlist-price">₹300 / day</p>
-                        <p class="wishlist-seller">Elite Rentals</p>
-                        <div class="wishlist-actions">
-                            <a href="#" class="view-btn">View Details</a>
-                            <button class="remove-btn" data-product-id="static3">Remove</button>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="wishlist-item" style="animation-delay: 0.4s;">
-                    <img src="https://images.unsplash.com/photo-1596755094514-f87e34085b2c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=776&q=80" alt="Summer Collection" class="wishlist-img">
-                    <div class="wishlist-details">
-                        <h3 class="wishlist-title">Summer Collection</h3>
-                        <p class="wishlist-price">₹180 / day</p>
-                        <p class="wishlist-seller">Seasonal Trends</p>
-                        <div class="wishlist-actions">
-                            <a href="#" class="view-btn">View Details</a>
-                            <button class="remove-btn" data-product-id="static4">Remove</button>
-                        </div>
-                    </div>
-                </div>
+                <!-- Dynamic wishlist items will be loaded here -->
             </div>
             
             <!-- Empty wishlist message (hidden by default) -->
@@ -524,6 +473,23 @@
                 let wishlistIds = [];
                 try {
                     wishlistIds = JSON.parse(localStorage.getItem(wishlistKey) || '[]');
+                    
+                    // Check the old format from details.html
+                    const oldWishlist = JSON.parse(localStorage.getItem('clothloop-wishlist') || '[]');
+                    if (oldWishlist.length > 0) {
+                        console.log(`Found ${oldWishlist.length} items in old wishlist format, merging`);
+                        // Extract IDs from old format (which might be objects or strings)
+                        const oldIds = oldWishlist.map(item => typeof item === 'object' ? item.id.toString() : item.toString());
+                        
+                        // Merge the lists without duplicates
+                        const mergedIds = [...new Set([...wishlistIds, ...oldIds])];
+                        wishlistIds = mergedIds;
+                        
+                        // Save back to the new format and clear old format
+                        localStorage.setItem(wishlistKey, JSON.stringify(wishlistIds));
+                        localStorage.removeItem('clothloop-wishlist');
+                    }
+                    
                     // Ensure all IDs are strings for consistent comparison
                     wishlistIds = wishlistIds.map(id => id.toString());
                     console.log(`getWishlistItems: Found ${wishlistIds.length} items in ${wishlistKey}`);
@@ -562,8 +528,27 @@
                 localStorage.setItem(wishlistKey, JSON.stringify(wishlist));
                 console.log(`removeFromWishlist: Updated wishlist has ${wishlist.length} items`);
                 
-                // Reload the wishlist
-                loadWishlistItems();
+                // Also update old format for compatibility with details.html page
+                try {
+                    let oldWishlist = JSON.parse(localStorage.getItem('clothloop-wishlist') || '[]');
+                    oldWishlist = oldWishlist.filter(item => {
+                        const itemId = typeof item === 'object' ? item.id.toString() : item.toString();
+                        return itemId !== productIdStr;
+                    });
+                    localStorage.setItem('clothloop-wishlist', JSON.stringify(oldWishlist));
+                } catch (e) {
+                    console.error(`Error updating old wishlist format: ${e.message}`);
+                }
+                
+                // Check if wishlist is now empty
+                if (wishlist.length === 0) {
+                    // Show empty wishlist message
+                    document.getElementById('wishlist-grid').style.display = 'none';
+                    document.getElementById('empty-wishlist').style.display = 'block';
+                } else {
+                    // Reload the wishlist
+                    loadWishlistItems();
+                }
             } catch (e) {
                 console.error(`Error in removeFromWishlist: ${e.message}`);
             }
@@ -574,47 +559,12 @@
             const wishlistGrid = document.getElementById('wishlist-grid');
             const emptyWishlist = document.getElementById('empty-wishlist');
             
-            // Check if user is logged in
-            const userId = localStorage.getItem('user_id');
-            const wishlistKey = userId ? `wishlist_${userId}` : 'wishlist';
-            
-            console.log(`loadWishlistItems: Using wishlist key: ${wishlistKey} for user ID: ${userId || 'guest'}`);
-            
             // Get wishlist product IDs
             const wishlistIds = getWishlistItems();
             console.log(`loadWishlistItems: Found ${wishlistIds.length} items in wishlist:`, wishlistIds);
             
-            // Add event listeners to static items' remove buttons
-            const staticRemoveButtons = document.querySelectorAll('.wishlist-item .remove-btn[data-product-id^="static"]');
-            staticRemoveButtons.forEach(button => {
-                if (!button.hasAttribute('listener')) {
-                    button.setAttribute('listener', 'true');
-                    button.addEventListener('click', function() {
-                        const item = this.closest('.wishlist-item');
-                        item.style.animation = 'fadeOut 0.3s forwards';
-                        setTimeout(() => {
-                            item.remove();
-                            // Check if grid is empty after removal
-                            if (wishlistGrid.children.length === 0) {
-                                wishlistGrid.style.display = 'none';
-                                emptyWishlist.style.display = 'block';
-                            }
-                        }, 300);
-                    });
-                }
-            });
-            
-            // If there are no saved wishlist items and no dynamic content to load,
-            // leave the static items as placeholders
+            // If there are no saved wishlist items, show empty message
             if (wishlistIds.length === 0) {
-                // If there are static items already displayed, keep them
-                if (staticRemoveButtons.length > 0) {
-                    wishlistGrid.style.display = 'grid';
-                    emptyWishlist.style.display = 'none';
-                    return;
-                }
-                
-                // Otherwise show empty wishlist message
                 wishlistGrid.style.display = 'none';
                 emptyWishlist.style.display = 'block';
                 return;
@@ -626,7 +576,10 @@
             
             // Add timestamp to prevent caching
             const timestamp = new Date().getTime();
-            const apiUrl = `/ClothLoop/backend/utils/product_operations.php?operation=fetch_all&user_type=buyer&timestamp=${timestamp}`;
+            const apiUrl = `/ClothLoop/backend/api/products/get_products.php?timestamp=${timestamp}`;
+            
+            // Clear the grid before adding new items
+            wishlistGrid.innerHTML = '';
             
             // Get all products from the API with cache-busting
             fetch(apiUrl, {
@@ -644,35 +597,36 @@
                     return response.json();
                 })
                 .then(data => {
-                    if (data.status === 'success') {
-                        // Clear the static placeholder items before adding dynamic content
-                        wishlistGrid.innerHTML = '';
-                        
-                        const products = data.products || [];
+                    if (data.status === 'success' && data.data && data.data.products) {
+                        const products = data.data.products || [];
                         
                         // Filter products to only include those in the wishlist
                         const wishlistProducts = products.filter(product => 
                             wishlistIds.includes(product.id.toString()));
                         
+                        // Check if we need to display fallback items
+                        let displayedIds = new Set();
+                        
                         if (wishlistProducts.length === 0) {
-                            // No matching products found
-                            wishlistGrid.style.display = 'none';
-                            emptyWishlist.style.display = 'block';
+                            // No products found in API, display fallback for all wishlist items
+                            displayFallbackItems(wishlistIds, wishlistGrid);
                             return;
                         }
                         
-                        // Display each wishlist product
+                        // Display each wishlist product from API response
                         wishlistProducts.forEach((product, index) => {
+                            displayedIds.add(product.id.toString());
+                            
                             // Map product properties for consistency
                             const mappedProduct = {
                                 id: product.id,
-                                title: product.title || product.cloth_title || '',
+                                title: product.title || product.name || '',
                                 description: product.description || '',
-                                category: product.category || '',
-                                rental_price: product.rental_price || product.rentalPrice || 0,
+                                category: product.category_name || '',
+                                rental_price: product.rental_price || product.price || 0,
                                 seller_id: product.seller_id || 0,
-                                shop_name: product.shop_name || 'ClothLoop Seller',
-                                image: product.image || '../../assets/images/placeholder.png'
+                                shop_name: product.shop_name || product.seller_name || 'ClothLoop Seller',
+                                image: product.primary_image || '../../assets/images/placeholder.png'
                             };
                             
                             // Create wishlist item element
@@ -719,55 +673,101 @@
                                 }, 300);
                             });
                         });
+                        
+                        // Display fallback items for IDs we didn't find in the API
+                        const missingIds = wishlistIds.filter(id => !displayedIds.has(id));
+                        if (missingIds.length > 0) {
+                            displayFallbackItems(missingIds, wishlistGrid);
+                        }
                     } else {
-                        console.error('Error fetching products:', data.message);
-                        wishlistGrid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: var(--accent-color);">Error loading wishlist items</p>`;
+                        console.error('Error fetching products:', data.message || 'Invalid response format');
+                        displayFallbackItems(wishlistIds, wishlistGrid);
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    // Don't clear static items when API fails, just show the error message
-                    wishlistGrid.innerHTML = `
-                        ${wishlistGrid.innerHTML}
-                        <p style="grid-column: 1/-1; text-align: center; color: var(--accent-color); padding: 20px;">
-                            Error loading your wishlist items. Please try again later.
-                        </p>
-                    `;
                     
-                    // If there are no static items, try an alternative method
-                    if (document.querySelectorAll('.wishlist-item').length === 0) {
-                        try {
-                            // Display wishlist items from localStorage only as a fallback
-                            const wishlistIds = getWishlistItems();
-                            if (wishlistIds.length > 0) {
-                                wishlistIds.forEach(id => {
-                                    const wishlistItem = document.createElement('div');
-                                    wishlistItem.className = 'wishlist-item';
-                                    wishlistItem.innerHTML = `
-                                        <div class="wishlist-details">
-                                            <h3 class="wishlist-title">Wishlist Item #${id}</h3>
-                                            <p class="wishlist-seller">Item details unavailable</p>
-                                            <div class="wishlist-actions">
-                                                <button class="remove-btn" data-product-id="${id}">Remove</button>
-                                            </div>
-                                        </div>
-                                    `;
-                                    wishlistGrid.appendChild(wishlistItem);
-                                    
-                                    // Add event listener to remove button
-                                    const removeBtn = wishlistItem.querySelector('.remove-btn');
-                                    removeBtn.addEventListener('click', function() {
-                                        removeFromWishlist(id);
-                                    });
-                                });
-                                wishlistGrid.style.display = 'grid';
-                                emptyWishlist.style.display = 'none';
-                            }
-                        } catch (fallbackError) {
-                            console.error('Fallback error:', fallbackError);
-                        }
-                    }
+                    // Create error message
+                    const errorMessage = document.createElement('div');
+                    errorMessage.style.gridColumn = '1/-1';
+                    errorMessage.style.textAlign = 'center';
+                    errorMessage.style.padding = '20px';
+                    errorMessage.style.color = 'var(--accent-color)';
+                    errorMessage.style.marginBottom = '20px';
+                    errorMessage.innerHTML = `
+                        <p>Error loading your wishlist items.</p>
+                        <p>Please try again later or refresh the page.</p>
+                    `;
+                    wishlistGrid.appendChild(errorMessage);
+                    
+                    // Display fallback items
+                    displayFallbackItems(wishlistIds, wishlistGrid);
                 });
+        }
+        
+        // Function to display fallback items for wishlist IDs
+        function displayFallbackItems(ids, container) {
+            if (!ids || ids.length === 0) {
+                // Empty wishlist
+                container.style.display = 'none';
+                document.getElementById('empty-wishlist').style.display = 'block';
+                return;
+            }
+            
+            ids.forEach((id, index) => {
+                // Try to get product info from localStorage
+                let productTitle = `Wishlist Item #${id}`;
+                let productDetails = '';
+                let productImage = '../../assets/images/placeholder.png';
+                
+                try {
+                    // Check if we have product details in localStorage
+                    const savedProduct = localStorage.getItem(`product_${id}`);
+                    if (savedProduct) {
+                        const productInfo = JSON.parse(savedProduct);
+                        productTitle = productInfo.title || productTitle;
+                        productImage = productInfo.image || productImage;
+                        productDetails = `
+                            <p class="wishlist-price">₹${productInfo.price || '0'} / day</p>
+                            <p class="wishlist-seller">${productInfo.seller || 'ClothLoop Seller'}</p>
+                        `;
+                    }
+                } catch (e) {
+                    console.error('Error parsing saved product info:', e);
+                }
+                
+                const wishlistItem = document.createElement('div');
+                wishlistItem.className = 'wishlist-item';
+                wishlistItem.style.animationDelay = `${0.1 * index}s`;
+                
+                wishlistItem.innerHTML = `
+                    <img src="${productImage}" alt="${productTitle}" class="wishlist-img" onerror="this.src='../../assets/images/placeholder.png';">
+                    <div class="wishlist-details">
+                        <h3 class="wishlist-title">${productTitle}</h3>
+                        ${productDetails || '<p class="wishlist-seller">Item details unavailable</p>'}
+                        <div class="wishlist-actions">
+                            <button class="remove-btn" data-product-id="${id}">Remove</button>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(wishlistItem);
+                
+                // Add event listener to remove button
+                const removeBtn = wishlistItem.querySelector('.remove-btn');
+                removeBtn.addEventListener('click', function() {
+                    // Add animation before removing
+                    wishlistItem.style.animation = 'fadeOut 0.3s forwards';
+                    
+                    // Remove from wishlist after animation
+                    setTimeout(() => {
+                        removeFromWishlist(id);
+                    }, 300);
+                });
+            });
+            
+            container.style.display = 'grid';
+            document.getElementById('empty-wishlist').style.display = 'none';
         }
         
         // Function to handle logout
@@ -791,13 +791,12 @@
                     console.log(`handleLogout: Saved ${userWishlist.length} items to generic wishlist`);
                 }
                 
-                // Clear all localStorage items for complete cleanup
-                for (let key in localStorage) {
-                    if (key.startsWith('wishlist_') || key === 'user_id' || key === 'userId' || 
-                        key === 'userType' || key === 'username') {
-                        localStorage.removeItem(key);
-                    }
-                }
+                // Clear user-specific data
+                localStorage.removeItem(wishlistKey);
+                localStorage.removeItem('user_id');
+                localStorage.removeItem('userId');
+                localStorage.removeItem('userType');
+                localStorage.removeItem('username');
                 
                 console.log('handleLogout: User data cleared from localStorage');
             } catch (e) {
@@ -808,34 +807,14 @@
             window.location.href = '../account/login.html';
         }
         
+        // Add event listener to logout link
+        document.getElementById('logout-link').addEventListener('click', function(e) {
+            e.preventDefault();
+            handleLogout();
+        });
+        
         // Load wishlist items when the page loads
         document.addEventListener('DOMContentLoaded', function() {
-            // Add event listeners to static items first
-            const staticRemoveButtons = document.querySelectorAll('.wishlist-item .remove-btn[data-product-id^="static"]');
-            staticRemoveButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const item = this.closest('.wishlist-item');
-                    item.style.animation = 'fadeOut 0.3s forwards';
-                    setTimeout(() => {
-                        item.remove();
-                        // Check if grid is empty after removal
-                        const wishlistGrid = document.getElementById('wishlist-grid');
-                        const emptyWishlist = document.getElementById('empty-wishlist');
-                        if (wishlistGrid.children.length === 0) {
-                            wishlistGrid.style.display = 'none';
-                            emptyWishlist.style.display = 'block';
-                        }
-                    }, 300);
-                });
-            });
-            
-            // Initialize View Details links for static items
-            const staticViewButtons = document.querySelectorAll('.wishlist-item .view-btn');
-            staticViewButtons.forEach((button, index) => {
-                button.href = `details.html?id=static${index+1}&title=${encodeURIComponent(button.closest('.wishlist-item').querySelector('.wishlist-title').textContent)}&price=${encodeURIComponent(button.closest('.wishlist-item').querySelector('.wishlist-price').textContent.replace('₹', '').replace(' / day', ''))}&shop=${encodeURIComponent(button.closest('.wishlist-item').querySelector('.wishlist-seller').textContent)}`;
-            });
-            
-            // Then load dynamic wishlist items
             loadWishlistItems();
         });
     </script>

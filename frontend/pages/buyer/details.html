@@ -1023,52 +1023,60 @@
 
         // Add to wishlist function
         function addToWishlist() {
-            const params = getQueryParams();
-            const productId = params.id;
-            const wishlistButton = document.querySelector('.wishlist-button[onclick="addToWishlist()"]');
-            
-            // Get current wishlist from localStorage
-            let wishlist = JSON.parse(localStorage.getItem('clothloop-wishlist') || '[]');
-            
-            // Check if button is already in "added to wishlist" state
-            if (wishlistButton.textContent.trim() === 'ADDED TO WISHLIST') {
-                // Remove from wishlist
-                wishlist = wishlist.filter(item => {
-                    if (typeof item === 'object') return item.id != productId;
-                    return item != productId;
-                });
-                localStorage.setItem('clothloop-wishlist', JSON.stringify(wishlist));
+            try {
+                const wishlistButton = document.querySelector('.wishlist-button[onclick="addToWishlist()"]');
                 
-                // Toggle back to original state
-                wishlistButton.textContent = 'ADD TO WISHLIST';
-                wishlistButton.style.backgroundColor = 'transparent';
-                wishlistButton.style.color = 'var(--accent-color)';
+                // Get user-specific wishlist key
+                const userId = localStorage.getItem('user_id');
+                const wishlistKey = userId ? `wishlist_${userId}` : 'wishlist';
                 
-                // Show notification
-                showNotification('Removed from wishlist');
-                return;
+                // Get current wishlist from localStorage
+                let wishlist = JSON.parse(localStorage.getItem(wishlistKey) || '[]');
+                
+                // Get product ID from URL or data attribute
+                const urlParams = new URLSearchParams(window.location.search);
+                const productId = urlParams.get('id');
+                
+                if (!productId) {
+                    console.error('Product ID not found');
+                    return;
+                }
+                
+                // Check if button is already in "added to wishlist" state
+                if (wishlistButton.textContent.trim() === 'ADDED TO WISHLIST') {
+                    // Remove from wishlist
+                    wishlist = wishlist.filter(item => {
+                        const itemId = typeof item === 'object' ? item.id.toString() : item.toString();
+                        return itemId !== productId.toString();
+                    });
+                    
+                    localStorage.setItem(wishlistKey, JSON.stringify(wishlist));
+                    
+                    // Reset button text and style
+                    wishlistButton.textContent = 'ADD TO WISHLIST';
+                    wishlistButton.style.backgroundColor = 'transparent';
+                    wishlistButton.style.color = 'var(--accent-color)';
+                    
+                    // Show notification
+                    showNotification('Removed from wishlist');
+                } else {
+                    // Add to wishlist (store just the ID for consistency with dashboard)
+                    if (!wishlist.includes(productId.toString())) {
+                        wishlist.push(productId.toString());
+                        localStorage.setItem(wishlistKey, JSON.stringify(wishlist));
+                        
+                        // Update button text and style for "added to wishlist" state
+                        wishlistButton.textContent = 'ADDED TO WISHLIST';
+                        wishlistButton.style.backgroundColor = 'var(--accent-color)';
+                        wishlistButton.style.color = 'var(--primary-color)';
+                        
+                        // Show notification
+                        showNotification('Product added to wishlist!');
+                    }
+                }
+            } catch (error) {
+                console.error('Error in addToWishlist:', error);
             }
-            
-            // Get product details for wishlist
-            const productDetails = {
-                id: productId,
-                title: document.getElementById('clothTitle').textContent,
-                price: document.getElementById('clothPrice').textContent,
-                image: document.getElementById('mainProductImage').src,
-                seller: document.getElementById('shopName').textContent
-            };
-            
-            // Add to wishlist
-            wishlist.push(productDetails);
-            localStorage.setItem('clothloop-wishlist', JSON.stringify(wishlist));
-            
-            // Update button text and style for "added to wishlist" state
-            wishlistButton.textContent = 'ADDED TO WISHLIST';
-            wishlistButton.style.backgroundColor = 'var(--accent-color)';
-            wishlistButton.style.color = 'var(--primary-color)';
-            
-            // Show notification
-            showNotification('Product added to wishlist!');
         }
 
         // Function to open Google Maps with seller's location
@@ -1556,29 +1564,42 @@
             try {
                 if (!productId) return;
                 
-                // Try to get wishlist from localStorage
-                const wishlistData = localStorage.getItem('clothloop-wishlist');
-                let wishlist = [];
+                // Get user-specific wishlist key
+                const userId = localStorage.getItem('user_id');
+                const wishlistKey = userId ? `wishlist_${userId}` : 'wishlist';
                 
-                if (wishlistData) {
-                    try {
-                        wishlist = JSON.parse(wishlistData);
-                    } catch (e) {
-                        console.error('Error parsing wishlist data:', e);
-                        wishlist = [];
+                // Try to get wishlist from localStorage
+                let wishlist = [];
+                try {
+                    wishlist = JSON.parse(localStorage.getItem(wishlistKey) || '[]');
+                    
+                    // For backward compatibility, also check old wishlist format
+                    const oldWishlistData = localStorage.getItem('clothloop-wishlist');
+                    if (oldWishlistData) {
+                        const oldWishlist = JSON.parse(oldWishlistData);
+                        if (oldWishlist.length > 0) {
+                            // Extract IDs and add to current wishlist check
+                            oldWishlist.forEach(item => {
+                                const oldId = typeof item === 'object' ? item.id.toString() : item.toString();
+                                if (!wishlist.includes(oldId)) {
+                                    wishlist.push(oldId);
+                                }
+                            });
+                            
+                            // Save merged wishlist to new format
+                            localStorage.setItem(wishlistKey, JSON.stringify(wishlist));
+                        }
                     }
+                } catch (e) {
+                    console.error('Error parsing wishlist data:', e);
+                    wishlist = [];
                 }
                 
                 // Check if this product is in the wishlist
-                // Handle both array of IDs and array of objects formats
-                const isInWishlist = wishlist.some(item => {
-                    if (typeof item === 'object' && item !== null) {
-                        return item.id == productId;
-                    }
-                    return item == productId;
-                });
+                const productIdStr = productId.toString();
+                const isInWishlist = wishlist.includes(productIdStr);
                 
-                // Update the button state accordingly
+                // Update wishlist button appearance
                 const wishlistButton = document.querySelector('.wishlist-button[onclick="addToWishlist()"]');
                 if (wishlistButton) {
                     if (isInWishlist) {
@@ -1590,13 +1611,11 @@
                         wishlistButton.style.backgroundColor = 'transparent';
                         wishlistButton.style.color = 'var(--accent-color)';
                     }
-                    
-                    console.log('Updated wishlist button state, isInWishlist:', isInWishlist);
                 }
                 
+                console.log('Updated wishlist button state, isInWishlist:', isInWishlist);
             } catch (error) {
                 console.error('Error checking wishlist status:', error);
-                // Non-critical error, no need to show notification
             }
         }
 
