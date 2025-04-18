@@ -139,3 +139,21 @@ Files: Array
 )
 
 
+Request method: POST
+Data: Array
+(
+    [title] => Polo
+    [description] => Tri Color
+    [size] => XXXL
+    [category_id] => 17
+    [occasion] => Casual
+    [rental_price] => 899.00
+    [terms] => Do not Wash
+    [id] => 2
+)
+
+Files: Array
+(
+)
+
+
