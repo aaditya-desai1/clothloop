@@ -925,3 +925,85 @@ Seller Rows Affected: 1
 
 Transaction committed successfully
 
+Received POST data: {
+    "seller_id": "4",
+    "name": "Lorem Ipsum",
+    "email": "seller2@gmail.com",
+    "phone_no": "7896541230",
+    "shop_name": "Lorem Ipsum",
+    "description": "Rental shop"
+}
+
+Received FILES data: {
+    "profile_photo": {
+        "name": "download (1).png",
+        "full_path": "download (1).png",
+        "type": "image\/png",
+        "tmp_name": "C:\\xampp\\tmp\\phpD333.tmp",
+        "error": 0,
+        "size": 2965
+    }
+}
+
+Transaction started
+File uploaded successfully to: C:\xampp\htdocs\ClothLoop\backend\api\sellers/../../uploads/profile_photos/profile_68033734d339b.png as profile_68033734d339b.png
+User Update Query: UPDATE users SET name = ?, email = ?, phone_no = ?, profile_photo = ? WHERE id = ?
+User Params: ["Lorem Ipsum","seller2@gmail.com","7896541230","profile_68033734d339b.png",4]
+User Update Result: Success
+User Rows Affected: 1
+
+Seller Update Query: UPDATE sellers SET shop_name = ?, description = ? WHERE id = ?
+Seller Params: ["Lorem Ipsum","Rental shop",4]
+Seller Update Result: Success
+Seller Rows Affected: 1
+
+Transaction committed successfully
+
+Received POST data: {
+    "seller_id": "4",
+    "name": "Lorem Ipsum",
+    "email": "seller2@gmail.com",
+    "phone_no": "7896541230",
+    "shop_name": "Lorem Ipsum",
+    "description": "Rental shop",
+    "latitude": "21.1447217",
+    "longitude": "72.7717735"
+}
+
+Transaction started
+User Update Query: UPDATE users SET name = ?, email = ?, phone_no = ? WHERE id = ?
+User Params: ["Lorem Ipsum","seller2@gmail.com","7896541230",4]
+User Update Result: Success
+User Rows Affected: 0
+
+Seller Update Query: UPDATE sellers SET shop_name = ?, description = ?, latitude = ?, longitude = ? WHERE id = ?
+Seller Params: ["Lorem Ipsum","Rental shop","21.1447217","72.7717735",4]
+Seller Update Result: Success
+Seller Rows Affected: 1
+
+Transaction committed successfully
+
+Received POST data: {
+    "seller_id": "4",
+    "name": "Lorem Ipsum",
+    "email": "seller2@gmail.com",
+    "phone_no": "7896541230",
+    "shop_name": "Lorem Ipsum",
+    "description": "Rental shop",
+    "latitude": "21.14472170",
+    "longitude": "72.77177350"
+}
+
+Transaction started
+User Update Query: UPDATE users SET name = ?, email = ?, phone_no = ? WHERE id = ?
+User Params: ["Lorem Ipsum","seller2@gmail.com","7896541230",4]
+User Update Result: Success
+User Rows Affected: 0
+
+Seller Update Query: UPDATE sellers SET shop_name = ?, description = ?, latitude = ?, longitude = ? WHERE id = ?
+Seller Params: ["Lorem Ipsum","Rental shop","21.14472170","72.77177350",4]
+Seller Update Result: Success
+Seller Rows Affected: 0
+
+Transaction committed successfully
+
