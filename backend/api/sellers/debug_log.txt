@@ -728,3 +728,191 @@ Files: Array
 )
 
 
+Request method: POST
+Data: Array
+(
+    [title] => Polo
+    [description] => Tri Color
+    [size] => XL
+    [category_id] => 17
+    [occasion] => Casual
+    [rental_price] => 459.00
+    [terms] => Do not Wash
+    [id] => 5
+    [update_images] => true
+)
+
+Files: Array
+(
+    [images] => Array
+        (
+            [name] => Array
+                (
+                    [0] => Screenshot (53).png
+                )
+
+            [full_path] => Array
+                (
+                    [0] => Screenshot (53).png
+                )
+
+            [type] => Array
+                (
+                    [0] => image/png
+                )
+
+            [tmp_name] => Array
+                (
+                    [0] => C:\xampp\tmp\php9C46.tmp
+                )
+
+            [error] => Array
+                (
+                    [0] => 0
+                )
+
+            [size] => Array
+                (
+                    [0] => 466503
+                )
+
+        )
+
+    [clothImage] => Array
+        (
+            [name] => Screenshot (53).png
+            [full_path] => Screenshot (53).png
+            [type] => image/png
+            [tmp_name] => C:\xampp\tmp\php9C47.tmp
+            [error] => 0
+            [size] => 466503
+        )
+
+)
+
+
+Request method: POST
+Data: Array
+(
+    [title] => abc
+    [description] => cxy
+    [size] => M
+    [category_id] => 19
+    [occasion] => Formal
+    [rental_price] => 23
+    [terms] => cv
+    [update_images] => true
+)
+
+Files: Array
+(
+    [images] => Array
+        (
+            [name] => Array
+                (
+                    [0] => Screenshot (53).png
+                )
+
+            [full_path] => Array
+                (
+                    [0] => Screenshot (53).png
+                )
+
+            [type] => Array
+                (
+                    [0] => image/png
+                )
+
+            [tmp_name] => Array
+                (
+                    [0] => C:\xampp\tmp\php7368.tmp
+                )
+
+            [error] => Array
+                (
+                    [0] => 0
+                )
+
+            [size] => Array
+                (
+                    [0] => 466503
+                )
+
+        )
+
+    [clothImage] => Array
+        (
+            [name] => Screenshot (53).png
+            [full_path] => Screenshot (53).png
+            [type] => image/png
+            [tmp_name] => C:\xampp\tmp\php7369.tmp
+            [error] => 0
+            [size] => 466503
+        )
+
+)
+
+
+Request method: POST
+Data: Array
+(
+    [title] => abc
+    [description] => cxy
+    [size] => M
+    [category_id] => 19
+    [occasion] => Formal
+    [rental_price] => 23.00
+    [terms] => cv
+    [id] => 6
+    [update_images] => true
+)
+
+Files: Array
+(
+    [images] => Array
+        (
+            [name] => Array
+                (
+                    [0] => p3.jpg
+                )
+
+            [full_path] => Array
+                (
+                    [0] => p3.jpg
+                )
+
+            [type] => Array
+                (
+                    [0] => image/jpeg
+                )
+
+            [tmp_name] => Array
+                (
+                    [0] => C:\xampp\tmp\phpB57C.tmp
+                )
+
+            [error] => Array
+                (
+                    [0] => 0
+                )
+
+            [size] => Array
+                (
+                    [0] => 63982
+                )
+
+        )
+
+    [clothImage] => Array
+        (
+            [name] => p3.jpg
+            [full_path] => p3.jpg
+            [type] => image/jpeg
+            [tmp_name] => C:\xampp\tmp\phpB57D.tmp
+            [error] => 0
+            [size] => 63982
+        )
+
+)
+
+

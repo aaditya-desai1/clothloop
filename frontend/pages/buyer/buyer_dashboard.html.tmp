@@ -2178,6 +2178,52 @@
             showNotification(message);
         }
         
+        // Helper function to load product images with proper fallbacks
+        function loadProductImage(imageElement, product) {
+            if (!product || !product.id || !imageElement) {
+                console.error('Invalid product or image element');
+                imageElement.src = '../../assets/images/placeholder.png';
+                return;
+            }
+            
+            console.log(`Loading image for product ${product.id}`);
+            
+            // Set up a chain of fallbacks to try different image sources
+            const fallbacks = [
+                // Direct image API - most reliable
+                `/ClothLoop/backend/api/products/direct_image.php?product_id=${product.id}`,
+                // General image getter API
+                `/ClothLoop/backend/api/getimage.php?product_id=${product.id}`,
+                // Image checker API
+                `/ClothLoop/backend/api/check_product_images.php?product_id=${product.id}`,
+                // Direct folder path with standard filename
+                `/ClothLoop/backend/uploads/products/${product.id}/${product.id}.jpg`,
+                // Direct folder path with alternative name
+                `/ClothLoop/backend/uploads/products/${product.id}/product_image.jpg`,
+                // Placeholder as final fallback
+                '../../assets/images/placeholder.png'
+            ];
+            
+            // Try the first source
+            let currentIndex = 0;
+            imageElement.src = fallbacks[currentIndex];
+            console.log(`Trying image source [${currentIndex}]: ${fallbacks[currentIndex]}`);
+            
+            // Set up the error handler to try each fallback in sequence
+            imageElement.onerror = function() {
+                currentIndex++;
+                if (currentIndex < fallbacks.length) {
+                    console.log(`Trying fallback [${currentIndex}]: ${fallbacks[currentIndex]}`);
+                    this.src = fallbacks[currentIndex];
+                } else {
+                    // We've tried all fallbacks
+                    console.error(`All image sources failed for product ${product.id}`);
+                    this.src = '../../assets/images/placeholder.png';
+                    this.onerror = null; // Prevent further errors
+                }
+            };
+        }
+        
         // Function to render products in grid
         function renderProducts(products) {
             const productGrid = document.getElementById('productGrid');
@@ -2293,7 +2339,7 @@
                             this.onerror = function() {
                                 console.error('All fallbacks failed, using placeholder');
                                 this.src = '../../assets/images/placeholder.png';
-                                this.onerror = null; // Prevent further errors
+                                this.onerror = null; // Prevent infinite error handling
                             };
                             
                             // Try conventional image path
@@ -2420,7 +2466,7 @@
             }
         });
 
-        // Helper function to animate elements with error handling
+        // Function to safely animate elements with error handling
         function animateNumbers() {
             try {
                 const items = document.querySelectorAll('.product-card');
@@ -2458,7 +2504,7 @@
             if (product.id) {
                 // Ensure ID is a string to avoid any type issues
                 const productId = typeof product.id === 'string' ? product.id : String(product.id);
-                return `/ClothLoop/backend/api/products/direct_image.php?product_id=${productId}`;
+                return `/ClothLoop/backend/api/products/direct_image.php?id=${productId}`;
             }
             
             // Try standard image fields

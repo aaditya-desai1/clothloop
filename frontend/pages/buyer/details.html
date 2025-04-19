@@ -1424,7 +1424,7 @@
             if (product.id) {
                 // Ensure ID is a string to avoid any type issues
                 const productId = typeof product.id === 'string' ? product.id : String(product.id);
-                return `/ClothLoop/backend/api/products/direct_image.php?id=${productId}`;
+                return `/ClothLoop/backend/api/products/direct_image.php?product_id=${productId}`;
             }
             
             // Try standard image fields
@@ -2275,7 +2275,7 @@
                     // Only add fallback image paths if we have no additional images yet
                     if (images.length <= 1) {
                         // Use the direct_image.php API as it's more reliable
-                        images.push(`/ClothLoop/backend/api/products/direct_image.php?id=${product.id}`);
+                        images.push(`/ClothLoop/backend/api/products/direct_image.php?product_id=${product.id}`);
                         // Only add getimage.php as fallback with no additional query params
                         images.push(`/ClothLoop/backend/api/getimage.php?id=${product.id}`);
                     }
@@ -2288,7 +2288,7 @@
                     // Use a minimal set of fallback images to avoid 404 errors
                     setupImageSlider([
                         mainImageUrl, 
-                        `/ClothLoop/backend/api/products/direct_image.php?id=${product.id}`,
+                        `/ClothLoop/backend/api/products/direct_image.php?product_id=${product.id}`,
                         '../../assets/images/placeholder.png'
                     ]);
                 });
