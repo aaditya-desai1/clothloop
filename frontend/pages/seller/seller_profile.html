@@ -366,9 +366,23 @@
             z-index: 9999;
             min-width: 300px;
             max-width: 600px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
             border-radius: 4px;
             font-weight: 500;
+            padding: 15px 20px;
+            text-align: center;
+            animation: slideInFromTop 0.3s ease-out;
+        }
+
+        @keyframes slideInFromTop {
+            0% {
+                transform: translate(-50%, -50px);
+                opacity: 0;
+            }
+            100% {
+                transform: translate(-50%, 0);
+                opacity: 1;
+            }
         }
 
         .password-toggle {
@@ -561,6 +575,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            margin-bottom: 15px;
         }
         
         .location-btn-secondary:hover {
@@ -905,6 +920,23 @@
         #loginForm .btn {
             margin-top: 15px;
         }
+
+        #manualLocationEntry {
+            background-color: var(--input-bg);
+            border: 1px solid var(--input-border);
+            padding: 20px;
+            margin-top: 10px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .location-help-text {
+            font-size: 13px;
+            font-style: italic;
+            margin-bottom: 15px;
+            color: var(--text-color);
+            opacity: 0.8;
+        }
     </style>
 </head>
 <body>
@@ -1039,13 +1071,17 @@
                             <i class="fas fa-map-marker-alt"></i> GET CURRENT LOCATION
                         </button>
                         
+                        <div class="location-divider">
+                            <span>OR</span>
+                        </div>
+                        
+                        <button type="button" class="btn location-btn-secondary" id="toggleManualEntry">
+                            <i class="fas fa-pencil-alt"></i> ENTER COORDINATES MANUALLY
+                        </button>
+                        
                         <!-- Manual location entry - hidden by default -->
                         <div id="manualLocationEntry" style="display: none;">
-                            <div class="location-divider">
-                                <span>Enter location manually</span>
-                            </div>
-                            
-                            <div class="form-group">
+                            <div class="form-group" style="margin-top: 20px;">
                                 <label for="latitude" class="form-label">Latitude:</label>
                                 <input type="text" id="latitude" name="latitude" class="form-input" placeholder="e.g. 40.7128">
                             </div>
@@ -1054,6 +1090,8 @@
                                 <label for="longitude" class="form-label">Longitude:</label>
                                 <input type="text" id="longitude" name="longitude" class="form-input" placeholder="e.g. -74.0060">
                             </div>
+                            
+                            <p class="location-help-text">Tip: You can find coordinates for any location by right-clicking on Google Maps and selecting "What's here?"</p>
                             
                             <button type="button" class="btn location-btn-secondary" id="setManualLocation">
                                 <i class="fas fa-check"></i> SET MANUAL LOCATION
@@ -1106,6 +1144,22 @@
     <button id="resetButton" style="display: none;">Reset</button>
     
     <script>
+        // Function to show alerts
+        function showAlert(message, type) {
+            const alertElement = document.getElementById(type === 'success' ? 'successAlert' : 'errorAlert');
+            alertElement.textContent = message;
+            alertElement.style.display = 'block';
+            
+            // Add fixed class for better visibility
+            alertElement.classList.add('alert-fixed');
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                alertElement.style.display = 'none';
+                alertElement.classList.remove('alert-fixed');
+            }, 5000);
+        }
+        
         document.addEventListener('DOMContentLoaded', function() {
             // Theme switcher functionality
             const themeToggle = document.getElementById('theme-toggle');
@@ -1165,21 +1219,22 @@
             const shopLogoInput = document.getElementById('shopLogo');
             
             // Get user ID from session storage or URL parameter
-            let userId = sessionStorage.getItem('user_id');
+            let userId = localStorage.getItem('user_id');
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.has('id')) {
                 userId = urlParams.get('id');
+                localStorage.setItem('user_id', userId);
             }
             
             // If no user ID is available, set a default seller ID
             if (!userId) {
                 userId = 1; // Use a default seller ID (demo account)
-                sessionStorage.setItem('user_id', userId);
-                sessionStorage.setItem('user_role', 'seller');
+                localStorage.setItem('user_id', userId);
+                localStorage.setItem('user_role', 'seller');
             }
             
             // Fetch seller profile
-            fetchSellerProfile(userId);
+            fetchSellerProfile();
             
             // Helper function to add a debug message
             function addDebugMessage(message) {
@@ -1217,6 +1272,8 @@
                 // Show loading spinner
                 document.querySelector('.loading-spinner').style.display = 'flex';
                 profileForm.style.display = 'none';
+                
+                console.log('Fetching profile for seller ID:', sellerId);
                 
                 // Fetch seller profile data
                 fetch(`../../../backend/api/sellers/get_seller_profile.php?id=${sellerId}`)
@@ -1351,10 +1408,20 @@
                 formData.append('shop_name', shopNameInput.value);
                 formData.append('description', shopDescriptionInput.value);
                 
+                // Debug: Log all form values being submitted
+                console.log("Form Values:");
+                console.log("User ID:", userId);
+                console.log("Name:", nameInput.value);
+                console.log("Email:", emailInput.value);
+                console.log("Phone:", phoneInput.value);
+                console.log("Shop Name:", shopNameInput.value);
+                console.log("Description:", shopDescriptionInput.value);
+                
                 // Add location data if set
                 if (latitudeInput.value && longitudeInput.value) {
                     formData.append('latitude', latitudeInput.value);
                     formData.append('longitude', longitudeInput.value);
+                    console.log("Location:", latitudeInput.value, longitudeInput.value);
                 }
                 
                 // Add profile image/logo if selected
@@ -1389,6 +1456,9 @@
                 })
                 .then(response => {
                     console.log(`Response status: ${response.status}`);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
                     return response.text();
                 })
                 .then(rawText => {
@@ -1401,7 +1471,7 @@
                     }
                 })
                 .then(data => {
-                    console.log(`Profile update response: ${data.status || data.success}`);
+                    console.log(`Profile update response:`, data);
                     submitButton.disabled = false;
                     submitButton.textContent = originalButtonText;
                     
@@ -1415,16 +1485,18 @@
                             const img = document.createElement('img');
                             
                             // Check if the returned path is just a filename or a full path
-                            if (data.data.profile_photo.includes('/')) {
-                                img.src = '../../../' + data.data.profile_photo;
-                            } else if (data.data.profile_photo.startsWith('profile_')) {
-                                // For profile images with profile_ prefix
-                                img.src = '../../../backend/uploads/profile_photos/' + data.data.profile_photo;
+                            let fullPhotoUrl;
+                            if (data.data.profile_photo.includes('http')) {
+                                fullPhotoUrl = data.data.profile_photo;
+                            } else if (data.data.profile_photo.startsWith('/')) {
+                                fullPhotoUrl = data.data.profile_photo;
                             } else {
-                                img.src = '../../../' + data.data.profile_photo;
+                                fullPhotoUrl = '../../../backend/' + data.data.profile_photo;
                             }
                             
+                            img.src = fullPhotoUrl;
                             logoPreview.appendChild(img);
+                            console.log('Updated profile image to:', fullPhotoUrl);
                         }
                         
                         // Reset password fields if they were changed
@@ -1460,6 +1532,15 @@
             const getCurrentLocationBtn = document.getElementById('getCurrentLocation');
             const setManualLocationBtn = document.getElementById('setManualLocation');
             const manualLocationEntry = document.getElementById('manualLocationEntry');
+            const toggleManualEntryBtn = document.getElementById('toggleManualEntry');
+            
+            // Toggle manual location entry
+            toggleManualEntryBtn.addEventListener('click', function() {
+                manualLocationEntry.style.display = manualLocationEntry.style.display === 'none' ? 'block' : 'none';
+                this.innerHTML = manualLocationEntry.style.display === 'none' ? 
+                    '<i class="fas fa-pencil-alt"></i> ENTER COORDINATES MANUALLY' : 
+                    '<i class="fas fa-times"></i> HIDE MANUAL ENTRY';
+            });
             
             // Get current location
             getCurrentLocationBtn.addEventListener('click', function() {
@@ -1525,11 +1606,6 @@
                     // Show manual entry section
                     manualLocationEntry.style.display = 'block';
                 }
-            });
-            
-            // Manual location entry toggle
-            document.getElementById('getCurrentLocation').addEventListener('dblclick', function() {
-                manualLocationEntry.style.display = manualLocationEntry.style.display === 'none' ? 'block' : 'none';
             });
             
             // Set manual location

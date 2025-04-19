@@ -643,3 +643,285 @@ ERROR: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry 'aa
 Stack Trace: #0 C:\xampp\htdocs\ClothLoop\backend\api\sellers\update_seller_profile.php(122): PDOStatement->execute(Array)
 #1 {main}
 
+Received POST data: {
+    "seller_id": "1",
+    "name": "Aaditya Desai",
+    "email": "aadi@gmail.com",
+    "phone_no": "8160224860",
+    "shop_name": "Aadi Hub",
+    "description": "shop",
+    "latitude": "23.052288",
+    "longitude": "72.581120"
+}
+
+Received FILES data: {
+    "profile_photo": {
+        "name": "Aaryan.jpg",
+        "full_path": "Aaryan.jpg",
+        "type": "image\/jpeg",
+        "tmp_name": "C:\\xampp\\tmp\\php1BA9.tmp",
+        "error": 0,
+        "size": 356529
+    }
+}
+
+Transaction started
+File uploaded successfully to: C:\xampp\htdocs\ClothLoop\backend\api\sellers/../../uploads/profile_photos/profile_680332a05233c.jpg as profile_680332a05233c.jpg
+User Update Query: UPDATE users SET name = ?, email = ?, phone_no = ?, profile_photo = ? WHERE id = ?
+User Params: ["Aaditya Desai","aadi@gmail.com","8160224860","profile_680332a05233c.jpg",1]
+Transaction rolled back
+ERROR: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry 'aadi@gmail.com' for key 'email'
+Stack Trace: #0 C:\xampp\htdocs\ClothLoop\backend\api\sellers\update_seller_profile.php(122): PDOStatement->execute(Array)
+#1 {main}
+
+Received POST data: {
+    "seller_id": "1",
+    "name": "Aaditya Desai",
+    "email": "aadi@gmail.com",
+    "phone_no": "8160224860",
+    "shop_name": "Aadi Hub",
+    "description": "shop",
+    "latitude": "23.052288",
+    "longitude": "72.581120"
+}
+
+Received FILES data: {
+    "profile_photo": {
+        "name": "Aaryan.jpg",
+        "full_path": "Aaryan.jpg",
+        "type": "image\/jpeg",
+        "tmp_name": "C:\\xampp\\tmp\\php259D.tmp",
+        "error": 0,
+        "size": 356529
+    }
+}
+
+Transaction started
+File uploaded successfully to: C:\xampp\htdocs\ClothLoop\backend\api\sellers/../../uploads/profile_photos/profile_680332a2d62f2.jpg as profile_680332a2d62f2.jpg
+User Update Query: UPDATE users SET name = ?, email = ?, phone_no = ?, profile_photo = ? WHERE id = ?
+User Params: ["Aaditya Desai","aadi@gmail.com","8160224860","profile_680332a2d62f2.jpg",1]
+Transaction rolled back
+ERROR: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry 'aadi@gmail.com' for key 'email'
+Stack Trace: #0 C:\xampp\htdocs\ClothLoop\backend\api\sellers\update_seller_profile.php(122): PDOStatement->execute(Array)
+#1 {main}
+
+Received POST data: {
+    "seller_id": "1",
+    "name": "Aaditya Desai",
+    "email": "aadi@gmail.com",
+    "phone_no": "8160224860",
+    "shop_name": "Aadi Hub",
+    "description": "shop",
+    "latitude": "23.052288",
+    "longitude": "72.581120"
+}
+
+Received FILES data: {
+    "profile_photo": {
+        "name": "Aaryan.jpg",
+        "full_path": "Aaryan.jpg",
+        "type": "image\/jpeg",
+        "tmp_name": "C:\\xampp\\tmp\\php2679.tmp",
+        "error": 0,
+        "size": 356529
+    }
+}
+
+Transaction started
+File uploaded successfully to: C:\xampp\htdocs\ClothLoop\backend\api\sellers/../../uploads/profile_photos/profile_680332a318441.jpg as profile_680332a318441.jpg
+User Update Query: UPDATE users SET name = ?, email = ?, phone_no = ?, profile_photo = ? WHERE id = ?
+User Params: ["Aaditya Desai","aadi@gmail.com","8160224860","profile_680332a318441.jpg",1]
+Transaction rolled back
+ERROR: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry 'aadi@gmail.com' for key 'email'
+Stack Trace: #0 C:\xampp\htdocs\ClothLoop\backend\api\sellers\update_seller_profile.php(122): PDOStatement->execute(Array)
+#1 {main}
+
+Received POST data: {
+    "seller_id": "1",
+    "name": "Aaditya Desai",
+    "email": "aadi@gmail.com",
+    "phone_no": "8160224860",
+    "shop_name": "Aadi Hub",
+    "description": "shop",
+    "latitude": "23.052288",
+    "longitude": "72.581120"
+}
+
+Received FILES data: {
+    "profile_photo": {
+        "name": "Aaryan.jpg",
+        "full_path": "Aaryan.jpg",
+        "type": "image\/jpeg",
+        "tmp_name": "C:\\xampp\\tmp\\php27B2.tmp",
+        "error": 0,
+        "size": 356529
+    }
+}
+
+Transaction started
+File uploaded successfully to: C:\xampp\htdocs\ClothLoop\backend\api\sellers/../../uploads/profile_photos/profile_680332a367814.jpg as profile_680332a367814.jpg
+User Update Query: UPDATE users SET name = ?, email = ?, phone_no = ?, profile_photo = ? WHERE id = ?
+User Params: ["Aaditya Desai","aadi@gmail.com","8160224860","profile_680332a367814.jpg",1]
+Transaction rolled back
+ERROR: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry 'aadi@gmail.com' for key 'email'
+Stack Trace: #0 C:\xampp\htdocs\ClothLoop\backend\api\sellers\update_seller_profile.php(122): PDOStatement->execute(Array)
+#1 {main}
+
+Received POST data: {
+    "seller_id": "1",
+    "name": "Aaditya Desai",
+    "email": "aadi@gmail.com",
+    "phone_no": "8160224860",
+    "shop_name": "Aadi Hub",
+    "description": "shop",
+    "latitude": "23.052288",
+    "longitude": "72.581120"
+}
+
+Received FILES data: {
+    "profile_photo": {
+        "name": "Aaryan.jpg",
+        "full_path": "Aaryan.jpg",
+        "type": "image\/jpeg",
+        "tmp_name": "C:\\xampp\\tmp\\php2AA1.tmp",
+        "error": 0,
+        "size": 356529
+    }
+}
+
+Transaction started
+File uploaded successfully to: C:\xampp\htdocs\ClothLoop\backend\api\sellers/../../uploads/profile_photos/profile_680332a42615a.jpg as profile_680332a42615a.jpg
+User Update Query: UPDATE users SET name = ?, email = ?, phone_no = ?, profile_photo = ? WHERE id = ?
+User Params: ["Aaditya Desai","aadi@gmail.com","8160224860","profile_680332a42615a.jpg",1]
+Transaction rolled back
+ERROR: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry 'aadi@gmail.com' for key 'email'
+Stack Trace: #0 C:\xampp\htdocs\ClothLoop\backend\api\sellers\update_seller_profile.php(122): PDOStatement->execute(Array)
+#1 {main}
+
+Received POST data: {
+    "seller_id": "1",
+    "name": "Aaditya Desai",
+    "email": "aadi@gmail.com",
+    "phone_no": "8160224860",
+    "shop_name": "Aadi Hubs",
+    "description": "shop",
+    "latitude": "23.052288",
+    "longitude": "72.581120"
+}
+
+Received FILES data: {
+    "profile_photo": {
+        "name": "Aaryan.jpg",
+        "full_path": "Aaryan.jpg",
+        "type": "image\/jpeg",
+        "tmp_name": "C:\\xampp\\tmp\\php93CD.tmp",
+        "error": 0,
+        "size": 356529
+    }
+}
+
+Transaction started
+File uploaded successfully to: C:\xampp\htdocs\ClothLoop\backend\api\sellers/../../uploads/profile_photos/profile_680332bf12ddb.jpg as profile_680332bf12ddb.jpg
+User Update Query: UPDATE users SET name = ?, email = ?, phone_no = ?, profile_photo = ? WHERE id = ?
+User Params: ["Aaditya Desai","aadi@gmail.com","8160224860","profile_680332bf12ddb.jpg",1]
+Transaction rolled back
+ERROR: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry 'aadi@gmail.com' for key 'email'
+Stack Trace: #0 C:\xampp\htdocs\ClothLoop\backend\api\sellers\update_seller_profile.php(122): PDOStatement->execute(Array)
+#1 {main}
+
+Received POST data: {
+    "seller_id": "1",
+    "name": "Aaditya Desai",
+    "email": "aadi@gmail.com",
+    "phone_no": "8160224860",
+    "shop_name": "Aadi Hubs",
+    "description": "shop",
+    "latitude": "23.052288",
+    "longitude": "72.581120"
+}
+
+Received FILES data: {
+    "profile_photo": {
+        "name": "Aaryan.jpg",
+        "full_path": "Aaryan.jpg",
+        "type": "image\/jpeg",
+        "tmp_name": "C:\\xampp\\tmp\\php95B2.tmp",
+        "error": 0,
+        "size": 356529
+    }
+}
+
+Transaction started
+File uploaded successfully to: C:\xampp\htdocs\ClothLoop\backend\api\sellers/../../uploads/profile_photos/profile_680332bf8afb9.jpg as profile_680332bf8afb9.jpg
+User Update Query: UPDATE users SET name = ?, email = ?, phone_no = ?, profile_photo = ? WHERE id = ?
+User Params: ["Aaditya Desai","aadi@gmail.com","8160224860","profile_680332bf8afb9.jpg",1]
+Transaction rolled back
+ERROR: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry 'aadi@gmail.com' for key 'email'
+Stack Trace: #0 C:\xampp\htdocs\ClothLoop\backend\api\sellers\update_seller_profile.php(122): PDOStatement->execute(Array)
+#1 {main}
+
+Received POST data: {
+    "seller_id": "1",
+    "name": "Aaditya Desai",
+    "email": "aadi@gmail.com",
+    "phone_no": "8160224860",
+    "shop_name": "Aadi Hubs",
+    "description": "shop",
+    "latitude": "23.052288",
+    "longitude": "72.581120"
+}
+
+Received FILES data: {
+    "profile_photo": {
+        "name": "Aaryan.jpg",
+        "full_path": "Aaryan.jpg",
+        "type": "image\/jpeg",
+        "tmp_name": "C:\\xampp\\tmp\\php972A.tmp",
+        "error": 0,
+        "size": 356529
+    }
+}
+
+Transaction started
+File uploaded successfully to: C:\xampp\htdocs\ClothLoop\backend\api\sellers/../../uploads/profile_photos/profile_680332bfeab11.jpg as profile_680332bfeab11.jpg
+User Update Query: UPDATE users SET name = ?, email = ?, phone_no = ?, profile_photo = ? WHERE id = ?
+User Params: ["Aaditya Desai","aadi@gmail.com","8160224860","profile_680332bfeab11.jpg",1]
+Transaction rolled back
+ERROR: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry 'aadi@gmail.com' for key 'email'
+Stack Trace: #0 C:\xampp\htdocs\ClothLoop\backend\api\sellers\update_seller_profile.php(122): PDOStatement->execute(Array)
+#1 {main}
+
+Received POST data: {
+    "seller_id": "8",
+    "name": "Aaditya Desai",
+    "email": "aadi@gmail.com",
+    "phone_no": "8160224860",
+    "shop_name": "Aadi Hub",
+    "description": "buy"
+}
+
+Received FILES data: {
+    "profile_photo": {
+        "name": "Aaryan.jpg",
+        "full_path": "Aaryan.jpg",
+        "type": "image\/jpeg",
+        "tmp_name": "C:\\xampp\\tmp\\php3463.tmp",
+        "error": 0,
+        "size": 356529
+    }
+}
+
+Transaction started
+File uploaded successfully to: C:\xampp\htdocs\ClothLoop\backend\api\sellers/../../uploads/profile_photos/profile_680334b2e3422.jpg as profile_680334b2e3422.jpg
+User Update Query: UPDATE users SET name = ?, email = ?, phone_no = ?, profile_photo = ? WHERE id = ?
+User Params: ["Aaditya Desai","aadi@gmail.com","8160224860","profile_680334b2e3422.jpg",8]
+User Update Result: Success
+User Rows Affected: 1
+
+Seller Update Query: UPDATE sellers SET shop_name = ?, description = ? WHERE id = ?
+Seller Params: ["Aadi Hub","buy",8]
+Seller Update Result: Success
+Seller Rows Affected: 1
+
+Transaction committed successfully
+
