@@ -1616,8 +1616,29 @@
             const category = activeCategory ? activeCategory.textContent.trim().toLowerCase() : null;
             console.log('Current active category:', category);
             
-            // Call fetchProducts with occasion parameter
-            fetchProducts(category, null, null, occasionType);
+            // Get current search term (if any)
+            const searchInput = document.getElementById('searchInput');
+            const searchTerm = searchInput && searchInput.value ? searchInput.value.trim() : null;
+            
+            // Call fetchProducts with occasion parameter and other current filters
+            fetchProducts(category, searchTerm, null, occasionType);
+            
+            // Visually highlight the active occasion in submenu
+            const occasionOptions = document.querySelectorAll('.submenu-option');
+            occasionOptions.forEach(option => {
+                option.classList.remove('active');
+                if (option.getAttribute('data-occasion') === occasionType) {
+                    option.classList.add('active');
+                }
+            });
+            
+            // Add a visual indicator to the sort button showing an active filter
+            const sortButton = document.getElementById('sortButton');
+            if (sortButton) {
+                sortButton.innerHTML = `<i class="fas fa-filter"></i> ${occasionType}`;
+                sortButton.style.backgroundColor = 'var(--accent-color)';
+                sortButton.style.color = 'var(--primary-color)';
+            }
         }
 
         // Extended fetchProducts function to include sorting and occasion filters
@@ -1647,7 +1668,40 @@
                     url += `&search=${encodeURIComponent(searchTerm)}`;
                 }
                 
-                if (sortBy && sortBy !== 'nearby') {
+                // Handle 'nearby' sorting by requesting user location first if needed
+                if (sortBy === 'nearby') {
+                    // We'll sort by distance on the client side after receiving data
+                    console.log('Processing nearby sort request');
+                    
+                    // Check if we have location data
+                    let userLat = parseFloat(localStorage.getItem('user_latitude'));
+                    let userLng = parseFloat(localStorage.getItem('user_longitude'));
+                    
+                    if (!userLat || !userLng || isNaN(userLat) || isNaN(userLng)) {
+                        try {
+                            showNotification('Getting your location for nearby listings...');
+                            const location = await getUserLocation();
+                            userLat = parseFloat(location.latitude);
+                            userLng = parseFloat(location.longitude);
+                            console.log(`Location obtained: ${userLat}, ${userLng}`);
+                        } catch (error) {
+                            console.error('Error getting location:', error);
+                            showNotification('Using default location for nearby sorting');
+                            // Default values should now be in localStorage from getUserLocation
+                            userLat = parseFloat(localStorage.getItem('user_latitude'));
+                            userLng = parseFloat(localStorage.getItem('user_longitude'));
+                        }
+                    }
+                    
+                    // Add location parameters to the request if they're available
+                    if (userLat && userLng && !isNaN(userLat) && !isNaN(userLng)) {
+                        url += `&latitude=${userLat}&longitude=${userLng}`;
+                        // Some APIs expect a sorting parameter
+                        url += `&sort_by=distance`;
+                        console.log(`Adding location params to URL: ${userLat}, ${userLng}`);
+                    }
+                } else if (sortBy && sortBy !== 'nearby') {
+                    // For other sort options
                     url += `&sort_by=${sortBy}`;
                 }
                 
@@ -1693,54 +1747,24 @@
                         products = data.products;
                     }
                     
-                    // Debug: Log image fields in the first few products
-                    if (products.length > 0) {
-                        console.log('First product full data:', products[0]);
-                        console.log('Image-related fields in first three products:');
-                        
-                        for (let i = 0; i < Math.min(3, products.length); i++) {
-                            const p = products[i];
-                            console.log(`Product ${i+1} (ID: ${p.id}):`);
-                            console.log(`- image_path: ${p.image_path || 'not set'}`);
-                            console.log(`- primary_image: ${p.primary_image || 'not set'}`);
-                            console.log(`- image_url: ${p.image_url || 'not set'}`);
-                            console.log(`- image: ${p.image || 'not set'}`);
-                        }
-                    }
-                    
                     console.log('Parsed products:', products);
                     
-                    // Handle nearby sorting if requested
-                    if (sortBy === 'nearby') {
-                        // Get user's location from localStorage
+                    // Handle nearby sorting if requested and if we didn't already sort on the server
+                    if (sortBy === 'nearby' && products.length > 0) {
+                        // Get user's location from localStorage again (in case it was just set)
                         const userLat = parseFloat(localStorage.getItem('user_latitude'));
                         const userLng = parseFloat(localStorage.getItem('user_longitude'));
                         
-                        if (!userLat || !userLng || isNaN(userLat) || isNaN(userLng)) {
-                            // Ask for location if not available
-                            showNotification('Location needed for nearby listings. Please allow location access.');
-                            
-                            try {
-                                await getUserLocation();
-                                
-                                // Retry with the newly obtained location
-                                const newUserLat = parseFloat(localStorage.getItem('user_latitude'));
-                                const newUserLng = parseFloat(localStorage.getItem('user_longitude'));
-                                
-                                if (newUserLat && newUserLng && !isNaN(newUserLat) && !isNaN(newUserLng)) {
-                                    products = sortProductsByDistance(products, newUserLat, newUserLng);
-                                    showNotification('Showing nearby listings based on your location');
-                                } else {
-                                    showNotification('Could not get your location. Showing products without distance sorting.');
-                                }
-                            } catch (error) {
-                                console.error('Error getting user location:', error);
-                                showNotification('Could not get your location. Showing products without distance sorting.');
-                            }
-                        } else {
-                            // Sort products by distance using the existing location
+                        if (userLat && userLng && !isNaN(userLat) && !isNaN(userLng)) {
+                            console.log(`Client-side sorting by distance using: ${userLat}, ${userLng}`);
                             products = sortProductsByDistance(products, userLat, userLng);
                             showNotification('Showing nearby listings based on your location');
+                        }
+                        
+                        // Limit to 20 closest results for better performance and relevance
+                        if (products.length > 20) {
+                            console.log(`Limiting from ${products.length} to 20 closest products`);
+                            products = products.slice(0, 20);
                         }
                     }
                     
@@ -1812,14 +1836,27 @@
                                 break;
                         }
                         
-                        showNotification(errorMessage);
-                        reject(new Error(errorMessage));
+                        // Try to use last known location from localStorage as fallback
+                        const savedLat = localStorage.getItem('user_latitude');
+                        const savedLng = localStorage.getItem('user_longitude');
+                        
+                        if (savedLat && savedLng && !isNaN(parseFloat(savedLat)) && !isNaN(parseFloat(savedLng))) {
+                            showNotification('Using your last known location');
+                            resolve({latitude: savedLat, longitude: savedLng});
+                        } else {
+                            // If no fallback location, try to use IP geolocation or a default location
+                            // For demo, we'll use a fallback location of Mumbai
+                            localStorage.setItem('user_latitude', '19.076090');
+                            localStorage.setItem('user_longitude', '72.877426');
+                            showNotification('Using default location (Mumbai) for nearby sorting');
+                            resolve({latitude: '19.076090', longitude: '72.877426'});
+                        }
                     },
                     // Options
                     {
                         enableHighAccuracy: true,
                         timeout: 10000,
-                        maximumAge: 0
+                        maximumAge: 60000 // Accept cached positions up to 1 minute old
                     }
                 );
             });
@@ -1858,42 +1895,104 @@
         
         // Function to sort products by distance from user
         function sortProductsByDistance(products, userLat, userLng) {
-            // Add distance property to each product
-            products.forEach(product => {
-                let sellerLat, sellerLng;
+            console.log(`Sorting products by distance from user location: ${userLat}, ${userLng}`);
+            
+            // Function to extract coordinates from various product fields
+            function extractCoordinates(product) {
+                let sellerLat = null, sellerLng = null, source = 'none';
                 
-                // Check different possible properties for coordinates
+                // Try different possible coordinate properties and formats
                 if (product.latitude && product.longitude) {
                     sellerLat = parseFloat(product.latitude);
                     sellerLng = parseFloat(product.longitude);
+                    source = 'product coords';
                 } else if (product.seller_latitude && product.seller_longitude) {
                     sellerLat = parseFloat(product.seller_latitude);
                     sellerLng = parseFloat(product.seller_longitude);
-                } else if (product.shop_location) {
-                    // Try to parse coordinates from shop_location string
+                    source = 'seller coords';
+                } else if (product.shop_latitude && product.shop_longitude) {
+                    sellerLat = parseFloat(product.shop_latitude);
+                    sellerLng = parseFloat(product.shop_longitude);
+                    source = 'shop coords';
+                } else if (product.shop_location && typeof product.shop_location === 'string') {
+                    // Try to parse coordinates from shop_location string (could be "lat,lng" format)
                     try {
-                        const coordinates = product.shop_location.split(',');
-                        if (coordinates.length === 2) {
-                            sellerLat = parseFloat(coordinates[0].trim());
-                            sellerLng = parseFloat(coordinates[1].trim());
+                        const parts = product.shop_location.split(',');
+                        if (parts.length >= 2) {
+                            const lat = parseFloat(parts[0].trim());
+                            const lng = parseFloat(parts[1].trim());
+                            if (!isNaN(lat) && !isNaN(lng)) {
+                                sellerLat = lat;
+                                sellerLng = lng;
+                                source = 'shop_location string';
+                            }
                         }
                     } catch (e) {
-                        console.error('Error parsing shop location:', e);
+                        console.error('Error parsing shop location string:', e);
+                    }
+                } else if (product.location && typeof product.location === 'string') {
+                    // Try to parse coordinates from location string
+                    try {
+                        const parts = product.location.split(',');
+                        if (parts.length >= 2) {
+                            const lat = parseFloat(parts[0].trim());
+                            const lng = parseFloat(parts[1].trim());
+                            if (!isNaN(lat) && !isNaN(lng)) {
+                                sellerLat = lat;
+                                sellerLng = lng;
+                                source = 'location string';
+                            }
+                        }
+                    } catch (e) {
+                        console.error('Error parsing location string:', e);
                     }
                 }
                 
+                return { lat: sellerLat, lng: sellerLng, source };
+            }
+            
+            // Add distance property to each product
+            products.forEach(product => {
+                // Extract coordinates using the helper function
+                const coords = extractCoordinates(product);
+                
+                // Store the original coordinates and source for debugging
+                product.coords = coords;
+                
                 // Calculate distance if we have valid coordinates
-                if (sellerLat && sellerLng && !isNaN(sellerLat) && !isNaN(sellerLng)) {
-                    product.distance = calculateDistance(userLat, userLng, sellerLat, sellerLng);
-                    console.log(`Distance to ${product.title || product.name}: ${product.distance.toFixed(2)} km`);
+                if (coords.lat && coords.lng && !isNaN(coords.lat) && !isNaN(coords.lng)) {
+                    product.distance = calculateDistance(userLat, userLng, coords.lat, coords.lng);
+                    console.log(`Distance to ${product.title || product.name}: ${product.distance.toFixed(2)} km (source: ${coords.source})`);
                 } else {
                     // Set a large distance for products without coordinates
                     product.distance = Number.MAX_VALUE;
+                    console.log(`No valid coordinates for ${product.title || product.name}`);
+                }
+                
+                // Save formatted address for display, prioritizing the most specific field
+                if (product.shop_address) {
+                    product.formattedAddress = product.shop_address;
+                } else if (product.seller_address) {
+                    product.formattedAddress = product.seller_address;
+                } else if (product.address) {
+                    product.formattedAddress = product.address;
+                } else if (product.location_name) {
+                    product.formattedAddress = product.location_name;
+                } else {
+                    // Create a simple address if we have coordinates
+                    if (coords.lat && coords.lng) {
+                        product.formattedAddress = `${coords.lat.toFixed(4)}, ${coords.lng.toFixed(4)}`;
+                    } else {
+                        product.formattedAddress = 'Address not available';
+                    }
                 }
             });
             
             // Sort products by distance (closest first)
-            return products.sort((a, b) => a.distance - b.distance);
+            const sortedProducts = products.sort((a, b) => a.distance - b.distance);
+            console.log(`Sorted ${sortedProducts.length} products by distance`);
+            
+            return sortedProducts;
         }
         
         // Function to handle category selection
@@ -2022,6 +2121,9 @@
                         activeSort = null;
                         activeOccasion = null;
                         
+                        // Reset sort button to default state
+                        resetSortButton();
+                        
                         // Reset all products (using current category if any)
                         const activeCategory = document.querySelector('.categories a.active');
                         const category = activeCategory ? activeCategory.textContent.trim().toLowerCase() : null;
@@ -2088,6 +2190,16 @@
             });
         }
         
+        // Function to reset the sort button to its default state
+        function resetSortButton() {
+            const sortButton = document.getElementById('sortButton');
+            if (sortButton) {
+                sortButton.innerHTML = '<i class="fas fa-sort"></i> Sort';
+                sortButton.style.backgroundColor = '';
+                sortButton.style.color = '';
+            }
+        }
+
         // Function to apply sorting logic
         function applySorting(sortType) {
             // Get products grid
@@ -2116,9 +2228,38 @@
                     break;
                 
                 case 'nearby':
-                    showNotification('Showing nearby listings first');
-                    // Get user's location and fetch products sorted by distance
-                    fetchProducts(null, null, 'nearby');
+                    showNotification('Processing nearby listings...');
+                    
+                    // Get the current active category (if any)
+                    const activeCategory = document.querySelector('.categories a.active');
+                    const categoryName = activeCategory ? activeCategory.textContent.trim().toLowerCase() : null;
+                    
+                    // Get current search term (if any)
+                    const searchInput = document.getElementById('searchInput');
+                    const searchTerm = searchInput && searchInput.value ? searchInput.value.trim() : null;
+                    
+                    // Check if we already have user location in localStorage
+                    const userLat = parseFloat(localStorage.getItem('user_latitude'));
+                    const userLng = parseFloat(localStorage.getItem('user_longitude'));
+                    
+                    if (userLat && userLng && !isNaN(userLat) && !isNaN(userLng)) {
+                        console.log(`Using existing location (${userLat}, ${userLng}) for nearby sorting`);
+                        // We have location, fetch products with nearby sorting
+                        fetchProducts(categoryName, searchTerm, 'nearby');
+                    } else {
+                        // We need to get location first
+                        showNotification('Getting your location for nearby sorting...');
+                        getUserLocation()
+                            .then(({latitude, longitude}) => {
+                                console.log(`Location obtained (${latitude}, ${longitude}), fetching nearby products`);
+                                fetchProducts(categoryName, searchTerm, 'nearby');
+                            })
+                            .catch(error => {
+                                console.error('Error getting location for nearby sorting:', error);
+                                showNotification('Could not access your location. Using default location instead.');
+                                fetchProducts(categoryName, searchTerm, 'nearby');
+                            });
+                    }
                     return; // Return early as we're fetching new data
                 
                 case 'occasion':
@@ -2130,6 +2271,17 @@
                     // Reset the category selection
                     const categories = document.querySelectorAll('.categories a');
                     categories.forEach(cat => cat.classList.remove('active'));
+                    
+                    // Clear the search input
+                    const searchBox = document.getElementById('searchInput');
+                    if (searchBox) searchBox.value = '';
+                    
+                    // Reset sort button
+                    resetSortButton();
+                    
+                    // Reset active state on all submenu options
+                    const occasionOptions = document.querySelectorAll('.submenu-option');
+                    occasionOptions.forEach(opt => opt.classList.remove('active'));
                     
                     // Fetch all products with no filters
                     fetchProducts();
@@ -2205,8 +2357,6 @@
                         return; // Skip this product
                     }
                     
-                    console.log(`Processing product ${index}:`, product);
-                    
                     // Clone the template
                     const productNode = document.importNode(template.content, true);
                     const productCard = productNode.querySelector('.product-card');
@@ -2222,6 +2372,28 @@
                     // Add a data attribute for the product ID
                     productCard.setAttribute('data-product-id', product.id);
                     
+                    // Add data attribute for occasion if available
+                    if (product.occasion) {
+                        productCard.setAttribute('data-occasion', product.occasion.toLowerCase());
+                        
+                        // Add a subtle occasion badge
+                        const occasionBadge = document.createElement('div');
+                        occasionBadge.className = 'occasion-badge';
+                        occasionBadge.innerHTML = `<i class="fas fa-tag"></i> ${product.occasion}`;
+                        occasionBadge.style.position = 'absolute';
+                        occasionBadge.style.top = '10px';
+                        occasionBadge.style.left = '10px';
+                        occasionBadge.style.backgroundColor = 'var(--accent-color)';
+                        occasionBadge.style.color = 'var(--primary-color)';
+                        occasionBadge.style.padding = '5px 10px';
+                        occasionBadge.style.fontSize = '0.8rem';
+                        occasionBadge.style.fontWeight = 'bold';
+                        occasionBadge.style.zIndex = '10';
+                        occasionBadge.style.textTransform = 'capitalize';
+                        productCard.style.position = 'relative';
+                        productCard.appendChild(occasionBadge);
+                    }
+                    
                     // Make sure wishlist button has the correct onclick handler
                     wishlistBtn.setAttribute('onclick', 'toggleWishlist(this, event); return false;');
                     
@@ -2232,27 +2404,91 @@
                     const rentalPrice = product.rental_price || product.price || 0;
                     price.textContent = `₹${rentalPrice}/day`;
                     
-                    // Set seller info - include distance if available
+                    // Create shop info container with map icon and address
+                    const shopInfoContainer = document.createElement('div');
+                    shopInfoContainer.style.marginBottom = '0.7rem';
+                    
+                    // Shop name
+                    const shopNameElem = document.createElement('div');
+                    shopNameElem.className = 'shop-name';
+                    shopNameElem.style.fontSize = '0.9rem';
+                    shopNameElem.style.marginBottom = '0.3rem';
+                    shopNameElem.style.fontWeight = 'bold';
+                    shopNameElem.style.color = 'var(--accent-color)';
+                    
+                    const shopIcon = document.createElement('i');
+                    shopIcon.className = 'fas fa-store';
+                    shopIcon.style.marginRight = '5px';
+                    
+                    shopNameElem.appendChild(shopIcon);
+                    shopNameElem.appendChild(document.createTextNode(product.shop_name || product.seller_name || 'ClothLoop Seller'));
+                    shopInfoContainer.appendChild(shopNameElem);
+                    
+                    // Shop address with map icon
+                    const addressElem = document.createElement('div');
+                    addressElem.className = 'shop-address';
+                    addressElem.style.fontSize = '0.8rem';
+                    addressElem.style.display = 'flex';
+                    addressElem.style.alignItems = 'flex-start';
+                    addressElem.style.opacity = '0.8';
+                    
+                    const mapIcon = document.createElement('i');
+                    mapIcon.className = 'fas fa-map-marker-alt';
+                    mapIcon.style.marginRight = '5px';
+                    mapIcon.style.marginTop = '4px';
+                    mapIcon.style.color = 'var(--accent-color)';
+                    mapIcon.style.minWidth = '12px';
+                    
+                    const addressText = document.createElement('span');
+                    addressText.style.flexGrow = '1';
+                    addressText.textContent = product.formattedAddress || 'Location not available';
+                    addressText.dataset.sellerId = product.seller_id; // Store seller ID for dynamic fetch
+                    
+                    // Fetch seller address dynamically if it's not available
+                    if ((!product.formattedAddress || product.formattedAddress === 'Location not available') && product.seller_id) {
+                        // Fetch seller data asynchronously
+                        fetchSellerAddress(product.seller_id).then(address => {
+                            if (address) {
+                                addressText.textContent = address;
+                                product.formattedAddress = address;
+                            }
+                        }).catch(err => console.error('Error fetching seller address:', err));
+                    }
+                    
+                    addressElem.appendChild(mapIcon);
+                    addressElem.appendChild(addressText);
+                    shopInfoContainer.appendChild(addressElem);
+                    
+                    // Add distance badge if available
                     if (product.distance && product.distance !== Number.MAX_VALUE) {
-                        // Add distance information to seller info
                         const distanceKm = product.distance.toFixed(1);
-                        seller.textContent = `${product.shop_name || product.seller_name || 'ClothLoop Seller'} • ${distanceKm} km away`;
                         
-                        // Add a small location icon to indicate this has distance info
-                        const locationIcon = document.createElement('i');
-                        locationIcon.className = 'fas fa-map-marker-alt';
-                        locationIcon.style.marginRight = '5px';
-                        locationIcon.style.color = 'var(--accent-color)';
-                        seller.prepend(locationIcon);
+                        // Distance badge in shop info container
+                        const distanceElem = document.createElement('div');
+                        distanceElem.className = 'distance-info';
+                        distanceElem.style.fontSize = '0.8rem';
+                        distanceElem.style.marginTop = '0.3rem';
+                        distanceElem.style.color = 'var(--accent-color)';
+                        distanceElem.style.fontWeight = 'bold';
+                        distanceElem.textContent = `${distanceKm} km away`;
                         
-                        // Add distance as data attribute for sorting reference
+                        // Add a directional arrow
+                        const directionIcon = document.createElement('i');
+                        directionIcon.className = 'fas fa-location-arrow';
+                        directionIcon.style.marginRight = '5px';
+                        directionIcon.style.transform = 'rotate(-45deg)';
+                        
+                        distanceElem.prepend(directionIcon);
+                        shopInfoContainer.appendChild(distanceElem);
+                        
+                        // Add distance as data attribute for reference
                         productCard.setAttribute('data-distance', distanceKm);
                         
                         // Add a special class for nearby listings
                         if (product.distance < 10) {
                             productCard.classList.add('nearby-listing');
                             
-                            // Add a subtle visual indicator for very close listings (within 5km)
+                            // Add a visual indicator for very close listings (within 5km)
                             if (product.distance < 5) {
                                 const nearbyBadge = document.createElement('div');
                                 nearbyBadge.className = 'nearby-badge';
@@ -2270,14 +2506,15 @@
                                 productCard.appendChild(nearbyBadge);
                             }
                         }
-                    } else {
-                        seller.textContent = product.shop_name || product.seller_name || 'ClothLoop Seller';
                     }
+                    
+                    // Replace the original seller element with our new shop info container
+                    seller.replaceWith(shopInfoContainer);
                     
                     // Set link to details page
                     detailsLink.href = `details.html?id=${product.id}`;
                     
-                    // Set image using our helper function exactly as in details.html
+                    // Set image using our helper function
                     image.src = getProductImageUrl(product);
                     console.log(`Setting image for product ${product.id} to ${image.src}`);
                     
@@ -2488,6 +2725,29 @@
             
             // Final fallback to placeholder
             return '../../assets/images/placeholder.png';
+        }
+
+        // Function to fetch seller address dynamically
+        async function fetchSellerAddress(sellerId) {
+            try {
+                const response = await fetch(`/ClothLoop/backend/api/getshop.php?id=${sellerId}`);
+                
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch seller data: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('Fetched seller data:', data);
+                
+                if (data.status === 'success' && data.data) {
+                    return data.data.address || 'Location not available';
+                }
+                
+                return null;
+            } catch (error) {
+                console.error('Error fetching seller address:', error);
+                return null;
+            }
         }
     </script>
 </body>

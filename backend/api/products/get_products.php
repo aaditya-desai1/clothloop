@@ -31,6 +31,7 @@ $maxPrice = isset($_GET['max_price']) ? floatval($_GET['max_price']) : 0;
 $sortBy = isset($_GET['sort_by']) ? trim($_GET['sort_by']) : 'created_at';
 $sortDir = isset($_GET['sort_dir']) && strtolower($_GET['sort_dir']) === 'asc' ? 'ASC' : 'DESC';
 $sellerId = isset($_GET['seller_id']) ? intval($_GET['seller_id']) : 0;
+$occasion = isset($_GET['occasion']) ? trim($_GET['occasion']) : '';
 
 // Ensure valid pagination
 if ($page < 1) $page = 1;
@@ -94,6 +95,11 @@ try {
     if ($sellerId > 0) {
         $query .= " AND p.seller_id = :seller_id";
         $params[':seller_id'] = $sellerId;
+    }
+    
+    if (!empty($occasion)) {
+        $query .= " AND p.occasion LIKE :occasion";
+        $params[':occasion'] = "%$occasion%";
     }
     
     // Add sorting

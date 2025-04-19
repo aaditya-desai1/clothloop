@@ -113,6 +113,11 @@ try {
             }
         }
         
+        // Ensure address is never null or empty
+        if (empty($seller['address'])) {
+            $seller['address'] = 'Location not available';
+        }
+        
         // Set response data
         $response['status'] = 'success';
         $response['message'] = 'Seller information retrieved successfully';
@@ -132,7 +137,7 @@ try {
                 'id' => $user['id'],
                 'shop_name' => $user['name'] . "'s Shop",
                 'description' => 'No shop description available',
-                'address' => 'Address not specified',
+                'address' => 'Location not available',
                 'phone' => $user['phone'] ?? 'Not provided',
                 'email' => $user['email'] ?? 'Not provided'
             ];
@@ -149,7 +154,7 @@ try {
                 'id' => $sellerId,
                 'shop_name' => 'ClothLoop Shop',
                 'description' => 'Seller information not available',
-                'address' => 'Address not specified'
+                'address' => 'Location not available'
             ];
         }
     }
@@ -167,7 +172,7 @@ try {
         'id' => $sellerId ?? 0,
         'shop_name' => 'ClothLoop Shop (Fallback)',
         'description' => 'Error retrieving shop information',
-        'address' => 'Address not available due to error'
+        'address' => 'Location not available'
     ];
     
     echo json_encode($response);

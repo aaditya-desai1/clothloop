@@ -1109,7 +1109,7 @@
                 // Open Google Maps with the coordinates
                 window.open(`https://www.google.com/maps?q=${latitude},${longitude}`, '_blank');
                 console.log('Using coordinates for map');
-            } else if (shopAddress && shopAddress !== 'Address not specified' && shopAddress !== 'Not provided') {
+            } else if (shopAddress && shopAddress !== 'Location not available' && shopAddress !== 'Not provided' && shopAddress !== 'Address not specified') {
                 // Fallback to address search if we have an address but no coordinates
                 window.open(`https://www.google.com/maps?q=${encodeURIComponent(shopAddress)}`, '_blank');
                 console.log('Using address for location:', shopAddress);
@@ -1327,7 +1327,7 @@
                     
                     // Update product with seller info
                     product.shop_name = seller.shop_name || seller.name || 'ClothLoop Shop';
-                    product.shop_address = seller.address || 'Address not available';
+                    product.shop_address = seller.address || 'Location not available';
                     
                     if (seller.latitude && seller.longitude) {
                         product.latitude = seller.latitude;
@@ -1342,8 +1342,9 @@
                     document.getElementById('shopName').textContent = product.shop_name;
                     document.getElementById('shopAddress').textContent = product.shop_address;
                     
-                    // Enable location button if we have coordinates
-                    if ((product.latitude && product.longitude) || product.shop_location) {
+                    // Enable location button if we have coordinates or address
+                    if ((product.latitude && product.longitude) || product.shop_location || 
+                        (product.shop_address && product.shop_address !== 'Location not available')) {
                         enableLocationButton();
                     }
                 }
@@ -1533,7 +1534,7 @@
                 
                 // Try to get address from different possible property names, with fallback
                 const shopAddress = product.shop_address || product.seller_address || 
-                                   product.address || 'Address not specified';
+                                   product.address || 'Location not available';
                 document.getElementById('shopAddress').textContent = shopAddress;
                 
                 // Contact number and create clickable link
@@ -1586,6 +1587,11 @@
                     } catch (e) {
                         console.error('Error parsing location data:', e);
                     }
+                }
+                // Enable location button if we have a valid address
+                else if (shopAddress && shopAddress !== 'Location not available') {
+                    console.log('No coordinates but valid address found:', shopAddress);
+                    enableLocationButton();
                 }
                 
                 // Check if the product is already in wishlist to update button state
@@ -2136,7 +2142,7 @@
                 document.getElementById('shopName').textContent = params.shop || 'ClothLoop Shop';
                 
                 // Shop address from URL params
-                const shopAddress = params.address || 'Address not specified';
+                const shopAddress = params.address || 'Location not available';
                 document.getElementById('shopAddress').textContent = shopAddress;
                 
                 // Terms and conditions from URL params
