@@ -1647,7 +1647,7 @@
                     url += `&search=${encodeURIComponent(searchTerm)}`;
                 }
                 
-                if (sortBy) {
+                if (sortBy && sortBy !== 'nearby') {
                     url += `&sort_by=${sortBy}`;
                 }
                 
@@ -1695,6 +1695,40 @@
                     
                     console.log('Parsed products:', products);
                     
+                    // Handle nearby sorting if requested
+                    if (sortBy === 'nearby') {
+                        // Get user's location from localStorage
+                        const userLat = parseFloat(localStorage.getItem('user_latitude'));
+                        const userLng = parseFloat(localStorage.getItem('user_longitude'));
+                        
+                        if (!userLat || !userLng || isNaN(userLat) || isNaN(userLng)) {
+                            // Ask for location if not available
+                            showNotification('Location needed for nearby listings. Please allow location access.');
+                            
+                            try {
+                                await getUserLocation();
+                                
+                                // Retry with the newly obtained location
+                                const newUserLat = parseFloat(localStorage.getItem('user_latitude'));
+                                const newUserLng = parseFloat(localStorage.getItem('user_longitude'));
+                                
+                                if (newUserLat && newUserLng && !isNaN(newUserLat) && !isNaN(newUserLng)) {
+                                    products = sortProductsByDistance(products, newUserLat, newUserLng);
+                                    showNotification('Showing nearby listings based on your location');
+                                } else {
+                                    showNotification('Could not get your location. Showing products without distance sorting.');
+                                }
+                            } catch (error) {
+                                console.error('Error getting user location:', error);
+                                showNotification('Could not get your location. Showing products without distance sorting.');
+                            }
+                        } else {
+                            // Sort products by distance using the existing location
+                            products = sortProductsByDistance(products, userLat, userLng);
+                            showNotification('Showing nearby listings based on your location');
+                        }
+                    }
+                    
                     if (products.length > 0) {
                         renderProducts(products);
                     } else {
@@ -1720,6 +1754,131 @@
                 
                 showNotification('Error loading products. Please check console for details.');
             }
+        }
+        
+        // Function to get user's current location
+        function getUserLocation() {
+            return new Promise((resolve, reject) => {
+                if (!navigator.geolocation) {
+                    reject(new Error('Geolocation is not supported by your browser'));
+                    return;
+                }
+                
+                showNotification('Getting your location...');
+                
+                navigator.geolocation.getCurrentPosition(
+                    // Success callback
+                    function(position) {
+                        const latitude = position.coords.latitude.toFixed(6);
+                        const longitude = position.coords.longitude.toFixed(6);
+                        
+                        // Save to localStorage
+                        localStorage.setItem('user_latitude', latitude);
+                        localStorage.setItem('user_longitude', longitude);
+                        
+                        console.log(`User location: ${latitude}, ${longitude}`);
+                        showNotification('Location updated successfully!');
+                        resolve({latitude, longitude});
+                    },
+                    // Error callback
+                    function(error) {
+                        console.error('Error getting location:', error);
+                        let errorMessage = 'Could not get your location';
+                        
+                        switch(error.code) {
+                            case error.PERMISSION_DENIED:
+                                errorMessage = 'You denied the request for location';
+                                break;
+                            case error.POSITION_UNAVAILABLE:
+                                errorMessage = 'Location information is unavailable';
+                                break;
+                            case error.TIMEOUT:
+                                errorMessage = 'The request to get your location timed out';
+                                break;
+                        }
+                        
+                        showNotification(errorMessage);
+                        reject(new Error(errorMessage));
+                    },
+                    // Options
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 0
+                    }
+                );
+            });
+        }
+        
+        // Function to calculate distance between two coordinates using Haversine formula
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            if (!lat1 || !lon1 || !lat2 || !lon2 || 
+                isNaN(lat1) || isNaN(lon1) || isNaN(lat2) || isNaN(lon2)) {
+                return Number.MAX_VALUE; // Return a large value if coordinates are invalid
+            }
+            
+            // Convert latitude and longitude from degrees to radians
+            const radLat1 = (Math.PI * lat1) / 180;
+            const radLon1 = (Math.PI * lon1) / 180;
+            const radLat2 = (Math.PI * lat2) / 180;
+            const radLon2 = (Math.PI * lon2) / 180;
+            
+            // Haversine formula
+            const dLat = radLat2 - radLat1;
+            const dLon = radLon2 - radLon1;
+            
+            const a = 
+                Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(radLat1) * Math.cos(radLat2) * 
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            
+            // Earth radius in kilometers
+            const earthRadius = 6371;
+            const distance = earthRadius * c;
+            
+            return distance;
+        }
+        
+        // Function to sort products by distance from user
+        function sortProductsByDistance(products, userLat, userLng) {
+            // Add distance property to each product
+            products.forEach(product => {
+                let sellerLat, sellerLng;
+                
+                // Check different possible properties for coordinates
+                if (product.latitude && product.longitude) {
+                    sellerLat = parseFloat(product.latitude);
+                    sellerLng = parseFloat(product.longitude);
+                } else if (product.seller_latitude && product.seller_longitude) {
+                    sellerLat = parseFloat(product.seller_latitude);
+                    sellerLng = parseFloat(product.seller_longitude);
+                } else if (product.shop_location) {
+                    // Try to parse coordinates from shop_location string
+                    try {
+                        const coordinates = product.shop_location.split(',');
+                        if (coordinates.length === 2) {
+                            sellerLat = parseFloat(coordinates[0].trim());
+                            sellerLng = parseFloat(coordinates[1].trim());
+                        }
+                    } catch (e) {
+                        console.error('Error parsing shop location:', e);
+                    }
+                }
+                
+                // Calculate distance if we have valid coordinates
+                if (sellerLat && sellerLng && !isNaN(sellerLat) && !isNaN(sellerLng)) {
+                    product.distance = calculateDistance(userLat, userLng, sellerLat, sellerLng);
+                    console.log(`Distance to ${product.title || product.name}: ${product.distance.toFixed(2)} km`);
+                } else {
+                    // Set a large distance for products without coordinates
+                    product.distance = Number.MAX_VALUE;
+                }
+            });
+            
+            // Sort products by distance (closest first)
+            return products.sort((a, b) => a.distance - b.distance);
         }
         
         // Function to handle category selection
@@ -1943,14 +2102,23 @@
                 
                 case 'nearby':
                     showNotification('Showing nearby listings first');
-                    // This would typically use geolocation - for demo, we'll just show a notification
-                    // In a real implementation, we would sort based on distance calculation
+                    // Get user's location and fetch products sorted by distance
                     fetchProducts(null, null, 'nearby');
                     return; // Return early as we're fetching new data
                 
                 case 'occasion':
-                    // This is handled by occasion submenu
+                    // This is handled by the occasion filter
                     return;
+                
+                case 'clear':
+                    showNotification('Clearing all filters');
+                    // Reset the category selection
+                    const categories = document.querySelectorAll('.categories a');
+                    categories.forEach(cat => cat.classList.remove('active'));
+                    
+                    // Fetch all products with no filters
+                    fetchProducts();
+                    return; // Return early as we're fetching new data
                 
                 default:
                     return;
@@ -2085,8 +2253,47 @@
                     const rentalPrice = product.rental_price || product.price || 0;
                     price.textContent = `₹${rentalPrice}/day`;
                     
-                    // Set seller info
-                    seller.textContent = product.shop_name || product.seller_name || 'ClothLoop Seller';
+                    // Set seller info - include distance if available
+                    if (product.distance && product.distance !== Number.MAX_VALUE) {
+                        // Add distance information to seller info
+                        const distanceKm = product.distance.toFixed(1);
+                        seller.textContent = `${product.shop_name || product.seller_name || 'ClothLoop Seller'} • ${distanceKm} km away`;
+                        
+                        // Add a small location icon to indicate this has distance info
+                        const locationIcon = document.createElement('i');
+                        locationIcon.className = 'fas fa-map-marker-alt';
+                        locationIcon.style.marginRight = '5px';
+                        locationIcon.style.color = 'var(--accent-color)';
+                        seller.prepend(locationIcon);
+                        
+                        // Add distance as data attribute for sorting reference
+                        productCard.setAttribute('data-distance', distanceKm);
+                        
+                        // Add a special class for nearby listings
+                        if (product.distance < 10) {
+                            productCard.classList.add('nearby-listing');
+                            
+                            // Add a subtle visual indicator for very close listings (within 5km)
+                            if (product.distance < 5) {
+                                const nearbyBadge = document.createElement('div');
+                                nearbyBadge.className = 'nearby-badge';
+                                nearbyBadge.innerHTML = '<i class="fas fa-map-marker-alt"></i> Nearby';
+                                nearbyBadge.style.position = 'absolute';
+                                nearbyBadge.style.top = '10px';
+                                nearbyBadge.style.right = '10px';
+                                nearbyBadge.style.backgroundColor = 'var(--accent-color)';
+                                nearbyBadge.style.color = 'var(--primary-color)';
+                                nearbyBadge.style.padding = '5px 10px';
+                                nearbyBadge.style.fontSize = '0.8rem';
+                                nearbyBadge.style.fontWeight = 'bold';
+                                nearbyBadge.style.zIndex = '10';
+                                productCard.style.position = 'relative';
+                                productCard.appendChild(nearbyBadge);
+                            }
+                        }
+                    } else {
+                        seller.textContent = product.shop_name || product.seller_name || 'ClothLoop Seller';
+                    }
                     
                     // Set link to details page
                     detailsLink.href = `details.html?id=${product.id}`;
@@ -2112,19 +2319,21 @@
                         }
                     };
                     
-                    // Check if product is in wishlist
-                    if (isInWishlist(product.id)) {
+                    // Check if product is in wishlist and update heart icon accordingly
+                    const isProductInWishlist = isInWishlist(product.id);
+                    if (isProductInWishlist) {
                         const heartIcon = wishlistBtn.querySelector('i');
-                        heartIcon.className = 'fas fa-heart';
-                        wishlistBtn.classList.add('active');
+                        if (heartIcon) {
+                            heartIcon.className = 'fas fa-heart';
+                            wishlistBtn.classList.add('active');
+                        }
                     }
                     
-                    // Append to grid
+                    // Add the product card to the grid
                     productGrid.appendChild(productNode);
                     
-                } catch (err) {
-                    console.error(`Error rendering product ${index}:`, err, product);
-                    // Continue with next product
+                } catch (error) {
+                    console.error(`Error rendering product ${index}:`, error);
                 }
             });
             
@@ -2258,3 +2467,4 @@
     </script>
 </body>
 </html>
+
