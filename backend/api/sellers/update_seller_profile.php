@@ -65,20 +65,21 @@ try {
     $profile_photo_path = null;
     if (!empty($_FILES['profile_photo']) && $_FILES['profile_photo']['error'] == 0) {
         // Create uploads directory if it doesn't exist
-        $upload_dir = __DIR__ . '/../../../uploads/seller_profiles/';
+        $upload_dir = __DIR__ . '/../../uploads/profile_photos/';
         if (!is_dir($upload_dir)) {
             mkdir($upload_dir, 0777, true);
         }
         
-        // Generate unique filename
+        // Generate unique filename with profile_ prefix
         $file_extension = pathinfo($_FILES['profile_photo']['name'], PATHINFO_EXTENSION);
-        $file_name = 'seller_' . $seller_id . '_' . time() . '.' . $file_extension;
+        $file_name = 'profile_' . uniqid() . '.' . $file_extension;
         $target_file = $upload_dir . $file_name;
         
         // Move uploaded file
         if (move_uploaded_file($_FILES['profile_photo']['tmp_name'], $target_file)) {
-            $profile_photo_path = 'uploads/seller_profiles/' . $file_name;
-            file_put_contents($logFile, "File uploaded successfully to: $profile_photo_path\n", FILE_APPEND);
+            // Use just the filename, the path will be constructed in frontend
+            $profile_photo_path = $file_name;
+            file_put_contents($logFile, "File uploaded successfully to: $target_file as $profile_photo_path\n", FILE_APPEND);
         } else {
             file_put_contents($logFile, "ERROR: Failed to upload file\n", FILE_APPEND);
         }

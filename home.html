@@ -655,7 +655,7 @@
     <!-- Navigation -->
     <nav class="nav-bar">
         <a href="home.html" class="nav-logo">
-            <img src="frontend/assets/images/logo_f.png" alt="ClothLoop Logo" style="height: 40px; margin-right: 10px;"> ClothLoop
+            <img id="navbar-logo" src="frontend/assets/images/logo_f.png" alt="ClothLoop Logo" style="height: 40px; margin-right: 10px;"> ClothLoop
         </a>
         <div style="display: flex; align-items: center;">
             <ul class="nav-links">
@@ -719,7 +719,7 @@
     <footer class="footer" style="padding: 1rem 0 1rem;">
         <div class="footer-bottom" style="border-top: none; margin-top: 0;">
             <div class="footer-logo" style="justify-content: center; margin-bottom: 1rem;">
-                <img src="frontend/assets/images/logo_f.png" alt="ClothLoop Logo" style="height: 40px; margin-right: 10px;"> ClothLoop
+                <img id="footer-logo" src="frontend/assets/images/logo_f.png" alt="ClothLoop Logo" style="height: 40px; margin-right: 10px;"> ClothLoop
             </div>
             <p>&copy; 2024 ClothLoop. All rights reserved.</p>
         </div>
@@ -752,6 +752,20 @@
             carouselImage.src = slides[currentSlide];
         }, 5000);
         
+        // Function to update logo based on theme
+        function updateLogos(isLightTheme) {
+            const navbarLogo = document.getElementById('navbar-logo');
+            const footerLogo = document.getElementById('footer-logo');
+            
+            if (isLightTheme) {
+                navbarLogo.src = 'frontend/assets/images/logo_b.png';
+                footerLogo.src = 'frontend/assets/images/logo_b.png';
+            } else {
+                navbarLogo.src = 'frontend/assets/images/logo_f.png';
+                footerLogo.src = 'frontend/assets/images/logo_f.png';
+            }
+        }
+        
         // Theme switcher functionality
         const themeToggle = document.getElementById('theme-toggle');
         const themeIcon = themeToggle.querySelector('i');
@@ -762,21 +776,24 @@
             document.body.classList.add('light-theme');
             themeIcon.classList.remove('fa-sun');
             themeIcon.classList.add('fa-moon');
+            updateLogos(true);
         }
         
         // Toggle theme
         themeToggle.addEventListener('click', () => {
-            document.body.classList.toggle('light-theme');
+            const isLightTheme = document.body.classList.toggle('light-theme');
             
             // Update icon
-            if (document.body.classList.contains('light-theme')) {
+            if (isLightTheme) {
                 themeIcon.classList.remove('fa-sun');
                 themeIcon.classList.add('fa-moon');
                 localStorage.setItem('clothloop-theme', 'light');
+                updateLogos(true);
             } else {
                 themeIcon.classList.remove('fa-moon');
                 themeIcon.classList.add('fa-sun');
                 localStorage.setItem('clothloop-theme', 'dark');
+                updateLogos(false);
             }
         });
     </script>

@@ -72,6 +72,7 @@ $response = [
         'interested_customers' => 0,
         'average_rating' => 0,
         'avg_product_price' => 0,
+        'profile_photo' => null,
         'interested_customers_list' => []
     ]
 ];
@@ -84,6 +85,28 @@ try {
     $database = new Database();
     $conn = $database->getConnection();
     
+    // Check if products table exists and has the rental_price column
+    try {
+        $checkColumn = $conn->prepare("SHOW COLUMNS FROM products LIKE 'rental_price'");
+        $checkColumn->execute();
+        $hasRentalPrice = $checkColumn->rowCount() > 0;
+        
+        // If rental_price column doesn't exist, check for price column
+        if (!$hasRentalPrice) {
+            $checkColumn = $conn->prepare("SHOW COLUMNS FROM products LIKE 'price'");
+            $checkColumn->execute();
+            $hasPrice = $checkColumn->rowCount() > 0;
+            
+            if (!$hasPrice) {
+                // Neither column exists, log an error
+                error_log("Error: Neither 'rental_price' nor 'price' column exists in products table");
+            }
+        }
+    } catch (PDOException $e) {
+        error_log("Error checking columns: " . $e->getMessage());
+        // Continue execution with default values
+    }
+    
     // Initialize real data
     $data = [
         'seller_name' => $sellerName,
@@ -91,84 +114,157 @@ try {
         'interested_customers' => 0,
         'average_rating' => 0,
         'avg_product_price' => 0,
+        'profile_photo' => null,
         'interested_customers_list' => []
     ];
     
     // Only proceed with database queries if we have a user ID
     if ($userId) {
+        // Get seller profile info including profile photo
+        try {
+            $query = "SELECT u.name, u.profile_photo FROM users u WHERE u.id = ?";
+            $stmt = $conn->prepare($query);
+            if ($stmt) {
+                $stmt->bindParam(1, $userId);
+                $stmt->execute();
+                $result = $stmt->fetch(PDO::FETCH_ASSOC);
+                if ($result) {
+                    if (isset($result['name']) && !empty($result['name'])) {
+                        $data['seller_name'] = $result['name'];
+                    }
+                    if (isset($result['profile_photo']) && !empty($result['profile_photo'])) {
+                        $data['profile_photo'] = $result['profile_photo'];
+                    }
+                }
+            }
+        } catch (PDOException $e) {
+            error_log("Error getting seller profile: " . $e->getMessage());
+            // Continue with default values
+        }
+        
         // Get total products
-        $query = "SELECT COUNT(*) as count FROM products WHERE seller_id = ?";
-        $stmt = $conn->prepare($query);
-        if ($stmt) {
-            $stmt->bindParam(1, $userId);
-            $stmt->execute();
-            $result = $stmt->fetch(PDO::FETCH_ASSOC);
-            if ($result) {
-                $data['total_products'] = (int)$result['count'];
+        try {
+            $query = "SELECT COUNT(*) as count FROM products WHERE seller_id = ?";
+            $stmt = $conn->prepare($query);
+            if ($stmt) {
+                $stmt->bindParam(1, $userId);
+                $stmt->execute();
+                $result = $stmt->fetch(PDO::FETCH_ASSOC);
+                if ($result) {
+                    $data['total_products'] = (int)$result['count'];
+                }
             }
+        } catch (PDOException $e) {
+            error_log("Error getting product count: " . $e->getMessage());
+            // Continue with default value
         }
         
-        // Get average product price
-        $query = "SELECT AVG(price) as avg_price FROM products WHERE seller_id = ?";
-        $stmt = $conn->prepare($query);
-        if ($stmt) {
-            $stmt->bindParam(1, $userId);
-            $stmt->execute();
-            $result = $stmt->fetch(PDO::FETCH_ASSOC);
-            if ($result && $result['avg_price'] !== null) {
-                $data['avg_product_price'] = round((float)$result['avg_price'], 2);
+        // Get average product price - try with rental_price first, then fall back to price if needed
+        try {
+            if (isset($hasRentalPrice) && $hasRentalPrice) {
+                $query = "SELECT AVG(rental_price) as avg_price FROM products WHERE seller_id = ?";
+            } else if (isset($hasPrice) && $hasPrice) {
+                $query = "SELECT AVG(price) as avg_price FROM products WHERE seller_id = ?";
             } else {
-                $data['avg_product_price'] = 0;
+                throw new PDOException("No price column available");
             }
+            
+            $stmt = $conn->prepare($query);
+            if ($stmt) {
+                $stmt->bindParam(1, $userId);
+                $stmt->execute();
+                $result = $stmt->fetch(PDO::FETCH_ASSOC);
+                if ($result && $result['avg_price'] !== null) {
+                    $data['avg_product_price'] = round((float)$result['avg_price'], 2);
+                } else {
+                    $data['avg_product_price'] = 0;
+                }
+            }
+        } catch (PDOException $e) {
+            error_log("Error getting average price: " . $e->getMessage());
+            // Continue with default value
         }
         
-        // Get average rating
-        $query = "SELECT AVG(rating) as avg_rating FROM seller_reviews WHERE seller_id = ?";
-        $stmt = $conn->prepare($query);
-        if ($stmt) {
-            $stmt->bindParam(1, $userId);
-            $stmt->execute();
-            $result = $stmt->fetch(PDO::FETCH_ASSOC);
-            if ($result && $result['avg_rating'] !== null) {
-                $data['average_rating'] = round((float)$result['avg_rating'], 1);
+        // Get average rating - New approach: Get average rating from product_reviews
+        try {
+            $query = "SELECT AVG(pr.rating) as avg_rating 
+                      FROM product_reviews pr 
+                      JOIN products p ON pr.product_id = p.id 
+                      WHERE p.seller_id = ?";
+            $stmt = $conn->prepare($query);
+            if ($stmt) {
+                $stmt->bindParam(1, $userId);
+                $stmt->execute();
+                $result = $stmt->fetch(PDO::FETCH_ASSOC);
+                if ($result && $result['avg_rating'] !== null) {
+                    $data['average_rating'] = round((float)$result['avg_rating'], 1);
+                }
+            }
+        } catch (PDOException $e) {
+            error_log("Error getting average rating from product_reviews: " . $e->getMessage());
+            // Try alternative approach with seller_reviews as fallback
+            try {
+                $query = "SELECT AVG(rating) as avg_rating FROM seller_reviews WHERE seller_id = ?";
+                $stmt = $conn->prepare($query);
+                if ($stmt) {
+                    $stmt->bindParam(1, $userId);
+                    $stmt->execute();
+                    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+                    if ($result && $result['avg_rating'] !== null) {
+                        $data['average_rating'] = round((float)$result['avg_rating'], 1);
+                    }
+                }
+            } catch (PDOException $e2) {
+                error_log("Error getting average rating from seller_reviews: " . $e2->getMessage());
+                // Continue with default value
             }
         }
         
         // Get count of interested customers
-        $query = "SELECT COUNT(DISTINCT buyer_id) as count FROM customer_interests 
-                 JOIN products ON customer_interests.product_id = products.id 
-                 WHERE products.seller_id = ?";
-        $stmt = $conn->prepare($query);
-        if ($stmt) {
-            $stmt->bindParam(1, $userId);
-            $stmt->execute();
-            $result = $stmt->fetch(PDO::FETCH_ASSOC);
-            if ($result) {
-                $data['interested_customers'] = (int)$result['count'];
+        try {
+            $query = "SELECT COUNT(DISTINCT buyer_id) as count FROM customer_interests 
+                    JOIN products ON customer_interests.product_id = products.id 
+                    WHERE products.seller_id = ?";
+            $stmt = $conn->prepare($query);
+            if ($stmt) {
+                $stmt->bindParam(1, $userId);
+                $stmt->execute();
+                $result = $stmt->fetch(PDO::FETCH_ASSOC);
+                if ($result) {
+                    $data['interested_customers'] = (int)$result['count'];
+                }
             }
+        } catch (PDOException $e) {
+            error_log("Error getting interested customers count: " . $e->getMessage());
+            // Continue with default value
         }
         
         // Get list of interested customers
-        $query = "SELECT 
-                    ci.id,
-                    u.name as customer_name,
-                    u.phone_no,
-                    p.name as product_name,
-                    ci.created_at as interest_date
-                 FROM customer_interests ci 
-                 JOIN users u ON ci.buyer_id = u.id
-                 JOIN products p ON ci.product_id = p.id
-                 WHERE p.seller_id = ?
-                 ORDER BY ci.created_at DESC
-                 LIMIT 10";
-        $stmt = $conn->prepare($query);
-        if ($stmt) {
-            $stmt->bindParam(1, $userId);
-            $stmt->execute();
-            $customers = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            if ($customers) {
-                $data['interested_customers_list'] = $customers;
+        try {
+            $query = "SELECT 
+                        ci.id,
+                        u.name as customer_name,
+                        u.phone_no,
+                        p.title as product_name,
+                        ci.created_at as interest_date
+                    FROM customer_interests ci 
+                    JOIN users u ON ci.buyer_id = u.id
+                    JOIN products p ON ci.product_id = p.id
+                    WHERE p.seller_id = ?
+                    ORDER BY ci.created_at DESC
+                    LIMIT 10";
+            $stmt = $conn->prepare($query);
+            if ($stmt) {
+                $stmt->bindParam(1, $userId);
+                $stmt->execute();
+                $customers = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                if ($customers) {
+                    $data['interested_customers_list'] = $customers;
+                }
             }
+        } catch (PDOException $e) {
+            error_log("Error getting interested customers list: " . $e->getMessage());
+            // Continue with default value
         }
     }
     

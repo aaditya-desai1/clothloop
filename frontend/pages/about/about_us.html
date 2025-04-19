@@ -645,7 +645,7 @@
     <!-- Navigation -->
     <nav>
         <a href="../../../home.html" class="logo">
-            <img src="../../assets/images/logo_f.png" alt="ClothLoop Logo" style="height: 40px; margin-right: 10px;"> ClothLoop
+            <img id="navbar-logo" src="../../assets/images/logo_f.png" alt="ClothLoop Logo" style="height: 40px; margin-right: 10px;"> ClothLoop
         </a>
         <div style="display: flex; align-items: center;">
             <ul>
@@ -774,7 +774,7 @@
     <footer class="footer">
         <div class="footer-bottom">
             <div class="footer-logo" style="justify-content: center; margin-bottom: 1rem;">
-                <img src="../../assets/images/logo_f.png" alt="ClothLoop Logo" style="height: 40px; margin-right: 10px;"> ClothLoop
+                <img id="footer-logo" src="../../assets/images/logo_f.png" alt="ClothLoop Logo" style="height: 40px; margin-right: 10px;"> ClothLoop
             </div>
             <p>&copy; 2024 ClothLoop. All rights reserved.</p>
         </div>
@@ -785,27 +785,44 @@
         const themeToggle = document.getElementById('theme-toggle');
         const themeIcon = themeToggle.querySelector('i');
         
+        // Function to update logos based on theme
+        function updateLogos(isLightTheme) {
+            const navbarLogo = document.getElementById('navbar-logo');
+            const footerLogo = document.getElementById('footer-logo');
+            
+            if (isLightTheme) {
+                navbarLogo.src = '../../assets/images/logo_b.png';
+                footerLogo.src = '../../assets/images/logo_b.png';
+            } else {
+                navbarLogo.src = '../../assets/images/logo_f.png';
+                footerLogo.src = '../../assets/images/logo_f.png';
+            }
+        }
+        
         // Check for saved theme preference or use default
         const savedTheme = localStorage.getItem('clothloop-theme');
         if (savedTheme === 'light') {
             document.body.classList.add('light-theme');
             themeIcon.classList.remove('fa-sun');
             themeIcon.classList.add('fa-moon');
+            updateLogos(true);
         }
         
         // Toggle theme
         themeToggle.addEventListener('click', () => {
-            document.body.classList.toggle('light-theme');
+            const isLightTheme = document.body.classList.toggle('light-theme');
             
             // Update icon
-            if (document.body.classList.contains('light-theme')) {
+            if (isLightTheme) {
                 themeIcon.classList.remove('fa-sun');
                 themeIcon.classList.add('fa-moon');
                 localStorage.setItem('clothloop-theme', 'light');
+                updateLogos(true);
             } else {
                 themeIcon.classList.remove('fa-moon');
                 themeIcon.classList.add('fa-sun');
                 localStorage.setItem('clothloop-theme', 'dark');
+                updateLogos(false);
             }
         });
     </script>

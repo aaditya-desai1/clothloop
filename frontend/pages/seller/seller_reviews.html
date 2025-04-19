@@ -209,7 +209,7 @@
         
         .reviews-stats {
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
             align-items: center;
             padding: 20px;
             background-color: var(--card-bg);
@@ -219,10 +219,11 @@
             margin-bottom: 30px;
         }
         
-        .stats-left {
+        .stats-top {
             display: flex;
             flex-direction: column;
             align-items: center;
+            margin-bottom: 30px;
         }
         
         .overall-rating {
@@ -238,38 +239,40 @@
             color: var(--star-color);
         }
         
-        .stats-right {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-        }
-        
         .rating-count {
             font-size: 14px;
             color: var(--text-color);
             opacity: 0.8;
         }
         
-        .rating-bars {
+        .stats-bottom {
             display: flex;
-            flex-direction: column;
-            align-items: flex-end;
+            width: 100%;
+            justify-content: space-between;
+            max-width: 800px;
         }
         
         .rating-bar-item {
             display: flex;
             flex-direction: column;
-            align-items: flex-end;
-            margin-bottom: 8px;
+            align-items: center;
+            margin: 0 5px;
+            width: 18%;
+        }
+        
+        .rating-label {
+            font-weight: bold;
+            margin-bottom: 5px;
         }
         
         .rating-bar {
-            width: 200px;
+            width: 100%;
             height: 8px;
             background-color: var(--hover-bg);
             border-radius: 4px;
             position: relative;
             overflow: hidden;
+            margin-bottom: 5px;
         }
         
         .rating-bar-fill {
@@ -281,9 +284,8 @@
         }
         
         .rating-percent {
-            font-size: 14px;
-            width: 50px;
-            margin-left: 10px;
+            font-size: 12px;
+            text-align: center;
         }
         
         /* Reviews List */
@@ -435,19 +437,17 @@
             color: var(--accent-color) !important;
         }
 
-        /* Responsive Styles */
-        @media (max-width: 992px) {
-            .reviews-stats {
-                flex-direction: column;
-                align-items: flex-start;
+        /* Responsive adjustments for ratings */
+        @media (max-width: 768px) {
+            .stats-bottom {
+                flex-wrap: wrap;
             }
             
-            .rating-bars {
-                align-items: flex-start;
+            .rating-bar-item {
+                width: 45%;
+                margin-bottom: 10px;
             }
-        }
-
-        @media (max-width: 768px) {
+            
             nav {
                 padding: 1rem;
             }
@@ -490,6 +490,12 @@
             
             .review-card {
                 padding: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .rating-bar-item {
+                width: 100%;
             }
         }
 
@@ -715,7 +721,7 @@
     <!-- Navigation -->
     <nav>
         <a href="seller_dashboard.html" class="logo">
-            <img src="../../assets/images/logo_f.png" alt="ClothLoop Logo" style="height: 40px; margin-right: 10px;"> ClothLoop
+            <img src="../../assets/images/logo_b.png" alt="ClothLoop Logo" style="height: 40px; margin-right: 10px;"> ClothLoop
             <span class="seller-badge">Seller</span>
         </a>
         <div style="display: flex; align-items: center;">
@@ -748,72 +754,70 @@
         <!-- Reviews Overview Section -->
         <div class="reviews-section">
             <div class="reviews-stats">
-                <div class="stats-left">
+                <div class="stats-top">
                     <div class="overall-rating" id="overall-rating">0</div>
                     <div class="rating-stars" id="average-rating-stars">
                         <!-- Stars will be filled dynamically -->
                     </div>
                 </div>
-                <div class="stats-right">
-                    <div class="rating-count" id="rating-count">Based on 0 reviews</div>
-                    <div class="rating-bars">
-                        <div class="rating-bar-item">
-                            <div class="rating-label">5</div>
-                    <div class="rating-bar">
-                                <div class="rating-bar-fill" id="rating-bar-5" style="width: 0%"></div>
+                <div class="rating-count" id="rating-count">Based on 0 reviews</div>
+                <div class="stats-bottom">
+                    <div class="rating-bar-item">
+                        <div class="rating-label">5</div>
+                        <div class="rating-bar">
+                            <div class="rating-bar-fill" id="rating-bar-5" style="width: 0%"></div>
                         </div>
-                            <div class="rating-percent" id="rating-percent-5">0%</div>
+                        <div class="rating-percent" id="rating-percent-5">0%</div>
                     </div>
-                        <div class="rating-bar-item">
-                            <div class="rating-label">4</div>
-                    <div class="rating-bar">
-                                <div class="rating-bar-fill" id="rating-bar-4" style="width: 0%"></div>
+                    <div class="rating-bar-item">
+                        <div class="rating-label">4</div>
+                        <div class="rating-bar">
+                            <div class="rating-bar-fill" id="rating-bar-4" style="width: 0%"></div>
                         </div>
-                            <div class="rating-percent" id="rating-percent-4">0%</div>
+                        <div class="rating-percent" id="rating-percent-4">0%</div>
                     </div>
-                        <div class="rating-bar-item">
-                            <div class="rating-label">3</div>
-                    <div class="rating-bar">
-                                <div class="rating-bar-fill" id="rating-bar-3" style="width: 0%"></div>
+                    <div class="rating-bar-item">
+                        <div class="rating-label">3</div>
+                        <div class="rating-bar">
+                            <div class="rating-bar-fill" id="rating-bar-3" style="width: 0%"></div>
                         </div>
-                            <div class="rating-percent" id="rating-percent-3">0%</div>
+                        <div class="rating-percent" id="rating-percent-3">0%</div>
                     </div>
-                        <div class="rating-bar-item">
-                            <div class="rating-label">2</div>
-                    <div class="rating-bar">
-                                <div class="rating-bar-fill" id="rating-bar-2" style="width: 0%"></div>
+                    <div class="rating-bar-item">
+                        <div class="rating-label">2</div>
+                        <div class="rating-bar">
+                            <div class="rating-bar-fill" id="rating-bar-2" style="width: 0%"></div>
                         </div>
-                            <div class="rating-percent" id="rating-percent-2">0%</div>
+                        <div class="rating-percent" id="rating-percent-2">0%</div>
                     </div>
-                        <div class="rating-bar-item">
-                            <div class="rating-label">1</div>
-                    <div class="rating-bar">
-                                <div class="rating-bar-fill" id="rating-bar-1" style="width: 0%"></div>
+                    <div class="rating-bar-item">
+                        <div class="rating-label">1</div>
+                        <div class="rating-bar">
+                            <div class="rating-bar-fill" id="rating-bar-1" style="width: 0%"></div>
                         </div>
-                            <div class="rating-percent" id="rating-percent-1">0%</div>
+                        <div class="rating-percent" id="rating-percent-1">0%</div>
                     </div>
                 </div>
             </div>
-                    </div>
-                </div>
-                
+        </div>
+        
         <!-- Reviews List -->
         <div class="reviews-list" id="reviews-container">
             <!-- Reviews will be loaded dynamically -->
             <div id="no-reviews-message" style="display: none;">
                 <p>You don't have any reviews yet. As customers rent your items and leave reviews, they will appear here.</p>
-                            </div>
+            </div>
             <div id="loading-spinner" class="loading-spinner">
                 <div class="spinner"></div>
-                    </div>
-                </div>
+            </div>
+        </div>
     </main>
 
     <!-- Footer -->
     <footer class="footer">
         <div class="footer-bottom">
             <div class="footer-logo">
-                <img src="../../assets/images/logo_f.png" alt="ClothLoop Logo" style="height: 40px; margin-right: 10px;"> ClothLoop
+                <img src="../../assets/images/logo_b.png" alt="ClothLoop Logo" style="height: 40px; margin-right: 10px;"> ClothLoop
             </div>
             <p>&copy; 2024 ClothLoop. All rights reserved.</p>
         </div>

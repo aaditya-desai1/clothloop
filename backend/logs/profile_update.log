@@ -230,3 +230,171 @@ Seller Rows Affected: 0
 
 Transaction committed successfully
 
+Received POST data: {
+    "seller_id": "1",
+    "name": "Seller",
+    "email": "seller@gmail.com",
+    "phone_no": "1234567890",
+    "shop_name": "Seller Hub",
+    "description": "hi",
+    "latitude": "40.71280000",
+    "longitude": "-74.00600000"
+}
+
+Received FILES data: {
+    "profile_photo": {
+        "name": "Yash.jpg",
+        "full_path": "Yash.jpg",
+        "type": "image\/jpeg",
+        "tmp_name": "C:\\xampp\\tmp\\phpF26A.tmp",
+        "error": 0,
+        "size": 197409
+    }
+}
+
+Transaction started
+File uploaded successfully to: uploads/seller_profiles/seller_1_1745020407.jpg
+User Update Query: UPDATE users SET name = ?, email = ?, phone_no = ?, profile_photo = ? WHERE id = ?
+User Params: ["Seller","seller@gmail.com","1234567890","uploads\/seller_profiles\/seller_1_1745020407.jpg",1]
+User Update Result: Success
+User Rows Affected: 1
+
+Seller Update Query: UPDATE sellers SET shop_name = ?, description = ?, latitude = ?, longitude = ? WHERE id = ?
+Seller Params: ["Seller Hub","hi","40.71280000","-74.00600000",1]
+Seller Update Result: Success
+Seller Rows Affected: 0
+
+Transaction committed successfully
+
+Received POST data: {
+    "seller_id": "1",
+    "name": "Aadi",
+    "email": "seller@gmail.com",
+    "phone_no": "1234567890",
+    "shop_name": "Seller Hub",
+    "description": "hi",
+    "latitude": "40.71280000",
+    "longitude": "-74.00600000"
+}
+
+Transaction started
+User Update Query: UPDATE users SET name = ?, email = ?, phone_no = ? WHERE id = ?
+User Params: ["Aadi","seller@gmail.com","1234567890",1]
+User Update Result: Success
+User Rows Affected: 1
+
+Seller Update Query: UPDATE sellers SET shop_name = ?, description = ?, latitude = ?, longitude = ? WHERE id = ?
+Seller Params: ["Seller Hub","hi","40.71280000","-74.00600000",1]
+Seller Update Result: Success
+Seller Rows Affected: 0
+
+Transaction committed successfully
+
+Received POST data: {
+    "seller_id": "1",
+    "name": "Seller",
+    "email": "seller@gmail.com",
+    "phone_no": "1234567890",
+    "shop_name": "Seller Hub",
+    "description": "hi",
+    "latitude": "40.71280000",
+    "longitude": "-74.00600000"
+}
+
+Transaction started
+User Update Query: UPDATE users SET name = ?, email = ?, phone_no = ? WHERE id = ?
+User Params: ["Seller","seller@gmail.com","1234567890",1]
+User Update Result: Success
+User Rows Affected: 1
+
+Seller Update Query: UPDATE sellers SET shop_name = ?, description = ?, latitude = ?, longitude = ? WHERE id = ?
+Seller Params: ["Seller Hub","hi","40.71280000","-74.00600000",1]
+Seller Update Result: Success
+Seller Rows Affected: 0
+
+Transaction committed successfully
+
+Received POST data: {
+    "seller_id": "1",
+    "name": "Seller",
+    "email": "seller@gmail.com",
+    "phone_no": "9825561050",
+    "shop_name": "Seller Hub",
+    "description": "hi",
+    "latitude": "40.71280000",
+    "longitude": "-74.00600000"
+}
+
+Transaction started
+User Update Query: UPDATE users SET name = ?, email = ?, phone_no = ? WHERE id = ?
+User Params: ["Seller","seller@gmail.com","9825561050",1]
+User Update Result: Success
+User Rows Affected: 1
+
+Seller Update Query: UPDATE sellers SET shop_name = ?, description = ?, latitude = ?, longitude = ? WHERE id = ?
+Seller Params: ["Seller Hub","hi","40.71280000","-74.00600000",1]
+Seller Update Result: Success
+Seller Rows Affected: 0
+
+Transaction committed successfully
+
+Received POST data: {
+    "seller_id": "1",
+    "name": "Seller",
+    "email": "seller@gmail.com",
+    "phone_no": "9825561050",
+    "shop_name": "Seller Hub",
+    "description": "hi",
+    "latitude": "40.71280000",
+    "longitude": "-74.00600000"
+}
+
+Received FILES data: {
+    "profile_photo": {
+        "name": "Nishidh.jpg",
+        "full_path": "Nishidh.jpg",
+        "type": "image\/jpeg",
+        "tmp_name": "C:\\xampp\\tmp\\phpAF2F.tmp",
+        "error": 0,
+        "size": 256756
+    }
+}
+
+Transaction started
+File uploaded successfully to: C:\xampp\htdocs\ClothLoop\backend\api\sellers/../../uploads/profile_photos/profile_6802e8752da33.jpg as profile_6802e8752da33.jpg
+User Update Query: UPDATE users SET name = ?, email = ?, phone_no = ?, profile_photo = ? WHERE id = ?
+User Params: ["Seller","seller@gmail.com","9825561050","profile_6802e8752da33.jpg",1]
+User Update Result: Success
+User Rows Affected: 1
+
+Seller Update Query: UPDATE sellers SET shop_name = ?, description = ?, latitude = ?, longitude = ? WHERE id = ?
+Seller Params: ["Seller Hub","hi","40.71280000","-74.00600000",1]
+Seller Update Result: Success
+Seller Rows Affected: 0
+
+Transaction committed successfully
+
+Received POST data: {
+    "seller_id": "1",
+    "name": "Nishidh",
+    "email": "seller@gmail.com",
+    "phone_no": "9825561050",
+    "shop_name": "Seller Hub",
+    "description": "hi",
+    "latitude": "40.71280000",
+    "longitude": "-74.00600000"
+}
+
+Transaction started
+User Update Query: UPDATE users SET name = ?, email = ?, phone_no = ? WHERE id = ?
+User Params: ["Nishidh","seller@gmail.com","9825561050",1]
+User Update Result: Success
+User Rows Affected: 1
+
+Seller Update Query: UPDATE sellers SET shop_name = ?, description = ?, latitude = ?, longitude = ? WHERE id = ?
+Seller Params: ["Seller Hub","hi","40.71280000","-74.00600000",1]
+Seller Update Result: Success
+Seller Rows Affected: 0
+
+Transaction committed successfully
+

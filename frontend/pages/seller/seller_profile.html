@@ -911,7 +911,7 @@
     <!-- Navigation -->
     <nav>
         <a href="seller_dashboard.html" class="logo">
-            <img src="../../assets/images/logo_f.png" alt="ClothLoop Logo" style="height: 40px; margin-right: 10px;"> ClothLoop
+            <img src="../../assets/images/logo_b.png" alt="ClothLoop Logo" style="height: 40px; margin-right: 10px;"> ClothLoop
             <span class="seller-badge">Seller</span>
         </a>
         <div style="display: flex; align-items: center;">
@@ -1096,7 +1096,7 @@
     <footer class="footer">
         <div class="footer-bottom">
             <div class="footer-logo">
-                <img src="../../assets/images/logo_f.png" alt="ClothLoop Logo" style="height: 40px; margin-right: 10px;"> ClothLoop
+                <img src="../../assets/images/logo_b.png" alt="ClothLoop Logo" style="height: 40px; margin-right: 10px;"> ClothLoop
             </div>
             <p>&copy; 2024 ClothLoop. All rights reserved.</p>
         </div>
@@ -1307,7 +1307,26 @@
                                 const logoPreview = document.querySelector('.logo-preview');
                                 logoPreview.innerHTML = '';
                                 const img = document.createElement('img');
-                                img.src = '../../../' + logoImage;
+                                
+                                // Check if the path already starts with backend or uploads
+                                if (logoImage.startsWith('backend/') || logoImage.startsWith('/backend/') || 
+                                    logoImage.startsWith('uploads/') || logoImage.startsWith('/uploads/')) {
+                                    img.src = '../../../' + logoImage;
+                                } else if (logoImage.includes('profile_')) {
+                                    // For profile images that start with profile_ prefix, use the profile_photos directory
+                                    img.src = '../../../backend/uploads/profile_photos/' + logoImage;
+                                } else {
+                                    // Fallback to original logic
+                                    img.src = '../../../' + logoImage;
+                                }
+                                
+                                // Add error handling for missing images
+                                img.onerror = function() {
+                                    console.log('Error loading profile image:', img.src);
+                                    // Replace with default icon
+                                    logoPreview.innerHTML = '<i class="fas fa-store"></i>';
+                                };
+                                
                                 logoPreview.appendChild(img);
                             }
                             
@@ -1435,6 +1454,25 @@
                     
                     if (data.status === 'success' || data.success === true) {
                         showSuccess('Profile updated successfully!');
+                        
+                        // Update profile image if it was uploaded and returned in the response
+                        if (data.data && data.data.profile_photo) {
+                            const logoPreview = document.querySelector('.logo-preview');
+                            logoPreview.innerHTML = '';
+                            const img = document.createElement('img');
+                            
+                            // Check if the returned path is just a filename or a full path
+                            if (data.data.profile_photo.includes('/')) {
+                                img.src = '../../../' + data.data.profile_photo;
+                            } else if (data.data.profile_photo.startsWith('profile_')) {
+                                // For profile images with profile_ prefix
+                                img.src = '../../../backend/uploads/profile_photos/' + data.data.profile_photo;
+                            } else {
+                                img.src = '../../../' + data.data.profile_photo;
+                            }
+                            
+                            logoPreview.appendChild(img);
+                        }
                         
                         // Reset password fields if they were changed
                         if (changePasswordCheckbox.checked) {

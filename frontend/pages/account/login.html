@@ -269,7 +269,7 @@
         <div class="form-container">
             <div class="form-header">
                 <div class="form-logo">
-                    <img src="../../assets/images/logo_f.png" alt="ClothLoop Logo" style="height: 40px; margin-bottom: 15px;">
+                    <img id="login-logo" src="../../assets/images/logo_f.png" alt="ClothLoop Logo" style="height: 40px; margin-bottom: 15px;">
                     <h2>Welcome Back</h2>
                 </div>
             </div>
@@ -303,12 +303,23 @@
         const themeToggle = document.getElementById('theme-toggle');
         const themeIcon = themeToggle.querySelector('i');
         
+        // Function to update logo based on theme
+        function updateLogo(isLightTheme) {
+            const loginLogo = document.getElementById('login-logo');
+            if (loginLogo) {
+                loginLogo.src = isLightTheme ? 
+                    '../../assets/images/logo_b.png' : 
+                    '../../assets/images/logo_f.png';
+            }
+        }
+        
         // Check for saved theme preference or use default
         const savedTheme = localStorage.getItem('clothloop-theme');
         if (savedTheme === 'light') {
             document.body.classList.add('light-theme');
             themeIcon.classList.remove('fa-sun');
             themeIcon.classList.add('fa-moon');
+            updateLogo(true);
         }
         
         // Toggle theme
@@ -320,10 +331,12 @@
                 themeIcon.classList.remove('fa-sun');
                 themeIcon.classList.add('fa-moon');
                 localStorage.setItem('clothloop-theme', 'light');
+                updateLogo(true);
             } else {
                 themeIcon.classList.remove('fa-moon');
                 themeIcon.classList.add('fa-sun');
                 localStorage.setItem('clothloop-theme', 'dark');
+                updateLogo(false);
             }
         });
         

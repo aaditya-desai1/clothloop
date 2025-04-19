@@ -257,8 +257,8 @@
     }
 
     .action-button {
-        background-color: var(--accent-color);
-        color: var(--primary-color);
+        background-color: transparent;
+        color: var(--accent-color);
         border: 2px solid var(--accent-color);
         padding: 0.8rem 1.8rem;
         font-size: 1rem;
@@ -333,6 +333,13 @@
         flex-grow: 1;
         display: flex;
         flex-direction: column;
+        justify-content: space-between;
+        min-height: 250px;
+    }
+
+    /* Create a wrapper for product details */
+    .product-details {
+        margin-bottom: 15px;
     }
 
     .product-name {
@@ -354,6 +361,24 @@
         font-size: 18px;
     }
 
+    .product-category {
+        font-size: 14px;
+        color: var(--text-color);
+        margin-bottom: 5px;
+    }
+
+    .product-date {
+        font-size: 14px;
+        color: var(--text-color);
+        margin-bottom: 5px;
+    }
+
+    .product-interest {
+        font-size: 14px;
+        color: var(--text-color);
+        margin-bottom: 20px;
+    }
+
     .product-shop {
         font-size: 14px;
         color: var(--text-color);
@@ -365,8 +390,8 @@
         display: block;
         width: 100%;
         padding: 12px;
-        background-color: var(--accent-color);
-        color: var(--primary-color);
+        background-color: transparent;
+        color: var(--accent-color);
         text-decoration: none;
         text-align: center;
         text-transform: uppercase;
@@ -375,6 +400,11 @@
         border: 2px solid var(--accent-color);
         margin-bottom: 15px;
         transition: all 0.2s linear;
+        height: 46px;
+        box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .view-details-btn:hover {
@@ -392,6 +422,7 @@
         flex-direction: row;
         gap: 8px; /* Consistent small gap between buttons */
         width: 100%;
+        margin-top: auto;
     }
     
     .product-action-btn {
@@ -844,13 +875,20 @@
     input:checked + .toggle-slider .toggle-off {
         opacity: 0;
     }
+
+    /* Wrapper for product actions buttons */
+    .product-actions {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    }
   </style>
 </head>
 <body>
     <!-- Navigation -->
     <nav>
         <a href="seller_dashboard.html" class="logo">
-            <img src="../../assets/images/logo_f.png" alt="ClothLoop Logo" style="height: 40px; margin-right: 10px;"> ClothLoop
+            <img src="../../assets/images/logo_b.png" alt="ClothLoop Logo" style="height: 40px; margin-right: 10px;"> ClothLoop
             <span class="seller-badge">Seller</span>
         </a>
         <div style="display: flex; align-items: center;">
@@ -907,28 +945,32 @@
                 <div class="product-status"></div>
             </div>
             <div class="product-info">
-                <h3 class="product-name"></h3>
-                <div class="product-price"></div>
-                <div class="product-category"></div>
-                <div class="product-date"></div>
-                <div class="product-interest">
-                    <i class="fas fa-users"></i> <span class="interest-count"></span> interested
+                <div class="product-details">
+                    <h3 class="product-name"></h3>
+                    <div class="product-price"></div>
+                    <div class="product-category"></div>
+                    <div class="product-date"></div>
+                    <div class="product-interest">
+                        <i class="fas fa-users"></i> <span class="interest-count"></span> interested
+                    </div>
                 </div>
-                <a href="#" class="view-details-btn">View Details</a>
-                <div class="product-buttons">
-                    <button class="product-action-btn edit-btn">
-                        <i class="fas fa-edit"></i> Edit
-                    </button>
-                    <label class="toggle-switch" title="Toggle availability">
-                        <input type="checkbox" class="availability-toggle">
-                        <span class="toggle-slider">
-                            <span class="toggle-status toggle-on">SHOW</span>
-                            <span class="toggle-status toggle-off">HIDE</span>
-                        </span>
-                    </label>
-                    <button class="product-action-btn delete-btn">
-                        <i class="fas fa-trash"></i> Delete
-                    </button>
+                <div class="product-actions">
+                    <a href="#" class="view-details-btn">View Details</a>
+                    <div class="product-buttons">
+                        <button class="product-action-btn edit-btn">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <label class="toggle-switch" title="Toggle availability">
+                            <input type="checkbox" class="availability-toggle">
+                            <span class="toggle-slider">
+                                <span class="toggle-status toggle-on">SHOW</span>
+                                <span class="toggle-status toggle-off">HIDE</span>
+                            </span>
+                        </label>
+                        <button class="product-action-btn delete-btn">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

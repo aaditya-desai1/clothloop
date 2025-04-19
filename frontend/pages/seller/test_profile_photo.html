@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Photo Test | ClothLoop</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        .photo-container {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .photo-item {
+            border: 1px solid #eee;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .photo-preview {
+            width: 120px;
+            height: 120px;
+            border-radius: 60px;
+            overflow: hidden;
+            margin: 0 auto 10px;
+            border: 2px solid #333;
+        }
+        .photo-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .filename {
+            font-size: 12px;
+            word-break: break-all;
+            color: #555;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .error {
+            color: #ff0000;
+            margin: 10px 0;
+        }
+        .success {
+            color: #00aa00;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Profile Photo Test</h1>
+    <p>This page tests if profile photos from the backend/uploads/profile_photos directory are displaying correctly.</p>
+    
+    <div class="photo-container">
+        <h2>Available Profile Photos</h2>
+        <button id="loadPhotos">Load Profile Photos</button>
+        <div id="messageArea"></div>
+        <div id="photoGrid" class="photo-grid"></div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const loadButton = document.getElementById('loadPhotos');
+            const photoGrid = document.getElementById('photoGrid');
+            const messageArea = document.getElementById('messageArea');
+            
+            loadButton.addEventListener('click', function() {
+                // Clear previous content
+                photoGrid.innerHTML = '';
+                messageArea.innerHTML = '';
+                messageArea.className = '';
+                
+                // Show loading message
+                messageArea.innerHTML = 'Loading photos...';
+                
+                // Fetch the photo directory listing
+                fetch('../../../backend/api/utils/list_profile_photos.php')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        messageArea.innerHTML = '';
+                        
+                        if (data.status === 'success' && data.photos && data.photos.length > 0) {
+                            // Display each photo
+                            data.photos.forEach(photo => {
+                                displayPhoto(photo);
+                            });
+                            
+                            // Show success message
+                            messageArea.innerHTML = `Found ${data.photos.length} profile photos`;
+                            messageArea.className = 'success';
+                        } else {
+                            messageArea.innerHTML = 'No profile photos found';
+                            messageArea.className = 'error';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching photos:', error);
+                        messageArea.innerHTML = `Error loading photos: ${error.message}`;
+                        messageArea.className = 'error';
+                        
+                        // Show manual test for common profile photo names
+                        showManualTest();
+                    });
+            });
+            
+            // Function to display a single photo
+            function displayPhoto(filename) {
+                const photoItem = document.createElement('div');
+                photoItem.className = 'photo-item';
+                
+                const photoPreview = document.createElement('div');
+                photoPreview.className = 'photo-preview';
+                
+                const img = document.createElement('img');
+                img.src = `../../../backend/uploads/profile_photos/${filename}`;
+                img.alt = filename;
+                img.onerror = function() {
+                    this.src = '../../assets/images/profile-placeholder.png';
+                    this.alt = 'Image not found';
+                };
+                
+                photoPreview.appendChild(img);
+                photoItem.appendChild(photoPreview);
+                
+                const filenameDiv = document.createElement('div');
+                filenameDiv.className = 'filename';
+                filenameDiv.textContent = filename;
+                photoItem.appendChild(filenameDiv);
+                
+                photoGrid.appendChild(photoItem);
+            }
+            
+            // Function to show manual test with hardcoded photo names
+            function showManualTest() {
+                // Add a message
+                const manualTestMessage = document.createElement('div');
+                manualTestMessage.innerHTML = 'Trying manual test with common profile photo filenames:';
+                manualTestMessage.className = 'success';
+                messageArea.appendChild(manualTestMessage);
+                
+                // Try some common profile photo patterns
+                const testPhotos = [
+                    'profile_68029ddcb4778.png',
+                    'profile_68029a7d8ce73.png',
+                    'profile_680299a4cc79c.png',
+                    'profile_6802992cab918.png',
+                    'profile_68029926d0ea1.png',
+                    'profile_6802991e0c47a.png'
+                ];
+                
+                testPhotos.forEach(photo => {
+                    displayPhoto(photo);
+                });
+            }
+        });
+    </script>
+</body>
+</html> 

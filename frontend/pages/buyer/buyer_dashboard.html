@@ -181,6 +181,27 @@
         .categories ul li a:hover, .categories ul li a.active {
             border-bottom: 2px solid var(--accent-color);
         }
+        
+        /* Enhanced styles for active category */
+        .categories ul li a.active {
+            border-bottom: 3px solid var(--accent-color);
+            font-weight: 700;
+            color: var(--accent-color);
+            position: relative;
+            transform: translateY(-2px);
+        }
+        
+        .categories ul li a.active::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: var(--accent-color);
+        }
 
         /* Search Bar */
         .search-section {
@@ -238,6 +259,7 @@
             height: 40px;
             margin-right: 2rem;
             position: relative;
+            z-index: 250;
         }
         
         .sort-button i {
@@ -262,7 +284,7 @@
             box-shadow: var(--box-shadow);
             border: 1px solid var(--border-color);
             min-width: 200px;
-            z-index: 100;
+            z-index: 251;
             display: none;
             margin-top: 5px;
         }
@@ -319,7 +341,7 @@
             box-shadow: var(--box-shadow);
             border: 1px solid var(--border-color);
             display: none;
-            z-index: 101;
+            z-index: 252;
         }
         
         .submenu-header {
@@ -365,6 +387,8 @@
             background-color: var(--primary-color);
             border-bottom: 1px solid var(--border-color);
             height: 85px;
+            position: relative;
+            z-index: 150;
         }
 
         /* Product Grid */
@@ -890,6 +914,7 @@
             transition: transform 0.8s ease, opacity 0.8s ease, margin-bottom 0.8s ease, padding 0.8s ease, height 0.8s ease;
             height: auto;
             opacity: 1;
+            z-index: 100;
         }
         
         .welcome-section::before {
@@ -1080,8 +1105,8 @@
 <body>
     <!-- Navigation -->
     <nav>
-        <a href="buyer_dashboard.html" class="logo">
-            <img src="../../assets/images/logo_f.png" alt="ClothLoop Logo" style="height: 40px; margin-right: 10px;"> ClothLoop
+        <a href="../../../home.html" class="logo">
+            <img id="navbar-logo" src="../../assets/images/logo_f.png" alt="ClothLoop Logo" style="height: 40px; margin-right: 10px;"> ClothLoop
         </a>
         <div style="display: flex; align-items: center;">
             <ul>
@@ -1089,7 +1114,7 @@
                 <li><a href="wish.html">Wishlist</a></li>
                 <li><a href="buyer_profile.html">Profile</a></li>
                 <li><a href="../about/about_us.html">About</a></li>
-                <li><a href="../account/login.html">Logout</a></li>
+                <li><a href="../../../home.html" id="logout-link">Logout</a></li>
             </ul>
             <button class="theme-switcher" id="theme-toggle" aria-label="Toggle theme">
                 <i class="fas fa-sun"></i>
@@ -1176,7 +1201,7 @@
     <footer class="footer">
         <div class="footer-bottom">
             <div class="footer-logo">
-                <img src="../../assets/images/logo_f.png" alt="ClothLoop Logo" style="height: 40px; margin-right: 10px;"> ClothLoop
+                <img src="../../assets/images/logo_b.png" alt="ClothLoop Logo" style="height: 40px; margin-right: 10px;"> ClothLoop
             </div>
             <p>&copy; 2024 ClothLoop. All rights reserved.</p>
         </div>
@@ -1476,27 +1501,41 @@
             }, 3000);
         }
         
+        // Function to update logo based on theme
+        function updateLogo(isLightTheme) {
+            const navbarLogo = document.getElementById('navbar-logo');
+            
+            if (isLightTheme) {
+                navbarLogo.src = '../../assets/images/logo_b.png';
+            } else {
+                navbarLogo.src = '../../assets/images/logo_f.png';
+            }
+        }
+
         // Check for saved theme preference or use default
         const savedTheme = localStorage.getItem('clothloop-theme');
         if (savedTheme === 'light') {
             document.body.classList.add('light-theme');
             themeIcon.classList.remove('fa-sun');
             themeIcon.classList.add('fa-moon');
+            updateLogo(true);
         }
-        
+
         // Toggle theme
         themeToggle.addEventListener('click', () => {
-            document.body.classList.toggle('light-theme');
+            const isLightTheme = document.body.classList.toggle('light-theme');
             
             // Update icon
-            if (document.body.classList.contains('light-theme')) {
+            if (isLightTheme) {
                 themeIcon.classList.remove('fa-sun');
                 themeIcon.classList.add('fa-moon');
                 localStorage.setItem('clothloop-theme', 'light');
+                updateLogo(true);
             } else {
                 themeIcon.classList.remove('fa-moon');
                 themeIcon.classList.add('fa-sun');
                 localStorage.setItem('clothloop-theme', 'dark');
+                updateLogo(false);
             }
         });
         
@@ -1567,6 +1606,20 @@
             }
         };
         
+        // Function to apply occasion filter
+        function applyOccasionFilter(occasionType) {
+            console.log('Applying occasion filter:', occasionType);
+            showNotification(`Filtering products for ${occasionType} occasions`);
+            
+            // Get current active category if any
+            const activeCategory = document.querySelector('.categories a.active');
+            const category = activeCategory ? activeCategory.textContent.trim().toLowerCase() : null;
+            console.log('Current active category:', category);
+            
+            // Call fetchProducts with occasion parameter
+            fetchProducts(category, null, null, occasionType);
+        }
+
         // Extended fetchProducts function to include sorting and occasion filters
         async function fetchProducts(category = null, searchTerm = null, sortBy = null, occasion = null) {
             try {
@@ -1578,14 +1631,16 @@
                 let url = '/ClothLoop/backend/api/products/get_products.php?limit=20';
                 
                 if (category) {
+                    // Map category names to IDs based on the correct database values
                     const categoryMap = {
-                        'men': 1,
-                        'women': 2,
-                        'kids': 3
+                        'men': 17,
+                        'women': 18,
+                        'kids': 19
                     };
                     
                     const categoryId = categoryMap[category.toLowerCase()] || category;
                     url += `&category=${categoryId}`;
+                    console.log(`Filtering by category: ${category} (ID: ${categoryId})`);
                 }
                 
                 if (searchTerm) {
@@ -1597,10 +1652,21 @@
                 }
                 
                 if (occasion) {
-                    url += `&occasion=${occasion}`;
+                    url += `&occasion=${encodeURIComponent(occasion)}`;
+                    console.log(`Filtering by occasion: ${occasion}`);
                 }
                 
                 console.log('Fetching products from:', url);
+                
+                // Debug API request
+                try {
+                    const debugResponse = await fetch(url);
+                    console.log('Response status:', debugResponse.status);
+                    const debugData = await debugResponse.clone().text();
+                    console.log('Raw API response:', debugData.substring(0, 500) + '...');
+                } catch (e) {
+                    console.error('Debug request failed:', e);
+                }
                 
                 const response = await fetch(url);
                 
@@ -1662,30 +1728,78 @@
             const womenCategory = document.getElementById('womenCategory');
             const kidsCategory = document.getElementById('kidsCategory');
             
+            // Verify that we found the category elements
+            console.log('Category elements found:', { 
+                men: menCategory, 
+                women: womenCategory, 
+                kids: kidsCategory 
+            });
+            
+            if (!menCategory || !womenCategory || !kidsCategory) {
+                console.error('Some category elements could not be found');
+                return;
+            }
+            
             const categories = [menCategory, womenCategory, kidsCategory];
             
             categories.forEach(category => {
                 category.addEventListener('click', function(e) {
                     e.preventDefault();
+                    console.log('Category clicked:', this.textContent, this);
                     
                     // Check if the clicked category already has the active class
                     const wasActive = this.classList.contains('active');
+                    console.log('Was active before:', wasActive);
                     
                     // Remove active class from all categories
-                    categories.forEach(cat => cat.classList.remove('active'));
+                    categories.forEach(cat => {
+                        cat.classList.remove('active');
+                        console.log('Removed active class from:', cat.textContent);
+                    });
                     
                     // Only add active class if this wasn't already active
                     if (!wasActive) {
                         this.classList.add('active');
+                        console.log('Added active class to:', this.textContent);
+                        
                         // Filter products based on category
                         const selectedCategory = this.textContent.trim().toLowerCase();
+                        console.log('Selected category:', selectedCategory);
                         fetchProducts(selectedCategory);
+                        showNotification(`Showing ${selectedCategory}'s clothing`);
                     } else {
                         // If it was active and now deselected, show all products
+                        console.log('Deselected category, showing all products');
                         fetchProducts();
+                        showNotification('Showing all products');
                     }
                 });
             });
+            
+            // Try to set initial category if present in URL
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const initialCategory = urlParams.get('category');
+                if (initialCategory) {
+                    console.log('Initial category from URL:', initialCategory);
+                    
+                    // Find matching category
+                    const categoryMap = {
+                        'men': menCategory,
+                        'women': womenCategory,
+                        'kids': kidsCategory
+                    };
+                    
+                    const categoryElement = categoryMap[initialCategory.toLowerCase()];
+                    if (categoryElement) {
+                        // Trigger click on this category
+                        console.log('Triggering click on initial category:', initialCategory);
+                        categoryElement.click();
+                    }
+                }
+            } catch (e) {
+                console.error('Error setting initial category:', e);
+            }
         }
         
         // Function to handle search
@@ -1850,15 +1964,6 @@
             products.forEach(product => {
                 productGrid.appendChild(product);
             });
-        }
-        
-        // Function to apply occasion filter
-        function applyOccasionFilter(occasionType) {
-            showNotification(`Filtering products for ${occasionType} occasions`);
-            
-            // In a real implementation, we would filter based on the occasion type
-            // For this demo, we'll simulate by showing a notification
-            fetchProducts(null, null, null, occasionType);
         }
         
         // Helper function to show "no products" message
