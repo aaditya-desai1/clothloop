@@ -465,6 +465,30 @@
         .light-theme .product-card:hover {
             box-shadow: 12px 12px 0 rgba(0, 0, 0, 0.1);
         }
+        
+        /* Special styles for nearby listings */
+        .nearby-listing {
+            position: relative;
+            border-color: rgba(255, 62, 108, 0.2);
+        }
+        
+        .nearby-listing:hover {
+            transform: translateY(-20px) skewX(-3deg) !important;
+            box-shadow: 15px 15px 0 rgba(255, 62, 108, 0.3) !important;
+        }
+        
+        .nearby-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #ff3e6c;
+            color: white;
+            padding: 5px 10px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
 
         .product-image {
             width: 100%;
@@ -1946,27 +1970,66 @@
                     } catch (e) {
                         console.error('Error parsing location string:', e);
                     }
+                } else if (product.seller_address || product.shop_address) {
+                    // For testing - use a random location around Mumbai
+                    // This should be replaced with proper geocoding in production
+                    sellerLat = 19.07 + (Math.random() * 0.1);
+                    sellerLng = 72.87 + (Math.random() * 0.1);
+                    source = 'fallback random coords for demo';
+                    console.log(`Using demo coordinates for ${product.title || product.name}: ${sellerLat}, ${sellerLng}`);
                 }
                 
                 return { lat: sellerLat, lng: sellerLng, source };
             }
             
-            // Add distance property to each product
+            // Generate mock coordinates for any missing locations (FOR DEMO ONLY)
+            // In production, use a geocoding service to convert addresses to coordinates
+            function ensureCoordinates(products) {
+                const productCount = products.length;
+                let missingCoords = 0;
+                
+                products.forEach((product, index) => {
+                    // Extract coordinates using the helper function
+                    const coords = extractCoordinates(product);
+                    
+                    // If no coordinates were found, generate mock ones
+                    if (!coords.lat || !coords.lng || isNaN(coords.lat) || isNaN(coords.lng)) {
+                        // For demo: generate random coordinates around Mumbai (19.07, 72.87)
+                        // Spread them in a radius to simulate different distances
+                        const randomAngle = (index / productCount) * 2 * Math.PI; // Spread points in a circle
+                        const randomDistance = 0.01 + (Math.random() * 0.1); // 1-10km approximately
+                        
+                        coords.lat = 19.076090 + (randomDistance * Math.cos(randomAngle));
+                        coords.lng = 72.877426 + (randomDistance * Math.sin(randomAngle));
+                        coords.source = 'mock coordinates for demo';
+                        missingCoords++;
+                    }
+                    
+                    // Store the coordinates in the product object
+                    product.coords = coords;
+                });
+                
+                if (missingCoords > 0) {
+                    console.log(`Generated mock coordinates for ${missingCoords} products with missing location data`);
+                }
+                
+                return products;
+            }
+            
+            // Ensure all products have coordinates (for demo purposes)
+            products = ensureCoordinates(products);
+            
+            // Calculate and add distance property to each product
             products.forEach(product => {
-                // Extract coordinates using the helper function
-                const coords = extractCoordinates(product);
-                
-                // Store the original coordinates and source for debugging
-                product.coords = coords;
-                
                 // Calculate distance if we have valid coordinates
-                if (coords.lat && coords.lng && !isNaN(coords.lat) && !isNaN(coords.lng)) {
+                const coords = product.coords;
+                if (coords && coords.lat && coords.lng && !isNaN(coords.lat) && !isNaN(coords.lng)) {
                     product.distance = calculateDistance(userLat, userLng, coords.lat, coords.lng);
                     console.log(`Distance to ${product.title || product.name}: ${product.distance.toFixed(2)} km (source: ${coords.source})`);
                 } else {
-                    // Set a large distance for products without coordinates
+                    // This should never happen after ensureCoordinates, but just in case
                     product.distance = Number.MAX_VALUE;
-                    console.log(`No valid coordinates for ${product.title || product.name}`);
+                    console.log(`No valid coordinates for ${product.title || product.name} even after fallbacks`);
                 }
                 
                 // Save formatted address for display, prioritizing the most specific field
@@ -1986,11 +2049,35 @@
                         product.formattedAddress = 'Address not available';
                     }
                 }
+                
+                // Add a distance label to each product
+                if (product.distance && product.distance !== Number.MAX_VALUE) {
+                    if (product.distance < 1) {
+                        product.distanceLabel = `${(product.distance * 1000).toFixed(0)} m away`;
+                    } else {
+                        product.distanceLabel = `${product.distance.toFixed(1)} km away`;
+                    }
+                    
+                    // Add a "nearby" flag for very close locations
+                    product.isNearby = product.distance < 5;
+                    product.isVeryNearby = product.distance < 2;
+                }
             });
             
             // Sort products by distance (closest first)
-            const sortedProducts = products.sort((a, b) => a.distance - b.distance);
-            console.log(`Sorted ${sortedProducts.length} products by distance`);
+            const sortedProducts = products.sort((a, b) => {
+                // Make sure products with distance info come first
+                if (a.distance === Number.MAX_VALUE && b.distance !== Number.MAX_VALUE) {
+                    return 1;
+                }
+                if (a.distance !== Number.MAX_VALUE && b.distance === Number.MAX_VALUE) {
+                    return -1;
+                }
+                // Regular distance comparison
+                return a.distance - b.distance;
+            });
+            
+            console.log(`Sorted ${sortedProducts.length} products by distance, closest first`);
             
             return sortedProducts;
         }
@@ -2230,6 +2317,14 @@
                 case 'nearby':
                     showNotification('Processing nearby listings...');
                     
+                    // Update sort button to show active state
+                    const sortButton = document.getElementById('sortButton');
+                    if (sortButton) {
+                        sortButton.innerHTML = '<i class="fas fa-map-marker-alt"></i> Nearby';
+                        sortButton.style.backgroundColor = 'var(--accent-color)';
+                        sortButton.style.color = 'var(--primary-color)';
+                    }
+                    
                     // Get the current active category (if any)
                     const activeCategory = document.querySelector('.categories a.active');
                     const categoryName = activeCategory ? activeCategory.textContent.trim().toLowerCase() : null;
@@ -2361,6 +2456,9 @@
                     const productNode = document.importNode(template.content, true);
                     const productCard = productNode.querySelector('.product-card');
                     
+                    // Ensure product card has position:relative for absolute positioning of badges
+                    productCard.style.position = 'relative';
+                    
                     // Get references to elements
                     const image = productNode.querySelector('.product-image');
                     const title = productNode.querySelector('.product-title');
@@ -2461,49 +2559,60 @@
                     
                     // Add distance badge if available
                     if (product.distance && product.distance !== Number.MAX_VALUE) {
-                        const distanceKm = product.distance.toFixed(1);
-                        
                         // Distance badge in shop info container
                         const distanceElem = document.createElement('div');
                         distanceElem.className = 'distance-info';
-                        distanceElem.style.fontSize = '0.8rem';
+                        distanceElem.style.fontSize = '0.85rem';
                         distanceElem.style.marginTop = '0.3rem';
                         distanceElem.style.color = 'var(--accent-color)';
                         distanceElem.style.fontWeight = 'bold';
-                        distanceElem.textContent = `${distanceKm} km away`;
+                        distanceElem.style.display = 'flex';
+                        distanceElem.style.alignItems = 'center';
+                        
+                        // Use distance label if available, otherwise format distance ourselves
+                        const distanceText = product.distanceLabel || 
+                            (product.distance < 1 
+                                ? `${(product.distance * 1000).toFixed(0)} m away` 
+                                : `${product.distance.toFixed(1)} km away`);
                         
                         // Add a directional arrow
                         const directionIcon = document.createElement('i');
                         directionIcon.className = 'fas fa-location-arrow';
-                        directionIcon.style.marginRight = '5px';
+                        directionIcon.style.marginRight = '8px';
                         directionIcon.style.transform = 'rotate(-45deg)';
                         
-                        distanceElem.prepend(directionIcon);
+                        distanceElem.appendChild(directionIcon);
+                        distanceElem.appendChild(document.createTextNode(distanceText));
                         shopInfoContainer.appendChild(distanceElem);
                         
                         // Add distance as data attribute for reference
-                        productCard.setAttribute('data-distance', distanceKm);
+                        productCard.setAttribute('data-distance', product.distance.toFixed(2));
                         
                         // Add a special class for nearby listings
-                        if (product.distance < 10) {
+                        if (product.isNearby) {
                             productCard.classList.add('nearby-listing');
                             
-                            // Add a visual indicator for very close listings (within 5km)
-                            if (product.distance < 5) {
+                            // Add visual indicator for very close locations
+                            if (product.isVeryNearby) {
+                                // More prominent badge for very nearby items
                                 const nearbyBadge = document.createElement('div');
                                 nearbyBadge.className = 'nearby-badge';
                                 nearbyBadge.innerHTML = '<i class="fas fa-map-marker-alt"></i> Nearby';
                                 nearbyBadge.style.position = 'absolute';
                                 nearbyBadge.style.top = '10px';
                                 nearbyBadge.style.right = '10px';
-                                nearbyBadge.style.backgroundColor = 'var(--accent-color)';
-                                nearbyBadge.style.color = 'var(--primary-color)';
+                                nearbyBadge.style.backgroundColor = '#ff3e6c';
+                                nearbyBadge.style.color = 'white';
                                 nearbyBadge.style.padding = '5px 10px';
                                 nearbyBadge.style.fontSize = '0.8rem';
                                 nearbyBadge.style.fontWeight = 'bold';
                                 nearbyBadge.style.zIndex = '10';
-                                productCard.style.position = 'relative';
+                                nearbyBadge.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
                                 productCard.appendChild(nearbyBadge);
+                                
+                                // Add a subtle glow effect to highlight nearby items
+                                productCard.style.boxShadow = '0 5px 15px rgba(255, 62, 108, 0.2)';
+                                productCard.style.borderColor = '#ff3e6c50';
                             }
                         }
                     }
