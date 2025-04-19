@@ -182,80 +182,6 @@ try {
     // Add order by and pagination
     $baseQuery .= " ORDER BY p.created_at DESC LIMIT :limit OFFSET :offset";
     
-    // Create example products with sample data
-    $sampleProducts = [
-        [
-            'id' => 1,
-            'name' => 'Vintage Denim Jacket',
-            'description' => 'Classic vintage denim jacket in excellent condition',
-            'price' => 49.99,
-            'category_id' => 1,
-            'category_name' => 'Jackets',
-            'status' => 'active',
-            'stock' => 1,
-            'condition' => 'Used - Excellent',
-            'image_url' => '../../assets/images/products/denim-jacket.jpg',
-            'created_at' => date('Y-m-d H:i:s', strtotime('-2 days')),
-            'updated_at' => date('Y-m-d H:i:s', strtotime('-1 day'))
-        ],
-        [
-            'id' => 2,
-            'name' => 'Leather Boots',
-            'description' => 'Genuine leather boots, lightly worn',
-            'price' => 79.99,
-            'category_id' => 2,
-            'category_name' => 'Footwear',
-            'status' => 'active',
-            'stock' => 1,
-            'condition' => 'Used - Good',
-            'image_url' => '../../assets/images/products/leather-boots.jpg',
-            'created_at' => date('Y-m-d H:i:s', strtotime('-3 days')),
-            'updated_at' => date('Y-m-d H:i:s', strtotime('-2 days'))
-        ],
-        [
-            'id' => 3,
-            'name' => 'Cotton T-Shirt',
-            'description' => 'Premium cotton t-shirt, brand new with tags',
-            'price' => 19.99,
-            'category_id' => 3,
-            'category_name' => 'Tops',
-            'status' => 'active',
-            'stock' => 2,
-            'condition' => 'New with tags',
-            'image_url' => '../../assets/images/products/tshirt.jpg',
-            'created_at' => date('Y-m-d H:i:s', strtotime('-5 days')),
-            'updated_at' => date('Y-m-d H:i:s', strtotime('-4 days'))
-        ],
-        [
-            'id' => 4,
-            'name' => 'Summer Dress',
-            'description' => 'Light summer dress, perfect for beach days',
-            'price' => 29.99,
-            'category_id' => 4,
-            'category_name' => 'Dresses',
-            'status' => 'active',
-            'stock' => 1,
-            'condition' => 'Used - Like New',
-            'image_url' => '../../assets/images/products/summer-dress.jpg',
-            'created_at' => date('Y-m-d H:i:s', strtotime('-7 days')),
-            'updated_at' => date('Y-m-d H:i:s', strtotime('-6 days'))
-        ],
-        [
-            'id' => 5,
-            'name' => 'Winter Coat',
-            'description' => 'Warm winter coat with faux fur lining',
-            'price' => 89.99,
-            'category_id' => 1,
-            'category_name' => 'Jackets',
-            'status' => 'active',
-            'stock' => 1,
-            'condition' => 'Used - Excellent',
-            'image_url' => '../../assets/images/products/winter-coat.jpg',
-            'created_at' => date('Y-m-d H:i:s', strtotime('-10 days')),
-            'updated_at' => date('Y-m-d H:i:s', strtotime('-9 days'))
-        ]
-    ];
-    
     try {
         // Log the query for debugging
         error_log("Product listings query: " . $baseQuery);
@@ -307,22 +233,22 @@ try {
             ];
         } else {
             // Use sample products if no real products found
-            $response['data']['products'] = $sampleProducts;
+            $response['data']['products'] = [];
             $response['data']['pagination'] = [
                 'current_page' => 1,
                 'total_pages' => 1,
-                'total_products' => count($sampleProducts),
-                'per_page' => count($sampleProducts)
+                'total_products' => 0,
+                'per_page' => 0
             ];
         }
     } catch (PDOException $e) {
         // If database query fails, use sample products
-        $response['data']['products'] = $sampleProducts;
+        $response['data']['products'] = [];
         $response['data']['pagination'] = [
             'current_page' => 1,
             'total_pages' => 1,
-            'total_products' => count($sampleProducts),
-            'per_page' => count($sampleProducts)
+            'total_products' => 0,
+            'per_page' => 0
         ];
     }
     

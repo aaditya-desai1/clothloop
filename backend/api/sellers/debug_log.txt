@@ -731,6 +731,7 @@ Files: Array
 Request method: POST
 Data: Array
 (
+<<<<<<< HEAD
     [title] => Polo
     [description] => Tri Color
     [size] => XL
@@ -739,6 +740,14 @@ Data: Array
     [rental_price] => 459.00
     [terms] => Do not Wash
     [id] => 5
+=======
+    [title] => Chaniya Choli
+    [description] => Red color patola pettern
+    [size] => M
+    [category_id] => 18
+    [occasion] => Wedding
+    [rental_price] => 2500
+    [terms] => Do not wash
     [update_images] => true
 )
 
@@ -748,11 +757,79 @@ Files: Array
         (
             [name] => Array
                 (
-                    [0] => Screenshot (53).png
+                    [0] => taa777.webp
                 )
 
             [full_path] => Array
                 (
+                    [0] => taa777.webp
+                )
+
+            [type] => Array
+                (
+                    [0] => image/webp
+                )
+
+            [tmp_name] => Array
+                (
+                    [0] => C:\xampp\tmp\phpD052.tmp
+                )
+
+            [error] => Array
+                (
+                    [0] => 0
+                )
+
+            [size] => Array
+                (
+                    [0] => 508462
+                )
+
+        )
+
+    [clothImage] => Array
+        (
+            [name] => taa777.webp
+            [full_path] => taa777.webp
+            [type] => image/webp
+            [tmp_name] => C:\xampp\tmp\phpD062.tmp
+            [error] => 0
+            [size] => 508462
+        )
+
+)
+
+
+Request method: POST
+Data: Array
+(
+    [title] => Sari
+    [description] => White Color
+    [size] => M
+    [category_id] => 18
+    [occasion] => Wedding
+    [rental_price] => 1500
+    [terms] => Do not Wash
+>>>>>>> 1d383233823488337c563f297c64ada7dabf09ba
+    [update_images] => true
+)
+
+Files: Array
+(
+    [images] => Array
+        (
+            [name] => Array
+                (
+<<<<<<< HEAD
+                    [0] => Screenshot (53).png
+=======
+                    [0] => 1592216718444562-2.jpg
+>>>>>>> 1d383233823488337c563f297c64ada7dabf09ba
+                )
+
+            [full_path] => Array
+                (
+<<<<<<< HEAD
                     [0] => Screenshot (53).png
                 )
 
@@ -879,6 +956,9 @@ Files: Array
             [full_path] => Array
                 (
                     [0] => p3.jpg
+=======
+                    [0] => 1592216718444562-2.jpg
+>>>>>>> 1d383233823488337c563f297c64ada7dabf09ba
                 )
 
             [type] => Array
@@ -888,7 +968,11 @@ Files: Array
 
             [tmp_name] => Array
                 (
+<<<<<<< HEAD
                     [0] => C:\xampp\tmp\phpB57C.tmp
+=======
+                    [0] => C:\xampp\tmp\php90E0.tmp
+>>>>>>> 1d383233823488337c563f297c64ada7dabf09ba
                 )
 
             [error] => Array
@@ -898,19 +982,529 @@ Files: Array
 
             [size] => Array
                 (
+<<<<<<< HEAD
                     [0] => 63982
+=======
+                    [0] => 662520
+>>>>>>> 1d383233823488337c563f297c64ada7dabf09ba
                 )
 
         )
 
     [clothImage] => Array
         (
+<<<<<<< HEAD
             [name] => p3.jpg
             [full_path] => p3.jpg
             [type] => image/jpeg
             [tmp_name] => C:\xampp\tmp\phpB57D.tmp
             [error] => 0
             [size] => 63982
+=======
+            [name] => 1592216718444562-2.jpg
+            [full_path] => 1592216718444562-2.jpg
+            [type] => image/jpeg
+            [tmp_name] => C:\xampp\tmp\php90F0.tmp
+            [error] => 0
+            [size] => 662520
+        )
+
+)
+
+
+Request method: POST
+Data: Array
+(
+    [title] => Gown
+    [description] => Pink color
+    [size] => M
+    [category_id] => 18
+    [occasion] => Wedding
+    [rental_price] => 5000
+    [terms] => Do not wash
+    [update_images] => true
+)
+
+Files: Array
+(
+    [images] => Array
+        (
+            [name] => Array
+                (
+                    [0] => OIP.jpeg
+                )
+
+            [full_path] => Array
+                (
+                    [0] => OIP.jpeg
+                )
+
+            [type] => Array
+                (
+                    [0] => image/jpeg
+                )
+
+            [tmp_name] => Array
+                (
+                    [0] => C:\xampp\tmp\php75CA.tmp
+                )
+
+            [error] => Array
+                (
+                    [0] => 0
+                )
+
+            [size] => Array
+                (
+                    [0] => 20864
+                )
+
+        )
+
+    [clothImage] => Array
+        (
+            [name] => OIP.jpeg
+            [full_path] => OIP.jpeg
+            [type] => image/jpeg
+            [tmp_name] => C:\xampp\tmp\php75CB.tmp
+            [error] => 0
+            [size] => 20864
+        )
+
+)
+
+
+Request method: POST
+Data: Array
+(
+    [title] => Suit
+    [description] => Blue color
+    [size] => M
+    [category_id] => 17
+    [occasion] => Formal
+    [rental_price] => 1000
+    [terms] => Do not Wash
+    [update_images] => true
+)
+
+Files: Array
+(
+    [images] => Array
+        (
+            [name] => Array
+                (
+                    [0] => download (1).jpeg
+                )
+
+            [full_path] => Array
+                (
+                    [0] => download (1).jpeg
+                )
+
+            [type] => Array
+                (
+                    [0] => image/jpeg
+                )
+
+            [tmp_name] => Array
+                (
+                    [0] => C:\xampp\tmp\phpA23.tmp
+                )
+
+            [error] => Array
+                (
+                    [0] => 0
+                )
+
+            [size] => Array
+                (
+                    [0] => 7851
+                )
+
+        )
+
+    [clothImage] => Array
+        (
+            [name] => download (1).jpeg
+            [full_path] => download (1).jpeg
+            [type] => image/jpeg
+            [tmp_name] => C:\xampp\tmp\phpA24.tmp
+            [error] => 0
+            [size] => 7851
+        )
+
+)
+
+
+Request method: POST
+Data: Array
+(
+    [title] => Wedding Shervani
+    [description] => Traditional
+    [size] => M
+    [category_id] => 17
+    [occasion] => Wedding
+    [rental_price] => 5500
+    [terms] => Do not wash
+    [update_images] => true
+)
+
+Files: Array
+(
+    [images] => Array
+        (
+            [name] => Array
+                (
+                    [0] => AC-08th-nov-23_6261-copy.jpg
+                )
+
+            [full_path] => Array
+                (
+                    [0] => AC-08th-nov-23_6261-copy.jpg
+                )
+
+            [type] => Array
+                (
+                    [0] => image/jpeg
+                )
+
+            [tmp_name] => Array
+                (
+                    [0] => C:\xampp\tmp\php8839.tmp
+                )
+
+            [error] => Array
+                (
+                    [0] => 0
+                )
+
+            [size] => Array
+                (
+                    [0] => 1241701
+                )
+
+        )
+
+    [clothImage] => Array
+        (
+            [name] => AC-08th-nov-23_6261-copy.jpg
+            [full_path] => AC-08th-nov-23_6261-copy.jpg
+            [type] => image/jpeg
+            [tmp_name] => C:\xampp\tmp\php884A.tmp
+            [error] => 0
+            [size] => 1241701
+        )
+
+)
+
+
+Request method: POST
+Data: Array
+(
+    [title] => Suit
+    [description] => Gray color
+    [size] => M
+    [category_id] => 17
+    [occasion] => Formal
+    [rental_price] => 1200
+    [terms] => Do not wash
+    [update_images] => true
+)
+
+Files: Array
+(
+    [images] => Array
+        (
+            [name] => Array
+                (
+                    [0] => download (2).jpeg
+                )
+
+            [full_path] => Array
+                (
+                    [0] => download (2).jpeg
+                )
+
+            [type] => Array
+                (
+                    [0] => image/jpeg
+                )
+
+            [tmp_name] => Array
+                (
+                    [0] => C:\xampp\tmp\php6211.tmp
+                )
+
+            [error] => Array
+                (
+                    [0] => 0
+                )
+
+            [size] => Array
+                (
+                    [0] => 4652
+                )
+
+        )
+
+    [clothImage] => Array
+        (
+            [name] => download (2).jpeg
+            [full_path] => download (2).jpeg
+            [type] => image/jpeg
+            [tmp_name] => C:\xampp\tmp\php6212.tmp
+            [error] => 0
+            [size] => 4652
+        )
+
+)
+
+
+Request method: POST
+Data: Array
+(
+    [title] => Western
+    [description] => 3 piece plazo set
+    [size] => M
+    [category_id] => 19
+    [occasion] => Western
+    [rental_price] => 1300
+    [terms] => Do not wash
+    [update_images] => true
+)
+
+Files: Array
+(
+    [images] => Array
+        (
+            [name] => Array
+                (
+                    [0] => download (3).jpeg
+                )
+
+            [full_path] => Array
+                (
+                    [0] => download (3).jpeg
+                )
+
+            [type] => Array
+                (
+                    [0] => image/jpeg
+                )
+
+            [tmp_name] => Array
+                (
+                    [0] => C:\xampp\tmp\php29FD.tmp
+                )
+
+            [error] => Array
+                (
+                    [0] => 0
+                )
+
+            [size] => Array
+                (
+                    [0] => 9938
+                )
+
+        )
+
+    [clothImage] => Array
+        (
+            [name] => download (3).jpeg
+            [full_path] => download (3).jpeg
+            [type] => image/jpeg
+            [tmp_name] => C:\xampp\tmp\php29FE.tmp
+            [error] => 0
+            [size] => 9938
+        )
+
+)
+
+
+Request method: POST
+Data: Array
+(
+    [title] => Shervani
+    [description] => Black
+    [size] => M
+    [category_id] => 19
+    [occasion] => Wedding
+    [rental_price] => 500
+    [terms] => Do not wash
+    [update_images] => true
+)
+
+Files: Array
+(
+    [images] => Array
+        (
+            [name] => Array
+                (
+                    [0] => images.jpeg
+                )
+
+            [full_path] => Array
+                (
+                    [0] => images.jpeg
+                )
+
+            [type] => Array
+                (
+                    [0] => image/jpeg
+                )
+
+            [tmp_name] => Array
+                (
+                    [0] => C:\xampp\tmp\phpB969.tmp
+                )
+
+            [error] => Array
+                (
+                    [0] => 0
+                )
+
+            [size] => Array
+                (
+                    [0] => 7887
+                )
+
+        )
+
+    [clothImage] => Array
+        (
+            [name] => images.jpeg
+            [full_path] => images.jpeg
+            [type] => image/jpeg
+            [tmp_name] => C:\xampp\tmp\phpB96A.tmp
+            [error] => 0
+            [size] => 7887
+        )
+
+)
+
+
+Request method: POST
+Data: Array
+(
+    [title] => Koti and Kurto
+    [description] => Jodhpuri
+    [size] => L
+    [category_id] => 19
+    [occasion] => Traditional
+    [rental_price] => 1400
+    [terms] => DO not Wash
+    [update_images] => true
+)
+
+Files: Array
+(
+    [images] => Array
+        (
+            [name] => Array
+                (
+                    [0] => images (1).jpeg
+                )
+
+            [full_path] => Array
+                (
+                    [0] => images (1).jpeg
+                )
+
+            [type] => Array
+                (
+                    [0] => image/jpeg
+                )
+
+            [tmp_name] => Array
+                (
+                    [0] => C:\xampp\tmp\phpB678.tmp
+                )
+
+            [error] => Array
+                (
+                    [0] => 0
+                )
+
+            [size] => Array
+                (
+                    [0] => 7471
+                )
+
+        )
+
+    [clothImage] => Array
+        (
+            [name] => images (1).jpeg
+            [full_path] => images (1).jpeg
+            [type] => image/jpeg
+            [tmp_name] => C:\xampp\tmp\phpB679.tmp
+            [error] => 0
+            [size] => 7471
+>>>>>>> 1d383233823488337c563f297c64ada7dabf09ba
+        )
+
+)
+
+
+Request method: POST
+Data: Array
+(
+    [title] => Polo
+    [description] => Tri Color
+    [size] => XL
+    [category_id] => 17
+    [occasion] => Casual
+    [rental_price] => 459.00
+    [terms] => Do not Wash
+    [id] => 5
+    [update_images] => true
+)
+
+Files: Array
+(
+    [images] => Array
+        (
+            [name] => Array
+                (
+                    [0] => Aaryan.jpg
+                )
+
+            [full_path] => Array
+                (
+                    [0] => Aaryan.jpg
+                )
+
+            [type] => Array
+                (
+                    [0] => image/jpeg
+                )
+
+            [tmp_name] => Array
+                (
+                    [0] => C:\xampp\tmp\phpC404.tmp
+                )
+
+            [error] => Array
+                (
+                    [0] => 0
+                )
+
+            [size] => Array
+                (
+                    [0] => 356529
+                )
+
+        )
+
+    [clothImage] => Array
+        (
+            [name] => Aaryan.jpg
+            [full_path] => Aaryan.jpg
+            [type] => image/jpeg
+            [tmp_name] => C:\xampp\tmp\phpC405.tmp
+            [error] => 0
+            [size] => 356529
         )
 
 )

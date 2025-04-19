@@ -488,6 +488,28 @@
         box-shadow: var(--box-shadow);
         border: 2px solid var(--border-color);
         animation: pulse-border 2s infinite;
+        width: 100%;
+        max-width: 600px;
+        margin: 50px auto;
+    }
+    
+    .no-products i {
+        font-size: 60px;
+        margin-bottom: 30px;
+        color: var(--accent-color);
+    }
+    
+    .no-products h3 {
+        font-size: 24px;
+        margin-bottom: 15px;
+        color: var(--accent-color);
+    }
+    
+    .no-products p {
+        margin-bottom: 30px;
+        color: var(--text-color);
+        font-size: 16px;
+        line-height: 1.6;
     }
 
     .empty-state {
@@ -535,22 +557,6 @@
     .btn-add-product:hover {
         transform: translateY(-5px) skewX(-5deg);
         box-shadow: 8px 8px 0 rgba(255, 255, 255, 0.2);
-    }
-
-    .no-products i {
-        font-size: 60px;
-        margin-bottom: 30px;
-        color: var(--accent-color);
-    }
-
-    .no-products p {
-        margin-bottom: 30px;
-        color: var(--text-color);
-        opacity: 0.9;
-        font-size: 18px;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        font-weight: 600;
     }
 
     .no-products .action-button {
@@ -1194,7 +1200,7 @@
                                 <div class="no-products">
                                     <i class="fas fa-shopping-bag"></i>
                                     <h3>No products found</h3>
-                                    <p>Ready to start selling? Add your first product now!</p>
+                                    <p>You haven't added any products yet. Ready to start selling? Add your first product now!</p>
                                     <button class="btn-add-product">Add New Product</button>
                                 </div>
                             `;
@@ -1213,6 +1219,9 @@
                             
                             // Setup pagination
                             setupPagination(data.data.pagination);
+                            
+                            // Show pagination
+                            paginationContainer.style.display = 'block';
                         }
                 } else {
                     showAlert(data.message || 'Error loading products', 'error');
@@ -1247,53 +1256,55 @@
                     
                     // Show empty state with error message
                     productsContainer.innerHTML = `
-                        <div class="empty-state">
-                            <i class="fas fa-exclamation-circle" style="font-size: 50px; color: var(--error-color); margin-bottom: 20px;"></i>
+                        <div class="no-products">
+                            <i class="fas fa-exclamation-circle" style="color: var(--error-color);"></i>
                             <h3>Error loading products</h3>
                             <p>${errorMessage}</p>
+                            <button class="btn-add-product" id="retryButton">Retry</button>
                         </div>
                     `;
                     
-                    // Hide pagination if error
+                    // Add event listener to retry button
+                    const retryButton = document.getElementById('retryButton');
+                    if (retryButton) {
+                        retryButton.addEventListener('click', () => {
+                            loadProducts();
+                        });
+                    }
+                    
+                    // Hide pagination on error
                     paginationContainer.style.display = 'none';
-                });
+            });
         }
         
-        // Function to display products
+        // Function to display products in the grid
         function displayProducts(products) {
+            // Get the product template
+            const template = document.getElementById('product-template');
             const productsGrid = document.getElementById('productsGrid');
+            
+            // Clear existing content
             productsGrid.innerHTML = '';
             
-            // Get the base URL of the website for creating absolute URLs
-            const baseUrl = window.location.origin;
-            console.log('Base URL:', baseUrl);
-            
+            // If no products, show empty state and return early
             if (!products || products.length === 0) {
-                // No products - show empty state
-                productsGrid.innerHTML = `
-                    <div class="no-products">
-                        <i class="fas fa-shopping-bag"></i>
-                        <h3>No products found</h3>
-                        <p>Ready to start selling? Add your first product now!</p>
-                        <button class="btn-add-product">Add New Product</button>
-                    </div>
+                const emptyState = document.createElement('div');
+                emptyState.className = 'no-products';
+                emptyState.innerHTML = `
+                    <i class="fas fa-shopping-bag"></i>
+                    <h3>No products found</h3>
+                    <p>You haven't added any products yet. Ready to start selling? Add your first product now!</p>
+                    <button class="btn-add-product">Add New Product</button>
                 `;
                 
-                // Add event listener to the "Add New Product" button
-                const addProductBtn = productsGrid.querySelector('.btn-add-product');
-                if (addProductBtn) {
-                    addProductBtn.addEventListener('click', () => {
-                        window.location.href = 'cloth_upload.html';
-                    });
-                }
+                productsGrid.appendChild(emptyState);
                 
-                return;
-            }
-            
-            // Get product template
-            const template = document.getElementById('product-template');
-            if (!template) {
-                console.error('Product template not found');
+                // Add event listener to the "Add New Product" button
+                const addProductBtn = emptyState.querySelector('.btn-add-product');
+                addProductBtn.addEventListener('click', () => {
+                    window.location.href = 'cloth_upload.html';
+                });
+                
                 return;
             }
             
