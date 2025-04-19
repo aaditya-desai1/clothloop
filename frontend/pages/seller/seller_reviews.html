@@ -715,6 +715,74 @@
                 width: 100%;
             }
         }
+
+        /* Pagination Styles */
+        .pagination {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 30px;
+            margin-bottom: 50px;
+        }
+
+        .pagination-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .pagination-btn {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 8px 15px;
+            margin: 0 5px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .pagination-btn:hover:not(:disabled) {
+            background-color: var(--hover-bg);
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .pagination-btn.active {
+            background-color: var(--accent-color);
+            color: var(--primary-color);
+            border-color: var(--accent-color);
+        }
+
+        .pagination-ellipsis {
+            margin: 0 5px;
+            color: var(--text-color);
+        }
+
+        .pagination-info {
+            font-size: 14px;
+            color: var(--text-color);
+            opacity: 0.8;
+        }
+
+        @media (max-width: 576px) {
+            .pagination-controls {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            
+            .pagination-btn {
+                margin: 0 2px;
+                padding: 6px 10px;
+                min-width: 30px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -811,6 +879,11 @@
                 <div class="spinner"></div>
             </div>
         </div>
+
+        <!-- Pagination -->
+        <div class="pagination" id="pagination" style="display: none;">
+            <!-- Pagination will be generated dynamically -->
+        </div>
     </main>
 
     <!-- Footer -->
@@ -826,18 +899,23 @@
     <!-- JavaScript code for functionality -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Get the seller ID from session storage
-            let sellerId = localStorage.getItem('user_id');
+            // Get the seller ID from localStorage or use a default for testing
+            let sellerId = localStorage.getItem('user_id') || 1; // Default to 1 for testing
+            
+            console.log('Using seller ID:', sellerId);
             
             // Check if we have a seller ID
             if (!sellerId) {
                 // Alert that login is required
-                showAlert('Please log in to view your reviews.', 'error');
+                showError('Please log in to view your reviews.');
                 return;
             }
             
+            // Initialize current page
+            let currentPage = 1;
+            
             // Fetch reviews when the page loads
-            fetchReviews(sellerId);
+            fetchReviews(sellerId, currentPage);
             
             // Setup theme switcher
             const themeToggle = document.getElementById('theme-toggle');
@@ -887,12 +965,12 @@
         }
         
         // Function to fetch reviews from the API
-        function fetchReviews(sellerId) {
+        function fetchReviews(sellerId, page = 1, limit = 100) {
             const loadingSpinner = document.getElementById('loading-spinner');
             loadingSpinner.style.display = 'flex';
             
-            // Construct the URL with seller_id parameter
-            const url = `../../../backend/api/sellers/get_seller_reviews.php?seller_id=${sellerId}`;
+            // Construct the URL with seller_id parameter and pagination
+            const url = `../../../backend/api/sellers/get_seller_reviews.php?seller_id=${sellerId}&page=${page}&limit=${limit}`;
             console.log('Fetching reviews with URL:', url);
             
             fetch(url)
@@ -915,12 +993,16 @@
                 .then(data => {
                     loadingSpinner.style.display = 'none';
                     
+                    // Log the entire response data
+                    console.log('API Response:', data);
+                    
                     if (data.status === 'success') {
                         // Clear any previous errors
                         clearError();
                         
                         // Update stats
                         if (data.data && data.data.stats) {
+                            console.log('Stats data:', data.data.stats);
                             updateReviewStats(data.data.stats);
                         } else {
                             console.warn('No stats data available in response');
@@ -928,20 +1010,40 @@
                         
                         // Display reviews
                         if (data.data && data.data.reviews) {
+                            console.log('Reviews data:', data.data.reviews);
+                            console.log('Number of reviews:', data.data.reviews.length);
+                            // Log each review
+                            data.data.reviews.forEach((review, index) => {
+                                console.log(`Review ${index + 1}:`, review);
+                            });
                             displayReviews(data.data.reviews);
+                            
+                            // Setup pagination if available
+                            if (data.data.pagination) {
+                                setupPagination(data.data.pagination, sellerId);
+                            }
                         } else {
                             console.warn('No reviews data available in response');
                             displayReviews([]);
+                            
+                            // Hide pagination
+                            document.getElementById('pagination').style.display = 'none';
                         }
                     } else {
                         console.error('API returned error:', data);
                         showError(data.message || 'Failed to load reviews. Please try again later.');
+                        
+                        // Hide pagination on error
+                        document.getElementById('pagination').style.display = 'none';
                     }
                 })
                 .catch(error => {
                     loadingSpinner.style.display = 'none';
                     console.error('Error:', error);
                     showError('Failed to load reviews. Please try again later.');
+                    
+                    // Hide pagination on error
+                    document.getElementById('pagination').style.display = 'none';
                 });
         }
         
@@ -1015,8 +1117,13 @@
                     return;
                 }
                 
-                reviews.forEach(review => {
+                // Display a debug message with the count of reviews
+                console.log(`Displaying ${reviews.length} reviews`);
+                
+                reviews.forEach((review, index) => {
                     try {
+                        console.log(`Processing review ${index + 1}:`, review);
+                        
                         const reviewElement = document.createElement('div');
                         reviewElement.className = 'review-card';
                         
@@ -1028,10 +1135,12 @@
                         
                         // Default values if fields are missing
                         const rating = isNaN(Number(review.rating)) ? 0 : Number(review.rating);
-                        const reviewText = review.review_text || 'No review text provided';
+                        // Handle reviews from both tables - product_reviews and seller_reviews
+                        const reviewText = review.review_text || review.review || 'No review text provided';
                         const username = review.buyer_name || 'Anonymous';
                         const reviewDate = review.review_date ? new Date(review.review_date).toLocaleDateString() : 'Unknown date';
-                        const productName = review.product_name || 'Unknown Product';
+                        // Product name may be null for seller_reviews
+                        const productName = review.product_name || 'General Review';
                         
                         // Create the rating stars
                         let starsHTML = '';
@@ -1060,11 +1169,13 @@
                             <div class="review-content">${reviewText}</div>
                         `;
                         
-                        // Add product information
+                        // Add product information (only for product reviews)
                         const productInfo = document.createElement('div');
                         productInfo.className = 'review-product';
+                        // Show source for debugging purposes
+                        const reviewSource = review.review_type === 'seller_review' ? 'Seller Review' : 'Product Review';
                         productInfo.innerHTML = `
-                            <div class="review-product-name">For: ${productName}</div>
+                            <div class="review-product-name">For: ${productName} <span style="font-size: 10px; opacity: 0.7;">(${reviewSource})</span></div>
                         `;
                         reviewElement.appendChild(productInfo);
                         
@@ -1089,6 +1200,123 @@
                 if (loadingSpinner) {
                     loadingSpinner.style.display = 'none';
                 }
+            }
+        }
+        
+        // Function to set up pagination
+        function setupPagination(pagination, sellerId) {
+            const paginationElement = document.getElementById('pagination');
+            paginationElement.innerHTML = '';
+            
+            // Show pagination container if we have more than one page
+            if (pagination.total_pages > 1) {
+                paginationElement.style.display = 'flex';
+                
+                // Create pagination controls
+                const paginationControls = document.createElement('div');
+                paginationControls.className = 'pagination-controls';
+                
+                // Previous button
+                const prevBtn = document.createElement('button');
+                prevBtn.className = 'pagination-btn prev';
+                prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
+                prevBtn.disabled = pagination.current_page <= 1;
+                
+                if (pagination.current_page > 1) {
+                    prevBtn.addEventListener('click', () => {
+                        fetchReviews(sellerId, pagination.current_page - 1);
+                    });
+                }
+                
+                paginationControls.appendChild(prevBtn);
+                
+                // Page buttons - show max 5 page buttons
+                const maxPageButtons = 5;
+                let startPage = Math.max(1, pagination.current_page - Math.floor(maxPageButtons / 2));
+                let endPage = Math.min(pagination.total_pages, startPage + maxPageButtons - 1);
+                
+                // Adjust start page if we're near the end
+                if (endPage - startPage + 1 < maxPageButtons) {
+                    startPage = Math.max(1, endPage - maxPageButtons + 1);
+                }
+                
+                // Add first page button if not included in the range
+                if (startPage > 1) {
+                    const firstPageBtn = document.createElement('button');
+                    firstPageBtn.className = 'pagination-btn page';
+                    firstPageBtn.textContent = '1';
+                    firstPageBtn.addEventListener('click', () => {
+                        fetchReviews(sellerId, 1);
+                    });
+                    paginationControls.appendChild(firstPageBtn);
+                    
+                    // Add ellipsis if there's a gap
+                    if (startPage > 2) {
+                        const ellipsis = document.createElement('span');
+                        ellipsis.className = 'pagination-ellipsis';
+                        ellipsis.textContent = '...';
+                        paginationControls.appendChild(ellipsis);
+                    }
+                }
+                
+                // Add page buttons
+                for (let i = startPage; i <= endPage; i++) {
+                    const pageBtn = document.createElement('button');
+                    pageBtn.className = 'pagination-btn page';
+                    if (i === pagination.current_page) {
+                        pageBtn.classList.add('active');
+                    }
+                    pageBtn.textContent = i;
+                    pageBtn.addEventListener('click', () => {
+                        fetchReviews(sellerId, i);
+                    });
+                    paginationControls.appendChild(pageBtn);
+                }
+                
+                // Add last page button if not included in the range
+                if (endPage < pagination.total_pages) {
+                    // Add ellipsis if there's a gap
+                    if (endPage < pagination.total_pages - 1) {
+                        const ellipsis = document.createElement('span');
+                        ellipsis.className = 'pagination-ellipsis';
+                        ellipsis.textContent = '...';
+                        paginationControls.appendChild(ellipsis);
+                    }
+                    
+                    const lastPageBtn = document.createElement('button');
+                    lastPageBtn.className = 'pagination-btn page';
+                    lastPageBtn.textContent = pagination.total_pages;
+                    lastPageBtn.addEventListener('click', () => {
+                        fetchReviews(sellerId, pagination.total_pages);
+                    });
+                    paginationControls.appendChild(lastPageBtn);
+                }
+                
+                // Next button
+                const nextBtn = document.createElement('button');
+                nextBtn.className = 'pagination-btn next';
+                nextBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
+                nextBtn.disabled = pagination.current_page >= pagination.total_pages;
+                
+                if (pagination.current_page < pagination.total_pages) {
+                    nextBtn.addEventListener('click', () => {
+                        fetchReviews(sellerId, pagination.current_page + 1);
+                    });
+                }
+                
+                paginationControls.appendChild(nextBtn);
+                
+                // Add pagination info
+                const paginationInfo = document.createElement('div');
+                paginationInfo.className = 'pagination-info';
+                paginationInfo.textContent = `Showing page ${pagination.current_page} of ${pagination.total_pages} (${pagination.total_reviews} reviews)`;
+                
+                // Add controls and info to the pagination element
+                paginationElement.appendChild(paginationControls);
+                paginationElement.appendChild(paginationInfo);
+            } else {
+                // Hide pagination if only one page
+                paginationElement.style.display = 'none';
             }
         }
         
@@ -1146,6 +1374,9 @@
             
             // Scroll to the top to make sure error is visible
             window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            // Log error to console
+            console.error('Error:', message);
         }
     </script>
 </body>

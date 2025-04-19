@@ -159,11 +159,9 @@ ClothLoop/
 
 ## 🚀 Future Enhancements
 
-- **Payment Integration**: Secure payment processing for rentals
 - **Messaging System**: In-app messaging between buyers and sellers
 - **Reviews and Ratings**: Allow users to rate and review transactions
 - **Advanced Filtering**: More detailed search and filter options
-- **Mobile App**: Native mobile applications for iOS and Android
 
 ## 👨‍💻 Contributors
 
