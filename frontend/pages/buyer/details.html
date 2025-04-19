@@ -1043,12 +1043,14 @@
                         return itemId !== productId.toString();
                     });
                     
+                    // Save to the user-specific key
                     localStorage.setItem(wishlistKey, JSON.stringify(wishlist));
                     
                     // For compatibility with any old code still using the old key
                     localStorage.setItem('clothloop-wishlist', JSON.stringify(wishlist));
                     
-                    // Also maintain compatibility with the global wishlist (no user ID)
+                    // Also update the generic wishlist if user is logged in
+                    // This helps with data persistence during login/logout
                     if (userId) {
                         localStorage.setItem('wishlist', JSON.stringify(wishlist));
                     }
@@ -1064,12 +1066,15 @@
                     // Add to wishlist (store just the ID for consistency with dashboard)
                     if (!wishlist.includes(productId.toString())) {
                         wishlist.push(productId.toString());
+                        
+                        // Save to the user-specific key
                         localStorage.setItem(wishlistKey, JSON.stringify(wishlist));
                         
                         // For compatibility with any old code still using the old key
                         localStorage.setItem('clothloop-wishlist', JSON.stringify(wishlist));
                         
-                        // Also maintain compatibility with the global wishlist (no user ID)
+                        // Also update the generic wishlist if user is logged in
+                        // This helps with data persistence during login/logout
                         if (userId) {
                             localStorage.setItem('wishlist', JSON.stringify(wishlist));
                         }

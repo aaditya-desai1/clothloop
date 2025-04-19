@@ -504,6 +504,12 @@
                         localStorage.removeItem('clothloop-wishlist');
                     }
                     
+                    // If not already using a user-specific key but user is logged in,
+                    // also ensure wishlistIds are stored in user-specific storage
+                    if (userId && wishlistKey !== 'wishlist' && wishlistIds.length > 0) {
+                        localStorage.setItem(`wishlist_${userId}`, JSON.stringify(wishlistIds));
+                    }
+                    
                     // Ensure all IDs are strings for consistent comparison
                     wishlistIds = wishlistIds.map(id => id.toString());
                     console.log(`getWishlistItems: Found ${wishlistIds.length} items in ${wishlistKey}`);

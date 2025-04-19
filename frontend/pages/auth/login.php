@@ -8,23 +8,81 @@ session_start();
 
 // If form is submitted
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // For simplicity, using demo credentials
+    // Get email and password from form
     $email = $_POST['email'] ?? '';
     $password = $_POST['password'] ?? '';
     
-    // Demo credentials - in a real app, you would check against database
-    if ($email === 'seller@clothloop.com' && $password === 'password123') {
-        // Store session data
-        $_SESSION['user_id'] = 1;
-        $_SESSION['user_role'] = 'seller';
-        $_SESSION['user_name'] = 'Demo Seller';
-        $_SESSION['user_email'] = 'seller@clothloop.com';
-        
-        // Redirect to seller dashboard or profile
-        header('Location: ../seller/seller_profile.php');
-        exit;
+    // Connect to database
+    $conn = new mysqli("localhost", "root", "", "clothloop");
+    
+    if ($conn->connect_error) {
+        $error_message = "Database connection error: " . $conn->connect_error;
     } else {
-        $error_message = "Invalid email or password";
+        // Check user credentials
+        $sql = "SELECT * FROM users WHERE email = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        if ($result->num_rows > 0) {
+            $user = $result->fetch_assoc();
+            
+            // Simple password verify (in production use password_verify)
+            // For demo, checking plain password against stored password
+            if ($password === $user['password']) {
+                // Store session data
+                $_SESSION['user_id'] = $user['id'];
+                $_SESSION['user_role'] = $user['role'] ?? 'buyer';
+                $_SESSION['user_name'] = $user['name'] ?? 'User';
+                $_SESSION['user_email'] = $user['email'];
+                
+                // Store user ID for JavaScript
+                $user_id = $user['id'];
+                
+                // Redirect based on role
+                if (isset($user['role']) && $user['role'] === 'seller') {
+                    header('Location: ../seller/seller_dashboard.html');
+                } else {
+                    header('Location: ../buyer/buyer_dashboard.html');
+                }
+                exit;
+            } else {
+                $error_message = "Invalid password";
+            }
+        } else {
+            // Check for demo credentials
+            if ($email === 'seller@gmail.com' && $password === 'seller123') {
+                $_SESSION['user_id'] = 1;
+                $_SESSION['user_role'] = 'seller';
+                $_SESSION['user_name'] = 'Nishidh';
+                $_SESSION['user_email'] = 'seller@gmail.com';
+                $user_id = 1;
+                header('Location: ../seller/seller_dashboard.html');
+                exit;
+            } else if ($email === 'buyer@gmail.com' && $password === 'buyer123') {
+                $_SESSION['user_id'] = 3;
+                $_SESSION['user_role'] = 'buyer';
+                $_SESSION['user_name'] = 'Buyer';
+                $_SESSION['user_email'] = 'buyer@gmail.com';
+                $user_id = 3;
+                header('Location: ../buyer/buyer_dashboard.html');
+                exit;
+            } else if ($email === 'buyer2@gmail.com' && $password === 'buyer123') {
+                $_SESSION['user_id'] = 5;
+                $_SESSION['user_role'] = 'buyer';
+                $_SESSION['user_name'] = 'Buyer 2';
+                $_SESSION['user_email'] = 'buyer2@gmail.com';
+                $user_id = 5;
+                header('Location: ../buyer/buyer_dashboard.html');
+                exit;
+            } else {
+                $error_message = "Invalid email or password";
+            }
+        }
+        
+        $stmt->close();
+        $conn->close();
     }
 }
 ?>
@@ -438,6 +496,74 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     localStorage.setItem('clothloop-theme', 'dark');
                 }
             });
+
+            // Handle form submission - Add wishlist persistence feature
+            document.querySelector('form').addEventListener('submit', function(e) {
+                // Save the current anonymous/guest wishlist before login
+                try {
+                    const tempWishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
+                    
+                    // Store the email for later user ID lookup
+                    const emailInput = document.getElementById('email');
+                    const email = emailInput.value.trim();
+                    
+                    if (email) {
+                        localStorage.setItem('login_email', email);
+                        
+                        // If email matches a known user, pre-store their user ID
+                        if (email === 'buyer@gmail.com') {
+                            localStorage.setItem('pending_user_id', '3');
+                            // Store the temp wishlist for this user if there are items
+                            if (tempWishlist.length > 0) {
+                                localStorage.setItem('wishlist_3', JSON.stringify(tempWishlist));
+                            }
+                        } else if (email === 'buyer2@gmail.com') {
+                            localStorage.setItem('pending_user_id', '5');
+                            // Store the temp wishlist for this user if there are items
+                            if (tempWishlist.length > 0) {
+                                localStorage.setItem('wishlist_5', JSON.stringify(tempWishlist));
+                            }
+                        } else if (email === 'seller@gmail.com') {
+                            localStorage.setItem('pending_user_id', '1');
+                        }
+                    }
+                } catch (e) {
+                    console.error('Error saving wishlist data before login:', e);
+                }
+            });
+            
+            <?php if (isset($user_id)): ?>
+            // Store the user ID in localStorage for JS to use
+            localStorage.setItem('user_id', '<?php echo $user_id; ?>');
+            
+            // Handle wishlist data persistence when logging in
+            try {
+                const userId = '<?php echo $user_id; ?>';
+                const wishlistKey = `wishlist_${userId}`;
+                
+                // Check if we have a temporary wishlist saved for this login
+                const pendingUserId = localStorage.getItem('pending_user_id');
+                if (pendingUserId === userId) {
+                    // Clear the pending user ID as we've handled it
+                    localStorage.removeItem('pending_user_id');
+                }
+                
+                // Always check if there's an old wishlist to merge
+                const oldWishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
+                const userWishlist = JSON.parse(localStorage.getItem(wishlistKey) || '[]');
+                
+                if (oldWishlist.length > 0 || userWishlist.length > 0) {
+                    // Merge old and user wishlists without duplicates
+                    const mergedWishlist = [...new Set([...userWishlist, ...oldWishlist])];
+                    
+                    // Save the merged wishlist to this user's key
+                    localStorage.setItem(wishlistKey, JSON.stringify(mergedWishlist));
+                    console.log(`Merged ${oldWishlist.length} anonymous items with ${userWishlist.length} user items`);
+                }
+            } catch (e) {
+                console.error('Error merging wishlist data on login:', e);
+            }
+            <?php endif; ?>
         });
     </script>
 </body>
