@@ -142,9 +142,19 @@ try {
     $baseQuery = "SELECT p.*, 
                    COALESCE(p.status, 'inactive') AS status_normalized,
                    c.name as category_name,
+                   pi.image_path,
                    (SELECT COUNT(*) FROM customer_interests ci WHERE ci.product_id = p.id) as interest_count
                  FROM products p 
                  LEFT JOIN categories c ON p.category_id = c.id
+                 LEFT JOIN (
+                     SELECT product_id, image_path 
+                     FROM product_images 
+                     WHERE is_primary = 1
+                     UNION
+                     SELECT product_id, MIN(image_path) as image_path
+                     FROM product_images
+                     GROUP BY product_id
+                 ) pi ON p.id = pi.product_id
                  WHERE p.seller_id = :seller_id";
     $countQuery = "SELECT COUNT(*) as total FROM products WHERE seller_id = :seller_id";
     

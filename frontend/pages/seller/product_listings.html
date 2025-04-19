@@ -1315,64 +1315,79 @@
                 
                 // Define the base URL to ensure paths are consistent
                 // Get base URL from current page location
-                const basePath = window.location.pathname.includes('/ClothLoop/') ? '/ClothLoop' : '';
+                const basePath = window.location.pathname.includes('/ClothLoop/') ? '/ClothLoop/' : '/';
                 
-                // Try to load the image using image_display.php first
-                console.log(`Loading image for product ${product.id}...`);
+                // Add timestamp to prevent caching
+                const timestamp = new Date().getTime();
                 
-                // Create a list of fallback image sources to try in order
-                const imageSources = [
-                    `${basePath}/backend/api/image_display.php?type=product&id=${product.id}`,
-                    `${basePath}/backend/uploads/products/${product.id}/${product.image_filename || 'product_image.jpg'}`,
-                    `${basePath}/backend/uploads/products/${product.id}/product_image.jpg`,
-                    `${basePath}/backend/api/products/direct_image.php?product_id=${product.id}`,
-                    `${basePath}/frontend/assets/images/Clothify.png`,
-                    `${basePath}/frontend/assets/images/placeholder.png`,
-                    `${basePath}/frontend/assets/images/p3.jpg`
-                ];
-                
-                // Recursive function to try loading images from the sources array
-                function tryNextImage(index) {
-                    if (index >= imageSources.length) {
-                        console.error(`Failed to load any image for product ${product.id}`);
-                        return;
+                // Check if the product has an image_path specified directly
+                if (product.image_path) {
+                    // Use the direct image path from the database
+                    const directImageUrl = `${baseUrl}${basePath}backend/${product.image_path}?t=${timestamp}`;
+                    console.log(`Using direct image path for product ${product.id}:`, directImageUrl);
+                    imageElement.src = directImageUrl;
+                    imageElement.alt = product.title || product.name || 'Product Image';
+                } else {
+                    // Fallback to trying various image sources
+                    console.log(`No direct image path for product ${product.id}, trying fallback sources...`);
+                    
+                    // Create a list of fallback image sources to try in order
+                    const imageSources = [
+                        `${basePath}backend/api/image_display.php?type=product&id=${product.id}&t=${timestamp}`,
+                        `${basePath}backend/uploads/products/${product.id}/${product.image_filename || 'product_image.jpg'}?t=${timestamp}`,
+                        `${basePath}backend/uploads/products/${product.id}/product_image.jpg?t=${timestamp}`,
+                        `${basePath}backend/api/products/direct_image.php?product_id=${product.id}&t=${timestamp}`,
+                        `${basePath}frontend/assets/images/Clothify.png`,
+                        `${basePath}frontend/assets/images/placeholder.png`,
+                        `${basePath}frontend/assets/images/p3.jpg`
+                    ];
+                    
+                    // Recursive function to try loading images from the sources array
+                    function tryNextImage(index) {
+                        if (index >= imageSources.length) {
+                            console.error(`Failed to load any image for product ${product.id}`);
+                            return;
+                        }
+                        
+                        // Try current image source
+                        imageElement.src = imageSources[index];
+                        console.log(`Trying image source ${index + 1}/${imageSources.length}:`, imageSources[index]);
+                        
+                        // Set up error handler to try next source if this one fails
+                        imageElement.onerror = function() {
+                            console.log(`Image source ${index + 1} failed, trying next...`);
+                            // Add a random query parameter to prevent browser caching
+                            if (index === 0 || index === 1 || index === 2) {
+                                // First try directly accessing the product folder to see if we can find any images
+                                console.log(`Trying direct folder access for product ${product.id}...`);
+                                // Make an AJAX request to check if the directory exists and has images
+                                fetch(`${basePath}backend/api/check_product_images.php?product_id=${product.id}&t=${timestamp}`, {
+                                    cache: 'no-store' // Prevent browser caching
+                                })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.status === 'success' && data.image_path) {
+                                        console.log(`Found image at: ${data.image_path}`);
+                                        // Add timestamp to prevent caching
+                                        imageElement.src = `${data.image_path}?t=${timestamp}`;
+                                    } else {
+                                        tryNextImage(index + 1);
+                                    }
+                                })
+                                .catch(error => {
+                                    console.log('Error checking product images:', error);
+                                    tryNextImage(index + 1);
+                                });
+                            } else {
+                                tryNextImage(index + 1);
+                            }
+                        };
                     }
                     
-                    // Try current image source
-                    imageElement.src = imageSources[index];
-                    console.log(`Trying image source ${index + 1}/${imageSources.length}:`, imageSources[index]);
-                    
-                    // Set up error handler to try next source if this one fails
-                    imageElement.onerror = function() {
-                        console.log(`Image source ${index + 1} failed, trying next...`);
-                        // Add a random query parameter to prevent browser caching
-                        if (index === 0 || index === 1 || index === 2) {
-                            // First try directly accessing the product folder to see if we can find any images
-                            console.log(`Trying direct folder access for product ${product.id}...`);
-                            // Make an AJAX request to check if the directory exists and has images
-                            fetch(`${basePath}/backend/api/check_product_images.php?product_id=${product.id}`)
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.status === 'success' && data.image_path) {
-                                    console.log(`Found image at: ${data.image_path}`);
-                                    imageElement.src = data.image_path;
-                                } else {
-                                    tryNextImage(index + 1);
-                                }
-                            })
-                            .catch(error => {
-                                console.log('Error checking product images:', error);
-                                tryNextImage(index + 1);
-                            });
-                        } else {
-                            tryNextImage(index + 1);
-                        }
-                    };
+                    // Start trying paths
+                    tryNextImage(0);
                 }
-                
-                // Start trying paths
-                tryNextImage(0);
-                
+
                 // Set product status badge
                 const statusElement = productElement.querySelector('.product-status');
                 let statusClass = '';

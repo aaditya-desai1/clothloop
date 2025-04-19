@@ -125,6 +125,25 @@ try {
         
         $stmt->execute();
         $productId = $data['id'];
+        
+        // If updating images, handle old images first
+        if (isset($_FILES['images']) && !empty($_FILES['images']['name'][0]) && isset($data['update_images']) && $data['update_images'] === 'true') {
+            // If explicitly updating images, optionally delete old ones from database
+            $stmt = $db->prepare("DELETE FROM product_images WHERE product_id = :product_id");
+            $stmt->bindParam(':product_id', $productId);
+            $stmt->execute();
+            
+            // Optionally, delete old image files from the directory too
+            $uploadDir = UPLOADS_PATH . '/products/' . $productId;
+            if (file_exists($uploadDir) && is_dir($uploadDir)) {
+                $files = glob($uploadDir . '/*');
+                foreach ($files as $file) {
+                    if (is_file($file)) {
+                        unlink($file); // Delete the file
+                    }
+                }
+            }
+        }
     } else {
         // Insert new product
         $stmt = $db->prepare("
@@ -165,7 +184,8 @@ try {
         for ($i = 0; $i < $fileCount; $i++) {
             if ($_FILES['images']['error'][$i] === UPLOAD_ERR_OK) {
                 $tmpName = $_FILES['images']['tmp_name'][$i];
-                $fileName = time() . '_' . basename($_FILES['images']['name'][$i]);
+                // Add microseconds to ensure uniqueness
+                $fileName = time() . '_' . microtime(true) . '_' . basename($_FILES['images']['name'][$i]);
                 $filePath = $uploadDir . '/' . $fileName;
                 
                 // Validate file type

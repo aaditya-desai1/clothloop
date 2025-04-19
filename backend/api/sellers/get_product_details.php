@@ -39,12 +39,18 @@ try {
     $query = "
         SELECT 
             p.*,
+            pi.image_path,
             c.name AS category_name,
             s.shop_name,
             s.address AS shop_address,
             u.phone_no AS contact_number
         FROM products p
         LEFT JOIN categories c ON p.category_id = c.id
+        LEFT JOIN (
+            SELECT product_id, image_path FROM product_images WHERE is_primary = 1
+            UNION 
+            SELECT product_id, MIN(image_path) FROM product_images GROUP BY product_id
+        ) pi ON p.id = pi.product_id
         JOIN sellers s ON p.seller_id = s.id
         JOIN users u ON s.id = u.id
         WHERE p.id = :id
@@ -71,7 +77,8 @@ try {
             'shop_address' => $product['shop_address'],
             'contact_number' => $product['contact_number'],
             'terms_and_conditions' => isset($product['terms']) ? $product['terms'] : 'Standard rental terms apply.',
-            'status' => $product['status']
+            'status' => $product['status'],
+            'image_path' => $product['image_path'] ?? null
         ];
         
         $response = [

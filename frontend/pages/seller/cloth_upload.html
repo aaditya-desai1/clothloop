@@ -769,6 +769,10 @@
                 
                 // For compatibility with the backend API
                 formData.append('clothImage', images[0]);
+                
+                // Add a flag to indicate we're updating images
+                formData.append('update_images', 'true');
+                console.log('Setting update_images flag: true - New images will replace existing ones');
             }
             
             // Log form data for debugging
@@ -780,7 +784,8 @@
             // Send data to server
             fetch('../../../backend/api/sellers/upload_cloth.php', {
                 method: 'POST',
-                body: formData
+                body: formData,
+                cache: 'no-store' // Prevent caching
             })
             .then(response => {
                 console.log('Response status:', response.status);
@@ -806,6 +811,26 @@
                     const successAlert = document.getElementById('successAlert');
                     successAlert.style.display = 'block';
                     successAlert.textContent = data.message || 'Product added successfully!';
+                    
+                    // Clear any cached data for this product
+                    if (editId) {
+                        // Clear localStorage cache if any
+                        const cacheKeys = ['product_status_cache', 'product_images_cache'];
+                        cacheKeys.forEach(key => {
+                            const cache = localStorage.getItem(key);
+                            if (cache) {
+                                try {
+                                    const cacheObj = JSON.parse(cache);
+                                    if (cacheObj[editId]) {
+                                        delete cacheObj[editId];
+                                        localStorage.setItem(key, JSON.stringify(cacheObj));
+                                    }
+                                } catch (e) {
+                                    console.error('Error clearing cache:', e);
+                                }
+                            }
+                        });
+                    }
                     
                     // Redirect to listings page after a short delay
                     setTimeout(() => {
@@ -880,7 +905,20 @@
             if (productId) {
                 const existingImageDiv = document.getElementById('existingProductImage');
                 const currentProductImage = document.getElementById('currentProductImage');
-                currentProductImage.src = `../../../backend/api/sellers/get_cloth_image.php?id=${productId}`;
+                
+                // Try to use image_path from the database if available
+                if (product.image_path) {
+                    // Create absolute path by prepending the base URL
+                    const baseUrl = window.location.origin;
+                    const basePath = window.location.pathname.includes('/ClothLoop/') ? '/ClothLoop/' : '/';
+                    currentProductImage.src = `${baseUrl}${basePath}backend/${product.image_path}`;
+                    console.log('Using image path from database:', currentProductImage.src);
+                } else {
+                    // Fallback to the API route
+                    currentProductImage.src = `../../../backend/api/image_display.php?type=product&id=${productId}&t=${new Date().getTime()}`;
+                    console.log('Using API fallback for image:', currentProductImage.src);
+                }
+                
                 existingImageDiv.style.display = 'block';
                 
                 // Add click handler to open the modal

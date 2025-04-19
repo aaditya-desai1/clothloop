@@ -671,11 +671,17 @@
             // Show loading spinner
             document.getElementById('loadingSpinner').style.display = 'flex';
             
+            // Add timestamp to prevent caching
+            const timestamp = new Date().getTime();
+            
             // Fetch product data from backend API
-            const apiUrl = `../../../backend/api/sellers/get_product_details.php?id=${productId}`;
+            const apiUrl = `../../../backend/api/sellers/get_product_details.php?id=${productId}&t=${timestamp}`;
             console.log('Fetching from:', apiUrl);
             
-            fetch(apiUrl)
+            fetch(apiUrl, {
+                method: 'GET',
+                cache: 'no-store' // Prevent browser caching
+            })
                 .then(response => {
                     console.log('Response status:', response.status);
                     if (!response.ok) {
@@ -722,65 +728,6 @@
                 });
         }
         
-        // Function to fetch additional images from the API
-        function getProductImages(product) {
-            console.log('Fetching additional images for product:', product.id);
-            
-            // Check the product upload directory for additional images
-            const apiUrl = `/ClothLoop/backend/api/get_product_images.php?id=${product.id}`;
-            console.log('Fetching from API:', apiUrl);
-            
-            fetch(apiUrl)
-                .then(response => {
-                    console.log('API Response Status:', response.status);
-                    return response.text();
-                })
-                .then(text => {
-                    console.log('Raw API Response:', text);
-                    try {
-                        return JSON.parse(text);
-                    } catch (e) {
-                        console.error('JSON parse error:', e);
-                        return { status: 'error', message: 'Invalid JSON response' };
-                    }
-                })
-                .then(data => {
-                    console.log('Parsed API Response:', data);
-                    
-                    if (data.status === 'success' && data.images && data.images.length > 1) {
-                        // We expect the first image to be the main image we already have
-                        // Additional images start from index 1
-                        const additionalImages = data.images.slice(1);
-                        console.log(`Found ${additionalImages.length} additional images`);
-                        
-                        if (additionalImages.length > 0) {
-                            // Get the existing main image URL
-                            const mainImageUrl = window.sliderImages[0];
-                            
-                            // Create a new array with all unique images
-                            const allImages = [mainImageUrl];
-                            
-                            // Add additional images, avoiding duplicates
-                            additionalImages.forEach(imgPath => {
-                                if (!allImages.includes(imgPath)) {
-                                    console.log(`Adding image: ${imgPath}`);
-                                    allImages.push(imgPath);
-                                }
-                            });
-                            
-                            // Update the slider with all images
-                            console.log('Updating image slider with images:', allImages);
-                            updateImageSlider(allImages);
-                        }
-                    } else {
-                        console.log('No additional images found or API error:', data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error fetching additional images:', error);
-                });
-        }
-        
         // Function to display product details
         function displayProductDetails(product) {
             console.log('Displaying product:', product);
@@ -789,8 +736,23 @@
             // Update page title
             document.title = `${product.name} | Product Details | ClothLoop`;
             
-            // Initialize with just the main image
-            const mainImageUrl = `/ClothLoop/backend/api/image_display.php?type=product&id=${product.id}`;
+            // Add timestamp to prevent caching
+            const timestamp = new Date().getTime();
+            
+            // Determine the image URL - prioritize image_path from the database
+            let mainImageUrl;
+            if (product.image_path) {
+                // Create absolute path by prepending the base URL
+                const baseUrl = window.location.origin;
+                const basePath = window.location.pathname.includes('/ClothLoop/') ? '/ClothLoop/' : '/';
+                mainImageUrl = `${baseUrl}${basePath}backend/${product.image_path}?t=${timestamp}`;
+                console.log('Using image path from database:', mainImageUrl);
+            } else {
+                // Fallback to the API route
+                mainImageUrl = `/ClothLoop/backend/api/image_display.php?type=product&id=${product.id}&t=${timestamp}`;
+                console.log('Using API fallback for image:', mainImageUrl);
+            }
+            
             const initialImages = [mainImageUrl];
             
             // Set up global slider images initially with just the main image
@@ -891,6 +853,77 @@
             
             // Fetch additional images
             getProductImages(product);
+        }
+        
+        // Function to fetch additional images from the API
+        function getProductImages(product) {
+            console.log('Fetching additional images for product:', product.id);
+            
+            // If we already have the primary image from image_path, don't fetch more images
+            if (product.image_path) {
+                console.log('Using primary image from database, no need to fetch additional images');
+                return;
+            }
+            
+            // Add timestamp to prevent caching
+            const timestamp = new Date().getTime();
+            
+            // Check the product upload directory for additional images
+            const apiUrl = `/ClothLoop/backend/api/get_product_images.php?id=${product.id}&t=${timestamp}`;
+            console.log('Fetching from API:', apiUrl);
+            
+            fetch(apiUrl, {
+                method: 'GET',
+                cache: 'no-store' // Prevent browser caching
+            })
+                .then(response => {
+                    console.log('API Response Status:', response.status);
+                    return response.text();
+                })
+                .then(text => {
+                    console.log('Raw API Response:', text);
+                    try {
+                        return JSON.parse(text);
+                    } catch (e) {
+                        console.error('JSON parse error:', e);
+                        return { status: 'error', message: 'Invalid JSON response' };
+                    }
+                })
+                .then(data => {
+                    console.log('Parsed API Response:', data);
+                    
+                    if (data.status === 'success' && data.images && data.images.length > 1) {
+                        // We expect the first image to be the main image we already have
+                        // Additional images start from index 1
+                        const additionalImages = data.images.slice(1);
+                        console.log(`Found ${additionalImages.length} additional images`);
+                        
+                        if (additionalImages.length > 0) {
+                            // Get the existing main image URL
+                            const mainImageUrl = window.sliderImages[0];
+                            
+                            // Create a new array with all unique images
+                            const allImages = [mainImageUrl];
+                            
+                            // Add additional images, avoiding duplicates
+                            additionalImages.forEach(imgPath => {
+                                if (!allImages.includes(imgPath)) {
+                                    console.log(`Adding image: ${imgPath}`);
+                                    allImages.push(imgPath);
+                                }
+                            });
+                            
+                            // Update the slider with all images
+                            console.log('Updating image slider with images:', allImages);
+                            updateImageSlider(allImages);
+                        }
+                    } else {
+                        console.log('No additional images found or API error:', data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching additional images:', error);
+                });
         }
         
         // Initialize image slider

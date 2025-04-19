@@ -541,3 +541,190 @@ Files: Array
 )
 
 
+Request method: POST
+Data: Array
+(
+    [title] => Chaniya Choli
+    [description] => Black color
+    [size] => M
+    [category_id] => 18
+    [occasion] => Wedding
+    [rental_price] => 1000.00
+    [terms] => Do not wash 
+    [id] => 8
+)
+
+Files: Array
+(
+    [images] => Array
+        (
+            [name] => Array
+                (
+                    [0] => download.jpeg
+                )
+
+            [full_path] => Array
+                (
+                    [0] => download.jpeg
+                )
+
+            [type] => Array
+                (
+                    [0] => image/jpeg
+                )
+
+            [tmp_name] => Array
+                (
+                    [0] => C:\xampp\tmp\php95B8.tmp
+                )
+
+            [error] => Array
+                (
+                    [0] => 0
+                )
+
+            [size] => Array
+                (
+                    [0] => 21658
+                )
+
+        )
+
+    [clothImage] => Array
+        (
+            [name] => download.jpeg
+            [full_path] => download.jpeg
+            [type] => image/jpeg
+            [tmp_name] => C:\xampp\tmp\php95B9.tmp
+            [error] => 0
+            [size] => 21658
+        )
+
+)
+
+
+Request method: POST
+Data: Array
+(
+    [title] => Chaniya Choli
+    [description] => Black color
+    [size] => M
+    [category_id] => 18
+    [occasion] => Wedding
+    [rental_price] => 1000.00
+    [terms] => Do not wash 
+    [id] => 8
+)
+
+Files: Array
+(
+    [images] => Array
+        (
+            [name] => Array
+                (
+                    [0] => download.jpeg
+                )
+
+            [full_path] => Array
+                (
+                    [0] => download.jpeg
+                )
+
+            [type] => Array
+                (
+                    [0] => image/jpeg
+                )
+
+            [tmp_name] => Array
+                (
+                    [0] => C:\xampp\tmp\phpFC53.tmp
+                )
+
+            [error] => Array
+                (
+                    [0] => 0
+                )
+
+            [size] => Array
+                (
+                    [0] => 21658
+                )
+
+        )
+
+    [clothImage] => Array
+        (
+            [name] => download.jpeg
+            [full_path] => download.jpeg
+            [type] => image/jpeg
+            [tmp_name] => C:\xampp\tmp\phpFC54.tmp
+            [error] => 0
+            [size] => 21658
+        )
+
+)
+
+
+Request method: POST
+Data: Array
+(
+    [title] => Polo
+    [description] => Tri Color
+    [size] => XL
+    [category_id] => 17
+    [occasion] => Casual
+    [rental_price] => 459.00
+    [terms] => Do not Wash
+    [id] => 5
+    [update_images] => true
+)
+
+Files: Array
+(
+    [images] => Array
+        (
+            [name] => Array
+                (
+                    [0] => download.jpeg
+                )
+
+            [full_path] => Array
+                (
+                    [0] => download.jpeg
+                )
+
+            [type] => Array
+                (
+                    [0] => image/jpeg
+                )
+
+            [tmp_name] => Array
+                (
+                    [0] => C:\xampp\tmp\php62D.tmp
+                )
+
+            [error] => Array
+                (
+                    [0] => 0
+                )
+
+            [size] => Array
+                (
+                    [0] => 21658
+                )
+
+        )
+
+    [clothImage] => Array
+        (
+            [name] => download.jpeg
+            [full_path] => download.jpeg
+            [type] => image/jpeg
+            [tmp_name] => C:\xampp\tmp\php63E.tmp
+            [error] => 0
+            [size] => 21658
+        )
+
+)
+
+
