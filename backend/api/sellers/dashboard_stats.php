@@ -62,6 +62,14 @@ if (isset($_SESSION['user_name'])) {
     $sellerName = $_GET['user_name'];
 }
 
+// Validate user role - only allow sellers to access their own data
+$userRole = null;
+if (isset($_SESSION['user_role'])) {
+    $userRole = $_SESSION['user_role'];
+} else if (isset($_GET['user_role'])) {
+    $userRole = $_GET['user_role'];
+}
+
 // Initialize response
 $response = [
     'status' => 'success',
@@ -84,6 +92,22 @@ try {
     // Connect to database
     $database = new Database();
     $conn = $database->getConnection();
+    
+    // Authenticate the seller - verify the user exists and is a seller
+    if ($userId) {
+        $authQuery = "SELECT id, role FROM users WHERE id = ? AND role = 'seller'";
+        $authStmt = $conn->prepare($authQuery);
+        $authStmt->bindParam(1, $userId);
+        $authStmt->execute();
+        
+        if ($authStmt->rowCount() === 0) {
+            // Not a valid seller
+            $response['status'] = 'error';
+            $response['message'] = 'Unauthorized access or invalid seller ID';
+            echo json_encode($response);
+            exit;
+        }
+    }
     
     // Check if products table exists and has the rental_price column
     try {

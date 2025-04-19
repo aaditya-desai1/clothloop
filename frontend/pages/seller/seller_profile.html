@@ -1182,168 +1182,121 @@
             fetchSellerProfile(userId);
             
             // Helper function to add a debug message
-            function debugLog(message) {
-                const debugOutput = document.getElementById('debugOutput');
-                if (debugOutput) {
-                    const timestamp = new Date().toLocaleTimeString();
-                    const logEntry = document.createElement('div');
-                    logEntry.textContent = `[${timestamp}] ${message}`;
-                    debugOutput.appendChild(logEntry);
-                    
-                    // Keep only the last 10 messages
-                    while (debugOutput.children.length > 10) {
-                        debugOutput.removeChild(debugOutput.firstChild);
-                    }
-                    
-                    // Auto-scroll to the bottom
-                    debugOutput.scrollTop = debugOutput.scrollHeight;
+            function addDebugMessage(message) {
+                console.log('Debug:', message);
+                if (typeof message === 'object') {
+                    message = JSON.stringify(message, null, 2);
                 }
                 
-                // Also log to console
-                console.log(message);
+                const debugOutput = document.createElement('pre');
+                debugOutput.className = 'debug-output';
+                debugOutput.textContent = message;
+                
+                // Get debug container or create it
+                let debugContainer = document.getElementById('debugContainer');
+                if (!debugContainer) {
+                    debugContainer = document.createElement('div');
+                    debugContainer.id = 'debugContainer';
+                    debugContainer.style.display = 'none';
+                    document.body.appendChild(debugContainer);
+                }
+                
+                debugContainer.appendChild(debugOutput);
             }
             
-            // Function to fetch seller profile data
-            function fetchSellerProfile(sellerId) {
-                // Show loading state
-                loadingSpinner.style.display = 'block';
+            // Fetch seller profile data from API
+            function fetchSellerProfile() {
+                // Get seller ID from localStorage
+                const sellerId = localStorage.getItem('user_id');
+                
+                if (!sellerId) {
+                    showAlert('No seller ID found. Please login again.', 'error');
+                    return;
+                }
+                
+                // Show loading spinner
+                document.querySelector('.loading-spinner').style.display = 'flex';
                 profileForm.style.display = 'none';
                 
-                console.log("Fetching profile for seller ID:", sellerId);
-                
+                // Fetch seller profile data
                 fetch(`../../../backend/api/sellers/get_seller_profile.php?id=${sellerId}`)
                     .then(response => {
-                        console.log("Response status:", response.status);
-                        return response.text(); // Get raw text first for parsing
-                    })
-                    .then(rawText => {
-                        // Try to parse as JSON
-                        try {
-                            return JSON.parse(rawText);
-                        } catch (e) {
-                            console.error("Failed to parse JSON:", e);
-                            throw new Error("Invalid JSON response: " + e.message);
+                        if (!response.ok) {
+                            throw new Error(`HTTP error ${response.status}`);
                         }
+                        return response.json();
                     })
                     .then(data => {
-                        console.log("Profile data received");
-                        loadingSpinner.style.display = 'none';
+                        // Hide loading spinner
+                        document.querySelector('.loading-spinner').style.display = 'none';
+                        profileForm.style.display = 'block';
                         
-                        // Try to handle the data regardless of format
-                        let sellerData = null;
+                        console.log('Seller profile data:', data);
+                        addDebugMessage(data);
                         
-                        // Check for success flag
-                        if (data.success === false) {
-                            console.error("API reported error:", data.message);
-                            showError(data.message || 'Failed to load profile data');
-                            profileForm.style.display = 'block';
-                            return;
-                        }
-                        
-                        // Try different possible data structures
-                        if (data.data) {
-                            // Standard API format
-                            sellerData = data.data;
-                        } else if (data.seller) {
-                            // Alternative format
-                            sellerData = data.seller;
-                        } else if (data.name && data.email) {
-                            // Direct format
-                            sellerData = data;
-                        } else if (data.status === 'success' && data.data) {
-                            // New API format
-                            sellerData = data.data;
-                        } else {
-                            // Unknown format - try to make best guess
-                            for (const key in data) {
-                                if (typeof data[key] === 'object' && data[key] !== null) {
-                                    // This might be our data object
-                                    if (data[key].name || data[key].email || data[key].shop_name) {
-                                        sellerData = data[key];
-                                        break;
+                        if (data.status === 'success') {
+                            const sellerData = data.data;
+                            
+                            try {
+                                // Populate personal info - try different possible field names
+                                nameInput.value = sellerData.name || sellerData.seller_name || sellerData.user_name || '';
+                                emailInput.value = sellerData.email || sellerData.user_email || '';
+                                phoneInput.value = sellerData.phone || sellerData.phone_no || sellerData.phone_number || '';
+                                
+                                // Populate shop info - try different possible field names
+                                shopNameInput.value = sellerData.shop_name || sellerData.shopName || '';
+                                shopDescriptionInput.value = sellerData.description || sellerData.shop_description || '';
+                                
+                                // Populate location data
+                                if (sellerData.latitude || sellerData.longitude) {
+                                    latitudeInput.value = sellerData.latitude || '';
+                                    longitudeInput.value = sellerData.longitude || '';
+                                    locationDisplay.textContent = `${sellerData.latitude || ''}, ${sellerData.longitude || ''}`;
+                                
+                                    // Store in localStorage
+                                    if (sellerData.latitude) localStorage.setItem('seller_latitude', sellerData.latitude);
+                                    if (sellerData.longitude) localStorage.setItem('seller_longitude', sellerData.longitude);
+                                }
+                                
+                                // Set profile photo if available
+                                if (sellerData.profile_image || sellerData.profile_photo) {
+                                    const photoUrl = sellerData.profile_image || sellerData.profile_photo;
+                                    
+                                    if (photoUrl && photoUrl !== 'null') {
+                                        // Determine correct URL based on what's returned
+                                        let fullPhotoUrl;
+                                        if (photoUrl.startsWith('http')) {
+                                            fullPhotoUrl = photoUrl;
+                                        } else if (photoUrl.startsWith('/')) {
+                                            fullPhotoUrl = photoUrl;
+                                        } else {
+                                            fullPhotoUrl = '../../../backend/' + photoUrl;
+                                        }
+                                        
+                                        // Set image source
+                                        const logoPreview = document.getElementById('logoPreview');
+                                        if (logoPreview) {
+                                            logoPreview.src = fullPhotoUrl;
+                                            logoPreview.style.display = 'block';
+                                        }
                                     }
                                 }
-                            }
-                            
-                            // If still not found, use the data directly
-                            if (!sellerData) {
-                                sellerData = data;
-                            }
-                        }
-                        
-                        // Check if we have any usable data
-                        if (!sellerData) {
-                            console.error("No usable seller data found");
-                            showError("No seller data found in the response");
-                            profileForm.style.display = 'block';
-                            return;
-                        }
-                        
-                        // Populate form with our best attempt at finding data
-                        try {
-                            // Populate personal info - try different possible field names
-                            nameInput.value = sellerData.name || sellerData.seller_name || sellerData.user_name || '';
-                            emailInput.value = sellerData.email || sellerData.user_email || '';
-                            phoneInput.value = sellerData.phone || sellerData.phone_no || sellerData.phone_number || '';
-                            
-                            // Populate shop info - try different possible field names
-                            shopNameInput.value = sellerData.shop_name || sellerData.shopName || '';
-                            shopDescriptionInput.value = sellerData.description || sellerData.shop_description || '';
-                            
-                            // Populate location data
-                            if (sellerData.latitude || sellerData.longitude) {
-                                latitudeInput.value = sellerData.latitude || '';
-                                longitudeInput.value = sellerData.longitude || '';
-                                locationDisplay.textContent = `${sellerData.latitude || ''}, ${sellerData.longitude || ''}`;
-                            
-                                // Store in localStorage
-                                if (sellerData.latitude) localStorage.setItem('seller_latitude', sellerData.latitude);
-                                if (sellerData.longitude) localStorage.setItem('seller_longitude', sellerData.longitude);
-                            }
-                        
-                            // Populate shop logo - try different possible field names
-                            const logoImage = sellerData.profile_image || sellerData.shop_logo || sellerData.logo || sellerData.profile_photo;
-                            if (logoImage) {
-                                const logoPreview = document.querySelector('.logo-preview');
-                                logoPreview.innerHTML = '';
-                                const img = document.createElement('img');
                                 
-                                // Check if the path already starts with backend or uploads
-                                if (logoImage.startsWith('backend/') || logoImage.startsWith('/backend/') || 
-                                    logoImage.startsWith('uploads/') || logoImage.startsWith('/uploads/')) {
-                                    img.src = '../../../' + logoImage;
-                                } else if (logoImage.includes('profile_')) {
-                                    // For profile images that start with profile_ prefix, use the profile_photos directory
-                                    img.src = '../../../backend/uploads/profile_photos/' + logoImage;
-                                } else {
-                                    // Fallback to original logic
-                                    img.src = '../../../' + logoImage;
-                                }
-                                
-                                // Add error handling for missing images
-                                img.onerror = function() {
-                                    console.log('Error loading profile image:', img.src);
-                                    // Replace with default icon
-                                    logoPreview.innerHTML = '<i class="fas fa-store"></i>';
-                                };
-                                
-                                logoPreview.appendChild(img);
+                            } catch (error) {
+                                console.error('Error populating form:', error);
+                                showAlert('Error populating form: ' + error.message, 'error');
                             }
-                            
-                            // Show success silently without message
-                            console.log("Profile data loaded successfully!");
-                        } catch (err) {
-                            console.error("Error populating form:", err.message);
+                        } else {
+                            showAlert(data.message || 'Failed to load profile data', 'error');
                         }
-                        
-                        // Show the form regardless of errors
-                        profileForm.style.display = 'block';
                     })
                     .catch(error => {
-                        console.error("Error fetching profile:", error.message);
-                        loadingSpinner.style.display = 'none';
-                        showError('Error fetching profile: ' + error.message);
+                        // Hide loading spinner
+                        document.querySelector('.loading-spinner').style.display = 'none';
                         profileForm.style.display = 'block';
+                        
+                        console.error('Error fetching seller profile:', error);
+                        showAlert('Error fetching profile: ' + error.message, 'error');
                     });
             }
             
@@ -1417,7 +1370,7 @@
                     const confirmPasswordInput = document.getElementById('confirm_password');
                     
                     if (newPasswordInput.value !== confirmPasswordInput.value) {
-                        showError('New password and confirm password do not match');
+                        showAlert('New password and confirm password do not match', 'error');
                         submitButton.disabled = false;
                         submitButton.textContent = originalButtonText;
                         return;
@@ -1453,7 +1406,7 @@
                     submitButton.textContent = originalButtonText;
                     
                     if (data.status === 'success' || data.success === true) {
-                        showSuccess('Profile updated successfully!');
+                        showAlert('Profile updated successfully!', 'success');
                         
                         // Update profile image if it was uploaded and returned in the response
                         if (data.data && data.data.profile_photo) {
@@ -1489,67 +1442,19 @@
                         
                         // Refresh profile data
                         setTimeout(function() {
-                            fetchSellerProfile(userId);
+                            fetchSellerProfile();
                         }, 500);
                     } else {
-                        showError(data.message || 'Failed to update profile');
+                        showAlert(data.message || 'Failed to update profile', 'error');
                     }
                 })
                 .catch(error => {
                     console.error(`Profile update error: ${error.message}`);
                     submitButton.disabled = false;
                     submitButton.textContent = originalButtonText;
-                    showError('Error updating profile: ' + error.message);
+                    showAlert('Error updating profile: ' + error.message, 'error');
                 });
             });
-            
-            // Success message display
-            function showSuccess(message) {
-                const successAlert = document.getElementById('successAlert');
-                successAlert.textContent = message;
-                successAlert.style.display = 'block';
-                successAlert.classList.add('alert-fixed');
-                
-                // Add an icon to make it more noticeable
-                const icon = document.createElement('i');
-                icon.className = 'fas fa-check-circle';
-                icon.style.marginRight = '10px';
-                successAlert.prepend(icon);
-                
-                // Scroll to the message
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-                
-                // Hide after 3 seconds
-                setTimeout(function() {
-                    successAlert.style.display = 'none';
-                    successAlert.innerHTML = '';
-                    successAlert.classList.remove('alert-fixed');
-                }, 3000);
-            }
-            
-            // Error message display
-            function showError(message) {
-                const errorAlert = document.getElementById('errorAlert');
-                errorAlert.textContent = message;
-                errorAlert.style.display = 'block';
-                errorAlert.classList.add('alert-fixed');
-                
-                // Add an icon to make it more noticeable
-                const icon = document.createElement('i');
-                icon.className = 'fas fa-exclamation-triangle';
-                icon.style.marginRight = '10px';
-                errorAlert.prepend(icon);
-                
-                // Scroll to the error
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-                
-                // Hide after 5 seconds
-                setTimeout(function() {
-                    errorAlert.style.display = 'none';
-                    errorAlert.innerHTML = '';
-                    errorAlert.classList.remove('alert-fixed');
-                }, 5000);
-            }
             
             // Location features
             const getCurrentLocationBtn = document.getElementById('getCurrentLocation');
@@ -1587,7 +1492,7 @@
                             getCurrentLocationBtn.disabled = false;
                             getCurrentLocationBtn.innerHTML = '<i class="fas fa-map-marker-alt"></i> GET CURRENT LOCATION';
                             
-                            showSuccess('Shop location updated successfully!');
+                            showAlert('Shop location updated successfully!', 'success');
                         },
                         // Error callback
                         function(error) {
@@ -1605,7 +1510,7 @@
                                     break;
                             }
                             
-                            showError(errorMessage);
+                            showAlert(errorMessage, 'error');
                             
                             // Show manual entry section
                             manualLocationEntry.style.display = 'block';
@@ -1616,7 +1521,7 @@
                         }
                     );
                 } else {
-                    showError('Geolocation is not supported by this browser.');
+                    showAlert('Geolocation is not supported by this browser.', 'error');
                     // Show manual entry section
                     manualLocationEntry.style.display = 'block';
                 }
@@ -1633,12 +1538,12 @@
                 const longitude = longitudeInput.value.trim();
                 
                 if (!latitude || !longitude) {
-                    showError('Please enter both latitude and longitude.');
+                    showAlert('Please enter both latitude and longitude.', 'error');
                     return;
                 }
                 
                 if (!isValidCoordinate(latitude, 'lat') || !isValidCoordinate(longitude, 'lng')) {
-                    showError('Please enter valid coordinates.');
+                    showAlert('Please enter valid coordinates.', 'error');
                     return;
                 }
                 
@@ -1652,7 +1557,7 @@
                 localStorage.setItem('seller_latitude', latitude);
                 localStorage.setItem('seller_longitude', longitude);
                 
-                showSuccess('Shop location set manually!');
+                showAlert('Shop location set manually!', 'success');
             });
             
             // Validate coordinates

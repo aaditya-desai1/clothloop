@@ -827,17 +827,13 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Get the seller ID from session storage
-            let sellerId = sessionStorage.getItem('user_id');
+            let sellerId = localStorage.getItem('user_id');
             
             // Check if we have a seller ID
             if (!sellerId) {
-                // For development purposes, use ID 1 as default
-                sellerId = 1;
-                console.log('No seller ID in session storage, using default ID:', sellerId);
-                
-                // Store it in session storage for future use
-                sessionStorage.setItem('user_id', sellerId);
-                sessionStorage.setItem('user_role', 'seller');
+                // Alert that login is required
+                showAlert('Please log in to view your reviews.', 'error');
+                return;
             }
             
             // Fetch reviews when the page loads

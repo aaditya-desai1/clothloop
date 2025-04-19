@@ -76,11 +76,13 @@ if (!$authenticated) {
 error_log("Product listings authentication check: User ID = " . ($userId ?? 'null') . ", Role = " . ($userRole ?? 'null') . ", Authenticated = " . ($authenticated ? 'true' : 'false'));
 
 // If still not authenticated, allow demo seller access for testing
-if (!$authenticated && !isset($_GET['strict_auth'])) {
+// ONLY if running in development mode (allow override for strict auth)
+$isDevelopment = strpos($_SERVER['HTTP_HOST'], 'localhost') !== false || strpos($_SERVER['HTTP_HOST'], '127.0.0.1') !== false;
+if (!$authenticated && $isDevelopment && !isset($_GET['strict_auth'])) {
     $userId = 1; // Demo seller ID
     $userRole = 'seller';
     $authenticated = true;
-    error_log("Using demo seller credentials for product listings");
+    error_log("Using demo seller credentials for product listings - DEVELOPMENT MODE ONLY");
 }
 
 // Initialize response
@@ -111,6 +113,20 @@ try {
     // Get database connection
     $database = new Database();
     $db = $database->getConnection();
+    
+    // Verify that the user is actually a seller
+    $authQuery = "SELECT id, role FROM users WHERE id = ? AND role = 'seller'";
+    $authStmt = $db->prepare($authQuery);
+    $authStmt->bindParam(1, $userId);
+    $authStmt->execute();
+    
+    if ($authStmt->rowCount() === 0) {
+        // Not a valid seller
+        $response['status'] = 'error';
+        $response['message'] = 'Unauthorized access or invalid seller ID';
+        echo json_encode($response);
+        exit;
+    }
     
     // Get pagination parameters
     $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
