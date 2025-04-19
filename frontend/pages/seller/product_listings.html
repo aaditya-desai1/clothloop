@@ -1328,6 +1328,10 @@
                 // Get base URL from current page location
                 const basePath = window.location.pathname.includes('/ClothLoop/') ? '/ClothLoop/' : '/';
                 
+                // Define baseUrl for image paths
+                const baseUrl = window.location.origin;
+                console.log('Base URL:', baseUrl, 'Base Path:', basePath);
+                
                 // Add timestamp to prevent caching
                 const timestamp = new Date().getTime();
                 
@@ -1344,13 +1348,13 @@
                     
                     // Create a list of fallback image sources to try in order
                     const imageSources = [
-                        `${basePath}backend/api/image_display.php?type=product&id=${product.id}&t=${timestamp}`,
-                        `${basePath}backend/uploads/products/${product.id}/${product.image_filename || 'product_image.jpg'}?t=${timestamp}`,
-                        `${basePath}backend/uploads/products/${product.id}/product_image.jpg?t=${timestamp}`,
-                        `${basePath}backend/api/products/direct_image.php?product_id=${product.id}&t=${timestamp}`,
-                        `${basePath}frontend/assets/images/Clothify.png`,
-                        `${basePath}frontend/assets/images/placeholder.png`,
-                        `${basePath}frontend/assets/images/p3.jpg`
+                        `${baseUrl}${basePath}backend/api/image_display.php?type=product&id=${product.id}&t=${timestamp}`,
+                        `${baseUrl}${basePath}backend/uploads/products/${product.id}/${product.image_filename || 'product_image.jpg'}?t=${timestamp}`,
+                        `${baseUrl}${basePath}backend/uploads/products/${product.id}/product_image.jpg?t=${timestamp}`,
+                        `${baseUrl}${basePath}backend/api/products/direct_image.php?product_id=${product.id}&t=${timestamp}`,
+                        `${baseUrl}${basePath}frontend/assets/images/Clothify.png`,
+                        `${baseUrl}${basePath}frontend/assets/images/placeholder.png`,
+                        `${baseUrl}${basePath}frontend/assets/images/p3.jpg`
                     ];
                     
                     // Recursive function to try loading images from the sources array
@@ -1372,7 +1376,7 @@
                                 // First try directly accessing the product folder to see if we can find any images
                                 console.log(`Trying direct folder access for product ${product.id}...`);
                                 // Make an AJAX request to check if the directory exists and has images
-                                fetch(`${basePath}backend/api/check_product_images.php?product_id=${product.id}&t=${timestamp}`, {
+                                fetch(`${baseUrl}${basePath}backend/api/check_product_images.php?product_id=${product.id}&t=${timestamp}`, {
                                     cache: 'no-store' // Prevent browser caching
                                 })
                                 .then(response => response.json())
@@ -1380,7 +1384,7 @@
                                     if (data.status === 'success' && data.image_path) {
                                         console.log(`Found image at: ${data.image_path}`);
                                         // Add timestamp to prevent caching
-                                        imageElement.src = `${data.image_path}?t=${timestamp}`;
+                                        imageElement.src = `${baseUrl}${data.image_path}?t=${timestamp}`;
                                     } else {
                                         tryNextImage(index + 1);
                                     }
@@ -1397,6 +1401,13 @@
                     
                     // Start trying paths
                     tryNextImage(0);
+                    
+                    // Set a default error handler for the image element
+                    imageElement.onerror = function() {
+                        console.error(`Final image failed to load for product ${product.id}`);
+                        // Use a placeholder as last resort
+                        imageElement.src = `${baseUrl}${basePath}frontend/assets/images/placeholder.png`;
+                    };
                 }
 
                 // Set product status badge
