@@ -131,7 +131,7 @@ try {
     
     // Update sellers table if needed
     $sellerUpdated = false;
-    if (isset($data['shop_name']) || isset($data['description']) || isset($data['latitude']) || isset($data['longitude'])) {
+    if (isset($data['shop_name']) || isset($data['description']) || isset($data['shop_address']) || isset($data['latitude']) || isset($data['longitude'])) {
         $sellerFields = [];
         $sellerParams = [];
         
@@ -143,6 +143,11 @@ try {
         if (isset($data['description'])) {
             $sellerFields[] = "description = ?";
             $sellerParams[] = $data['description'];
+        }
+        
+        if (isset($data['shop_address'])) {
+            $sellerFields[] = "address = ?";
+            $sellerParams[] = $data['shop_address'];
         }
         
         if (isset($data['latitude'])) {

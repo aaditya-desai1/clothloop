@@ -1007,3 +1007,77 @@ Seller Rows Affected: 0
 
 Transaction committed successfully
 
+Received POST data: {
+    "seller_id": "4",
+    "name": "Lorem Ipsum",
+    "email": "seller2@gmail.com",
+    "phone_no": "7896541230",
+    "shop_name": "Lorem Ipsum",
+    "description": "Rental shop",
+    "latitude": "23.035793",
+    "longitude": "72.437650"
+}
+
+Transaction started
+User Update Query: UPDATE users SET name = ?, email = ?, phone_no = ? WHERE id = ?
+User Params: ["Lorem Ipsum","seller2@gmail.com","7896541230",4]
+User Update Result: Success
+User Rows Affected: 0
+
+Seller Update Query: UPDATE sellers SET shop_name = ?, description = ?, latitude = ?, longitude = ? WHERE id = ?
+Seller Params: ["Lorem Ipsum","Rental shop","23.035793","72.437650",4]
+Seller Update Result: Success
+Seller Rows Affected: 1
+
+Transaction committed successfully
+
+Received POST data: {
+    "seller_id": "4",
+    "name": "Lorem Ipsum",
+    "email": "seller2@gmail.com",
+    "phone_no": "7896541230",
+    "shop_name": "Lorem Ipsum",
+    "description": "Rental shop",
+    "shop_address": "Kapodara",
+    "latitude": "23.03579300",
+    "longitude": "72.43765000"
+}
+
+Transaction started
+User Update Query: UPDATE users SET name = ?, email = ?, phone_no = ? WHERE id = ?
+User Params: ["Lorem Ipsum","seller2@gmail.com","7896541230",4]
+User Update Result: Success
+User Rows Affected: 0
+
+Seller Update Query: UPDATE sellers SET shop_name = ?, description = ?, latitude = ?, longitude = ? WHERE id = ?
+Seller Params: ["Lorem Ipsum","Rental shop","23.03579300","72.43765000",4]
+Seller Update Result: Success
+Seller Rows Affected: 0
+
+Transaction committed successfully
+
+Received POST data: {
+    "seller_id": "4",
+    "name": "Lorem Ipsum",
+    "email": "seller2@gmail.com",
+    "phone_no": "7896541230",
+    "shop_name": "Lorem Ipsum",
+    "description": "Rental shop",
+    "shop_address": "Kapodara",
+    "latitude": "23.03579300",
+    "longitude": "72.43765000"
+}
+
+Transaction started
+User Update Query: UPDATE users SET name = ?, email = ?, phone_no = ? WHERE id = ?
+User Params: ["Lorem Ipsum","seller2@gmail.com","7896541230",4]
+User Update Result: Success
+User Rows Affected: 0
+
+Seller Update Query: UPDATE sellers SET shop_name = ?, description = ?, address = ?, latitude = ?, longitude = ? WHERE id = ?
+Seller Params: ["Lorem Ipsum","Rental shop","Kapodara","23.03579300","72.43765000",4]
+Seller Update Result: Success
+Seller Rows Affected: 1
+
+Transaction committed successfully
+

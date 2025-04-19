@@ -704,6 +704,10 @@
                     console.log('API response:', data);
                     
                     if (data.status === 'success' && data.product) {
+                        // Debug shop address details
+                        console.log('Shop address from API:', data.product.shop_address);
+                        console.log('Address field from API:', data.product.address);
+                        
                         // Update product details
                         displayProductDetails(data.product);
                         document.getElementById('productDetails').style.display = 'block';
@@ -758,6 +762,17 @@
             // Set up global slider images initially with just the main image
             window.sliderImages = initialImages;
             
+            // Handle shop address - check different fields
+            let shopAddress = 'No location specified';
+            
+            if (product.shop_address && product.shop_address !== 'null' && product.shop_address.trim() !== '') {
+                shopAddress = product.shop_address;
+            } else if (product.address && product.address !== 'null' && product.address.trim() !== '') {
+                shopAddress = product.address;
+            }
+            
+            console.log('Final shop address to display:', shopAddress);
+            
             // Create HTML for product details
             const html = `
                 <div class="product-detail">
@@ -811,7 +826,7 @@
                             </div>
                             <div class="shop-detail">
                                 <i class="fas fa-map-marker-alt"></i>
-                                <span>${product.shop_address || 'No location specified'}</span>
+                                <span>${shopAddress}</span>
                             </div>
                             <div class="shop-detail">
                                 <i class="fas fa-phone"></i>
