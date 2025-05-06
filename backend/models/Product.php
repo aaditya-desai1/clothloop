@@ -297,5 +297,58 @@ class Product {
         
         return false;
     }
+
+    /**
+     * Delete all products by seller ID
+     * 
+     * @param int $sellerId The seller ID
+     * @return bool True if deleted successfully, false otherwise
+     */
+    public function deleteAllBySellerId($sellerId) {
+        // First delete associated product images
+        $imageQuery = "SELECT id FROM " . $this->table . " WHERE seller_id = :seller_id";
+        $imageStmt = $this->conn->prepare($imageQuery);
+        $imageStmt->bindParam(':seller_id', $sellerId);
+        $imageStmt->execute();
+        
+        if ($imageStmt->rowCount() > 0) {
+            while ($row = $imageStmt->fetch(PDO::FETCH_ASSOC)) {
+                // Delete product images from storage
+                $imagesDir = $_SERVER['DOCUMENT_ROOT'] . '/uploads/products/' . $row['id'];
+                if (is_dir($imagesDir)) {
+                    $files = glob($imagesDir . '/*');
+                    foreach ($files as $file) {
+                        if (is_file($file)) {
+                            unlink($file);
+                        }
+                    }
+                    // Remove the directory
+                    rmdir($imagesDir);
+                }
+                
+                // Delete from product_images table
+                $deleteImagesQuery = "DELETE FROM product_images WHERE product_id = :product_id";
+                $deleteImagesStmt = $this->conn->prepare($deleteImagesQuery);
+                $deleteImagesStmt->bindParam(':product_id', $row['id']);
+                $deleteImagesStmt->execute();
+            }
+        }
+        
+        // Next delete related entries in various tables
+        $tables = ['customer_interests', 'wishlist', 'orders', 'product_reviews'];
+        foreach ($tables as $table) {
+            $query = "DELETE FROM " . $table . " WHERE product_id IN (SELECT id FROM " . $this->table . " WHERE seller_id = :seller_id)";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':seller_id', $sellerId);
+            $stmt->execute();
+        }
+        
+        // Finally, delete all products
+        $query = "DELETE FROM " . $this->table . " WHERE seller_id = :seller_id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':seller_id', $sellerId);
+        
+        return $stmt->execute();
+    }
 }
 ?> 

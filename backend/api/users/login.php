@@ -106,18 +106,30 @@ try {
     $stmt = $db->prepare("
         SELECT id, name, email, password, role, phone_no, status
         FROM users
-        WHERE email = :email AND status = 'active'
+        WHERE email = :email
     ");
     $stmt->bindParam(':email', $email);
     $stmt->execute();
     
     if ($stmt->rowCount() === 0) {
-        // User not found or inactive
+        // User not found
         Response::error('Invalid credentials');
         exit;
     }
     
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    // Check if user is suspended
+    if ($user['status'] === 'suspended') {
+        Response::error('Your account has been suspended. Please contact the administrator for more information.');
+        exit;
+    }
+    
+    // Check if user is inactive
+    if ($user['status'] === 'inactive') {
+        Response::error('Your account is inactive. Please activate your account.');
+        exit;
+    }
     
     // Verify password
     if (!Auth::verifyPassword($password, $user['password'])) {

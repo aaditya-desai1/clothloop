@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Seller Monitoring | ClothLoop</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Theme Variables */
+        :root {
+            /* Dark Theme (Default) */
+            --primary-color: #000000;
+            --secondary-color: #333333;
+            --accent-color: #ffffff;
+            --text-color: #ffffff;
+            --light-bg: #111111;
+            --card-bg: #1a1a1a;
+            --footer-bg: #000000;
+            --footer-text: #cccccc;
+            --border-radius: 0;
+            --box-shadow: 0 5px 10px rgba(0, 0, 0, 0.8);
+            --border-color: #333333;
+            --hover-bg: #222222;
+            --input-bg: #333333;
+            --input-text: #ffffff;
+            --error-color: #FF3B30;
+            --success-color: #34C759;
+            --warning-color: #FF9500;
+            --admin-color: #FF2D55;
+        }
+
+        /* Light Theme Variables */
+        .light-theme {
+            --primary-color: #ffffff;
+            --secondary-color: #000000;
+            --accent-color: #000000;
+            --text-color: #000000;
+            --light-bg: #f5f5f5;
+            --card-bg: #ffffff;
+            --footer-bg: #f5f5f5;
+            --footer-text: #000000;
+            --border-radius: 0;
+            --box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+            --border-color: #e0e0e0;
+            --hover-bg: #e0e0e0;
+            --input-bg: #f0f0f0;
+            --input-text: #333333;
+            --error-color: #FF3B30;
+            --success-color: #34C759;
+            --warning-color: #FF9500;
+            --admin-color: #FF2D55;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.7;
+            color: var(--text-color);
+            background-color: var(--light-bg);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Theme Switcher */
+        .theme-switcher {
+            background: var(--primary-color);
+            border: 2px solid var(--accent-color);
+            color: var(--accent-color);
+            width: 40px;
+            height: 40px;
+            border-radius: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            margin-left: 20px;
+            transition: all 0.2s linear;
+        }
+        
+        .theme-switcher:hover {
+            transform: skewX(-5deg);
+            box-shadow: 3px 3px 0 rgba(128, 128, 128, 0.3);
+        }
+
+        /* Navigation */
+        nav {
+            background-color: var(--primary-color);
+            padding: 1.2rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(255, 255, 255, 0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        nav .logo {
+            color: var(--accent-color);
+            font-size: 1.8rem;
+            font-weight: 700;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            position: relative;
+        }
+
+        nav .logo i {
+            margin-right: 10px;
+        }
+        
+        .admin-badge {
+            position: absolute;
+            top: -10px;
+            right: -30px;
+            background-color: var(--admin-color);
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+            padding: 3px 8px;
+            border-radius: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 1.5rem;
+        }
+
+        nav ul li a {
+            color: var(--accent-color);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0;
+            transition: all 0.2s linear;
+            font-weight: 500;
+            border-bottom: 2px solid transparent;
+        }
+
+        nav ul li a:hover, nav ul li a.active {
+            background-color: transparent;
+            color: var(--accent-color);
+            border-bottom: 2px solid var(--accent-color);
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 1200px;
+            margin: 120px auto 50px;
+            padding: 0 2rem;
+            flex: 1;
+            width: 100%;
+        }
+
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            width: 100%;
+            flex-wrap: wrap;
+        }
+
+        .content-title {
+            font-size: 24px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--accent-color);
+            margin-right: auto;
+        }
+        
+        /* Seller monitoring specific styles */
+        .sort-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .sort-controls label {
+            font-weight: 600;
+        }
+        
+        .sort-controls select {
+            padding: 8px 15px;
+            border: 2px solid var(--border-color);
+            background-color: var(--input-bg);
+            color: var(--input-text);
+            border-radius: 0;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .sellers-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;
+        }
+        
+        .seller-card {
+            background-color: var(--card-bg);
+            border: 2px solid var(--border-color);
+            padding: 20px;
+            border-radius: 0;
+            transition: all 0.2s ease;
+        }
+        
+        .seller-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--box-shadow);
+        }
+        
+        .seller-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .seller-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .seller-image {
+            width: 70px;
+            height: 70px;
+            object-fit: cover;
+            border: 2px solid var(--border-color);
+        }
+        
+        .seller-status {
+            font-size: 12px;
+            padding: 3px 8px;
+            border-radius: 10px;
+            margin-left: 10px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+        
+        .status-active {
+            background-color: var(--success-color);
+            color: white;
+        }
+        
+        .status-inactive {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        
+        .status-suspended {
+            background-color: var(--error-color);
+            color: white;
+        }
+        
+        .seller-rating {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+        
+        .rating-stars {
+            color: gold;
+            font-size: 18px;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+        }
+        
+        .seller-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+        
+        .seller-actions button {
+            padding: 8px 15px;
+            border: none;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-view-details {
+            background-color: var(--primary-color);
+            color: var(--accent-color);
+            border: 2px solid var(--accent-color);
+        }
+        
+        .btn-ban {
+            background-color: var(--warning-color);
+            color: white;
+        }
+        
+        .btn-unban {
+            background-color: var(--success-color);
+            color: white;
+        }
+        
+        .btn-delete {
+            background-color: var(--error-color);
+            color: white;
+        }
+        
+        .seller-actions button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+        }
+        
+        .seller-reviews {
+            background-color: rgba(0, 0, 0, 0.05);
+            padding: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border: 0 solid var(--border-color);
+        }
+        
+        .seller-reviews.show {
+            padding: 20px;
+            max-height: 1000px;
+            border-width: 1px;
+        }
+        
+        .reviews-summary {
+            margin-bottom: 20px;
+        }
+        
+        .rating-overview {
+            display: flex;
+            gap: 30px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .rating-average {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 120px;
+        }
+        
+        .large-rating {
+            font-size: 3rem;
+            font-weight: 700;
+        }
+        
+        .reviews-count {
+            margin-top: 5px;
+            color: var(--secondary-color);
+        }
+        
+        .rating-breakdown {
+            flex: 1;
+        }
+        
+        .rating-bar-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        
+        .rating-bar-container span {
+            width: 30px;
+        }
+        
+        .rating-bar {
+            flex: 1;
+            background-color: var(--border-color);
+            height: 8px;
+            margin: 0 10px;
+            position: relative;
+        }
+        
+        .rating-bar-fill {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            background-color: gold;
+        }
+        
+        .reviews-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .review-item {
+            background-color: var(--card-bg);
+            padding: 15px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .review-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .review-user-image {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .review-text {
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+        
+        .seller-response {
+            background-color: rgba(0, 0, 0, 0.05);
+            padding: 10px;
+            margin-top: 10px;
+            border-left: 3px solid var(--primary-color);
+        }
+        
+        .response-header {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .loading, .error, .no-sellers, .no-reviews {
+            padding: 20px;
+            text-align: center;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+        }
+        
+        .error {
+            color: var(--error-color);
+        }
+        
+        /* Footer */
+        footer {
+            background-color: var(--footer-bg);
+            color: var(--footer-text);
+            padding: 2rem;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="/" class="logo">
+            <i class="fas fa-tshirt"></i> ClothLoop
+            <span class="admin-badge">Admin</span>
+        </a>
+        <ul>
+            <li><a href="#" class="active">Seller Monitoring</a></li>
+            <li><a href="#">Products</a></li>
+            <li><a href="#">Orders</a></li>
+            <li><a href="#">Settings</a></li>
+            <li><a href="../../../backend/api/users/logout.php">Logout</a></li>
+        </ul>
+        <div class="theme-switcher" id="theme-switcher">
+            <i class="fas fa-sun"></i>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="content-header">
+            <h1 class="content-title">Seller Monitoring</h1>
+        </div>
+        
+        <div class="sort-controls">
+            <label for="sort-select">Sort by:</label>
+            <select id="sort-select">
+                <option value="avg_rating-ASC">Rating (Low to High)</option>
+                <option value="avg_rating-DESC">Rating (High to Low)</option>
+                <option value="total_reviews-DESC">Most Reviews</option>
+                <option value="name-ASC">Name (A-Z)</option>
+                <option value="name-DESC">Name (Z-A)</option>
+                <option value="created_at-DESC">Newest First</option>
+                <option value="created_at-ASC">Oldest First</option>
+            </select>
+        </div>
+        
+        <div class="sellers-container" id="sellers-list">
+            <!-- Sellers will be loaded here dynamically -->
+            <div class="loading">Loading sellers...</div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 ClothLoop. All rights reserved.</p>
+    </footer>
+    
+    <script>
+        // Theme switcher functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            initThemeSwitcher();
+            loadSellers();
+            
+            // Add event listener for sorting
+            document.getElementById('sort-select').addEventListener('change', function() {
+                loadSellers(this.value.split('-')[0], this.value.split('-')[1]);
+            });
+        });
+
+        // Initialize theme switcher
+        function initThemeSwitcher() {
+            const themeSwitch = document.getElementById('theme-switcher');
+            
+            if (localStorage.getItem('clothloop-theme') === 'light') {
+                document.body.classList.add('light-theme');
+                themeSwitch.innerHTML = '<i class="fas fa-moon"></i>';
+            } else {
+                themeSwitch.innerHTML = '<i class="fas fa-sun"></i>';
+            }
+            
+            themeSwitch.addEventListener('click', function() {
+                document.body.classList.toggle('light-theme');
+                
+                if (document.body.classList.contains('light-theme')) {
+                    localStorage.setItem('clothloop-theme', 'light');
+                    this.innerHTML = '<i class="fas fa-moon"></i>';
+                } else {
+                    localStorage.setItem('clothloop-theme', 'dark');
+                    this.innerHTML = '<i class="fas fa-sun"></i>';
+                }
+            });
+        }
+
+        // Load sellers from the API
+        function loadSellers(sort_by = 'avg_rating', sort_order = 'ASC') {
+            const sellersContainer = document.getElementById('sellers-list');
+            sellersContainer.innerHTML = '<div class="loading">Loading sellers...</div>';
+            
+            fetch('../../../backend/api/sellers/get_all_sellers.php?sort_by=' + sort_by + '&sort_order=' + sort_order)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        displaySellers(data.data.sellers);
+                    } else {
+                        sellersContainer.innerHTML = '<div class="error">Failed to load sellers: ' + data.message + '</div>';
+                    }
+                })
+                .catch(error => {
+                    sellersContainer.innerHTML = '<div class="error">Error: ' + error.message + '</div>';
+                });
+        }
+
+        // Create rating stars display
+        function createRatingStars(rating) {
+            let stars = '';
+            const fullStars = Math.floor(rating);
+            const halfStar = rating % 1 >= 0.5;
+            
+            for (let i = 1; i <= 5; i++) {
+                if (i <= fullStars) {
+                    stars += '<i class="fas fa-star"></i>';
+                } else if (i === fullStars + 1 && halfStar) {
+                    stars += '<i class="fas fa-star-half-alt"></i>';
+                } else {
+                    stars += '<i class="far fa-star"></i>';
+                }
+            }
+            
+            return stars;
+        }
+
+        // Ban a seller
+        function banSeller(sellerId) {
+            if (!confirm('Are you sure you want to ban this seller?')) {
+                return;
+            }
+            
+            fetch('../../../backend/api/sellers/ban_seller.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    seller_id: sellerId
+                }),
+                credentials: 'include'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert('Seller banned successfully');
+                    loadSellers(); // Reload the sellers list
+                } else {
+                    alert('Failed to ban seller: ' + data.message);
+                }
+            })
+            .catch(error => {
+                alert('Error: ' + error.message);
+            });
+        }
+
+        // Unban a seller
+        function unbanSeller(sellerId) {
+            if (!confirm('Are you sure you want to unban this seller?')) {
+                return;
+            }
+            
+            fetch('../../../backend/api/sellers/unban_seller.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    seller_id: sellerId
+                }),
+                credentials: 'include'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert('Seller unbanned successfully');
+                    loadSellers(); // Reload the sellers list
+                } else {
+                    alert('Failed to unban seller: ' + data.message);
+                }
+            })
+            .catch(error => {
+                alert('Error: ' + error.message);
+            });
+        }
+
+        // Delete a seller
+        function deleteSeller(sellerId) {
+            if (!confirm('Are you sure you want to DELETE this seller? This action cannot be undone!')) {
+                return;
+            }
+            
+            if (!confirm('This will delete ALL data related to this seller including products and reviews. Continue?')) {
+                return;
+            }
+            
+            fetch('../../../backend/api/sellers/delete_seller.php', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    seller_id: sellerId
+                }),
+                credentials: 'include'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert('Seller deleted successfully');
+                    loadSellers(); // Reload the sellers list
+                } else {
+                    alert('Failed to delete seller: ' + data.message);
+                }
+            })
+            .catch(error => {
+                alert('Error: ' + error.message);
+            });
+        }
+
+        // View seller details
+        function viewSellerDetails(sellerId) {
+            const reviewsElement = document.getElementById('reviews-' + sellerId);
+            
+            // Toggle the display
+            if (reviewsElement.classList.contains('show')) {
+                reviewsElement.classList.remove('show');
+                return;
+            }
+            
+            // Load reviews if not already loaded
+            if (reviewsElement.children.length === 0) {
+                reviewsElement.innerHTML = '<div class="loading">Loading reviews...</div>';
+                
+                fetch('../../../backend/api/getreviews.php?seller_id=' + sellerId + '&limit=10&offset=0')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success' && data.data.reviews.length > 0) {
+                            displaySellerReviews(reviewsElement, data.data.reviews, data.data.summary);
+                        } else {
+                            reviewsElement.innerHTML = '<div class="no-reviews">No reviews found for this seller.</div>';
+                        }
+                    })
+                    .catch(error => {
+                        reviewsElement.innerHTML = '<div class="error">Error loading reviews: ' + error.message + '</div>';
+                    });
+            }
+            
+            // Show the reviews
+            reviewsElement.classList.add('show');
+        }
+
+        // Display seller reviews
+        function displaySellerReviews(container, reviews, summary) {
+            let content = `
+                <div class="reviews-summary">
+                    <h4>Rating Summary</h4>
+                    <div class="rating-overview">
+                        <div class="rating-average">
+                            <span class="large-rating">${summary.average.toFixed(1)}</span>
+                            <div class="rating-stars">${createRatingStars(summary.average)}</div>
+                            <span class="reviews-count">${summary.total} reviews</span>
+                        </div>
+                        <div class="rating-breakdown">`;
+            
+            // Add rating breakdown bars
+            for (let i = 5; i >= 1; i--) {
+                const percentage = summary.total > 0 ? (summary.breakdown[i] / summary.total) * 100 : 0;
+                content += `
+                    <div class="rating-bar-container">
+                        <span>${i} <i class="fas fa-star"></i></span>
+                        <div class="rating-bar">
+                            <div class="rating-bar-fill" style="width: ${percentage}%"></div>
+                        </div>
+                        <span>${summary.breakdown[i]}</span>
+                    </div>`;
+            }
+            
+            content += `
+                        </div>
+                    </div>
+                </div>
+                <h4>Latest Reviews</h4>
+                <div class="reviews-list">`;
+            
+            // Add individual reviews
+            reviews.forEach(review => {
+                const date = new Date(review.created_at).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+                
+                content += `
+                    <div class="review-item">
+                        <div class="review-header">
+                            <div class="review-user">
+                                <img src="../../../backend/uploads/profiles/${review.buyer_image || 'default.png'}" alt="${review.buyer_name}" class="review-user-image">
+                                <span class="review-username">${review.buyer_name}</span>
+                            </div>
+                            <div class="review-rating">
+                                <div class="rating-stars">${createRatingStars(review.rating)}</div>
+                                <span class="review-date">${date}</span>
+                            </div>
+                        </div>
+                        <div class="review-text">${review.review_text}</div>
+                        ${review.seller_response ? `
+                        <div class="seller-response">
+                            <div class="response-header">
+                                <i class="fas fa-reply"></i> Seller's Response
+                            </div>
+                            <div class="response-text">${review.seller_response}</div>
+                        </div>` : ''}
+                    </div>`;
+            });
+            
+            content += `</div>`;
+            container.innerHTML = content;
+        }
+
+        // Display sellers in the container
+        function displaySellers(sellers) {
+            const sellersContainer = document.getElementById('sellers-list');
+            
+            if (!sellers || sellers.length === 0) {
+                sellersContainer.innerHTML = '<div class="no-sellers">No sellers found.</div>';
+                return;
+            }
+            
+            sellersContainer.innerHTML = '';
+            
+            sellers.forEach(seller => {
+                const sellerCard = document.createElement('div');
+                sellerCard.className = 'seller-card';
+                sellerCard.setAttribute('data-seller-id', seller.id);
+                
+                // Calculate status class
+                let statusClass = 'status-active';
+                if (seller.status === 'suspended') {
+                    statusClass = 'status-suspended';
+                } else if (seller.status === 'inactive') {
+                    statusClass = 'status-inactive';
+                }
+                
+                // Ensure rating values are valid
+                const rating = seller.avg_rating ? parseFloat(seller.avg_rating) : 0;
+                const totalReviews = seller.total_reviews ? parseInt(seller.total_reviews) : 0;
+                
+                const ratingStars = createRatingStars(rating);
+                
+                sellerCard.innerHTML = `
+                    <div class="seller-header">
+                        <div class="seller-info">
+                            <img src="../../../backend/uploads/profiles/${seller.profile_photo || 'default.png'}" alt="${seller.name}" class="seller-image">
+                            <div>
+                                <h3>${seller.name} <span class="seller-status ${statusClass}">${seller.status}</span></h3>
+                                <p><i class="fas fa-envelope"></i> ${seller.email}</p>
+                                <p><i class="fas fa-phone"></i> ${seller.phone_no || 'N/A'}</p>
+                            </div>
+                        </div>
+                        <div class="seller-rating">
+                            <div class="rating-stars">${ratingStars}</div>
+                            <p class="rating-value">${rating ? rating.toFixed(1) : 'No ratings'} (${totalReviews} reviews)</p>
+                        </div>
+                    </div>
+                    <div class="seller-actions">
+                        <button class="btn-view-details" onclick="viewSellerDetails('${seller.id}')">View Reviews</button>
+                        <button class="btn-${seller.status === 'suspended' ? 'unban' : 'ban'}" onclick="${seller.status === 'suspended' ? 'unbanSeller' : 'banSeller'}('${seller.id}')">
+                            ${seller.status === 'suspended' ? 'Unban Seller' : 'Ban Seller'}
+                        </button>
+                        <button class="btn-delete" onclick="deleteSeller('${seller.id}')">Delete Account</button>
+                    </div>
+                    <div class="seller-reviews" id="reviews-${seller.id}"></div>
+                `;
+                
+                sellersContainer.appendChild(sellerCard);
+            });
+        }
+    </script>
+</body>
+</html>

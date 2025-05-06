@@ -267,5 +267,60 @@ class User {
         // Execute query
         return $stmt->execute();
     }
+
+    /**
+     * Update user status (active, inactive, suspended)
+     * 
+     * @param string $status The new status
+     * @return bool True if updated successfully, false otherwise
+     */
+    public function updateStatus($status) {
+        // Validate status
+        $validStatuses = ['active', 'inactive', 'suspended'];
+        if (!in_array($status, $validStatuses)) {
+            return false;
+        }
+        
+        // Create query
+        $query = "UPDATE " . $this->table . " 
+                  SET status = :status,
+                      updated_at = NOW()
+                  WHERE id = :id";
+        
+        // Prepare statement
+        $stmt = $this->conn->prepare($query);
+        
+        // Clean data
+        $this->id = htmlspecialchars(strip_tags($this->id));
+        
+        // Bind parameters
+        $stmt->bindParam(':status', $status);
+        $stmt->bindParam(':id', $this->id);
+        
+        // Execute query
+        return $stmt->execute();
+    }
+    
+    /**
+     * Delete user account
+     * 
+     * @return bool True if deleted successfully, false otherwise
+     */
+    public function delete() {
+        // Create query
+        $query = "DELETE FROM " . $this->table . " WHERE id = :id";
+        
+        // Prepare statement
+        $stmt = $this->conn->prepare($query);
+        
+        // Clean data
+        $this->id = htmlspecialchars(strip_tags($this->id));
+        
+        // Bind parameter
+        $stmt->bindParam(':id', $this->id);
+        
+        // Execute query
+        return $stmt->execute();
+    }
 }
 ?> 

@@ -416,6 +416,8 @@
                             window.location.href = '../seller/seller_dashboard.html';
                         } else if (data.data.user.role === 'buyer') {
                             window.location.href = '../buyer/buyer_dashboard.html';
+                        } else if (data.data.user.role === 'admin') {
+                            window.location.href = '../admin/seller_monitoring.html';
                         } else {
                             window.location.href = '/';
                         }

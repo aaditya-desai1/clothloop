@@ -203,5 +203,28 @@ class Review {
         
         return false;
     }
+
+    /**
+     * Delete all reviews for a seller
+     * 
+     * @param int $sellerId The seller ID
+     * @return bool True if deleted successfully, false otherwise
+     */
+    public function deleteBySellerId($sellerId) {
+        // Create query
+        $query = 'DELETE FROM ' . $this->table . ' WHERE seller_id = :seller_id';
+        
+        // Prepare statement
+        $stmt = $this->conn->prepare($query);
+        
+        // Clean data
+        $sellerId = htmlspecialchars(strip_tags($sellerId));
+        
+        // Bind parameter
+        $stmt->bindParam(':seller_id', $sellerId);
+        
+        // Execute query
+        return $stmt->execute();
+    }
 }
 ?> 

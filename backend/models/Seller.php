@@ -244,5 +244,67 @@ class Seller {
         // Execute query
         return $stmt->execute();
     }
+    
+    /**
+     * Get all sellers with their user information, ordered by a specific field
+     * 
+     * @param string $sort_by Field to sort by (avg_rating, total_reviews, name, created_at)
+     * @param string $sort_order Sort order (ASC or DESC)
+     * @return array Array of sellers with user information
+     */
+    public function getAllWithUserInfo($sort_by = 'avg_rating', $sort_order = 'ASC') {
+        // Determine the correct table for the sort field
+        $sortTable = 's';
+        if ($sort_by === 'name') {
+            $sortTable = 'u';
+        }
+        
+        // Build the ORDER BY clause
+        $orderClause = "";
+        if ($sort_by === 'avg_rating') {
+            // Use COALESCE to handle NULL values, defaulting to 0
+            $orderClause = "ORDER BY COALESCE(s.avg_rating, 0) " . $sort_order;
+        } else if ($sort_by === 'total_reviews') {
+            $orderClause = "ORDER BY COALESCE(s.total_reviews, 0) " . $sort_order;
+        } else {
+            $orderClause = "ORDER BY " . $sortTable . "." . $sort_by . " " . $sort_order;
+        }
+        
+        $query = "SELECT s.*, u.name, u.email, u.phone_no, u.status, u.profile_photo
+                  FROM " . $this->table . " s
+                  JOIN users u ON s.id = u.id
+                  WHERE u.role = 'seller'
+                  " . $orderClause;
+        
+        // Prepare statement
+        $stmt = $this->conn->prepare($query);
+        
+        // Execute query
+        $stmt->execute();
+        
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Delete seller record
+     * 
+     * @return bool True if deleted successfully, false otherwise
+     */
+    public function delete() {
+        // Create query
+        $query = "DELETE FROM " . $this->table . " WHERE id = :id";
+        
+        // Prepare statement
+        $stmt = $this->conn->prepare($query);
+        
+        // Clean data
+        $this->id = htmlspecialchars(strip_tags($this->id));
+        
+        // Bind parameter
+        $stmt->bindParam(':id', $this->id);
+        
+        // Execute query
+        return $stmt->execute();
+    }
 }
 ?> 
