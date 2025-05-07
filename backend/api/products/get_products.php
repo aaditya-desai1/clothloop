@@ -54,8 +54,8 @@ try {
             u.name AS seller_name,
             s.shop_name,
             (SELECT image_path FROM product_images WHERE product_id = p.id AND is_primary = 1 LIMIT 1) AS primary_image,
-            (SELECT COUNT(*) FROM reviews WHERE product_id = p.id) AS review_count,
-            (SELECT AVG(rating) FROM reviews WHERE product_id = p.id) AS avg_rating
+            (SELECT COUNT(*) FROM product_reviews WHERE product_id = p.id) AS review_count,
+            (SELECT AVG(rating) FROM product_reviews WHERE product_id = p.id) AS avg_rating
         FROM products p
         LEFT JOIN categories c ON p.category_id = c.id
         JOIN sellers s ON p.seller_id = s.id
