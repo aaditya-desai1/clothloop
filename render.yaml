@@ -6,9 +6,14 @@ services:
     rootDir: .
     region: ohio
     plan: free
-    buildCommand: ""
-    startCommand: "php setup_database.php && apache2-foreground"
-    healthCheckPath: /api/test/cors_test.php
+    buildCommand: >
+      apt-get update && apt-get install -y postgresql-client &&
+      php -m | grep pgsql
+    startCommand: >
+      /usr/local/bin/wait-for-db.sh &&
+      php setup_database.php &&
+      apache2-foreground
+    healthCheckPath: /api/system/db_diagnostics.php
     envVars:
       - key: RENDER
         value: true
