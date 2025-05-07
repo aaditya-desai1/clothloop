@@ -7,12 +7,16 @@
 // Check if we're in a production environment (Render)
 $isProduction = (getenv('RENDER') === 'true');
 
+// Detect if we're using PostgreSQL on Render (hostname typically starts with dpg-)
+$isPgSql = $isProduction && (stripos(getenv('DB_HOST') ?: '', 'dpg-') === 0);
+
 // Database credentials
 $dbConfig = [
     'host' => $isProduction ? getenv('DB_HOST') : 'localhost',
     'dbname' => $isProduction ? getenv('DB_NAME') : 'clothloop',
     'username' => $isProduction ? getenv('DB_USER') : 'root',
     'password' => $isProduction ? getenv('DB_PASS') : '',
+    'type' => $isPgSql ? 'pgsql' : 'mysql'
 ];
 
 // Output database configuration for debugging in logs (only in production)
@@ -21,6 +25,7 @@ if ($isProduction) {
     error_log("Host: " . $dbConfig['host']);
     error_log("DB Name: " . $dbConfig['dbname']);
     error_log("DB User: " . $dbConfig['username']);
+    error_log("DB Type: " . $dbConfig['type']);
     error_log("DB Pass Length: " . (strlen($dbConfig['password']) > 0 ? 'Set' : 'Not Set'));
 }
 

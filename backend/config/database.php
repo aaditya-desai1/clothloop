@@ -14,7 +14,7 @@ class Database {
     private $username;
     private $password;
     private $conn;
-    private $dbType;
+    public $dbType; // Make dbType public so it can be accessed in setup_database.php
 
     /**
      * Constructor - set database credentials
@@ -30,11 +30,9 @@ class Database {
             error_log("[Database] Initializing connection with: Host=$this->host, DB=$this->db_name, User=$this->username");
         }
         
-        // Detect database type - PostgreSQL or MySQL based on host
-        $this->dbType = (IS_PRODUCTION && (
-            stripos($this->host, 'postgres') !== false || 
-            getenv('DB_TYPE') === 'postgres')
-        ) ? 'pgsql' : 'mysql';
+        // Use the database type from env.php
+        global $dbConfig;
+        $this->dbType = $dbConfig['type'] ?? 'mysql';
         
         if (IS_PRODUCTION) {
             error_log("[Database] Using database type: " . $this->dbType);
@@ -52,11 +50,24 @@ class Database {
         try {
             // Try connecting to the database
             if ($this->dbType === 'pgsql') {
-                // PostgreSQL connection
-                $dsn = "pgsql:host={$this->host};dbname={$this->db_name}";
-                if (IS_PRODUCTION) {
-                    error_log("[Database] Connecting with PostgreSQL DSN: $dsn");
+                // Check if host starts with "dpg-" (Render PostgreSQL)
+                $isRenderPostgres = (stripos($this->host, 'dpg-') === 0);
+                
+                if ($isRenderPostgres) {
+                    // For Render PostgreSQL, we need to use SSL
+                    $dsn = "pgsql:host={$this->host};dbname={$this->db_name};sslmode=require";
+                    if (IS_PRODUCTION) {
+                        error_log("[Database] Connecting to Render PostgreSQL with DSN: $dsn");
+                    }
+                } else {
+                    // Standard PostgreSQL connection
+                    $dsn = "pgsql:host={$this->host};dbname={$this->db_name}";
+                    if (IS_PRODUCTION) {
+                        error_log("[Database] Connecting with PostgreSQL DSN: $dsn");
+                    }
                 }
+                
+                // Create the connection
                 $this->conn = new PDO($dsn, $this->username, $this->password);
             } else {
                 // MySQL connection

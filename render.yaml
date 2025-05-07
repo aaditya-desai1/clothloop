@@ -34,8 +34,8 @@ services:
         generateValue: true
 
 databases:
-  # MySQL database
+  # PostgreSQL database
   - name: clothloop-db
     databaseName: clothloop
     plan: free
-    region: ohio 
+    type: postgres 
