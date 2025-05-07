@@ -416,6 +416,25 @@
     <!-- Main Content -->
     <div class="main-container">
         <h2 class="section-title">Your Wishlist</h2>
+        
+        <!-- Debug controls (only visible in development) -->
+        <div class="debug-controls" style="text-align: right; margin-bottom: 20px;">
+            <button id="refresh-wishlist-btn" style="
+                background-color: transparent;
+                color: var(--accent-color);
+                border: 2px solid var(--accent-color);
+                padding: 8px 15px;
+                cursor: pointer;
+                font-size: 0.9rem;
+                font-weight: 600;
+                transition: all 0.2s linear;
+                font-family: 'Poppins', sans-serif;
+                display: inline-flex;
+                align-items: center;
+            ">
+                <i class="fas fa-sync-alt" style="margin-right: 8px;"></i> Refresh Wishlist
+            </button>
+        </div>
 
         <div id="wishlist-container">
             <div class="wishlist-grid" id="wishlist-grid">
@@ -475,7 +494,7 @@
         });
 
         // Function to get wishlist items from localStorage (user-specific)
-        function getWishlistItems() {
+        async function getWishlistItems() {
             try {
                 const userId = localStorage.getItem('user_id');
                 
@@ -484,9 +503,33 @@
                 
                 console.log(`getWishlistItems: Accessing wishlist for user ID: ${userId || 'guest'}`);
                 
+                // If user is logged in, try to fetch from server first
+                if (userId) {
+                    try {
+                        const serverWishlist = await fetchWishlistFromServer();
+                        if (serverWishlist && serverWishlist.length > 0) {
+                            console.log(`getWishlistItems: Got ${serverWishlist.length} items from server`);
+                            return serverWishlist;
+                        }
+                    } catch (error) {
+                        console.error('Error fetching wishlist from server:', error);
+                        // Fall back to localStorage
+                    }
+                }
+                
+                // Fallback: get from localStorage
                 let wishlistIds = [];
                 try {
-                    wishlistIds = JSON.parse(localStorage.getItem(wishlistKey) || '[]');
+                    const storedWishlist = localStorage.getItem(wishlistKey);
+                    if (storedWishlist) {
+                        wishlistIds = JSON.parse(storedWishlist);
+                        
+                        // Ensure wishlistIds is an array
+                        if (!Array.isArray(wishlistIds)) {
+                            console.error(`Invalid wishlist format in localStorage: ${typeof wishlistIds}`);
+                            wishlistIds = [];
+                        }
+                    }
                     
                     // Check the old format from details.html
                     const oldWishlist = JSON.parse(localStorage.getItem('clothloop-wishlist') || '[]');
@@ -508,6 +551,11 @@
                     // also ensure wishlistIds are stored in user-specific storage
                     if (userId && wishlistKey !== 'wishlist' && wishlistIds.length > 0) {
                         localStorage.setItem(`wishlist_${userId}`, JSON.stringify(wishlistIds));
+                        
+                        // Sync with server if user is logged in
+                        syncWishlistWithServer(wishlistIds).catch(err => {
+                            console.error('Error syncing with server during get:', err);
+                        });
                     }
                     
                     // Ensure all IDs are strings for consistent comparison
@@ -531,20 +579,187 @@
             return wishlist.includes(productId.toString());
         }
         
+        // Function to fetch wishlist from server
+        async function fetchWishlistFromServer() {
+            try {
+                const userId = localStorage.getItem('user_id');
+                if (!userId || userId === 'guest') {
+                    console.log('Not fetching wishlist - user not logged in');
+                    return [];
+                }
+                
+                console.log(`Fetching wishlist for user ${userId} from server`);
+                
+                // Get wishlist from server with user_id in URL params
+                const response = await fetch(`/ClothLoop/backend/api/buyers/sync_wishlist.php?user_id=${userId}`, {
+                    method: 'GET',
+                    credentials: 'include' // Include cookies for session
+                });
+                
+                const responseText = await response.text();
+                console.log('Server response text:', responseText.substring(0, 300) + '...');
+                
+                let data;
+                try {
+                    data = JSON.parse(responseText);
+                } catch (e) {
+                    console.error('Error parsing server response:', e);
+                    return [];
+                }
+                
+                if (!response.ok) {
+                    console.error(`Server responded with ${response.status}: ${response.statusText}`);
+                    return [];
+                }
+                
+                if (data.status === 'success' && data.data && data.data.ids) {
+                    console.log('Wishlist fetched from server successfully:', data.data.ids);
+                    
+                    // Update localStorage with the ids from server
+                    const wishlistKey = `wishlist_${userId}`;
+                    localStorage.setItem(wishlistKey, JSON.stringify(data.data.ids));
+                    
+                    // Store each product's details if available
+                    if (data.data.items && Array.isArray(data.data.items)) {
+                        data.data.items.forEach(item => {
+                            if (item.product_id) {
+                                const productInfo = {
+                                    id: item.product_id,
+                                    title: item.title || 'Product',
+                                    price: item.rental_price || '0',
+                                    seller: item.seller_name || 'ClothLoop Seller',
+                                    image: item.image_path || ''
+                                };
+                                localStorage.setItem(`product_${item.product_id}`, JSON.stringify(productInfo));
+                            }
+                        });
+                    }
+                    
+                    return data.data.ids;
+                } else {
+                    console.error('Error fetching wishlist from server:', data.message || 'Unknown error');
+                    return [];
+                }
+            } catch (error) {
+                console.error('Error in fetchWishlistFromServer:', error);
+                return [];
+            }
+        }
+        
+        // Function to sync wishlist with server
+        async function syncWishlistWithServer(wishlist) {
+            try {
+                const userId = localStorage.getItem('user_id');
+                if (!userId || userId === 'guest') {
+                    console.log('Not syncing wishlist - user not logged in');
+                    return Promise.resolve(); // Return resolved promise
+                }
+                
+                // Ensure wishlist is an array of strings
+                if (!Array.isArray(wishlist)) {
+                    console.error('Invalid wishlist format for sync:', wishlist);
+                    return Promise.reject(new Error('Invalid wishlist format')); 
+                }
+                
+                console.log(`Syncing wishlist for user ${userId} with server. Items: ${wishlist.length}`);
+                
+                // Send wishlist to server
+                const response = await fetch('/ClothLoop/backend/api/buyers/sync_wishlist.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        items: wishlist,
+                        user_id: userId  // Explicitly include user_id in request
+                    }),
+                    credentials: 'include' // Include cookies for session
+                });
+                
+                const responseText = await response.text();
+                console.log('Server response:', responseText.substring(0, 200) + '...');
+                
+                let data;
+                try {
+                    data = JSON.parse(responseText);
+                } catch (e) {
+                    console.error('Error parsing server response:', e);
+                    return Promise.reject(new Error('Invalid server response')); 
+                }
+                
+                if (!response.ok) {
+                    console.error(`Server responded with ${response.status}: ${response.statusText}`);
+                    return Promise.reject(new Error(`Server error: ${response.status}`));
+                }
+                
+                if (data.status === 'success') {
+                    console.log('Wishlist synced with server successfully');
+                    // Update localStorage with server data if available
+                    if (data.data && data.data.ids) {
+                        const wishlistKey = `wishlist_${userId}`;
+                        localStorage.setItem(wishlistKey, JSON.stringify(data.data.ids));
+                        console.log(`Updated localStorage wishlist with ${data.data.ids.length} items from server`);
+                    }
+                    return Promise.resolve(data); // Return the data
+                } else {
+                    console.error('Error syncing wishlist with server:', data.message);
+                    return Promise.reject(new Error(data.message));
+                }
+            } catch (error) {
+                console.error('Error in syncWishlistWithServer:', error);
+                return Promise.reject(error); // Re-throw the error for the caller to handle
+            }
+        }
+        
         // Function to remove an item from wishlist
         function removeFromWishlist(productId) {
+            try {
             const userId = localStorage.getItem('user_id');
             const wishlistKey = userId ? `wishlist_${userId}` : 'wishlist';
             
             console.log(`removeFromWishlist: Removing product ${productId} for user ${userId || 'guest'}`);
             
+                // Get existing wishlist
             let wishlist = [];
-            try {
-                wishlist = JSON.parse(localStorage.getItem(wishlistKey) || '[]');
+                const storedWishlist = localStorage.getItem(wishlistKey);
+                if (storedWishlist) {
+                    try {
+                        wishlist = JSON.parse(storedWishlist);
+                    } catch (e) {
+                        console.error(`Error parsing existing wishlist: ${e.message}`);
+                        return false;
+                    }
+                }
+                
                 // Convert productId to string to ensure consistent comparison
                 const productIdStr = productId.toString();
+                
+                // Check if product exists in wishlist before removing
+                if (!wishlist.includes(productIdStr)) {
+                    console.warn(`Product ${productIdStr} not found in wishlist`);
+                    console.log('Current wishlist:', wishlist);
+                    // Try removing by direct API call even if not in local storage
+                    if (userId) {
+                        const updatedWishlist = wishlist.filter(id => id !== productIdStr);
+                        syncWishlistWithServer(updatedWishlist)
+                            .then(() => {
+                                console.log('Wishlist synced with server after removal');
+                                // Reload wishlist after server sync
+                                setTimeout(() => {
+                                    loadWishlistItems();
+                                }, 300);
+                            })
+                            .catch(err => {
+                                console.error('Error syncing with server after removal:', err);
+                            });
+                    }
+                    return true; // Return true to allow the animation to complete
+                }
+                
+                // Filter out the product
                 wishlist = wishlist.filter(id => id !== productIdStr);
                 
+                // Update localStorage
                 localStorage.setItem(wishlistKey, JSON.stringify(wishlist));
                 console.log(`removeFromWishlist: Updated wishlist has ${wishlist.length} items`);
                 
@@ -560,31 +775,106 @@
                     console.error(`Error updating old wishlist format: ${e.message}`);
                 }
                 
-                // Check if wishlist is now empty
+                // If user is logged in, sync with server
+                if (userId) {
+                    // Send the update to the server asynchronously
+                    syncWishlistWithServer(wishlist)
+                        .then(() => {
+                            console.log('Wishlist synced with server after removal');
+                        })
+                        .catch(err => {
+                            console.error('Error syncing with server after removal:', err);
+                            // Even if server sync fails, we've updated localStorage, so consider it a success
+                        });
+                }
+                
+                // Immediately check if wishlist is now empty
                 if (wishlist.length === 0) {
                     // Show empty wishlist message
                     document.getElementById('wishlist-grid').style.display = 'none';
                     document.getElementById('empty-wishlist').style.display = 'block';
                 } else {
                     // Reload the wishlist
+                    setTimeout(() => {
                     loadWishlistItems();
+                    }, 350); // Wait for animation to complete
                 }
+                
+                // Indicate success
+                return true;
             } catch (e) {
                 console.error(`Error in removeFromWishlist: ${e.message}`);
+                return false;
             }
         }
         
         // Function to load and display wishlist items
-        function loadWishlistItems() {
+        async function loadWishlistItems() {
             const wishlistGrid = document.getElementById('wishlist-grid');
             const emptyWishlist = document.getElementById('empty-wishlist');
             
-            // Get wishlist product IDs
-            const wishlistIds = getWishlistItems();
-            console.log(`loadWishlistItems: Found ${wishlistIds.length} items in wishlist:`, wishlistIds);
+            // Show loading state
+            wishlistGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 50px;"><i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--text-color);"></i><p style="margin-top: 20px;">Loading your wishlist...</p></div>';
             
-            // If there are no saved wishlist items, show empty message
+            try {
+                // Always try to get fresh data from server first
+                const userId = localStorage.getItem('user_id');
+                let wishlistItems = [];
+                let wishlistIds = [];
+                
+                if (userId) {
+                    console.log(`Attempting to fetch wishlist from server for user ${userId}`);
+                    try {
+                        // Force a fetch from server to ensure we have the latest data
+                        const response = await fetch(`/ClothLoop/backend/api/buyers/sync_wishlist.php?user_id=${userId}`, {
+                            method: 'GET',
+                            credentials: 'include'
+                        });
+                        
+                        if (response.ok) {
+                            const data = await response.json();
+                            console.log('Server response:', data);
+                            
+                            if (data.status === 'success' && data.data) {
+                                wishlistIds = data.data.ids || [];
+                                wishlistItems = data.data.items || [];
+                                
+                                // Save ids to localStorage
+                                localStorage.setItem(`wishlist_${userId}`, JSON.stringify(wishlistIds));
+                                
+                                // Display items directly from API response if available
+                                if (wishlistItems.length > 0) {
+                                    console.log(`Displaying ${wishlistItems.length} items from server response`);
+                                    displayServerItems(wishlistItems, wishlistGrid);
+                                    return;
+                                }
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Error fetching from server:', error);
+                    }
+                    
+                    // Fall back to localStorage if server fetch failed or returned no items
             if (wishlistIds.length === 0) {
+                        console.log('Falling back to localStorage');
+                        const wishlistKey = `wishlist_${userId}`;
+                        const storedList = localStorage.getItem(wishlistKey);
+                        if (storedList) {
+                            wishlistIds = JSON.parse(storedList);
+                        }
+                    }
+                } else {
+                    // No user ID, try localStorage for guest
+                    const storedList = localStorage.getItem('wishlist');
+                    if (storedList) {
+                        wishlistIds = JSON.parse(storedList);
+                    }
+                }
+                
+                console.log(`loadWishlistItems: Found ${wishlistIds.length} items in wishlist:`, wishlistIds);
+                
+                // If there are no wishlist items, show empty message
+                if (!wishlistIds || wishlistIds.length === 0) {
                 wishlistGrid.style.display = 'none';
                 emptyWishlist.style.display = 'block';
                 return;
@@ -594,110 +884,119 @@
             wishlistGrid.style.display = 'grid';
             emptyWishlist.style.display = 'none';
             
-            // Add timestamp to prevent caching
-            const timestamp = new Date().getTime();
-            const apiUrl = `/ClothLoop/backend/api/products/get_products.php?timestamp=${timestamp}`;
+                // Display fallback items using the product IDs
+                displayFallbackItems(wishlistIds, wishlistGrid);
+                
+            } catch (error) {
+                console.error('Error loading wishlist items:', error);
+                
+                // Create error message
+                const errorMessage = document.createElement('div');
+                errorMessage.style.gridColumn = '1/-1';
+                errorMessage.style.textAlign = 'center';
+                errorMessage.style.padding = '20px';
+                errorMessage.style.color = 'var(--accent-color)';
+                errorMessage.style.marginBottom = '20px';
+                errorMessage.innerHTML = `
+                    <p>Error loading your wishlist items.</p>
+                    <p>Please try again later or refresh the page.</p>
+                `;
+                wishlistGrid.innerHTML = '';
+                wishlistGrid.appendChild(errorMessage);
+            }
+        }
+        
+        // Function to display items directly from server response
+        function displayServerItems(items, container) {
+            console.log('Displaying server items:', items);
+            container.innerHTML = ''; // Clear container
             
-            // Clear the grid before adding new items
-            wishlistGrid.innerHTML = '';
-            
-            // Get all products from the API with cache-busting
-            fetch(apiUrl, {
-                method: 'GET', 
-                headers: {
-                    'Cache-Control': 'no-cache, no-store, must-revalidate',
-                    'Pragma': 'no-cache',
-                    'Expires': '0'
-                }
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`Network response was not ok: ${response.status} ${response.statusText}`);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.status === 'success' && data.data && data.data.products) {
-                        const products = data.data.products || [];
-                        
-                        // Filter products to only include those in the wishlist
-                        const wishlistProducts = products.filter(product => 
-                            wishlistIds.includes(product.id.toString()));
-                        
-                        // Check if we need to display fallback items
-                        let displayedIds = new Set();
-                        
-                        if (wishlistProducts.length === 0) {
-                            // No products found in API, display fallback for all wishlist items
-                            displayFallbackItems(wishlistIds, wishlistGrid);
+            if (!items || items.length === 0) {
+                const emptyWishlist = document.getElementById('empty-wishlist');
+                container.style.display = 'none';
+                emptyWishlist.style.display = 'block';
                             return;
                         }
                         
-                        // Display each wishlist product from API response
-                        wishlistProducts.forEach((product, index) => {
-                            displayedIds.add(product.id.toString());
-                            
-                            // Map product properties for consistency
-                            const mappedProduct = {
-                                id: product.id,
-                                title: product.title || product.name || '',
-                                description: product.description || '',
-                                category: product.category_name || '',
-                                rental_price: product.rental_price || product.price || 0,
-                                seller_id: product.seller_id || 0,
-                                shop_name: product.shop_name || product.seller_name || 'ClothLoop Seller',
-                                image: formatImagePath(product.primary_image, product.id)
-                            };
-                            
+            container.style.display = 'grid';
+            document.getElementById('empty-wishlist').style.display = 'none';
+            
+            items.forEach((item, index) => {
                             // Create wishlist item element
                             const wishlistItem = document.createElement('div');
                             wishlistItem.className = 'wishlist-item';
                             wishlistItem.style.animationDelay = `${0.1 * index}s`;
+                
+                // Store product info in localStorage for later use
+                const productInfo = {
+                    id: item.product_id,
+                    title: item.title || 'Product',
+                    price: item.rental_price || '0',
+                    seller: item.seller_name || 'ClothLoop Seller',
+                    image: item.image_path || ''
+                };
+                localStorage.setItem(`product_${item.product_id}`, JSON.stringify(productInfo));
                             
                             // Create URL params for details page
                             const queryParams = new URLSearchParams({
-                                id: mappedProduct.id,
-                                title: mappedProduct.title,
-                                price: mappedProduct.rental_price,
-                                image: mappedProduct.image,
-                                description: mappedProduct.description || '',
-                                seller_id: mappedProduct.seller_id
-                            });
-                            
-                            // Create image element with error handling
+                    id: item.product_id,
+                    title: item.title || 'Product',
+                    price: item.rental_price || '0'
+                });
+                
+                // Create image element
                             const imgElement = document.createElement('img');
                             imgElement.className = 'wishlist-img';
-                            imgElement.alt = mappedProduct.title;
+                imgElement.alt = item.title || 'Product';
+                
+                // Add error handler for image
                             imgElement.addEventListener('error', function() {
-                                console.warn(`Failed to load image for product ${mappedProduct.id}, trying alternative path`);
-                                // Try alternative path
-                                this.src = `/ClothLoop/backend/uploads/products/${mappedProduct.id}/1.jpg`;
+                    console.warn(`Failed to load image for product ${item.product_id}, trying direct API`);
+                    this.src = `/ClothLoop/backend/api/products/direct_image.php?product_id=${item.product_id}`;
                                 
-                                // Add another error handler for the alternative path
                                 this.addEventListener('error', function() {
-                                    console.error(`Failed to load alternative image for product ${mappedProduct.id}`);
+                        console.warn(`API failed, trying uploads path for product ${item.product_id}`);
+                        this.src = `/ClothLoop/backend/uploads/products/${item.product_id}/1.jpg`;
+                        
+                        this.addEventListener('error', function() {
+                            console.error(`All paths failed for product ${item.product_id}`);
                                     this.src = '../../assets/images/placeholder.png';
                                 });
                             });
-                            imgElement.src = mappedProduct.image;
+                });
+                
+                // Set image source based on available data
+                if (item.image_path) {
+                    if (item.image_path.startsWith('http')) {
+                        imgElement.src = item.image_path;
+                    } else if (item.image_path.startsWith('/')) {
+                        imgElement.src = item.image_path;
+                    } else if (item.image_path.startsWith('uploads/')) {
+                        imgElement.src = `/ClothLoop/backend/${item.image_path}`;
+                    } else {
+                        imgElement.src = `/ClothLoop/backend/${item.image_path}`;
+                    }
+                } else {
+                    imgElement.src = `/ClothLoop/backend/api/products/direct_image.php?product_id=${item.product_id}`;
+                }
                             
                             // Create details div
                             const detailsDiv = document.createElement('div');
                             detailsDiv.className = 'wishlist-details';
                             detailsDiv.innerHTML = `
-                                <h3 class="wishlist-title">${mappedProduct.title}</h3>
-                                <p class="wishlist-price">₹${mappedProduct.rental_price} / day</p>
-                                <p class="wishlist-seller">${mappedProduct.shop_name}</p>
+                    <h3 class="wishlist-title">${item.title || 'Product'}</h3>
+                    <p class="wishlist-price">₹${item.rental_price || '0'} / day</p>
+                    <p class="wishlist-seller">${item.seller_name || 'ClothLoop Seller'}</p>
                                 <div class="wishlist-actions">
-                                    <a href="details.html?${queryParams.toString()}" class="view-btn">View Details</a>
-                                    <button class="remove-btn" data-product-id="${mappedProduct.id}">Remove</button>
+                        <a href="details.html?${queryParams.toString()}" class="view-btn">VIEW DETAILS</a>
+                        <button class="remove-btn" data-product-id="${item.product_id}">REMOVE</button>
                                 </div>
                             `;
                             
                             // Append elements
                             wishlistItem.appendChild(imgElement);
                             wishlistItem.appendChild(detailsDiv);
-                            wishlistGrid.appendChild(wishlistItem);
+                container.appendChild(wishlistItem);
                             
                             // Add event listener to remove button
                             const removeBtn = wishlistItem.querySelector('.remove-btn');
@@ -707,107 +1006,234 @@
                                 // Add animation before removing
                                 wishlistItem.style.animation = 'fadeOut 0.3s forwards';
                                 
-                                // Remove from wishlist after animation
-                                setTimeout(() => {
-                                    removeFromWishlist(productId);
-                                }, 300);
-                            });
-                        });
-                        
-                        // Display fallback items for IDs we didn't find in the API
-                        const missingIds = wishlistIds.filter(id => !displayedIds.has(id));
-                        if (missingIds.length > 0) {
-                            displayFallbackItems(missingIds, wishlistGrid);
+                    // Create a direct server call to remove the item
+                    const userId = localStorage.getItem('user_id');
+                    if (userId) {
+                        // Get current wishlist from localStorage
+                        const wishlistKey = `wishlist_${userId}`;
+                        let currentWishlist = [];
+                        try {
+                            const storedList = localStorage.getItem(wishlistKey);
+                            if (storedList) {
+                                currentWishlist = JSON.parse(storedList);
+                            }
+                        } catch (e) {
+                            console.error('Error reading wishlist from localStorage:', e);
                         }
+                        
+                        // Remove the product ID from the list
+                        const updatedWishlist = currentWishlist.filter(id => id.toString() !== productId.toString());
+                        
+                        // Update localStorage immediately
+                        localStorage.setItem(wishlistKey, JSON.stringify(updatedWishlist));
+                        
+                        // Send the update to the server
+                        fetch('/ClothLoop/backend/api/buyers/sync_wishlist.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                items: updatedWishlist,
+                                user_id: userId
+                            }),
+                            credentials: 'include'
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log('Server response after removal:', data);
+                            if (data.status === 'success') {
+                                console.log('Item successfully removed from server');
+                                
+                                // Remove item from DOM
+                                setTimeout(() => {
+                                    wishlistItem.remove();
+                                    
+                                    // Check if we need to show empty state
+                                    if (container.children.length === 0) {
+                                        container.style.display = 'none';
+                                        document.getElementById('empty-wishlist').style.display = 'block';
+                                    }
+                                }, 300);
                     } else {
-                        console.error('Error fetching products:', data.message || 'Invalid response format');
-                        displayFallbackItems(wishlistIds, wishlistGrid);
+                                console.error('Server error removing item:', data.message);
+                                alert('Could not remove item from wishlist: ' + (data.message || 'Unknown error'));
+                                wishlistItem.style.animation = '';
                     }
                 })
                 .catch(error => {
-                    console.error('Error:', error);
-                    
-                    // Create error message
-                    const errorMessage = document.createElement('div');
-                    errorMessage.style.gridColumn = '1/-1';
-                    errorMessage.style.textAlign = 'center';
-                    errorMessage.style.padding = '20px';
-                    errorMessage.style.color = 'var(--accent-color)';
-                    errorMessage.style.marginBottom = '20px';
-                    errorMessage.innerHTML = `
-                        <p>Error loading your wishlist items.</p>
-                        <p>Please try again later or refresh the page.</p>
-                    `;
-                    wishlistGrid.appendChild(errorMessage);
-                    
-                    // Display fallback items
-                    displayFallbackItems(wishlistIds, wishlistGrid);
-                });
-        }
-        
-        // Function to display fallback items for wishlist IDs
-        function displayFallbackItems(ids, container) {
-            if (!ids || ids.length === 0) {
-                // Empty wishlist
+                            console.error('Network error removing item:', error);
+                            alert('Network error removing item from wishlist. Please try again.');
+                            wishlistItem.style.animation = '';
+                        });
+                    } else {
+                        // No user ID, just remove locally
+                        setTimeout(() => {
+                            // Update local storage
+                            const storedList = localStorage.getItem('wishlist');
+                            if (storedList) {
+                                let wishlist = JSON.parse(storedList);
+                                wishlist = wishlist.filter(id => id.toString() !== productId.toString());
+                                localStorage.setItem('wishlist', JSON.stringify(wishlist));
+                            }
+                            
+                            wishlistItem.remove();
+                            
+                            // Check if we need to show empty state
+                            if (container.children.length === 0) {
                 container.style.display = 'none';
                 document.getElementById('empty-wishlist').style.display = 'block';
-                return;
-            }
-            
-            ids.forEach((id, index) => {
-                // Try to get product info from localStorage
-                let productTitle = `Wishlist Item #${id}`;
-                let productDetails = '';
-                let productImage = '../../assets/images/placeholder.png';
-                
-                try {
-                    // Check if we have product details in localStorage
-                    const savedProduct = localStorage.getItem(`product_${id}`);
-                    if (savedProduct) {
-                        const productInfo = JSON.parse(savedProduct);
-                        productTitle = productInfo.title || productTitle;
-                        
-                        // Use the formatImagePath helper
-                        productImage = formatImagePath(productInfo.image, id);
-                        
-                        productDetails = `
-                            <p class="wishlist-price">₹${productInfo.price || '0'} / day</p>
-                            <p class="wishlist-seller">${productInfo.seller || 'ClothLoop Seller'}</p>
-                        `;
+                            }
+                        }, 300);
                     }
-                } catch (e) {
-                    console.error('Error parsing saved product info:', e);
+                });
+            });
+        }
+
+        // Load wishlist items when the page loads
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('DOM loaded - initializing wishlist');
+            try {
+                // Get user ID from localStorage
+                const userId = localStorage.getItem('user_id');
+                console.log('Current user ID:', userId);
+                
+                // If user is logged in, force a sync from server to update the localStorage
+                if (userId) {
+                    console.log('Checking server for up-to-date wishlist data');
                 }
                 
+                // Load wishlist items
+                await loadWishlistItems();
+                console.log('Wishlist initialization complete');
+                
+                // Add event listener for refresh button
+                const refreshButton = document.getElementById('refresh-wishlist-btn');
+                if (refreshButton) {
+                    refreshButton.addEventListener('click', async function() {
+                        console.log('Manual refresh requested');
+                        // Clear localStorage wishlist to force server fetch
+                        const userId = localStorage.getItem('user_id');
+                        if (userId) {
+                            localStorage.removeItem(`wishlist_${userId}`);
+                        }
+                        await loadWishlistItems();
+                    });
+                }
+                
+            } catch (error) {
+                console.error('Error initializing wishlist:', error);
+            }
+        });
+
+        // Function to format image paths
+        function formatImagePath(imagePath, productId) {
+            if (!imagePath) {
+                // Try direct image API path for products without image path
+                return `/ClothLoop/backend/api/products/direct_image.php?product_id=${productId}`;
+            }
+            
+            // Handle full URLs
+            if (imagePath.startsWith('http') || imagePath.startsWith('data:')) {
+                return imagePath;
+            }
+            
+            // Handle paths starting with slash
+            if (imagePath.startsWith('/')) {
+                return imagePath; // Already starts with slash
+            }
+            
+            // For paths like "uploads/products/19/..."
+            if (imagePath.startsWith('uploads/')) {
+                return `/ClothLoop/backend/${imagePath}`;
+            }
+            
+            // Default fallback
+            return `/ClothLoop/backend/uploads/products/${productId}/1.jpg`;
+        }
+        
+        // Function to display fallback items from localStorage
+        function displayFallbackItems(productIds, container) {
+            console.log(`Displaying fallback items for ${productIds.length} products`);
+            
+            // Get items from localStorage
+            productIds.forEach((productId, index) => {
+                try {
+                    const storedInfo = localStorage.getItem(`product_${productId}`);
+                    let product = null;
+                    
+                    if (storedInfo) {
+                        try {
+                            product = JSON.parse(storedInfo);
+                } catch (e) {
+                            console.error(`Error parsing stored product ${productId}:`, e);
+                        }
+                    }
+                    
+                    if (!product) {
+                        // Minimal fallback with just ID
+                        product = {
+                            id: productId,
+                            title: `Product ${productId}`,
+                            price: '0',
+                            seller: 'Unknown Seller',
+                            image: `/ClothLoop/backend/api/products/direct_image.php?product_id=${productId}`
+                        };
+                    }
+                    
+                    // Create wishlist item element
                 const wishlistItem = document.createElement('div');
                 wishlistItem.className = 'wishlist-item';
                 wishlistItem.style.animationDelay = `${0.1 * index}s`;
+                    
+                    // Create URL params for details page
+                    const detailsUrl = `details.html?id=${product.id}`;
                 
                 // Create image element with error handling
                 const imgElement = document.createElement('img');
                 imgElement.className = 'wishlist-img';
-                imgElement.alt = productTitle;
+                    imgElement.alt = product.title;
                 imgElement.addEventListener('error', function() {
-                    console.warn(`Failed to load image for fallback product ${id}, trying alternative path`);
-                    // Try alternative path for product directory structure
-                    this.src = `/ClothLoop/backend/uploads/products/${id}/1.jpg`;
-                    
-                    // Add another error handler for the alternative path
+                        console.warn(`Failed to load image for product ${product.id}, trying direct API`);
+                        // Try direct API path
+                        this.src = `/ClothLoop/backend/api/products/direct_image.php?product_id=${product.id}`;
+                        
+                        // Add another error handler for the first fallback
                     this.addEventListener('error', function() {
-                        console.error(`Failed to load alternative image for fallback product ${id}`);
+                            // Try standard uploads path
+                            console.warn(`Direct API failed for product ${product.id}, trying uploads path`);
+                            this.src = `/ClothLoop/backend/uploads/products/${product.id}/1.jpg`;
+                            
+                            // Final error handler 
+                            this.addEventListener('error', function() {
+                                console.error(`All image paths failed for product ${product.id}`);
                         this.src = '../../assets/images/placeholder.png';
                     });
                 });
-                imgElement.src = productImage;
+                    });
+                    
+                    // Try using image from localStorage or storage
+                    if (product.image && (product.image.startsWith('http') || product.image.startsWith('/ClothLoop'))) {
+                        // Use as is if it's already a full URL or starts with /ClothLoop
+                        imgElement.src = product.image;
+                    } else if (product.image && product.image.startsWith('uploads/')) {
+                        // Add base path for relative paths
+                        imgElement.src = `/ClothLoop/backend/${product.image}`;
+                    } else {
+                        // Use direct API as default first attempt
+                        imgElement.src = `/ClothLoop/backend/api/products/direct_image.php?product_id=${product.id}`;
+                    }
                 
                 // Create details div
                 const detailsDiv = document.createElement('div');
                 detailsDiv.className = 'wishlist-details';
                 detailsDiv.innerHTML = `
-                    <h3 class="wishlist-title">${productTitle}</h3>
-                    ${productDetails || '<p class="wishlist-seller">Item details unavailable</p>'}
+                        <h3 class="wishlist-title">${product.title}</h3>
+                        <p class="wishlist-price">₹${product.price} / day</p>
+                        <p class="wishlist-seller">${product.seller}</p>
                     <div class="wishlist-actions">
-                        <button class="remove-btn" data-product-id="${id}">Remove</button>
+                            <a href="${detailsUrl}" class="view-btn">View Details</a>
+                            <button class="remove-btn" data-product-id="${product.id}">Remove</button>
                     </div>
                 `;
                 
@@ -815,105 +1241,101 @@
                 wishlistItem.appendChild(imgElement);
                 wishlistItem.appendChild(detailsDiv);
                 
-                container.appendChild(wishlistItem);
-                
                 // Add event listener to remove button
-                const removeBtn = wishlistItem.querySelector('.remove-btn');
-                removeBtn.addEventListener('click', function() {
+                    wishlistItem.querySelector('.remove-btn').addEventListener('click', function() {
+                        const productId = this.getAttribute('data-product-id');
+                        
                     // Add animation before removing
                     wishlistItem.style.animation = 'fadeOut 0.3s forwards';
                     
-                    // Remove from wishlist after animation
-                    setTimeout(() => {
-                        removeFromWishlist(id);
-                    }, 300);
-                });
-            });
-            
-            container.style.display = 'grid';
-            document.getElementById('empty-wishlist').style.display = 'none';
-        }
-        
-        // Function to handle logout
-        function handleLogout() {
-            // Get the current user ID
+                        // Create a direct server call to remove the item
             const userId = localStorage.getItem('user_id');
-            if (!userId) {
-                console.log('handleLogout: No user ID found, nothing to do');
-                window.location.href = '../account/login.html';
-                return;
-            }
-            
+                        if (userId) {
+                            // Get current wishlist from localStorage
             const wishlistKey = `wishlist_${userId}`;
-            console.log(`handleLogout: Processing logout for user ID: ${userId}`);
-            
-            try {
-                // If user had a wishlist, save it to the generic wishlist for guest mode
-                const userWishlist = JSON.parse(localStorage.getItem(wishlistKey) || '[]');
-                if (userWishlist.length > 0) {
-                    localStorage.setItem('wishlist', JSON.stringify(userWishlist));
-                    console.log(`handleLogout: Saved ${userWishlist.length} items to generic wishlist`);
-                }
-                
-                // Clear user-specific data
-                localStorage.removeItem(wishlistKey);
-                localStorage.removeItem('user_id');
-                localStorage.removeItem('userId');
-                localStorage.removeItem('userType');
-                localStorage.removeItem('username');
-                
-                console.log('handleLogout: User data cleared from localStorage');
+                            let currentWishlist = [];
+                            try {
+                                const storedList = localStorage.getItem(wishlistKey);
+                                if (storedList) {
+                                    currentWishlist = JSON.parse(storedList);
+                                }
             } catch (e) {
-                console.error(`handleLogout error: ${e.message}`);
-            }
-            
-            // Redirect to login page
-            window.location.href = '../account/login.html';
-        }
-        
-        // Add event listener to logout link
-        document.getElementById('logout-link').addEventListener('click', function(e) {
-            e.preventDefault();
-            handleLogout();
-        });
-        
-        // Load wishlist items when the page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            loadWishlistItems();
-        });
-
-        // Function to format image paths correctly
-        function formatImagePath(imagePath, productId) {
-            // First try the direct image API
-            if (productId) {
-                return `/ClothLoop/backend/api/products/direct_image.php?product_id=${productId}`;
-            }
-            
-            // If no product ID, fall back to other methods
-            if (!imagePath) {
-                return '../../assets/images/placeholder.png';
-            }
-            
-            // Check if path is already absolute or relative
-            if (imagePath.startsWith('http') || imagePath.startsWith('/')) {
-                return imagePath;
-            } 
-            
-            // Fix the path by prepending backend path if needed
-            if (!imagePath.includes('/backend/')) {
-                if (imagePath.includes('uploads/')) {
-                    return `/ClothLoop/backend/${imagePath}`;
+                                console.error('Error reading wishlist from localStorage:', e);
+                            }
+                            
+                            // Remove the product ID from the list
+                            const updatedWishlist = currentWishlist.filter(id => id.toString() !== productId.toString());
+                            
+                            // Update localStorage immediately
+                            localStorage.setItem(wishlistKey, JSON.stringify(updatedWishlist));
+                            
+                            // Send the update to the server
+                            fetch('/ClothLoop/backend/api/buyers/sync_wishlist.php', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    items: updatedWishlist,
+                                    user_id: userId
+                                }),
+                                credentials: 'include'
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                console.log('Server response after removal:', data);
+                                if (data.status === 'success') {
+                                    console.log('Item successfully removed from server');
+                                    
+                                    // Remove item from DOM
+                                    setTimeout(() => {
+                                        wishlistItem.remove();
+                                        
+                                        // Check if we need to show empty state
+                                        if (container.children.length === 0) {
+                                            container.style.display = 'none';
+                                            document.getElementById('empty-wishlist').style.display = 'block';
+                                        }
+                                    }, 300);
+                                } else {
+                                    console.error('Server error removing item:', data.message);
+                                    alert('Could not remove item from wishlist: ' + (data.message || 'Unknown error'));
+                                    wishlistItem.style.animation = '';
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Network error removing item:', error);
+                                alert('Network error removing item from wishlist. Please try again.');
+                                wishlistItem.style.animation = '';
+                            });
                 } else {
-                    // Check if it might be a subdirectory structure
-                    if (productId) {
-                        return `/ClothLoop/backend/uploads/products/${productId}/${imagePath}`;
-                    } else {
-                        return `/ClothLoop/backend/uploads/products/${imagePath}`;
-                    }
+                            // No user ID, just remove locally
+                            setTimeout(() => {
+                                // Update local storage
+                                const storedList = localStorage.getItem('wishlist');
+                                if (storedList) {
+                                    let wishlist = JSON.parse(storedList);
+                                    wishlist = wishlist.filter(id => id.toString() !== productId.toString());
+                                    localStorage.setItem('wishlist', JSON.stringify(wishlist));
+                                }
+                                
+                                wishlistItem.remove();
+                                
+                                // Check if we need to show empty state
+                                if (container.children.length === 0) {
+                                    container.style.display = 'none';
+                                    document.getElementById('empty-wishlist').style.display = 'block';
+                                }
+                            }, 300);
+                        }
+                    });
+                    
+                    // Add to container
+                    container.appendChild(wishlistItem);
+                } catch (error) {
+                    console.error(`Error creating fallback item for product ${productId}:`, error);
                 }
-            } else {
-                return `/ClothLoop/${imagePath}`;
-            }
+            });
         }
     </script>
 </body>

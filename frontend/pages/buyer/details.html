@@ -1053,6 +1053,29 @@
                     // This helps with data persistence during login/logout
                     if (userId) {
                         localStorage.setItem('wishlist', JSON.stringify(wishlist));
+                        
+                        // Sync with server to ensure persistence
+                        fetch('/ClothLoop/backend/api/buyers/sync_wishlist.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                items: wishlist,
+                                user_id: userId
+                            }),
+                            credentials: 'include'
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log('Server response after wishlist removal:', data);
+                            if (data.status !== 'success') {
+                                console.error('Server error while removing from wishlist:', data.message);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error syncing wishlist with server:', error);
+                        });
                     }
                     
                     // Reset button text and style

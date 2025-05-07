@@ -1352,23 +1352,47 @@
                 
                 let wishlist = [];
                 try {
-                    wishlist = JSON.parse(localStorage.getItem(wishlistKey) || '[]');
+                    const storedWishlist = localStorage.getItem(wishlistKey);
+                    if (storedWishlist) {
+                        wishlist = JSON.parse(storedWishlist);
+                        // Validate that it's an array
+                        if (!Array.isArray(wishlist)) {
+                            console.error('Invalid wishlist format in localStorage. Resetting.');
+                            wishlist = [];
+                        }
+                    }
                 } catch (e) {
                     console.error('Error parsing wishlist:', e);
                     wishlist = [];
                 }
                 
+                // Convert productId to string for consistency
+                const productIdStr = productId.toString();
+                
                 // Check if product is already in wishlist
-                if (!wishlist.includes(productId.toString())) {
-                    wishlist.push(productId.toString());
+                if (!wishlist.includes(productIdStr)) {
+                    wishlist.push(productIdStr);
                     
                     // Save product info
                     if (productInfo) {
-                        localStorage.setItem(`product_${productId}`, JSON.stringify(productInfo));
+                        localStorage.setItem(`product_${productIdStr}`, JSON.stringify(productInfo));
                     }
                     
                     // Save updated wishlist
                     localStorage.setItem(wishlistKey, JSON.stringify(wishlist));
+                    
+                    // If user is logged in, sync with server
+                    if (userId !== 'guest') {
+                        syncWishlistWithServer(wishlist)
+                            .then(() => {
+                                console.log('Wishlist synced with server after adding item');
+                            })
+                            .catch(err => {
+                                console.error('Error syncing with server after adding item:', err);
+                                // Still consider add successful since local storage was updated
+                            });
+                    }
+                    
                     return true;
                 } else {
                     // Item is already in wishlist
@@ -1385,19 +1409,81 @@
                 const userId = localStorage.getItem('user_id') || 'guest';
                 const wishlistKey = userId !== 'guest' ? `wishlist_${userId}` : 'wishlist';
                 
+                console.log(`removeFromWishlist: Removing product ${productId} from wishlist for user ${userId}`);
+                
                 let wishlist = [];
                 try {
-                    wishlist = JSON.parse(localStorage.getItem(wishlistKey) || '[]');
+                    const storedWishlist = localStorage.getItem(wishlistKey);
+                    if (storedWishlist) {
+                        wishlist = JSON.parse(storedWishlist);
+                        // Validate that it's an array
+                        if (!Array.isArray(wishlist)) {
+                            console.error('Invalid wishlist format in localStorage. Resetting.');
+                            wishlist = [];
+                        }
+                    }
                 } catch (e) {
                     console.error('Error parsing wishlist:', e);
                     wishlist = [];
                 }
                 
+                // Convert productId to string for consistency
+                const productIdStr = productId.toString();
+                
+                // Check if item exists in wishlist
+                if (!wishlist.includes(productIdStr)) {
+                    console.log(`Product ${productIdStr} not found in local wishlist.`);
+                    // Try removing directly from server if user is logged in
+                    if (userId !== 'guest') {
+                        console.log('Attempting direct server removal');
+                        return syncWishlistWithServer(wishlist.filter(id => id !== productIdStr))
+                            .then(() => {
+                                console.log('Wishlist synced with server after removal attempt');
+                                return true;
+                            })
+                            .catch(err => {
+                                console.error('Error syncing with server after removal attempt:', err);
+                                return false;
+                            });
+                    }
+                    return false;
+                }
+                
                 // Filter out the product
-                wishlist = wishlist.filter(id => id !== productId.toString());
+                wishlist = wishlist.filter(id => id !== productIdStr);
                 
                 // Save updated wishlist
                 localStorage.setItem(wishlistKey, JSON.stringify(wishlist));
+                
+                // If user is logged in, sync with server
+                if (userId !== 'guest') {
+                    console.log(`Syncing updated wishlist with server (${wishlist.length} items)`);
+                    // Make a direct server call to ensure synchronization
+                    fetch('/ClothLoop/backend/api/buyers/sync_wishlist.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            items: wishlist,
+                            user_id: userId
+                        }),
+                        credentials: 'include'
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Server response after removal:', data);
+                        if (data.status === 'success') {
+                            console.log('Item successfully removed from server');
+                        } else {
+                            console.error('Server error removing item:', data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Network error removing item from wishlist:', error);
+                    });
+                }
+                
                 return true;
             } catch (e) {
                 console.error('Error removing from wishlist:', e);
@@ -1412,12 +1498,22 @@
                 
                 let wishlist = [];
                 try {
-                    wishlist = JSON.parse(localStorage.getItem(wishlistKey) || '[]');
+                    const storedWishlist = localStorage.getItem(wishlistKey);
+                    if (storedWishlist) {
+                        wishlist = JSON.parse(storedWishlist);
+                        // Validate that it's an array
+                        if (!Array.isArray(wishlist)) {
+                            console.error('Invalid wishlist format in localStorage. Resetting.');
+                            return false;
+                        }
+                    }
                 } catch (e) {
                     wishlist = [];
                 }
                 
-                return wishlist.includes(productId.toString());
+                // Convert productId to string for consistency
+                const productIdStr = productId.toString();
+                return wishlist.includes(productIdStr);
             } catch (e) {
                 console.error('Error checking wishlist:', e);
                 return false;
@@ -2864,6 +2960,75 @@
             } catch (error) {
                 console.error('Error fetching seller address:', error);
                 return null;
+            }
+        }
+
+        // Sync wishlist with server
+        async function syncWishlistWithServer(wishlist) {
+            try {
+                const userId = localStorage.getItem('user_id');
+                if (!userId || userId === 'guest') {
+                    console.log('Not syncing wishlist - user not logged in');
+                    return Promise.resolve(); // Return resolved promise
+                }
+                
+                // Ensure wishlist is an array of strings
+                if (!Array.isArray(wishlist)) {
+                    console.error('Invalid wishlist format for sync:', wishlist);
+                    return Promise.reject(new Error('Invalid wishlist format')); 
+                }
+                
+                console.log(`Syncing wishlist for user ${userId} with server. Items: ${wishlist.length}`);
+                
+                // Send wishlist to server
+                const response = await fetch('/ClothLoop/backend/api/buyers/sync_wishlist.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        items: wishlist,
+                        user_id: userId  // Explicitly include user_id in the request
+                    }),
+                    credentials: 'include' // Include cookies for session
+                });
+                
+                const responseText = await response.text();
+                console.log('Server response:', responseText);
+                
+                let data;
+                try {
+                    data = JSON.parse(responseText);
+                } catch (e) {
+                    console.error('Error parsing server response:', e);
+                    showNotification('Error syncing wishlist with server');
+                    return Promise.reject(new Error('Invalid server response')); 
+                }
+                
+                if (!response.ok) {
+                    console.error(`Server responded with ${response.status}: ${response.statusText}`);
+                    showNotification('Error syncing wishlist with server');
+                    return Promise.reject(new Error(`Server error: ${response.status}`));
+                }
+                
+                if (data.status === 'success') {
+                    console.log('Wishlist synced with server successfully');
+                    // Update localStorage with server data if available
+                    if (data.data && data.data.ids) {
+                        const wishlistKey = `wishlist_${userId}`;
+                        localStorage.setItem(wishlistKey, JSON.stringify(data.data.ids));
+                        console.log(`Updated localStorage wishlist with ${data.data.ids.length} items from server`);
+                    }
+                    return Promise.resolve(data); // Return the data
+                } else {
+                    console.error('Error syncing wishlist with server:', data.message);
+                    showNotification('Error syncing wishlist with server: ' + data.message);
+                    return Promise.reject(new Error(data.message));
+                }
+            } catch (error) {
+                console.error('Error in syncWishlistWithServer:', error);
+                showNotification('Network error syncing wishlist with server');
+                return Promise.reject(error); // Re-throw the error for the caller to handle
             }
         }
     </script>
