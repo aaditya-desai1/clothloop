@@ -1159,7 +1159,7 @@
             loadingSpinner.style.display = 'flex';
             
             // Verify session with a lightweight API call
-            fetch('../../../backend/api/users/check_session.php')
+            fetch('https://clothloop-backend.onrender.com/api/users/check_session.php')
                 .then(response => {
                     // First check if the response is OK
                     if (!response.ok) {
@@ -1250,7 +1250,7 @@
             showSpinner();
             
             // Build API URL with parameters
-            const apiUrl = new URL('../../../backend/api/sellers/product_listings.php', window.location.href);
+            const apiUrl = new URL('https://clothloop-backend.onrender.com/api/sellers/product_listings.php', window.location.href);
             apiUrl.searchParams.append('page', page);
             apiUrl.searchParams.append('limit', limit);
             
@@ -1498,10 +1498,10 @@
                     
                     // Create a list of fallback image sources to try in order
                     const imageSources = [
-                        `${baseUrl}${basePath}backend/api/image_display.php?type=product&id=${product.id}&t=${timestamp}`,
+                        `${baseUrl}${basePath}https://clothloop-backend.onrender.com/api/image_display.php?type=product&id=${product.id}&t=${timestamp}`,
                         `${baseUrl}${basePath}backend/uploads/products/${product.id}/${product.image_filename || 'product_image.jpg'}?t=${timestamp}`,
                         `${baseUrl}${basePath}backend/uploads/products/${product.id}/product_image.jpg?t=${timestamp}`,
-                        `${baseUrl}${basePath}backend/api/products/direct_image.php?product_id=${product.id}&t=${timestamp}`,
+                        `${baseUrl}${basePath}https://clothloop-backend.onrender.com/api/products/direct_image.php?product_id=${product.id}&t=${timestamp}`,
                         `${baseUrl}${basePath}frontend/assets/images/Clothify.png`,
                         `${baseUrl}${basePath}frontend/assets/images/placeholder.png`,
                         `${baseUrl}${basePath}frontend/assets/images/p3.jpg`
@@ -1527,7 +1527,7 @@
                                 // First try directly accessing the product folder to see if we can find any images
                                 console.log(`Trying direct folder access for product ${product.id}...`);
                                 // Make an AJAX request to check if the directory exists and has images
-                                fetch(`${baseUrl}${basePath}backend/api/check_product_images.php?product_id=${product.id}&t=${timestamp}`, {
+                                fetch(`${baseUrl}${basePath}https://clothloop-backend.onrender.com/api/check_product_images.php?product_id=${product.id}&t=${timestamp}`, {
                                     cache: 'no-store' // Prevent browser caching
                                 })
                                 .then(response => response.json())
@@ -1791,7 +1791,7 @@
             const loadingSpinner = document.getElementById('loadingSpinner');
             loadingSpinner.style.display = 'flex';
             
-            fetch('../../../backend/api/sellers/delete_product.php', {
+            fetch('https://clothloop-backend.onrender.com/api/sellers/delete_product.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -1835,7 +1835,7 @@
             
             console.log('Request payload:', payload);
             
-            fetch('../../../backend/api/sellers/update_product_status.php', {
+            fetch('https://clothloop-backend.onrender.com/api/sellers/update_product_status.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -1908,7 +1908,7 @@
         
         // Function to handle logout
         function logout() {
-            fetch('../../../backend/api/users/logout.php')
+            fetch('https://clothloop-backend.onrender.com/api/users/logout.php')
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'success') {

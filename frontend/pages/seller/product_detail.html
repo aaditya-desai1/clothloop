@@ -675,7 +675,7 @@
             const timestamp = new Date().getTime();
             
             // Fetch product data from backend API
-            const apiUrl = `../../../backend/api/sellers/get_product_details.php?id=${productId}&t=${timestamp}`;
+            const apiUrl = `https://clothloop-backend.onrender.com/api/sellers/get_product_details.php?id=${productId}&t=${timestamp}`;
             console.log('Fetching from:', apiUrl);
             
             fetch(apiUrl, {
@@ -753,7 +753,7 @@
                 console.log('Using image path from database:', mainImageUrl);
             } else {
                 // Fallback to the API route
-                mainImageUrl = `/ClothLoop/backend/api/image_display.php?type=product&id=${product.id}&t=${timestamp}`;
+                mainImageUrl = `/ClothLohttps://clothloop-backend.onrender.com/api/image_display.php?type=product&id=${product.id}&t=${timestamp}`;
                 console.log('Using API fallback for image:', mainImageUrl);
             }
             
@@ -884,7 +884,7 @@
             const timestamp = new Date().getTime();
             
             // Check the product upload directory for additional images
-            const apiUrl = `/ClothLoop/backend/api/get_product_images.php?id=${product.id}&t=${timestamp}`;
+            const apiUrl = `/ClothLohttps://clothloop-backend.onrender.com/api/get_product_images.php?id=${product.id}&t=${timestamp}`;
             console.log('Fetching from API:', apiUrl);
             
             fetch(apiUrl, {
@@ -1067,7 +1067,7 @@
                 document.getElementById('loadingSpinner').style.display = 'flex';
             
             // Call delete API
-                fetch(`../../../backend/api/sellers/delete_product.php?id=${productId}`, {
+                fetch(`https://clothloop-backend.onrender.com/api/sellers/delete_product.php?id=${productId}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'

@@ -782,7 +782,7 @@
             }
             
             // Send data to server
-            fetch('../../../backend/api/sellers/upload_cloth.php', {
+            fetch('https://clothloop-backend.onrender.com/api/sellers/upload_cloth.php', {
                 method: 'POST',
                 body: formData,
                 cache: 'no-store' // Prevent caching
@@ -864,7 +864,7 @@
                 document.getElementById('submitBtn').textContent = 'Update Product';
                 
                 // Fetch product data
-                fetch(`../../../backend/api/sellers/get_product_details.php?id=${editId}`)
+                fetch(`https://clothloop-backend.onrender.com/api/sellers/get_product_details.php?id=${editId}`)
                     .then(response => response.json())
                     .then(data => {
                         console.log('API Response for product details:', data);
@@ -915,7 +915,7 @@
                     console.log('Using image path from database:', currentProductImage.src);
                 } else {
                     // Fallback to the API route
-                    currentProductImage.src = `../../../backend/api/image_display.php?type=product&id=${productId}&t=${new Date().getTime()}`;
+                    currentProductImage.src = `https://clothloop-backend.onrender.com/api/image_display.php?type=product&id=${productId}&t=${new Date().getTime()}`;
                     console.log('Using API fallback for image:', currentProductImage.src);
                 }
                 
@@ -990,7 +990,7 @@
 
         // Update the JavaScript to load categories and handle form submission
         function loadCategories() {
-            fetch('../../../backend/api/categories/list.php')
+            fetch('https://clothloop-backend.onrender.com/api/categories/list.php')
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'success') {
@@ -1034,7 +1034,7 @@
             document.getElementById('loadingSpinner').style.display = 'flex';
             
             // Fetch product details from API
-            fetch(`../../../backend/api/sellers/get_product_details.php?id=${productId}`)
+            fetch(`https://clothloop-backend.onrender.com/api/sellers/get_product_details.php?id=${productId}`)
                 .then(response => response.json())
                 .then(data => {
                     document.getElementById('loadingSpinner').style.display = 'none';

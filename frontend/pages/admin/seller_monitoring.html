@@ -1347,7 +1347,7 @@
             const sellersContainer = document.getElementById('sellers-list');
             sellersContainer.innerHTML = '<div class="loading">Loading sellers...</div>';
             
-            fetch('../../../backend/api/sellers/get_all_sellers.php?sort_by=' + sort_by + '&sort_order=' + sort_order)
+            fetch('https://clothloop-backend.onrender.com/api/sellers/get_all_sellers.php?sort_by=' + sort_by + '&sort_order=' + sort_order)
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'success') {
@@ -1386,7 +1386,7 @@
                 return;
             }
             
-            fetch('../../../backend/api/sellers/ban_seller.php', {
+            fetch('https://clothloop-backend.onrender.com/api/sellers/ban_seller.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -1416,7 +1416,7 @@
                 return;
             }
             
-            fetch('../../../backend/api/sellers/unban_seller.php', {
+            fetch('https://clothloop-backend.onrender.com/api/sellers/unban_seller.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -1452,7 +1452,7 @@
             
             console.log('Deleting seller with ID:', sellerId);
             
-            fetch('../../../backend/api/sellers/delete_seller.php', {
+            fetch('https://clothloop-backend.onrender.com/api/sellers/delete_seller.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -1506,7 +1506,7 @@
             if (reviewsElement.children.length === 0) {
                 reviewsElement.innerHTML = '<div class="loading">Loading reviews...</div>';
                 
-                fetch('../../../backend/api/getreviews.php?seller_id=' + sellerId + '&limit=10&offset=0')
+                fetch('https://clothloop-backend.onrender.com/api/getreviews.php?seller_id=' + sellerId + '&limit=10&offset=0')
                     .then(response => response.json())
                     .then(data => {
                         if (data.status === 'success') {
@@ -1737,7 +1737,7 @@
                 console.log(`Fetching products for seller ID: ${sellerId}`);
                 
                 // Use relative paths for API
-                const apiUrl = `../../../backend/api/products/get_seller_products.php?seller_id=${sellerId}`;
+                const apiUrl = `https://clothloop-backend.onrender.com/api/products/get_seller_products.php?seller_id=${sellerId}`;
                 
                 fetch(apiUrl, {
                     method: 'GET',
@@ -1864,7 +1864,7 @@
                 productElement.style.pointerEvents = "none";
             }
             
-            fetch('../../../backend/api/products/toggle_product_visibility.php', {
+            fetch('https://clothloop-backend.onrender.com/api/products/toggle_product_visibility.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

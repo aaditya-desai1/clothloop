@@ -1,7 +1,7 @@
 // Check if logged-in user is admin and redirect to admin page
 document.addEventListener('DOMContentLoaded', function() {
     // Check session for user role
-    fetch('/backend/api/users/check_session.php')
+    fetchhttps://clothloop-backend.onrender.com/api/users/check_session.php')
         .then(response => response.json())
         .then(data => {
             if (data.status === 'success' && data.data.user && data.data.user.role === 'admin') {

@@ -1320,7 +1320,7 @@
                     };
                     
                     // Always use the direct image API for reliable image access
-                    const imageUrl = `/ClothLoop/backend/api/products/direct_image.php?product_id=${productId}`;
+                    const imageUrl = `/ClothLohttps://clothloop-backend.onrender.com/api/products/direct_image.php?product_id=${productId}`;
                     productObj.image = imageUrl;
                     
                     // Add to wishlist
@@ -1361,7 +1361,7 @@
                         localStorage.setItem(wishlistKey, JSON.stringify(updatedWishlist));
                         
                         // Send directly to server
-                        fetch('/ClothLoop/backend/api/buyers/sync_wishlist.php', {
+                        fetch('/ClothLohttps://clothloop-backend.onrender.com/api/buyers/sync_wishlist.php', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json'
@@ -1513,7 +1513,7 @@
                     console.log(`Syncing updated wishlist with server (${wishlist.length} items)`);
                     
                     // Make a direct server call to ensure synchronization
-                    fetch('/ClothLoop/backend/api/buyers/sync_wishlist.php', {
+                    fetch('/ClothLohttps://clothloop-backend.onrender.com/api/buyers/sync_wishlist.php', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
@@ -1548,7 +1548,7 @@
                         console.error('Network error removing item from wishlist:', error);
                         
                         // Make a fallback GET request to at least get the current state
-                        fetch(`/ClothLoop/backend/api/buyers/sync_wishlist.php?user_id=${userId}`, {
+                        fetch(`/ClothLohttps://clothloop-backend.onrender.com/api/buyers/sync_wishlist.php?user_id=${userId}`, {
                             method: 'GET',
                             credentials: 'include'
                         })
@@ -1625,7 +1625,7 @@
                 console.log(`Fetching wishlist for user ${userId} from server`);
                 
                 // Get wishlist from server with user_id in URL params
-                const response = await fetch(`/ClothLoop/backend/api/buyers/sync_wishlist.php?user_id=${userId}`, {
+                const response = await fetch(`/ClothLohttps://clothloop-backend.onrender.com/api/buyers/sync_wishlist.php?user_id=${userId}`, {
                     method: 'GET',
                     credentials: 'include' // Include cookies for session
                 });
@@ -1803,7 +1803,7 @@
                                 localStorage.setItem(`product_${productId}`, JSON.stringify(productInfo));
                                 
                                 // Send direct server request
-                                fetch('/ClothLoop/backend/api/buyers/sync_wishlist.php', {
+                                fetch('/ClothLohttps://clothloop-backend.onrender.com/api/buyers/sync_wishlist.php', {
                                     method: 'POST',
                                     headers: {
                                         'Content-Type': 'application/json'
@@ -1873,7 +1873,7 @@
                             localStorage.setItem(wishlistKey, JSON.stringify(updatedWishlist));
                             
                             // Send direct server request
-                            fetch('/ClothLoop/backend/api/buyers/sync_wishlist.php', {
+                            fetch('/ClothLohttps://clothloop-backend.onrender.com/api/buyers/sync_wishlist.php', {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json'
@@ -1986,7 +1986,7 @@
         // Function to fetch user profile data from API
         async function fetchUserProfile() {
             try {
-                const response = await fetch('/ClothLoop/backend/api/buyers/get_buyer_profile.php', {
+                const response = await fetch('/ClothLohttps://clothloop-backend.onrender.com/api/buyers/get_buyer_profile.php', {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json'
@@ -2105,7 +2105,7 @@
                 }
                 
                 // Construct the URL for the API endpoint
-                let url = '/ClothLoop/backend/api/products/get_products.php?limit=20';
+                let url = '/ClothLohttps://clothloop-backend.onrender.com/api/products/get_products.php?limit=20';
                 
                 // Add timestamp to prevent caching
                 url += `&_t=${new Date().getTime()}`;
@@ -3123,7 +3123,7 @@
                         };
                         
                         // Try legacy endpoint as fallback
-                        this.src = `/ClothLoop/backend/api/getimage.php?id=${product.id}`;
+                        this.src = `/ClothLohttps://clothloop-backend.onrender.com/api/getimage.php?id=${product.id}`;
                     };
                     
                     // Add the product card to the grid
@@ -3199,7 +3199,7 @@
                         console.log('Empty or invalid wishlist data, trying direct server lookup...');
                         try {
                             // Try a direct API call to check what's in the wishlist
-                            const response = await fetch(`/ClothLoop/backend/api/buyers/sync_wishlist.php?user_id=${userId}`, {
+                            const response = await fetch(`/ClothLohttps://clothloop-backend.onrender.com/api/buyers/sync_wishlist.php?user_id=${userId}`, {
                                 method: 'GET',
                                 credentials: 'include'
                             });
@@ -3315,7 +3315,7 @@
             if (product.id) {
                 // Ensure ID is a string to avoid any type issues
                 const productId = typeof product.id === 'string' ? product.id : String(product.id);
-                return `/ClothLoop/backend/api/products/direct_image.php?product_id=${productId}`;
+                return `/ClothLohttps://clothloop-backend.onrender.com/api/products/direct_image.php?product_id=${productId}`;
             }
             
             // Try standard image fields
@@ -3350,7 +3350,7 @@
         // Function to fetch seller address dynamically
         async function fetchSellerAddress(sellerId) {
             try {
-                const response = await fetch(`/ClothLoop/backend/api/getshop.php?id=${sellerId}`);
+                const response = await fetch(`/ClothLohttps://clothloop-backend.onrender.com/api/getshop.php?id=${sellerId}`);
                 
                 if (!response.ok) {
                     throw new Error(`Failed to fetch seller data: ${response.status}`);
@@ -3388,7 +3388,7 @@
                 console.log(`Syncing wishlist for user ${userId} with server. Items: ${wishlist.length}`);
                 
                 // Send wishlist to server
-                const response = await fetch('/ClothLoop/backend/api/buyers/sync_wishlist.php', {
+                const response = await fetch('/ClothLohttps://clothloop-backend.onrender.com/api/buyers/sync_wishlist.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'

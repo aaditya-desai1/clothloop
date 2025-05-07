@@ -1118,7 +1118,7 @@
             const sellerId = localStorage.getItem('seller_id') || userId;
             
             // API URL with user data
-            const apiUrl = `../../../backend/api/sellers/dashboard_stats.php?user_id=${userId}&seller_id=${sellerId}&user_role=${userRole}&user_name=${encodeURIComponent(userName)}`;
+            const apiUrl = `https://clothloop-backend.onrender.com/api/sellers/dashboard_stats.php?user_id=${userId}&seller_id=${sellerId}&user_role=${userRole}&user_name=${encodeURIComponent(userName)}`;
             
             // Fetch dashboard data from API with user credentials
             fetch(apiUrl, {
@@ -1230,7 +1230,7 @@
         
         // Function to fetch seller profile photo separately if needed
         function fetchSellerProfilePhoto(sellerId) {
-            fetch(`../../../backend/api/sellers/get_seller_profile.php?id=${sellerId}`)
+            fetch(`https://clothloop-backend.onrender.com/api/sellers/get_seller_profile.php?id=${sellerId}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'success' || data.success === true) {
@@ -1458,7 +1458,7 @@
             localStorage.removeItem('seller_id');
             
             // Call logout API
-            fetch('../../../backend/api/users/logout.php', {
+            fetch('https://clothloop-backend.onrender.com/api/users/logout.php', {
                 method: 'GET',
                 credentials: 'include' // Important: include cookies for session
             })

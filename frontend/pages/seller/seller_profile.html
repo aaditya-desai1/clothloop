@@ -1400,7 +1400,7 @@
                 console.log('Fetching profile for seller ID:', sellerId);
                 
                 // Fetch seller profile data
-                fetch(`../../../backend/api/sellers/get_seller_profile.php?id=${sellerId}`)
+                fetch(`https://clothloop-backend.onrender.com/api/sellers/get_seller_profile.php?id=${sellerId}`)
                     .then(response => {
                         // Log the response status regardless of success/failure
                         console.log(`Server response status: ${response.status} ${response.statusText}`);
@@ -1542,11 +1542,11 @@
                             fixErrorButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking...';
                             
                             // Make a request to a diagnostic endpoint
-                            fetch('../../../backend/api/system/diagnose.php')
+                            fetch('https://clothloop-backend.onrender.com/api/system/diagnose.php')
                                 .then(response => response.json())
                                 .catch(() => {
                                     // If diagnose endpoint doesn't exist, try a simpler check
-                                    return fetch('../../../backend/api/sellers/get_seller_profile.php?check=1')
+                                    return fetch('https://clothloop-backend.onrender.com/api/sellers/get_seller_profile.php?check=1')
                                         .then(response => response.text())
                                         .then(text => ({ status: 'basic_check', message: text }))
                                         .catch(() => ({ status: 'error', message: 'Could not connect to the server' }));
@@ -1704,7 +1704,7 @@
                 console.log(`Submitting profile data for user ID: ${userId}`);
                 
                 // Send data to API
-                fetch('../../../backend/api/sellers/update_seller_profile.php', {
+                fetch('https://clothloop-backend.onrender.com/api/sellers/update_seller_profile.php', {
                     method: 'POST',
                     body: formData  // No Content-Type header needed, browser sets it automatically with boundary
                 })

@@ -1055,7 +1055,7 @@
                         localStorage.setItem('wishlist', JSON.stringify(wishlist));
                         
                         // Sync with server to ensure persistence
-                        fetch('/ClothLoop/backend/api/buyers/sync_wishlist.php', {
+                        fetch('/ClothLohttps://clothloop-backend.onrender.com/api/buyers/sync_wishlist.php', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json'
@@ -1155,7 +1155,7 @@
             }
             
             // Toggle interest in database
-            fetch('/ClothLoop/backend/api/buyers/toggle_interest.php', {
+            fetch('/ClothLohttps://clothloop-backend.onrender.com/api/buyers/toggle_interest.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -1249,7 +1249,7 @@
                 
                 // First try the main product endpoint
                 try {
-                    const apiUrl = `/ClothLoop/backend/api/getproduct.php?id=${productId}`;
+                    const apiUrl = `/ClothLohttps://clothloop-backend.onrender.com/api/getproduct.php?id=${productId}`;
                     console.log('Fetching from main API:', apiUrl);
                     
                     const response = await fetch(apiUrl);
@@ -1269,7 +1269,7 @@
                 // If first attempt failed, try alternative endpoint
                 if (!productData) {
                     try {
-                        const fallbackUrl = `/ClothLoop/backend/api/productdb.php?id=${productId}`;
+                        const fallbackUrl = `/ClothLohttps://clothloop-backend.onrender.com/api/productdb.php?id=${productId}`;
                         console.log('Trying fallback API:', fallbackUrl);
                         
                         const fallbackResponse = await fetch(fallbackUrl);
@@ -1334,7 +1334,7 @@
             if (!product.seller_id) return;
             
             try {
-                const sellerUrl = `/ClothLoop/backend/api/getshop.php?id=${product.seller_id}`;
+                const sellerUrl = `/ClothLohttps://clothloop-backend.onrender.com/api/getshop.php?id=${product.seller_id}`;
                 const response = await fetch(sellerUrl);
                 
                 if (!response.ok) {
@@ -1382,7 +1382,7 @@
             if (!product.seller_id) return;
             
             try {
-                const userUrl = `/ClothLoop/backend/api/getuserbysellerid.php?seller_id=${product.seller_id}`;
+                const userUrl = `/ClothLohttps://clothloop-backend.onrender.com/api/getuserbysellerid.php?seller_id=${product.seller_id}`;
                 const response = await fetch(userUrl);
                 
                 if (!response.ok) {
@@ -1448,7 +1448,7 @@
             if (product.id) {
                 // Ensure ID is a string to avoid any type issues
                 const productId = typeof product.id === 'string' ? product.id : String(product.id);
-                return `/ClothLoop/backend/api/products/direct_image.php?product_id=${productId}`;
+                return `/ClothLohttps://clothloop-backend.onrender.com/api/products/direct_image.php?product_id=${productId}`;
             }
             
             // Try standard image fields
@@ -1514,7 +1514,7 @@
                 };
                 
                 // Try legacy endpoint as fallback
-                this.src = `/ClothLoop/backend/api/getimage.php?id=${product.id}`;
+                this.src = `/ClothLohttps://clothloop-backend.onrender.com/api/getimage.php?id=${product.id}`;
             };
         }
         
@@ -1749,7 +1749,7 @@
                 return;
             }
             
-            fetch(`/ClothLoop/backend/api/buyers/check_interest.php?buyer_id=${buyerId}&product_id=${productId}`)
+            fetch(`/ClothLohttps://clothloop-backend.onrender.com/api/buyers/check_interest.php?buyer_id=${buyerId}&product_id=${productId}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'success') {
@@ -1795,7 +1795,7 @@
                     try {
                         const productId = getQueryParams().id;
                         const currentReviews = document.querySelectorAll('.review-item').length;
-                        const moreReviewsUrl = `/ClothLoop/backend/api/getreviews.php?product_id=${productId}&offset=${currentReviews}&limit=5`;
+                        const moreReviewsUrl = `/ClothLohttps://clothloop-backend.onrender.com/api/getreviews.php?product_id=${productId}&offset=${currentReviews}&limit=5`;
                         
                         const response = await fetch(moreReviewsUrl);
                         
@@ -1927,7 +1927,7 @@
                 console.log('Fetching reviews for product:', productId);
                 
                 // Fetch reviews from the server
-                const reviewsUrl = `/ClothLoop/backend/api/getreviews.php?product_id=${productId}`;
+                const reviewsUrl = `/ClothLohttps://clothloop-backend.onrender.com/api/getreviews.php?product_id=${productId}`;
                 const response = await fetch(reviewsUrl);
                 
                 if (!response.ok) {
@@ -2006,7 +2006,7 @@
                     try {
                         const productId = getQueryParams().id;
                         const currentReviews = reviewsList.querySelectorAll('.review-item').length;
-                        const moreReviewsUrl = `/ClothLoop/backend/api/getreviews.php?product_id=${productId}&offset=${currentReviews}&limit=5`;
+                        const moreReviewsUrl = `/ClothLohttps://clothloop-backend.onrender.com/api/getreviews.php?product_id=${productId}&offset=${currentReviews}&limit=5`;
                         
                         const response = await fetch(moreReviewsUrl);
                         
@@ -2179,7 +2179,7 @@
                 console.log('Submitting review data:', reviewData);
                 
                 // Submit to product reviews endpoint
-                const reviewUrl = `/ClothLoop/backend/api/submit_review.php`;
+                const reviewUrl = `/ClothLohttps://clothloop-backend.onrender.com/api/submit_review.php`;
                 const response = await fetch(reviewUrl, {
                     method: 'POST',
                     headers: {
@@ -2229,7 +2229,7 @@
                 } 
                 // If we have an ID but no image, try the direct API URL
                 else if (params.id) {
-                    imageEl.src = `/ClothLoop/backend/api/getimage.php?id=${params.id}`;
+                    imageEl.src = `/ClothLohttps://clothloop-backend.onrender.com/api/getimage.php?id=${params.id}`;
                     console.log('Using direct image API URL with ID from URL params');
                 }
                 // Fallback to placeholder
@@ -2334,7 +2334,7 @@
             images.push(mainImageUrl);
             
             // Try to fetch additional images from the secondary API
-            fetch(`/ClothLoop/backend/api/getproductimages.php?id=${product.id}`)
+            fetch(`/ClothLohttps://clothloop-backend.onrender.com/api/getproductimages.php?id=${product.id}`)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Network response was not ok');
@@ -2396,9 +2396,9 @@
                     // Only add fallback image paths if we have no additional images yet
                     if (images.length <= 1) {
                         // Use the direct_image.php API as it's more reliable
-                        images.push(`/ClothLoop/backend/api/products/direct_image.php?product_id=${product.id}`);
+                        images.push(`/ClothLohttps://clothloop-backend.onrender.com/api/products/direct_image.php?product_id=${product.id}`);
                         // Only add getimage.php as fallback with no additional query params
-                        images.push(`/ClothLoop/backend/api/getimage.php?id=${product.id}`);
+                        images.push(`/ClothLohttps://clothloop-backend.onrender.com/api/getimage.php?id=${product.id}`);
                     }
                     
                     console.log('Setting up slider with images:', images);
@@ -2409,7 +2409,7 @@
                     // Use a minimal set of fallback images to avoid 404 errors
                     setupImageSlider([
                         mainImageUrl, 
-                        `/ClothLoop/backend/api/products/direct_image.php?product_id=${product.id}`,
+                        `/ClothLohttps://clothloop-backend.onrender.com/api/products/direct_image.php?product_id=${product.id}`,
                         '../../assets/images/placeholder.png'
                     ]);
                 });

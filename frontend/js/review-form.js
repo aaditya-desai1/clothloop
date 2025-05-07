@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Submitting review:', reviewData);
             
             // Send the data to the server
-            fetch('/backend/api/submit_review.php', {
+            fetchhttps://clothloop-backend.onrender.com/api/submit_review.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

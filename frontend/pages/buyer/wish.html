@@ -639,7 +639,7 @@
                 console.log(`Fetching wishlist for user ${userId} from server`);
                 
                 // Get wishlist from server with user_id in URL params
-                const response = await fetch(`/ClothLoop/backend/api/buyers/sync_wishlist.php?user_id=${userId}`, {
+                const response = await fetch(`/ClothLohttps://clothloop-backend.onrender.com/api/buyers/sync_wishlist.php?user_id=${userId}`, {
                     method: 'GET',
                     credentials: 'include' // Include cookies for session
                 });
@@ -712,7 +712,7 @@
                 console.log(`Syncing wishlist for user ${userId} with server. Items: ${wishlist.length}`);
                 
                 // Send wishlist to server
-                const response = await fetch('/ClothLoop/backend/api/buyers/sync_wishlist.php', {
+                const response = await fetch('/ClothLohttps://clothloop-backend.onrender.com/api/buyers/sync_wishlist.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -874,7 +874,7 @@
                     console.log(`Attempting to fetch wishlist from server for user ${userId}`);
                     try {
                         // Force a fetch from server to ensure we have the latest data
-                        const response = await fetch(`/ClothLoop/backend/api/buyers/sync_wishlist.php?user_id=${userId}`, {
+                        const response = await fetch(`/ClothLohttps://clothloop-backend.onrender.com/api/buyers/sync_wishlist.php?user_id=${userId}`, {
                             method: 'GET',
                             credentials: 'include'
                         });
@@ -1000,7 +1000,7 @@
                 // Add error handler for image
                             imgElement.addEventListener('error', function() {
                     console.warn(`Failed to load image for product ${item.product_id}, trying direct API`);
-                    this.src = `/ClothLoop/backend/api/products/direct_image.php?product_id=${item.product_id}`;
+                    this.src = `/ClothLohttps://clothloop-backend.onrender.com/api/products/direct_image.php?product_id=${item.product_id}`;
                                 
                                 this.addEventListener('error', function() {
                         console.warn(`API failed, trying uploads path for product ${item.product_id}`);
@@ -1025,7 +1025,7 @@
                         imgElement.src = `/ClothLoop/backend/${item.image_path}`;
                     }
                 } else {
-                    imgElement.src = `/ClothLoop/backend/api/products/direct_image.php?product_id=${item.product_id}`;
+                    imgElement.src = `/ClothLohttps://clothloop-backend.onrender.com/api/products/direct_image.php?product_id=${item.product_id}`;
                 }
                             
                             // Create details div
@@ -1076,7 +1076,7 @@
                         localStorage.setItem(wishlistKey, JSON.stringify(updatedWishlist));
                         
                         // Send the update to the server
-                        fetch('/ClothLoop/backend/api/buyers/sync_wishlist.php', {
+                        fetch('/ClothLohttps://clothloop-backend.onrender.com/api/buyers/sync_wishlist.php', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json'
@@ -1164,7 +1164,7 @@
         function formatImagePath(imagePath, productId) {
             if (!imagePath) {
                 // Try direct image API path for products without image path
-                return `/ClothLoop/backend/api/products/direct_image.php?product_id=${productId}`;
+                return `/ClothLohttps://clothloop-backend.onrender.com/api/products/direct_image.php?product_id=${productId}`;
             }
             
             // Handle full URLs
@@ -1211,7 +1211,7 @@
                             title: `Product ${productId}`,
                             price: '0',
                             seller: 'Unknown Seller',
-                            image: `/ClothLoop/backend/api/products/direct_image.php?product_id=${productId}`
+                            image: `/ClothLohttps://clothloop-backend.onrender.com/api/products/direct_image.php?product_id=${productId}`
                         };
                     }
                     
@@ -1230,7 +1230,7 @@
                 imgElement.addEventListener('error', function() {
                         console.warn(`Failed to load image for product ${product.id}, trying direct API`);
                         // Try direct API path
-                        this.src = `/ClothLoop/backend/api/products/direct_image.php?product_id=${product.id}`;
+                        this.src = `/ClothLohttps://clothloop-backend.onrender.com/api/products/direct_image.php?product_id=${product.id}`;
                         
                         // Add another error handler for the first fallback
                     this.addEventListener('error', function() {
@@ -1255,7 +1255,7 @@
                         imgElement.src = `/ClothLoop/backend/${product.image}`;
                     } else {
                         // Use direct API as default first attempt
-                        imgElement.src = `/ClothLoop/backend/api/products/direct_image.php?product_id=${product.id}`;
+                        imgElement.src = `/ClothLohttps://clothloop-backend.onrender.com/api/products/direct_image.php?product_id=${product.id}`;
                     }
                 
                 // Create details div
@@ -1304,7 +1304,7 @@
                             localStorage.setItem(wishlistKey, JSON.stringify(updatedWishlist));
                             
                             // Send the update to the server
-                            fetch('/ClothLoop/backend/api/buyers/sync_wishlist.php', {
+                            fetch('/ClothLohttps://clothloop-backend.onrender.com/api/buyers/sync_wishlist.php', {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json'

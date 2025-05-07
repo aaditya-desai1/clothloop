@@ -973,7 +973,7 @@
             loadingSpinner.style.display = 'flex';
             
             // Construct the URL with seller_id parameter and pagination
-            const url = `../../../backend/api/sellers/get_seller_reviews.php?seller_id=${sellerId}&page=${page}&limit=${limit}`;
+            const url = `https://clothloop-backend.onrender.com/api/sellers/get_seller_reviews.php?seller_id=${sellerId}&page=${page}&limit=${limit}`;
             console.log('Fetching reviews with URL:', url);
             
             fetch(url)

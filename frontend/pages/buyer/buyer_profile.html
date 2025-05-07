@@ -1061,7 +1061,7 @@
                 // Show confirmation if needed
                 if (confirm('Are you sure you want to log out?')) {
                     // Call logout API
-                    fetch('../../../backend/api/users/logout.php', {
+                    fetch('https://clothloop-backend.onrender.com/api/users/logout.php', {
                         method: 'GET',
                         credentials: 'include'
                     })
@@ -1148,7 +1148,7 @@
                 }
                 
                 // Send data to server
-                fetch('../../../backend/api/buyers/update_profile.php', {
+                fetch('https://clothloop-backend.onrender.com/api/buyers/update_profile.php', {
                     method: 'POST',
                     body: formData,
                     credentials: 'include'
@@ -1295,7 +1295,7 @@
             
             // Function to remove profile photo via API
             function removeProfilePhoto() {
-                fetch('../../../backend/api/buyers/remove_profile_photo.php', {
+                fetch('https://clothloop-backend.onrender.com/api/buyers/remove_profile_photo.php', {
                     method: 'POST',
                     credentials: 'include'
                 })
@@ -1332,7 +1332,7 @@
                 document.getElementById('errorAlert').style.display = 'none';
 
                 // Fetch user data from the server
-                fetch('../../../backend/api/buyers/get_profile.php', {
+                fetch('https://clothloop-backend.onrender.com/api/buyers/get_profile.php', {
                     method: 'GET',
                     credentials: 'include' // Include cookies for authentication
                 })
@@ -1498,7 +1498,7 @@
                     password: loginPassword
                 };
                 
-                fetch('../../../backend/api/users/login.php', {
+                fetch('https://clothloop-backend.onrender.com/api/users/login.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'

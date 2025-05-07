@@ -1,0 +1,12 @@
+{
+  "name": "clothloop",
+  "version": "1.0.0",
+  "description": "Clothing Rental Platform",
+  "scripts": {
+    "update-api": "node update_api.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "fs-extra": "^11.2.0"
+  }
+} 
