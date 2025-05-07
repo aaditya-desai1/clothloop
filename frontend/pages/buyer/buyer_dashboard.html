@@ -2107,6 +2107,9 @@
                 // Construct the URL for the API endpoint
                 let url = '/ClothLoop/backend/api/products/get_products.php?limit=20';
                 
+                // Add timestamp to prevent caching
+                url += `&_t=${new Date().getTime()}`;
+                
                 if (category) {
                     // Map category names to IDs based on the correct database values
                     const categoryMap = {

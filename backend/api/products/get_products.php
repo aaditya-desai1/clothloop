@@ -61,6 +61,7 @@ try {
         JOIN sellers s ON p.seller_id = s.id
         JOIN users u ON s.id = u.id
         WHERE (p.status = 'available' OR p.status = 'active' OR p.status IS NULL)
+        AND (p.is_hidden = 0 OR p.is_hidden IS NULL)
     ";
     
     // Add filters
