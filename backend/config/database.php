@@ -25,12 +25,20 @@ class Database {
         $this->username = DB_USER;
         $this->password = DB_PASS;
         
+        // Log database connection details in production for debugging
+        if (IS_PRODUCTION) {
+            error_log("[Database] Initializing connection with: Host=$this->host, DB=$this->db_name, User=$this->username");
+        }
+        
         // Detect database type - PostgreSQL or MySQL based on host
-        // Render PostgreSQL URLs typically include "postgres", external MySQL might not
         $this->dbType = (IS_PRODUCTION && (
             stripos($this->host, 'postgres') !== false || 
             getenv('DB_TYPE') === 'postgres')
         ) ? 'pgsql' : 'mysql';
+        
+        if (IS_PRODUCTION) {
+            error_log("[Database] Using database type: " . $this->dbType);
+        }
     }
 
     /**
@@ -46,10 +54,16 @@ class Database {
             if ($this->dbType === 'pgsql') {
                 // PostgreSQL connection
                 $dsn = "pgsql:host={$this->host};dbname={$this->db_name}";
+                if (IS_PRODUCTION) {
+                    error_log("[Database] Connecting with PostgreSQL DSN: $dsn");
+                }
                 $this->conn = new PDO($dsn, $this->username, $this->password);
             } else {
                 // MySQL connection
                 $dsn = "mysql:host={$this->host};dbname={$this->db_name}";
+                if (IS_PRODUCTION) {
+                    error_log("[Database] Connecting with MySQL DSN: $dsn");
+                }
                 $this->conn = new PDO($dsn, $this->username, $this->password);
             }
             
@@ -60,7 +74,21 @@ class Database {
             if ($this->dbType === 'mysql') {
                 $this->conn->exec("set names utf8");
             }
+            
+            if (IS_PRODUCTION) {
+                error_log("[Database] Connection successful!");
+            }
         } catch(PDOException $e) {
+            // Log more detailed error information in production
+            if (IS_PRODUCTION) {
+                error_log("[Database] Connection Error: " . $e->getMessage());
+                error_log("[Database] Error Code: " . $e->getCode());
+                
+                // Try to retrieve more system information
+                error_log("[Database] PHP Version: " . phpversion());
+                error_log("[Database] Database extensions loaded: " . implode(", ", get_loaded_extensions()));
+            }
+            
             // Try to automatically create the database if it doesn't exist
             if ($e->getCode() == 1049 || $e->getCode() == 7) { // MySQL or PostgreSQL code for "Unknown database"
                 try {

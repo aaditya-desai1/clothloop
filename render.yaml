@@ -1,0 +1,41 @@
+services:
+  # Web service for PHP application
+  - type: web
+    name: clothloop-backend
+    env: docker
+    rootDir: .
+    region: ohio
+    plan: free
+    buildCommand: ""
+    startCommand: apache2-foreground
+    healthCheckPath: /api/index.php
+    envVars:
+      - key: RENDER
+        value: true
+      - key: FRONTEND_URL
+        value: https://clothloop.vercel.app
+      - key: DB_HOST
+        fromDatabase:
+          name: clothloop-db
+          property: host
+      - key: DB_NAME
+        fromDatabase:
+          name: clothloop-db
+          property: database
+      - key: DB_USER
+        fromDatabase:
+          name: clothloop-db
+          property: user
+      - key: DB_PASS
+        fromDatabase:
+          name: clothloop-db
+          property: password
+      - key: JWT_SECRET
+        generateValue: true
+
+databases:
+  # MySQL database
+  - name: clothloop-db
+    databaseName: clothloop
+    plan: free
+    region: ohio 

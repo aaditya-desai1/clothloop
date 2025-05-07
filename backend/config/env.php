@@ -15,9 +15,18 @@ $dbConfig = [
     'password' => $isProduction ? getenv('DB_PASS') : '',
 ];
 
+// Output database configuration for debugging in logs (only in production)
+if ($isProduction) {
+    error_log("Database Configuration:");
+    error_log("Host: " . $dbConfig['host']);
+    error_log("DB Name: " . $dbConfig['dbname']);
+    error_log("DB User: " . $dbConfig['username']);
+    error_log("DB Pass Length: " . (strlen($dbConfig['password']) > 0 ? 'Set' : 'Not Set'));
+}
+
 // Base URLs
 $baseUrl = $isProduction 
-    ? (getenv('FRONTEND_URL') ?: 'https://clothloop-frontend.vercel.app')
+    ? (getenv('FRONTEND_URL') ?: 'https://clothloop.vercel.app')
     : 'http://localhost/ClothLoop';
 
 // For API URL, in Docker on Render, we need to use the RENDER_EXTERNAL_URL env var
@@ -31,7 +40,7 @@ $uploadsUrl = $isProduction
     : 'http://localhost/ClothLoop/backend/uploads';
 
 $uploadsPath = $isProduction
-    ? '/var/www/html/backend/uploads'
+    ? '/var/www/html/uploads'
     : __DIR__ . '/../uploads';
 
 // Define constants
@@ -49,10 +58,10 @@ define('UPLOADS_PATH', $uploadsPath);
 define('JWT_SECRET', $isProduction ? (getenv('JWT_SECRET') ?: 'default_jwt_secret_for_render_deployment') : 'clothloop_secret_key_change_in_production');
 define('SESSION_DURATION', 86400); // 24 hours in seconds
 
-// CORS settings - in production, allow the frontend URL
-$frontendUrl = $isProduction ? (getenv('FRONTEND_URL') ?: 'https://clothloop-frontend.vercel.app') : null;
+// CORS settings - in production, allow all origins for now
+// We'll properly configure this later when the frontend is stable
 define('ALLOWED_ORIGINS', $isProduction 
-    ? [$frontendUrl, 'https://clothloop-frontend.vercel.app'] 
+    ? ['*'] 
     : ['http://localhost:3000', 'http://localhost', 'http://localhost/ClothLoop']
 );
 

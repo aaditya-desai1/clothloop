@@ -1,51 +1,44 @@
-FROM php:8.1-apache
+FROM php:8.0-apache
 
-# Set working directory
-WORKDIR /var/www/html
-
-# Install system dependencies
+# Install system dependencies and PHP extensions
 RUN apt-get update && apt-get install -y \
-    git \
-    curl \
+    default-mysql-client \
     libpng-dev \
-    libonig-dev \
-    libxml2-dev \
-    libpq-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
     zip \
-    unzip
-
-# Clear cache
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
-
-# Install PHP extensions
-RUN docker-php-ext-install pdo pdo_mysql mysqli mbstring exif pcntl bcmath gd
+    unzip \
+    git \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j$(nproc) gd mysqli pdo pdo_mysql
 
 # Enable Apache modules
-RUN a2enmod rewrite headers
+RUN a2enmod rewrite
 
-# Copy the application
-COPY . .
+# Set working directory to Apache document root
+WORKDIR /var/www/html
 
-# Create necessary directories with proper permissions
-RUN mkdir -p backend/uploads backend/logs && \
-    chmod -R 777 backend/uploads backend/logs
+# Copy application files
+COPY . /var/www/html/
 
-# Install composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+# Create uploads directory with proper permissions
+RUN mkdir -p /var/www/html/backend/uploads \
+    && chmod -R 777 /var/www/html/backend/uploads
 
-# Install dependencies
-RUN if [ -f "composer.json" ]; then composer install --no-interaction --no-dev; fi
+# Set up Apache configuration
+RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
 
-# Configure Apache for Render
-RUN echo 'ServerName localhost' >> /etc/apache2/apache2.conf && \
-    sed -i 's/\/var\/www\/html/\/var\/www\/html\/backend/g' /etc/apache2/sites-available/000-default.conf
+# Copy the backend files to the document root
+RUN cp -r /var/www/html/backend/* /var/www/html/ \
+    && rm -rf /var/www/html/backend \
+    && rm -rf /var/www/html/frontend
 
-# Set the document root to the backend directory
-ENV APACHE_DOCUMENT_ROOT /var/www/html/backend
+# Setup MySQL connection wait script
+COPY wait-for-mysql.sh /usr/local/bin/wait-for-mysql.sh
+RUN chmod +x /usr/local/bin/wait-for-mysql.sh
 
-# Expose the port Render will use
-EXPOSE $PORT
+# Expose port 80
+EXPOSE 80
 
-# Start Apache with the port from Render's environment variable
-CMD sed -i "s/80/$PORT/g" /etc/apache2/sites-available/000-default.conf /etc/apache2/ports.conf && \
-    apache2-foreground 
+# Start Apache
+CMD ["apache2-foreground"] 
