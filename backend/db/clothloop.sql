@@ -103,41 +103,6 @@ INSERT INTO `customer_interests` (`id`, `buyer_id`, `product_id`, `created_at`) 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `messages`
---
-
-CREATE TABLE `messages` (
-  `id` int(11) NOT NULL,
-  `sender_id` int(11) NOT NULL,
-  `receiver_id` int(11) NOT NULL,
-  `message` text NOT NULL,
-  `is_read` tinyint(1) DEFAULT 0,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `orders`
---
-
-CREATE TABLE `orders` (
-  `id` int(11) NOT NULL,
-  `buyer_id` int(11) NOT NULL,
-  `seller_id` int(11) NOT NULL,
-  `product_id` int(11) NOT NULL,
-  `rental_start_date` date NOT NULL,
-  `rental_end_date` date NOT NULL,
-  `total_price` decimal(10,2) NOT NULL,
-  `status` enum('pending','confirmed','cancelled','completed','returned') DEFAULT 'pending',
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `notes` text DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `products`
 --
 
@@ -244,26 +209,6 @@ INSERT INTO `product_reviews` (`id`, `product_id`, `buyer_id`, `rating`, `review
 -- --------------------------------------------------------
 
 --
--- Table structure for table `reviews`
---
-
-CREATE TABLE `reviews` (
-  `id` int(11) NOT NULL,
-  `order_id` int(11) NOT NULL,
-  `buyer_id` int(11) NOT NULL,
-  `product_id` int(11) NOT NULL,
-  `seller_id` int(11) NOT NULL,
-  `rating` int(11) NOT NULL CHECK (`rating` between 1 and 5),
-  `review_text` text DEFAULT NULL,
-  `seller_response` text DEFAULT NULL,
-  `response_date` timestamp NULL DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `sellers`
 --
 
@@ -274,34 +219,18 @@ CREATE TABLE `sellers` (
   `address` text DEFAULT NULL,
   `latitude` decimal(10,8) DEFAULT NULL,
   `longitude` decimal(11,8) DEFAULT NULL,
-  `rating` decimal(3,2) DEFAULT 0.00,
-  `total_ratings` int(11) DEFAULT 0
+  `avg_rating` decimal(3,2) DEFAULT 0.00,
+  `total_reviews` int(11) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `sellers`
 --
 
-INSERT INTO `sellers` (`id`, `shop_name`, `description`, `address`, `latitude`, `longitude`, `rating`, `total_ratings`) VALUES
-(1, 'Seller Hub', 'hi', 'Vesu', 40.71280000, -74.00600000, 0.00, 0),
-(4, 'Lorem Ipsum', 'Rental shop', 'Katargam', 21.14472170, 72.77177350, 0.00, 0),
-(10, 'Ali shop', NULL, 'Udhna', NULL, NULL, 0.00, 0);
-
--- --------------------------------------------------------
-
---
--- Table structure for table `seller_reviews`
---
-
-CREATE TABLE `seller_reviews` (
-  `id` int(11) NOT NULL,
-  `seller_id` int(11) NOT NULL,
-  `buyer_id` int(11) NOT NULL,
-  `rating` decimal(3,1) NOT NULL,
-  `review` text DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+INSERT INTO `sellers` (`id`, `shop_name`, `description`, `address`, `latitude`, `longitude`, `avg_rating`, `total_reviews`) VALUES
+(1, 'Seller Hub', 'hi', 'Vesu', 40.71280000, -74.00600000, 4.50, 5),
+(4, 'Lorem Ipsum', 'Rental shop', 'Katargam', 21.14472170, 72.77177350, 3.20, 5),
+(10, 'Ali shop', NULL, 'Udhna', NULL, NULL, 4.80, 3);
 
 -- --------------------------------------------------------
 
@@ -333,7 +262,7 @@ INSERT INTO `users` (`id`, `name`, `email`, `password`, `phone_no`, `role`, `cre
 (4, 'Lorem Ipsum', 'seller2@gmail.com', '$2y$10$Xor2KnAD34j/6LUhFKvewOQXLoZdMyswUfkt76fHiYsyKfX/6GkZe', '7896541230', 'seller', '2025-04-19 01:09:00', '2025-04-19 05:40:04', 'profile_68033734d339b.png', 'active'),
 (6, 'Yash Jariwala', 'yash@gmail.com', '$2y$10$3BOca96xxgCMnIJzadgVmOoAffXj7BopISTAQFCRtpqMlLRx4BdV.', '9313906844', 'buyer', '2025-04-19 04:53:08', '2025-04-19 04:53:50', 'profile_68032c5e1271a.jpg', 'active'),
 (7, 'Nishidh Jasani', 'nishidh@gmail.com', '$2y$10$siapeFGQB/WrfRBgAAQmBObMLVLjNlAgavFDg5P0xE6KWceVmmGGe', '9825561050', 'buyer', '2025-04-19 04:55:16', '2025-04-19 04:55:51', 'profile_68032cd7cd673.jpg', 'active'),
-(8, 'Aaditya Desai', 'aadi@gmail.com', '$2y$10$WNXT4ThtrduQqNfoBrYfTuiI0a40PLHy2m4RzmGIEHPAXqgkgqb5u', '8160224860', 'buyer', '2025-04-19 05:01:15', '2025-04-19 05:01:38', 'profile_68032e32c7a2e.jpg', 'active'),
+(8, 'Aaditya Desai', 'aadi@gmail.com', '$2y$10$WNXT4ThtrduQqNfoBrYfTuiI0a40PLHy2m4RzmGIEHPAXqgkgqb5u', '8160224860', 'admin', '2025-04-19 05:01:15', '2025-04-19 05:01:38', 'profile_68032e32c7a2e.jpg', 'active'),
 (9, 'Aaryan Joshi', 'aaryan@gmail.com', '$2y$10$7X5U86oY5UrHdqVS9ldShOcbFbRWz5Hg6sH7gUJS59zA8IvhV1j/K', '9512874414', 'buyer', '2025-04-19 05:03:13', '2025-04-19 05:04:56', 'profile_68032ec407fc6.jpg', 'active'),
 (10, 'Ali', 'Ali@gmail.com', '$2y$10$8OiaTMKUqA78OwKtNpj79.pgSlkIQi1lmlnCPNuephDwfvx9lYG8y', '8521479630', 'seller', '2025-04-19 05:45:59', '2025-04-19 05:45:59', NULL, 'active');
 
@@ -385,25 +314,6 @@ ALTER TABLE `customer_interests`
   ADD KEY `product_id` (`product_id`);
 
 --
--- Indexes for table `messages`
---
-ALTER TABLE `messages`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `receiver_id` (`receiver_id`),
-  ADD KEY `sender_id` (`sender_id`,`receiver_id`),
-  ADD KEY `is_read` (`is_read`);
-
---
--- Indexes for table `orders`
---
-ALTER TABLE `orders`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `product_id` (`product_id`),
-  ADD KEY `status` (`status`),
-  ADD KEY `buyer_id` (`buyer_id`),
-  ADD KEY `seller_id` (`seller_id`);
-
---
 -- Indexes for table `products`
 --
 ALTER TABLE `products`
@@ -428,28 +338,10 @@ ALTER TABLE `product_reviews`
   ADD KEY `buyer_id` (`buyer_id`);
 
 --
--- Indexes for table `reviews`
---
-ALTER TABLE `reviews`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `order_id` (`order_id`),
-  ADD KEY `buyer_id` (`buyer_id`),
-  ADD KEY `product_id` (`product_id`),
-  ADD KEY `seller_id` (`seller_id`);
-
---
 -- Indexes for table `sellers`
 --
 ALTER TABLE `sellers`
   ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `seller_reviews`
---
-ALTER TABLE `seller_reviews`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `seller_id` (`seller_id`),
-  ADD KEY `buyer_id` (`buyer_id`);
 
 --
 -- Indexes for table `users`
@@ -486,18 +378,6 @@ ALTER TABLE `customer_interests`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
--- AUTO_INCREMENT for table `messages`
---
-ALTER TABLE `messages`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `orders`
---
-ALTER TABLE `orders`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
@@ -514,18 +394,6 @@ ALTER TABLE `product_images`
 --
 ALTER TABLE `product_reviews`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
-
---
--- AUTO_INCREMENT for table `reviews`
---
-ALTER TABLE `reviews`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `seller_reviews`
---
-ALTER TABLE `seller_reviews`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `users`
@@ -557,21 +425,6 @@ ALTER TABLE `customer_interests`
   ADD CONSTRAINT `customer_interests_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE;
 
 --
--- Constraints for table `messages`
---
-ALTER TABLE `messages`
-  ADD CONSTRAINT `messages_ibfk_1` FOREIGN KEY (`sender_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `messages_ibfk_2` FOREIGN KEY (`receiver_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
-
---
--- Constraints for table `orders`
---
-ALTER TABLE `orders`
-  ADD CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`buyer_id`) REFERENCES `buyers` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `orders_ibfk_2` FOREIGN KEY (`seller_id`) REFERENCES `sellers` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `orders_ibfk_3` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE;
-
---
 -- Constraints for table `products`
 --
 ALTER TABLE `products`
@@ -592,26 +445,10 @@ ALTER TABLE `product_reviews`
   ADD CONSTRAINT `product_reviews_ibfk_2` FOREIGN KEY (`buyer_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
--- Constraints for table `reviews`
---
-ALTER TABLE `reviews`
-  ADD CONSTRAINT `reviews_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `reviews_ibfk_2` FOREIGN KEY (`buyer_id`) REFERENCES `buyers` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `reviews_ibfk_3` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `reviews_ibfk_4` FOREIGN KEY (`seller_id`) REFERENCES `sellers` (`id`) ON DELETE CASCADE;
-
---
 -- Constraints for table `sellers`
 --
 ALTER TABLE `sellers`
   ADD CONSTRAINT `sellers_ibfk_1` FOREIGN KEY (`id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
-
---
--- Constraints for table `seller_reviews`
---
-ALTER TABLE `seller_reviews`
-  ADD CONSTRAINT `seller_reviews_ibfk_1` FOREIGN KEY (`seller_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `seller_reviews_ibfk_2` FOREIGN KEY (`buyer_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `wishlist`
