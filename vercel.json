@@ -2,14 +2,20 @@
   "version": 2,
   "name": "clothloop-frontend",
   "builds": [
+    { "src": "*.html", "use": "@vercel/static" },
     { "src": "frontend/**/*", "use": "@vercel/static" }
   ],
   "routes": [
     { "src": "/", "dest": "/home.html" },
     { "src": "/home", "dest": "/home.html" },
-    { "src": "/(.*).html", "dest": "/$1.html" },
-    { "src": "/frontend/(.*)", "dest": "/frontend/$1" },
-    { "src": "/(.*)", "dest": "/$1" }
+    { "src": "^/frontend/(.*)", "dest": "/frontend/$1" },
+    { "src": "^/(.*)\\.html", "dest": "/$1.html" },
+    { "src": "^/(.*)\\.css", "dest": "/$1.css" },
+    { "src": "^/(.*)\\.js", "dest": "/$1.js" },
+    { "src": "^/(.*)\\.png", "dest": "/$1.png" },
+    { "src": "^/(.*)\\.jpg", "dest": "/$1.jpg" },
+    { "src": "^/(.*)\\.svg", "dest": "/$1.svg" },
+    { "src": "^/(.*)", "dest": "/home.html" }
   ],
   "github": {
     "silent": true

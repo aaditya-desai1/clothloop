@@ -42,22 +42,22 @@ if (file_exists($envFile)) {
     
     // Update the frontend URL
     $content = preg_replace(
-        '/\$baseUrl = \$isProduction \? getenv\(\'FRONTEND_URL\'\) \/\/ This will be your Vercel deployment URL/',
-        "\$baseUrl = \$isProduction ? '{$vercelUrl}' // Vercel frontend URL",
+        '/\$baseUrl = \$isProduction \? \(getenv\(\'FRONTEND_URL\'\) \?: \'[^\']*\'\)/',
+        "\$baseUrl = \$isProduction ? (getenv('FRONTEND_URL') ?: '{$vercelUrl}')",
         $content
     );
     
     // Update the backend URL
     $content = preg_replace(
-        '/\$apiUrl = \$isProduction \? getenv\(\'RENDER_EXTERNAL_URL\'\) \/\/ This will be your Render deployment URL/',
-        "\$apiUrl = \$isProduction ? '{$renderUrl}' // Render backend URL",
+        '/\$apiUrl = \$isProduction \? \(getenv\(\'RENDER_EXTERNAL_URL\'\) \?: \'[^\']*\'\)/',
+        "\$apiUrl = \$isProduction ? (getenv('RENDER_EXTERNAL_URL') ?: '{$renderUrl}')",
         $content
     );
     
     // Update the uploads URL
     $content = preg_replace(
-        '/\$uploadsPath = \$isProduction \? getenv\(\'RENDER_EXTERNAL_URL\'\) \. \'\/uploads\'/',
-        "\$uploadsPath = \$isProduction ? '{$renderUrl}/uploads'",
+        '/\$uploadsUrl = \$isProduction \? \(\(getenv\(\'RENDER_EXTERNAL_URL\'\) \?: \'[^\']*\'\) \. \'\/uploads\'\)/',
+        "\$uploadsUrl = \$isProduction ? ((getenv('RENDER_EXTERNAL_URL') ?: '{$renderUrl}') . '/uploads')",
         $content
     );
     
@@ -68,15 +68,77 @@ if (file_exists($envFile)) {
     exit(1);
 }
 
-// Update API URLs in frontend files
+// Update API URLs in frontend files directly
 echo "\nUpdating API URLs in frontend files...\n";
-if (file_exists(__DIR__ . '/backend/api/update_api_urls.php')) {
-    include __DIR__ . '/backend/api/update_api_urls.php';
-    echo "Frontend files updated with new API URLs.\n";
-} else {
-    echo "Error: API URL update script not found.\n";
-    exit(1);
+
+// Define the local and production API URLs
+$localApiUrl = 'http://localhost/ClothLoop/backend/api';
+$productionApiUrl = $renderUrl;
+
+// Define the frontend directory
+$frontendDir = __DIR__ . '/frontend';
+
+// Define the home.html file
+$homeFile = __DIR__ . '/home.html';
+
+// Define the file extensions to update
+$fileExtensions = ['html', 'js'];
+
+// Function to update URLs in a file
+function updateFileUrls($filePath, $localUrl, $productionUrl) {
+    $content = file_get_contents($filePath);
+    
+    // Replace local API URL with production URL
+    $newContent = str_replace($localUrl, $productionUrl, $content);
+    
+    // Update local file upload URLs
+    $newContent = str_replace(
+        'http://localhost/ClothLoop/backend/uploads', 
+        $productionUrl . '/uploads', 
+        $newContent
+    );
+    
+    // If changes were made, write the file back
+    if ($content !== $newContent) {
+        file_put_contents($filePath, $newContent);
+        echo "Updated: " . basename($filePath) . "\n";
+        return true;
+    }
+    
+    return false;
 }
+
+// Function to update URLs in a directory
+function updateDirectoryUrls($dir, $localUrl, $productionUrl, $extensions) {
+    $updated = 0;
+    $iterator = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS)
+    );
+    
+    foreach ($iterator as $file) {
+        if ($file->isFile()) {
+            $extension = pathinfo($file, PATHINFO_EXTENSION);
+            if (in_array($extension, $extensions)) {
+                if (updateFileUrls($file->getRealPath(), $localUrl, $productionUrl)) {
+                    $updated++;
+                }
+            }
+        }
+    }
+    
+    return $updated;
+}
+
+// Update home.html
+if (file_exists($homeFile)) {
+    if (updateFileUrls($homeFile, $localApiUrl, $productionApiUrl)) {
+        echo "Updated: home.html\n";
+    }
+}
+
+// Update frontend files
+$updatedFiles = updateDirectoryUrls($frontendDir, $localApiUrl, $productionApiUrl, $fileExtensions);
+echo "Updated {$updatedFiles} frontend files.\n";
 
 // Create necessary directories
 echo "\nCreating necessary directories...\n";
@@ -107,9 +169,11 @@ foreach ($directories as $dir) {
 echo "\nChecking for required deployment files...\n";
 $requiredFiles = [
     'vercel.json',
-    'backend/render.yaml',
-    'composer.json',
-    '.gitignore'
+    'index.html',
+    'home.html',
+    '.gitignore',
+    'Dockerfile',
+    '.dockerignore'
 ];
 
 $missingFiles = [];
