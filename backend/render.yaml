@@ -1,0 +1,32 @@
+services:
+  - type: web
+    name: clothloop-backend
+    env: php
+    runtime: php
+    buildCommand: |
+      composer install
+      mkdir -p /tmp/deploy/backend/uploads
+      chmod -R 777 /tmp/deploy/backend/uploads
+    startCommand: php -S 0.0.0.0:$PORT -t backend
+    envVars:
+      - key: RENDER
+        value: true
+      - key: DB_HOST
+        sync: false
+      - key: DB_NAME
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASS
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: FRONTEND_URL
+        sync: false
+        # Set this to your Vercel frontend URL after deployment
+
+databases:
+  - name: clothloop-db
+    plan: free
+    postDeploy: |
+      mysql -h $DB_HOST -u $DB_USER -p$DB_PASS $DB_NAME < backend/db/clothloop_updates.sql 

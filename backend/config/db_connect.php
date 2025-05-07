@@ -1,4 +1,35 @@
 <?php
+/**
+ * Database Connection Script
+ * Provides a simple way to get a database connection
+ */
+
+// Include the database class
+require_once 'database.php';
+
+// Get database connection
+function getConnection() {
+    try {
+        $database = new Database();
+        $conn = $database->connect();
+        return $conn;
+    } catch (Exception $e) {
+        // Handle connection errors
+        if (DEBUG_MODE) {
+            echo json_encode([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ]);
+        } else {
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'Database connection failed. Please try again later.'
+            ]);
+        }
+        exit;
+    }
+}
+
 // Database connection configuration
 $host = "localhost";  // Usually localhost for local development
 $username = "root";   // Default MySQL username

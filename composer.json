@@ -1,0 +1,20 @@
+{
+    "name": "clothloop/clothing-rental-platform",
+    "description": "A clothing rental platform that connects people who want to rent clothing with those who have items available for rent",
+    "type": "project",
+    "require": {
+        "php": ">=7.4",
+        "firebase/php-jwt": "^6.0",
+        "vlucas/phpdotenv": "^5.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "ClothLoop\\": "backend/"
+        }
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "chmod -R 777 backend/uploads"
+        ]
+    }
+} 

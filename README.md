@@ -7,8 +7,10 @@ ClothLoop is a modern clothing rental platform that connects people who want to 
 ## 📋 Table of Contents
 - [Features](#features)
 - [Technologies Used](#technologies-used)
-- [Installation](#installation)
-- [Usage](#usage)
+- [Local Installation](#local-installation)
+- [Deployment](#deployment)
+  - [Backend (Render)](#backend-render)
+  - [Frontend (Vercel)](#frontend-vercel)
 - [Project Structure](#project-structure)
 - [User Roles](#user-roles)
 - [API Endpoints](#api-endpoints)
@@ -62,7 +64,7 @@ ClothLoop is a modern clothing rental platform that connects people who want to 
 - Animation and transitions for enhanced UX
 - Responsive design for all device sizes
 
-## 📥 Installation
+## 📥 Local Installation
 
 ### Prerequisites
 - PHP 7.4 or higher
@@ -78,7 +80,7 @@ ClothLoop is a modern clothing rental platform that connects people who want to 
    ```
 
 2. **Set up the database**
-   - Import the database schema from `database/clothloop.sql`
+   - Import the database schema from `backend/db/clothloop_updates.sql`
    - Configure the database connection in `backend/config/database.php`
 
 3. **Configure the web server**
@@ -89,23 +91,74 @@ ClothLoop is a modern clothing rental platform that connects people who want to 
    - If using XAMPP/WAMP/MAMP, start Apache and MySQL services
    - Navigate to `http://localhost/ClothLoop` in your browser
 
-## 💻 Usage
+## 🚀 Deployment
 
-### Buyer Account
-1. Register as a buyer or use test credentials (Email: buyer@gmail.com, Password: buyer123)
-2. Browse available clothing items on the dashboard
-3. Use the search function or filter by category (Men, Women, Kids)
-4. Sort items by price or find nearby items
-5. Add items to your wishlist by clicking the heart icon
-6. View an item's details by clicking "View Details"
-7. Contact the seller through the provided information
+### Backend (Render)
 
-### Seller Account
-1. Register as a seller or use test credentials (Email: seller@gmail.com, Password: seller123)
-2. Add products by providing details and uploading images
-3. Manage your listings through the seller dashboard
-4. Update your shop information including location
-5. Respond to buyer inquiries
+1. **Create a Render account**
+   - Sign up at [render.com](https://render.com)
+
+2. **Connect your GitHub repository**
+   - Go to the Render Dashboard
+   - Click "New" and select "Web Service"
+   - Connect your GitHub repository
+
+3. **Configure the Web Service**
+   - Name: `clothloop-backend`
+   - Environment: `PHP`
+   - Build Command: `composer install && mkdir -p /tmp/deploy/backend/uploads && chmod -R 777 /tmp/deploy/backend/uploads`
+   - Start Command: `php -S 0.0.0.0:$PORT -t backend`
+
+4. **Set Environment Variables**
+   - RENDER=true
+   - DB_HOST (from your Render MySQL database)
+   - DB_NAME (from your Render MySQL database)
+   - DB_USER (from your Render MySQL database)
+   - DB_PASS (from your Render MySQL database)
+   - JWT_SECRET (generate a random string)
+
+5. **Create a MySQL Database**
+   - Go to the Render Dashboard
+   - Click "New" and select "PostgreSQL" (or use your preferred external MySQL provider)
+   - Note the connection details to use as environment variables
+
+6. **Deploy the Backend**
+   - Click "Create Web Service"
+   - Wait for the deployment to complete
+   - Note the URL of your deployed backend (e.g., `https://clothloop-backend.onrender.com`)
+
+### Frontend (Vercel)
+
+1. **Prepare the Frontend**
+   - Update the API URLs in the frontend to point to your Render backend:
+   ```php
+   php backend/api/update_api_urls.php
+   ```
+
+2. **Create a Vercel account**
+   - Sign up at [vercel.com](https://vercel.com)
+
+3. **Connect your GitHub repository**
+   - Go to the Vercel Dashboard
+   - Click "Import Project" and select your GitHub repository
+
+4. **Configure the Deployment**
+   - Framework Preset: Other
+   - Root Directory: ./
+   - Build Command: (leave empty)
+   - Output Directory: ./ 
+
+5. **Set Environment Variables**
+   - API_URL=https://your-backend.onrender.com (your Render backend URL)
+
+6. **Deploy the Frontend**
+   - Click "Deploy"
+   - Wait for the deployment to complete
+   - Your frontend is now live at the URL provided by Vercel
+
+7. **Update Backend Environment Variables**
+   - Go back to your Render backend service
+   - Add the FRONTEND_URL environment variable with your Vercel URL
 
 ## 📁 Project Structure
 
@@ -114,6 +167,7 @@ ClothLoop/
 ├── backend/
 │   ├── api/           # RESTful API endpoints
 │   ├── config/        # Database and app configuration
+│   ├── db/            # Database schema and migrations
 │   ├── uploads/       # Product images and user uploads
 │   └── utils/         # Helper functions and utilities
 ├── frontend/
@@ -125,6 +179,9 @@ ClothLoop/
 │       ├── auth/      # Authentication pages
 │       ├── buyer/     # Buyer-specific pages
 │       └── seller/    # Seller-specific pages
+├── vercel.json        # Vercel configuration
+├── render.yaml        # Render configuration
+├── composer.json      # PHP dependencies
 └── home.html          # Main entry point
 ```
 
@@ -156,6 +213,8 @@ ClothLoop/
 ### User Profiles
 - `/backend/api/buyers/get_buyer_profile.php` - Get buyer profile information
 - `/backend/api/buyers/toggle_interest.php` - Toggle interest in a product
+
+For a complete list of endpoints, see the API documentation at `/backend/api/` after deployment.
 
 ## 🚀 Future Enhancements
 
