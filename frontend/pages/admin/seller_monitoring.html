@@ -809,6 +809,44 @@
             text-align: center;
             margin-top: 50px;
         }
+        
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        .footer-logo i {
+            margin-right: 0.5rem;
+            font-size: 1.8rem;
+        }
+        
+        .footer-social {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+        
+        .footer-social a {
+            color: var(--footer-text);
+            font-size: 1.2rem;
+            transition: all var(--transition-speed) var(--transition-function);
+        }
+        
+        .footer-social a:hover {
+            color: var(--accent-color);
+            transform: translateY(-3px);
+        }
 
         .high-rating .rating-stars {
             color: #4CAF50;
@@ -1166,18 +1204,16 @@
 <body>
     <nav>
         <a href="/" class="logo">
-            <i class="fas fa-tshirt"></i> ClothLoop
+            <img id="navbar-logo" src="../../assets/images/logo_f.png" alt="ClothLoop Logo" style="height: 40px; margin-right: 10px;"> ClothLoop
             <span class="admin-badge">Admin</span>
         </a>
-        <ul>
-            <li><a href="#" class="active">Seller Monitoring</a></li>
-            <li><a href="#">Products</a></li>
-            <li><a href="#">Orders</a></li>
-            <li><a href="#">Settings</a></li>
-            <li><a href="/ClothLoop/frontend/pages/account/login.html">Logout</a></li>
-        </ul>
-        <div class="theme-switcher" id="theme-switcher">
-            <i class="fas fa-sun"></i>
+        <div style="display: flex; align-items: center; margin-left: auto;">
+            <ul>
+                <li><a href="/ClothLoop/frontend/pages/account/login.html">Logout</a></li>
+            </ul>
+            <div class="theme-switcher" id="theme-switcher">
+                <i class="fas fa-sun"></i>
+            </div>
         </div>
     </nav>
 
@@ -1204,10 +1240,38 @@
     </main>
 
     <footer>
-        <p>&copy; 2025 ClothLoop. All rights reserved.</p>
+        <div class="footer-content">
+            <div class="footer-logo">
+                <img src="../../assets/images/logo_f.png" alt="ClothLoop Logo" style="height: 40px; margin-right: 10px;"> ClothLoop
+            </div>
+            <p>&copy; 2023 ClothLoop. All rights reserved.</p>
+        </div>
     </footer>
     
+    <!-- Footer Logo Theme Fixer -->
+    <script src="../../assets/js/footer_fixer.js"></script>
+    
     <script>
+        // Global function for toggling wishlist state directly from HTML
+        function toggleWishlist(productId, isCurrentlyWishlisted) {
+            // Implement the logic to toggle the wishlist state
+            console.log(`Toggling wishlist for product ID: ${productId}, isCurrentlyWishlisted: ${isCurrentlyWishlisted}`);
+        }
+
+        // Function to update logo based on theme
+        function updateLogo(isLightTheme) {
+            const navbarLogo = document.getElementById('navbar-logo');
+            const footerLogo = document.querySelector('.footer-logo img');
+            
+            if (isLightTheme) {
+                navbarLogo.src = '../../assets/images/logo_b.png';
+                if (footerLogo) footerLogo.src = '../../assets/images/logo_b.png';
+            } else {
+                navbarLogo.src = '../../assets/images/logo_f.png';
+                if (footerLogo) footerLogo.src = '../../assets/images/logo_f.png';
+            }
+        }
+
         // Theme switcher functionality
         document.addEventListener('DOMContentLoaded', function() {
             initThemeSwitcher();
@@ -1226,19 +1290,23 @@
             if (localStorage.getItem('clothloop-theme') === 'light') {
                 document.body.classList.add('light-theme');
                 themeSwitch.innerHTML = '<i class="fas fa-moon"></i>';
+                updateLogo(true);
             } else {
                 themeSwitch.innerHTML = '<i class="fas fa-sun"></i>';
+                updateLogo(false);
             }
             
             themeSwitch.addEventListener('click', function() {
-                document.body.classList.toggle('light-theme');
+                const isLightTheme = document.body.classList.toggle('light-theme');
                 
-                if (document.body.classList.contains('light-theme')) {
+                if (isLightTheme) {
                     localStorage.setItem('clothloop-theme', 'light');
                     this.innerHTML = '<i class="fas fa-moon"></i>';
+                    updateLogo(true);
                 } else {
                     localStorage.setItem('clothloop-theme', 'dark');
                     this.innerHTML = '<i class="fas fa-sun"></i>';
+                    updateLogo(false);
                 }
             });
             
