@@ -2,7 +2,7 @@
 class Review {
     // Database connection and table name
     private $conn;
-    private $table = 'reviews';
+    private $table = 'product_reviews';
 
     // Review properties
     public $id;
@@ -15,7 +15,6 @@ class Review {
     public $seller_response;
     public $response_date;
     public $created_at;
-    public $updated_at;
 
     // Constructor with DB connection
     public function __construct($db) {
@@ -24,23 +23,23 @@ class Review {
 
     // Get reviews for a seller with pagination and optional rating filter
     public function getSellerReviews($seller_id, $limit, $offset, $rating = null) {
-        // Base query
-        $query = 'SELECT r.id, r.order_id, r.product_id, r.buyer_id, r.seller_id, 
-                        r.rating, r.review_text, r.seller_response, r.response_date, r.created_at, r.updated_at,
-                        u.name as buyer_name, u.profile_photo as buyer_image,
-                        p.title as product_name, p.id as product_id
-                  FROM ' . $this->table . ' r
-                  LEFT JOIN users u ON r.buyer_id = u.id
-                  LEFT JOIN products p ON r.product_id = p.id
-                  WHERE r.seller_id = :seller_id';
+        // Base query - joining with products to get reviews for products from this seller
+        $query = 'SELECT pr.id, pr.product_id, pr.buyer_id, pr.rating, pr.review as review_text, 
+                      pr.created_at, 
+                      u.name as buyer_name, u.profile_photo as buyer_image,
+                      p.title as product_name, p.id as product_id, p.seller_id
+                  FROM ' . $this->table . ' pr
+                  JOIN products p ON pr.product_id = p.id
+                  LEFT JOIN users u ON pr.buyer_id = u.id
+                  WHERE p.seller_id = :seller_id';
         
         // Add rating filter if specified
         if ($rating !== null) {
-            $query .= ' AND r.rating = :rating';
+            $query .= ' AND pr.rating = :rating';
         }
         
         // Add ordering and pagination
-        $query .= ' ORDER BY r.created_at DESC LIMIT :limit OFFSET :offset';
+        $query .= ' ORDER BY pr.created_at DESC LIMIT :limit OFFSET :offset';
         
         // Prepare statement
         $stmt = $this->conn->prepare($query);
@@ -69,20 +68,15 @@ class Review {
                 // Format the review data
                 $review_item = [
                     'id' => $row['id'],
-                    'order_id' => $row['order_id'],
                     'product_id' => $row['product_id'],
                     'product_name' => $row['product_name'],
-                    'product_image' => $row['product_image'],
                     'buyer_id' => $row['buyer_id'],
                     'buyer_name' => $row['buyer_name'],
                     'buyer_image' => $row['buyer_image'],
                     'seller_id' => $row['seller_id'],
                     'rating' => $row['rating'],
                     'review_text' => $row['review_text'],
-                    'seller_response' => $row['seller_response'],
-                    'response_date' => $row['response_date'],
-                    'created_at' => $row['created_at'],
-                    'updated_at' => $row['updated_at']
+                    'created_at' => $row['created_at']
                 ];
                 
                 array_push($reviews, $review_item);
@@ -94,12 +88,15 @@ class Review {
     
     // Count total reviews for a seller with optional rating filter
     public function countSellerReviews($seller_id, $rating = null) {
-        // Base query
-        $query = 'SELECT COUNT(*) as total FROM ' . $this->table . ' WHERE seller_id = :seller_id';
+        // Base query - count reviews for products from this seller
+        $query = 'SELECT COUNT(*) as total 
+                 FROM ' . $this->table . ' pr
+                 JOIN products p ON pr.product_id = p.id
+                 WHERE p.seller_id = :seller_id';
         
         // Add rating filter if specified
         if ($rating !== null) {
-            $query .= ' AND rating = :rating';
+            $query .= ' AND pr.rating = :rating';
         }
         
         // Prepare statement
@@ -124,8 +121,11 @@ class Review {
     
     // Get rating summary for a seller (average rating and count by rating)
     public function getSellerRatingSummary($seller_id) {
-        // Get average rating
-        $avgQuery = 'SELECT AVG(rating) as average FROM ' . $this->table . ' WHERE seller_id = :seller_id';
+        // Get average rating for a seller's products
+        $avgQuery = 'SELECT AVG(pr.rating) as average 
+                    FROM ' . $this->table . ' pr
+                    JOIN products p ON pr.product_id = p.id
+                    WHERE p.seller_id = :seller_id';
         $avgStmt = $this->conn->prepare($avgQuery);
         $avgStmt->bindParam(':seller_id', $seller_id);
         $avgStmt->execute();
@@ -133,8 +133,12 @@ class Review {
         $average = $avgRow['average'] ? round($avgRow['average'], 1) : 0;
         
         // Get count by rating
-        $countByRatingQuery = 'SELECT rating, COUNT(*) as count FROM ' . $this->table . ' 
-                              WHERE seller_id = :seller_id GROUP BY rating ORDER BY rating DESC';
+        $countByRatingQuery = 'SELECT pr.rating, COUNT(*) as count 
+                              FROM ' . $this->table . ' pr
+                              JOIN products p ON pr.product_id = p.id
+                              WHERE p.seller_id = :seller_id 
+                              GROUP BY pr.rating 
+                              ORDER BY pr.rating DESC';
         $countStmt = $this->conn->prepare($countByRatingQuery);
         $countStmt->bindParam(':seller_id', $seller_id);
         $countStmt->execute();
@@ -148,11 +152,15 @@ class Review {
         ];
         
         while ($row = $countStmt->fetch(PDO::FETCH_ASSOC)) {
-            $ratingBreakdown[$row['rating']] = (int)$row['count'];
+            $rating = min(5, max(1, (int)$row['rating'])); // Ensure rating is between 1-5
+            $ratingBreakdown[$rating] = (int)$row['count'];
         }
         
         // Get total count
-        $totalQuery = 'SELECT COUNT(*) as total FROM ' . $this->table . ' WHERE seller_id = :seller_id';
+        $totalQuery = 'SELECT COUNT(*) as total 
+                     FROM ' . $this->table . ' pr
+                     JOIN products p ON pr.product_id = p.id
+                     WHERE p.seller_id = :seller_id';
         $totalStmt = $this->conn->prepare($totalQuery);
         $totalStmt->bindParam(':seller_id', $seller_id);
         $totalStmt->execute();
@@ -170,25 +178,21 @@ class Review {
     public function create() {
         // Create query
         $query = 'INSERT INTO ' . $this->table . ' 
-                 (order_id, product_id, buyer_id, seller_id, rating, review_text)
-                 VALUES (:order_id, :product_id, :buyer_id, :seller_id, :rating, :review_text)';
+                 (product_id, buyer_id, rating, review)
+                 VALUES (:product_id, :buyer_id, :rating, :review_text)';
                  
         // Prepare statement
         $stmt = $this->conn->prepare($query);
         
         // Clean data
-        $this->order_id = htmlspecialchars(strip_tags($this->order_id));
         $this->product_id = htmlspecialchars(strip_tags($this->product_id));
         $this->buyer_id = htmlspecialchars(strip_tags($this->buyer_id));
-        $this->seller_id = htmlspecialchars(strip_tags($this->seller_id));
         $this->rating = htmlspecialchars(strip_tags($this->rating));
         $this->review_text = htmlspecialchars(strip_tags($this->review_text));
         
         // Bind parameters
-        $stmt->bindParam(':order_id', $this->order_id);
         $stmt->bindParam(':product_id', $this->product_id);
         $stmt->bindParam(':buyer_id', $this->buyer_id);
-        $stmt->bindParam(':seller_id', $this->seller_id);
         $stmt->bindParam(':rating', $this->rating);
         $stmt->bindParam(':review_text', $this->review_text);
         
@@ -198,21 +202,64 @@ class Review {
             return true;
         }
         
-        // Print error if something goes wrong
-        printf("Error: %s.\n", $stmt->error);
+        return false;
+    }
+    
+    // Update an existing review with response from seller
+    public function addSellerResponse() {
+        // Update query
+        $query = 'UPDATE ' . $this->table . '
+                 SET seller_response = :seller_response,
+                     response_date = NOW()
+                 WHERE id = :id';
+                 
+        // Prepare statement
+        $stmt = $this->conn->prepare($query);
+        
+        // Clean data
+        $this->id = htmlspecialchars(strip_tags($this->id));
+        $this->seller_response = htmlspecialchars(strip_tags($this->seller_response));
+        
+        // Bind parameters
+        $stmt->bindParam(':id', $this->id);
+        $stmt->bindParam(':seller_response', $this->seller_response);
+        
+        // Execute query
+        if ($stmt->execute()) {
+            return true;
+        }
         
         return false;
     }
-
-    /**
-     * Delete all reviews for a seller
-     * 
-     * @param int $sellerId The seller ID
-     * @return bool True if deleted successfully, false otherwise
-     */
+    
+    // Delete a review
+    public function delete() {
+        // Delete query
+        $query = 'DELETE FROM ' . $this->table . ' WHERE id = :id';
+        
+        // Prepare statement
+        $stmt = $this->conn->prepare($query);
+        
+        // Clean data
+        $this->id = htmlspecialchars(strip_tags($this->id));
+        
+        // Bind parameters
+        $stmt->bindParam(':id', $this->id);
+        
+        // Execute query
+        if ($stmt->execute()) {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    // Delete all reviews for a seller's products
     public function deleteBySellerId($sellerId) {
-        // Create query
-        $query = 'DELETE FROM ' . $this->table . ' WHERE seller_id = :seller_id';
+        // Delete query - must join with products to get the seller's product reviews
+        $query = 'DELETE pr FROM ' . $this->table . ' pr
+                 JOIN products p ON pr.product_id = p.id
+                 WHERE p.seller_id = :seller_id';
         
         // Prepare statement
         $stmt = $this->conn->prepare($query);
@@ -220,11 +267,15 @@ class Review {
         // Clean data
         $sellerId = htmlspecialchars(strip_tags($sellerId));
         
-        // Bind parameter
+        // Bind parameters
         $stmt->bindParam(':seller_id', $sellerId);
         
         // Execute query
-        return $stmt->execute();
+        if ($stmt->execute()) {
+            return true;
+        }
+        
+        return false;
     }
 }
 ?> 

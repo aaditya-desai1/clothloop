@@ -113,12 +113,131 @@ else if (isset($_GET['seller_id'])) {
         exit;
     }
     
-    // Get seller reviews (implement existing seller review code here)
-    // This is simplified as the original function relies on models/Review.php
-    $response = [
-        'status' => 'success',
-        'message' => 'Seller reviews functionality requires the original model approach'
-    ];
+    // Attempt to use the Review model for consistency
+    try {
+        // Include necessary files
+        require_once '../config/database.php';
+        require_once '../models/Review.php';
+        
+        // Create database connection
+        $database = new Database();
+        $db = $database->getConnection();
+        
+        // Create Review object
+        $reviewModel = new Review($db);
+        
+        // Get reviews
+        $reviewsData = $reviewModel->getSellerReviews($sellerId, $limit, $offset, $rating);
+        $totalReviews = $reviewModel->countSellerReviews($sellerId, $rating);
+        $ratingSummary = $reviewModel->getSellerRatingSummary($sellerId);
+        
+        // Set response
+        $response = [
+            'status' => 'success',
+            'message' => 'Reviews retrieved successfully',
+            'data' => $reviewsData,
+            'meta' => [
+                'total' => $totalReviews,
+                'page' => ceil($offset / $limit) + 1,
+                'limit' => $limit,
+                'average' => $ratingSummary['average'],
+                'breakdown' => $ratingSummary['breakdown']
+            ]
+        ];
+    } catch (Exception $e) {
+        // Fallback to direct database query if model approach fails
+        error_log("Error using Review model: " . $e->getMessage());
+        
+        // Get reviews directly from product_reviews via products table
+        $reviewsQuery = "SELECT pr.*, u.name, p.title as product_name 
+                        FROM product_reviews pr 
+                        JOIN products p ON pr.product_id = p.id
+                        LEFT JOIN users u ON pr.buyer_id = u.id 
+                        WHERE p.seller_id = '$sellerId'
+                        ORDER BY pr.created_at DESC 
+                        LIMIT $offset, $limit";
+        
+        $reviewsResult = mysqli_query($conn, $reviewsQuery);
+        
+        // Calculate average rating
+        $ratingQuery = "SELECT AVG(pr.rating) as avg_rating 
+                       FROM product_reviews pr 
+                       JOIN products p ON pr.product_id = p.id
+                       WHERE p.seller_id = '$sellerId'";
+        
+        $ratingResult = mysqli_query($conn, $ratingQuery);
+        $avgRating = mysqli_fetch_assoc($ratingResult)['avg_rating'];
+        
+        // Get total reviews count
+        $countQuery = "SELECT COUNT(*) as total 
+                      FROM product_reviews pr 
+                      JOIN products p ON pr.product_id = p.id
+                      WHERE p.seller_id = '$sellerId'";
+        
+        $countResult = mysqli_query($conn, $countQuery);
+        $totalReviews = mysqli_fetch_assoc($countResult)['total'];
+        
+        // Format reviews
+        $reviews = [];
+        if ($reviewsResult && mysqli_num_rows($reviewsResult) > 0) {
+            while ($row = mysqli_fetch_assoc($reviewsResult)) {
+                // Format date
+                $date = new DateTime($row['created_at']);
+                $formattedDate = $date->format('Y-m-d');
+                
+                // Get reviewer name
+                $reviewerName = $row['name'] ?? 'Anonymous';
+                
+                $reviews[] = [
+                    'id' => $row['id'],
+                    'product_id' => $row['product_id'],
+                    'product_name' => $row['product_name'],
+                    'reviewer_name' => $reviewerName,
+                    'rating' => (float)$row['rating'],
+                    'review_text' => $row['review'],
+                    'date' => $formattedDate
+                ];
+            }
+        }
+        
+        // Calculate rating breakdown
+        $breakdownQuery = "SELECT 
+                          FLOOR(pr.rating) as rating_value, 
+                          COUNT(*) as count 
+                          FROM product_reviews pr 
+                          JOIN products p ON pr.product_id = p.id
+                          WHERE p.seller_id = '$sellerId'
+                          GROUP BY FLOOR(pr.rating)";
+        
+        $breakdownResult = mysqli_query($conn, $breakdownQuery);
+        
+        $breakdown = [
+            5 => 0,
+            4 => 0,
+            3 => 0,
+            2 => 0,
+            1 => 0
+        ];
+        
+        if ($breakdownResult) {
+            while ($row = mysqli_fetch_assoc($breakdownResult)) {
+                $rating = min(5, max(1, (int)$row['rating_value']));
+                $breakdown[$rating] = (int)$row['count'];
+            }
+        }
+        
+        // Prepare response
+        $response = [
+            'status' => 'success',
+            'message' => count($reviews) > 0 ? 'Seller reviews retrieved successfully' : 'No reviews found for this seller',
+            'data' => $reviews,
+            'meta' => [
+                'average' => $avgRating ? round((float)$avgRating, 1) : 0,
+                'total' => (int)$totalReviews,
+                'breakdown' => $breakdown
+            ]
+        ];
+    }
 } 
 else {
     $response['message'] = 'Either product_id or seller_id is required';

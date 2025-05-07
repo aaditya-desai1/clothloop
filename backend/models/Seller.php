@@ -16,7 +16,6 @@ class Seller {
     public $address;
     public $latitude;
     public $longitude;
-    public $shop_logo;
     public $created_at;
     public $updated_at;
     public $avg_rating;
@@ -93,8 +92,8 @@ class Seller {
     public function create() {
         // Create query
         $query = "INSERT INTO " . $this->table . " 
-                  (id, shop_name, description, address, latitude, longitude, shop_logo) 
-                  VALUES (:id, :shop_name, :description, :address, :latitude, :longitude, :shop_logo)";
+                  (id, shop_name, description, address, latitude, longitude) 
+                  VALUES (:id, :shop_name, :description, :address, :latitude, :longitude)";
         
         // Prepare statement
         $stmt = $this->conn->prepare($query);
@@ -106,7 +105,6 @@ class Seller {
         $this->address = htmlspecialchars(strip_tags($this->address));
         $this->latitude = htmlspecialchars(strip_tags($this->latitude));
         $this->longitude = htmlspecialchars(strip_tags($this->longitude));
-        $this->shop_logo = htmlspecialchars(strip_tags($this->shop_logo));
         
         // Bind parameters
         $stmt->bindParam(':id', $this->id);
@@ -115,7 +113,6 @@ class Seller {
         $stmt->bindParam(':address', $this->address);
         $stmt->bindParam(':latitude', $this->latitude);
         $stmt->bindParam(':longitude', $this->longitude);
-        $stmt->bindParam(':shop_logo', $this->shop_logo);
         
         // Execute query
         if ($stmt->execute()) {
@@ -141,7 +138,6 @@ class Seller {
                       address = :address, 
                       latitude = :latitude, 
                       longitude = :longitude, 
-                      shop_logo = :shop_logo,
                       updated_at = NOW()
                   WHERE id = :id";
         
@@ -155,7 +151,6 @@ class Seller {
         $this->address = htmlspecialchars(strip_tags($this->address));
         $this->latitude = htmlspecialchars(strip_tags($this->latitude));
         $this->longitude = htmlspecialchars(strip_tags($this->longitude));
-        $this->shop_logo = htmlspecialchars(strip_tags($this->shop_logo));
         
         // Bind parameters
         $stmt->bindParam(':id', $this->id);
@@ -164,7 +159,6 @@ class Seller {
         $stmt->bindParam(':address', $this->address);
         $stmt->bindParam(':latitude', $this->latitude);
         $stmt->bindParam(':longitude', $this->longitude);
-        $stmt->bindParam(':shop_logo', $this->shop_logo);
         
         // Execute query
         if ($stmt->execute()) {

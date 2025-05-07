@@ -716,10 +716,25 @@
                 fetch('../../../backend/api/getreviews.php?seller_id=' + sellerId + '&limit=10&offset=0')
                     .then(response => response.json())
                     .then(data => {
-                        if (data.status === 'success' && data.data.reviews.length > 0) {
-                            displaySellerReviews(reviewsElement, data.data.reviews, data.data.summary);
+                        if (data.status === 'success') {
+                            // Check if we have reviews in the data property
+                            if (data.data && Array.isArray(data.data) && data.data.length > 0) {
+                                // Create a summary object if not present
+                                const summary = data.meta || {
+                                    average: data.data.reduce((acc, review) => acc + parseFloat(review.rating), 0) / data.data.length,
+                                    total: data.data.length,
+                                    breakdown: calculateRatingBreakdown(data.data)
+                                };
+                                
+                                displaySellerReviews(reviewsElement, data.data, summary);
+                            } else if (data.data && data.data.reviews && data.data.reviews.length > 0) {
+                                // Legacy format with nested reviews
+                                displaySellerReviews(reviewsElement, data.data.reviews, data.data.summary);
+                            } else {
+                                reviewsElement.innerHTML = '<div class="no-reviews">No reviews found for this seller.</div>';
+                            }
                         } else {
-                            reviewsElement.innerHTML = '<div class="no-reviews">No reviews found for this seller.</div>';
+                            reviewsElement.innerHTML = '<div class="error">Error: ' + data.message + '</div>';
                         }
                     })
                     .catch(error => {
@@ -729,6 +744,24 @@
             
             // Show the reviews
             reviewsElement.classList.add('show');
+        }
+        
+        // Helper function to calculate rating breakdown
+        function calculateRatingBreakdown(reviews) {
+            const breakdown = {
+                5: 0,
+                4: 0,
+                3: 0,
+                2: 0,
+                1: 0
+            };
+            
+            reviews.forEach(review => {
+                const rating = Math.min(5, Math.max(1, Math.round(parseFloat(review.rating))));
+                breakdown[rating]++;
+            });
+            
+            return breakdown;
         }
 
         // Display seller reviews
@@ -766,25 +799,35 @@
             
             // Add individual reviews
             reviews.forEach(review => {
-                const date = new Date(review.created_at).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                });
+                const reviewDate = review.date || review.created_at || review.review_date || 'Unknown date';
+                const reviewerName = review.reviewer_name || review.buyer_name || 'Anonymous';
+                const reviewText = review.review_text || review.review || '';
+                const reviewerImage = review.buyer_image || review.profile_photo || 'default.png';
+                
+                let date;
+                try {
+                    date = new Date(reviewDate).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    });
+                } catch (e) {
+                    date = reviewDate;
+                }
                 
                 content += `
                     <div class="review-item">
                         <div class="review-header">
                             <div class="review-user">
-                                <img src="../../../backend/uploads/profiles/${review.buyer_image || 'default.png'}" alt="${review.buyer_name}" class="review-user-image">
-                                <span class="review-username">${review.buyer_name}</span>
+                                <img src="../../../backend/uploads/profile_photos/${reviewerImage}" alt="${reviewerName}" class="review-user-image">
+                                <span class="review-username">${reviewerName}</span>
                             </div>
                             <div class="review-rating">
                                 <div class="rating-stars">${createRatingStars(review.rating)}</div>
                                 <span class="review-date">${date}</span>
                             </div>
                         </div>
-                        <div class="review-text">${review.review_text}</div>
+                        <div class="review-text">${reviewText}</div>
                         ${review.seller_response ? `
                         <div class="seller-response">
                             <div class="response-header">
@@ -832,7 +875,7 @@
                 sellerCard.innerHTML = `
                     <div class="seller-header">
                         <div class="seller-info">
-                            <img src="../../../backend/uploads/profiles/${seller.profile_photo || 'default.png'}" alt="${seller.name}" class="seller-image">
+                            <img src="../../../backend/uploads/profile_photos/${seller.profile_photo || 'default.png'}" alt="${seller.name}" class="seller-image">
                             <div>
                                 <h3>${seller.name} <span class="seller-status ${statusClass}">${seller.status}</span></h3>
                                 <p><i class="fas fa-envelope"></i> ${seller.email}</p>
