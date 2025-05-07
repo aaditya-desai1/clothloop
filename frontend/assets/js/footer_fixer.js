@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Function to update the footer logo based on theme
     function updateFooterLogo() {
         // Find all footer logo images (could be in multiple places)
-        const footerLogoImages = document.querySelectorAll('.footer-logo img');
+        const footerLogoImages = document.querySelectorAll('.footer-logo img, #footer-logo');
         
         // Get current theme
         const isLightTheme = document.body.classList.contains('light-theme');

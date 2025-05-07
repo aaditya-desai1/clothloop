@@ -58,6 +58,9 @@
             line-height: 1.7;
             color: var(--text-color);
             background-color: var(--light-bg);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
         /* Theme Switcher */
@@ -208,7 +211,8 @@
 
         /* Profile Content */
         .profile-container {
-            max-width: 800px;
+            width: 70%;
+            max-width: 1200px;
             margin: 50px auto;
             padding: 0 20px;
         }
@@ -391,6 +395,7 @@
         }
 
         .form-container {
+            width: 100%;
             background-color: var(--card-bg);
             border: 1px solid var(--input-border);
             padding: 40px;
@@ -398,6 +403,7 @@
             animation: fadeIn 2s ease-out;
             position: relative;
             overflow: hidden;
+            margin: 0 auto;
         }
 
         .form-group {
@@ -691,8 +697,15 @@
         }
 
         /* Responsive */
+        @media (max-width: 1024px) {
+            .profile-container {
+                width: 85%;
+            }
+        }
+        
         @media (max-width: 768px) {
             .profile-container {
+                width: 95%;
                 margin-top: 100px;
             }
             
@@ -749,20 +762,19 @@
         .footer {
             background-color: var(--footer-bg);
             color: var(--footer-text);
-            padding: 1rem 0 1rem;
+            padding: 1.5rem 0 1rem;
             clip-path: polygon(0 10%, 100% 0, 100% 100%, 0 100%);
-            padding-top: 1rem !important;
+            padding-top: 3rem !important;
             margin-top: auto;
             width: 100%;
+            position: relative;
         }
 
-        .footer-bottom {
+        .footer-content {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 1rem 2rem 0;
-            border-top: none;
+            padding: 0 2rem;
             text-align: center;
-            font-size: 0.9rem;
         }
 
         .footer-logo {
@@ -775,6 +787,7 @@
             justify-content: center;
             text-transform: uppercase;
             letter-spacing: 3px;
+            line-height: 1;
         }
 
         @media (max-width: 500px) {
@@ -957,15 +970,17 @@
                 </div>
             </form>
         </div>
+        <div style="margin-bottom: 80px;"></div>
     </main>
 
     <!-- Footer -->
     <footer class="footer">
         <div class="footer-content">
             <div class="footer-logo">
-                <img src="../../assets/images/logo_f.png" alt="ClothLoop Logo" style="height: 40px; margin-right: 10px;"> ClothLoop
+                <img id="footer-logo" src="../../assets/images/logo_f.png" alt="ClothLoop Logo" style="height: 40px; margin-right: 10px; vertical-align: middle;"> 
+                <span style="vertical-align: middle;">ClothLoop</span>
             </div>
-            <p>&copy; 2024 ClothLoop. All rights reserved.</p>
+            <p style="margin-top: 10px;">&copy; 2024 ClothLoop. All rights reserved.</p>
         </div>
     </footer>
     
@@ -996,6 +1011,14 @@
                 themeIcon.classList.remove('fa-sun');
                 themeIcon.classList.add('fa-moon');
                 updateLogo(true);
+                
+                // Update footer logo for light theme
+                const footerLogo = document.getElementById('footer-logo');
+                if (footerLogo) {
+                    const currentSrc = footerLogo.getAttribute('src');
+                    const basePath = currentSrc.substring(0, currentSrc.lastIndexOf('/') + 1);
+                    footerLogo.setAttribute('src', basePath + 'logo_b.png');
+                }
             }
             
             // Toggle theme
@@ -1008,11 +1031,25 @@
                     themeIcon.classList.add('fa-moon');
                     localStorage.setItem('clothloop-theme', 'light');
                     updateLogo(true);
+                    // Also update footer logo
+                    const footerLogo = document.getElementById('footer-logo');
+                    if (footerLogo) {
+                        const currentSrc = footerLogo.getAttribute('src');
+                        const basePath = currentSrc.substring(0, currentSrc.lastIndexOf('/') + 1);
+                        footerLogo.setAttribute('src', basePath + 'logo_b.png');
+                    }
                 } else {
                     themeIcon.classList.remove('fa-moon');
                     themeIcon.classList.add('fa-sun');
                     localStorage.setItem('clothloop-theme', 'dark');
                     updateLogo(false);
+                    // Also update footer logo
+                    const footerLogo = document.getElementById('footer-logo');
+                    if (footerLogo) {
+                        const currentSrc = footerLogo.getAttribute('src');
+                        const basePath = currentSrc.substring(0, currentSrc.lastIndexOf('/') + 1);
+                        footerLogo.setAttribute('src', basePath + 'logo_f.png');
+                    }
                 }
             });
 
