@@ -64,10 +64,35 @@ try {
     // Handle profile photo upload
     $profile_photo_path = null;
     if (!empty($_FILES['profile_photo']) && $_FILES['profile_photo']['error'] == 0) {
+        // Log file information
+        file_put_contents($logFile, "Received profile photo: " . json_encode($_FILES['profile_photo']) . "\n", FILE_APPEND);
+        
         // Create uploads directory if it doesn't exist
         $upload_dir = __DIR__ . '/../../uploads/profile_photos/';
+        
+        // Debug directory information
+        file_put_contents($logFile, "Upload directory path: $upload_dir\n", FILE_APPEND);
+        file_put_contents($logFile, "Directory exists: " . (is_dir($upload_dir) ? "Yes" : "No") . "\n", FILE_APPEND);
+        file_put_contents($logFile, "Directory writable: " . (is_writable($upload_dir) ? "Yes" : "No") . "\n", FILE_APPEND);
+        
         if (!is_dir($upload_dir)) {
-            mkdir($upload_dir, 0777, true);
+            file_put_contents($logFile, "Creating upload directory...\n", FILE_APPEND);
+            $mkdir_result = mkdir($upload_dir, 0777, true);
+            file_put_contents($logFile, "Directory creation result: " . ($mkdir_result ? "Success" : "Failed") . "\n", FILE_APPEND);
+            // Also try to set permissions explicitly
+            chmod($upload_dir, 0777);
+        }
+        
+        // Double-check directory exists
+        if (!is_dir($upload_dir)) {
+            // Try alternative upload directory
+            $upload_dir = __DIR__ . '/../../../uploads/profile_photos/';
+            file_put_contents($logFile, "Trying alternative upload directory: $upload_dir\n", FILE_APPEND);
+            
+            if (!is_dir($upload_dir)) {
+                mkdir($upload_dir, 0777, true);
+                chmod($upload_dir, 0777);
+            }
         }
         
         // Generate unique filename with profile_ prefix
@@ -75,13 +100,30 @@ try {
         $file_name = 'profile_' . uniqid() . '.' . $file_extension;
         $target_file = $upload_dir . $file_name;
         
+        file_put_contents($logFile, "Target file path: $target_file\n", FILE_APPEND);
+        
         // Move uploaded file
         if (move_uploaded_file($_FILES['profile_photo']['tmp_name'], $target_file)) {
+            // Make sure file is readable by everyone
+            chmod($target_file, 0666);
+            
             // Use just the filename, the path will be constructed in frontend
             $profile_photo_path = $file_name;
             file_put_contents($logFile, "File uploaded successfully to: $target_file as $profile_photo_path\n", FILE_APPEND);
         } else {
-            file_put_contents($logFile, "ERROR: Failed to upload file\n", FILE_APPEND);
+            $upload_error = error_get_last();
+            file_put_contents($logFile, "ERROR: Failed to upload file. PHP error: " . json_encode($upload_error) . "\n", FILE_APPEND);
+            file_put_contents($logFile, "Trying direct copy...\n", FILE_APPEND);
+            
+            // Try another method if move_uploaded_file fails
+            if (copy($_FILES['profile_photo']['tmp_name'], $target_file)) {
+                chmod($target_file, 0666);
+                $profile_photo_path = $file_name;
+                file_put_contents($logFile, "File copied successfully to: $target_file as $profile_photo_path\n", FILE_APPEND);
+            } else {
+                $copy_error = error_get_last();
+                file_put_contents($logFile, "ERROR: Direct copy also failed. PHP error: " . json_encode($copy_error) . "\n", FILE_APPEND);
+            }
         }
     }
     
@@ -183,10 +225,28 @@ try {
     file_put_contents($logFile, "Transaction committed successfully\n\n", FILE_APPEND);
     
     // Return success response
+    $response_data = [
+        'profile_photo' => $profile_photo_path,
+    ];
+    
+    // Add full photo URL if a file was uploaded
+    if ($profile_photo_path) {
+        // Detect server protocol and host
+        $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https://' : 'http://';
+        $host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost';
+        
+        // Both relative and absolute paths for the frontend to try
+        $response_data['profile_photo_relative'] = 'uploads/profile_photos/' . $profile_photo_path;
+        $response_data['profile_photo_backend'] = 'backend/uploads/profile_photos/' . $profile_photo_path;
+        $response_data['profile_photo_full'] = $protocol . $host . '/ClothLoop/backend/uploads/profile_photos/' . $profile_photo_path;
+        
+        file_put_contents($logFile, "Photo paths in response: " . json_encode($response_data, JSON_PRETTY_PRINT) . "\n", FILE_APPEND);
+    }
+    
     echo json_encode([
         'status' => 'success',
         'message' => 'Profile updated successfully',
-        'data' => ['profile_photo' => $profile_photo_path]
+        'data' => $response_data
     ]);
     
 } catch (Exception $e) {

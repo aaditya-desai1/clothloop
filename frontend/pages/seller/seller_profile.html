@@ -712,12 +712,18 @@
             width: 100%;
             height: 46px;
             padding: 0;
-            border: 1px solid var(--input-border);
+            border: 2px solid var(--accent-color);
             background-color: var(--input-bg);
             color: var(--text-color);
             overflow: hidden;
             display: flex;
             align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .custom-file-input:hover {
+            transform: translateY(-2px);
+            box-shadow: 3px 3px 0 rgba(128, 128, 128, 0.2);
         }
 
         .custom-file-input input[type="file"] {
@@ -736,7 +742,7 @@
             background-color: var(--primary-color);
             color: var(--accent-color);
             border: none;
-            border-right: 1px solid var(--accent-color);
+            border-right: 2px solid var(--accent-color);
             height: 100%;
             padding: 0 15px;
             margin: 0;
@@ -745,6 +751,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            font-weight: 600;
         }
 
         .file-name {
@@ -845,6 +852,7 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
+            display: block;
         }
         
         .preview-label {
@@ -1041,22 +1049,20 @@
                 <div class="form-section">
                     <h2 class="section-title"><i class="fas fa-store"></i> Shop Information</h2>
                     
-                    <div class="profile-section shop-info">
-                        <h3>Shop Information</h3>
-                        <div class="form-group">
-                            <label for="shopLogo">Shop Logo</label>
-                            <div class="logo-preview-container">
-                                <div class="logo-preview">
-                                    <i class="fas fa-store"></i>
-                                </div>
-                                <span class="preview-label">Logo Preview</span>
+                    <div class="form-group">
+                        <label for="shopLogo" class="form-label">Shop Logo</label>
+                        <div class="logo-preview-container">
+                            <div class="logo-preview">
+                                <i class="fas fa-store"></i>
                             </div>
-                            <div class="custom-file-input">
-                                <input type="file" id="shopLogo" name="shopLogo" accept="image/*">
-                                <div class="file-button">Choose File</div>
-                                <div class="file-name">No file chosen</div>
-                            </div>
+                            <span class="preview-label">Logo Preview</span>
                         </div>
+                        <div class="custom-file-input">
+                            <input type="file" id="shopLogo" name="shopLogo" accept="image/*">
+                            <div class="file-button"><i class="fas fa-upload"></i> Choose File</div>
+                            <div class="file-name">No file chosen</div>
+                        </div>
+                        <p style="font-size: 12px; margin-top: 8px; color: var(--text-color); opacity: 0.7;">Upload a square image for best results. Max file size: 2MB.</p>
                     </div>
         
                     <div class="form-group">
@@ -1254,6 +1260,9 @@
                 localStorage.setItem('user_role', 'seller');
             }
             
+            // Initialize the logo preview from localStorage if available
+            loadProfilePicture();
+            
             // Fetch seller profile
             fetchSellerProfile();
             
@@ -1280,7 +1289,98 @@
                 debugContainer.appendChild(debugOutput);
             }
             
-            // Fetch seller profile data from API
+            // Update the image preview function to be more robust
+            function updateLogoPreview(imagePath) {
+                const logoPreview = document.querySelector('.logo-preview');
+                
+                // Clear any existing content
+                logoPreview.innerHTML = '';
+                
+                if (!imagePath) {
+                    logoPreview.innerHTML = '<i class="fas fa-store"></i>';
+                    return;
+                }
+                
+                // Create new image element
+                const img = document.createElement('img');
+                img.alt = 'Shop Logo';
+                
+                // Log for debugging
+                console.log('Loading shop logo from:', imagePath);
+                
+                // Set up error handling
+                img.onerror = function() {
+                    console.error('Failed to load image from:', imagePath);
+                    
+                    // Try alternative URLs if the primary one fails
+                    const pathParts = imagePath.split('/');
+                    const filename = pathParts[pathParts.length - 1];
+                    
+                    // Build several alternative paths to try
+                    const alternativePaths = [
+                        `/ClothLoop/backend/uploads/profile_photos/${filename}`,
+                        `../../../backend/uploads/profile_photos/${filename}`,
+                        `../../../uploads/profile_photos/${filename}`,
+                        `/ClothLoop/uploads/profile_photos/${filename}`
+                    ];
+                    
+                    // Try loading from alternative paths
+                    tryLoadFromPaths(alternativePaths, 0);
+                };
+                
+                // Function to try loading from multiple paths
+                function tryLoadFromPaths(paths, index) {
+                    if (index >= paths.length) {
+                        // If all paths fail, show default icon
+                        console.error('All image loading attempts failed. Using default icon.');
+                        logoPreview.innerHTML = '<i class="fas fa-store"></i>';
+                        return;
+                    }
+                    
+                    const path = paths[index];
+                    console.log(`Trying alternative path ${index + 1}/${paths.length}: ${path}`);
+                    
+                    const retryImg = document.createElement('img');
+                    retryImg.alt = 'Shop Logo';
+                    
+                    retryImg.onload = function() {
+                        console.log('Image loaded successfully from alternative path:', path);
+                        logoPreview.innerHTML = '';
+                        logoPreview.appendChild(retryImg);
+                    };
+                    
+                    retryImg.onerror = function() {
+                        console.error('Failed to load from alternative path:', path);
+                        // Try next path
+                        tryLoadFromPaths(paths, index + 1);
+                    };
+                    
+                    retryImg.src = path;
+                }
+                
+                // Set onload handler
+                img.onload = function() {
+                    console.log('Image loaded successfully from primary path');
+                };
+                
+                // Set the image source
+                img.src = imagePath;
+                logoPreview.appendChild(img);
+            }
+
+            // Add this function just before the fetchSellerProfile function
+            function loadProfilePicture() {
+                const userId = localStorage.getItem('user_id');
+                if (!userId) return;
+                
+                // Try to load from local storage first
+                const storedPhotoPath = localStorage.getItem(`profile_photo_${userId}`);
+                if (storedPhotoPath) {
+                    updateLogoPreview(storedPhotoPath);
+                }
+            }
+
+            // Modify the fetch profile code to update the logo preview correctly
             function fetchSellerProfile() {
                 // Get seller ID from localStorage
                 const sellerId = localStorage.getItem('user_id');
@@ -1367,17 +1467,14 @@
                                         } else if (photoUrl.startsWith('/')) {
                                             fullPhotoUrl = photoUrl;
                                         } else {
-                                            fullPhotoUrl = '../../../backend/' + photoUrl;
+                                            fullPhotoUrl = '../../../backend/uploads/profile_photos/' + photoUrl;
                                         }
                                         
-                                        // Set image source
-                                        const logoPreview = document.querySelector('.logo-preview');
-                                        if (logoPreview) {
-                                            logoPreview.innerHTML = '';
-                                            const img = document.createElement('img');
-                                            img.src = fullPhotoUrl;
-                                            logoPreview.appendChild(img);
-                                        }
+                                        // Store in localStorage
+                                        localStorage.setItem(`profile_photo_${sellerId}`, fullPhotoUrl);
+                                        
+                                        // Call the unified function to update logo preview
+                                        updateLogoPreview(fullPhotoUrl);
                                     }
                                 }
                                 
@@ -1508,7 +1605,7 @@
                 if (this.files && this.files[0]) {
                     const file = this.files[0];
                     fileName.textContent = file.name;
-                    console.log(`File selected: ${file.name}`);
+                    console.log(`File selected: ${file.name}, size: ${file.size} bytes, type: ${file.type}`);
                     
                     const reader = new FileReader();
                     reader.onload = function(e) {
@@ -1571,8 +1668,17 @@
                 
                 // Add profile image/logo if selected
                 if (shopLogoInput.files && shopLogoInput.files[0]) {
-                    formData.append('profile_photo', shopLogoInput.files[0]);
-                    console.log('Adding profile photo to form data:', shopLogoInput.files[0].name);
+                    const file = shopLogoInput.files[0];
+                    formData.append('profile_photo', file);
+                    console.log('Adding profile photo to form data:', file.name, file.size, file.type);
+                    
+                    // Log all form data entries for debugging
+                    console.log("FormData contents:");
+                    for (let pair of formData.entries()) {
+                        console.log(pair[0] + ': ' + (pair[1] instanceof File ? 
+                                   `File: ${pair[1].name}, ${pair[1].size} bytes, ${pair[1].type}` : 
+                                   pair[1]));
+                    }
                 }
                 
                 // Add password info if change password checkbox is checked
@@ -1607,7 +1713,7 @@
                     return response.text();
                 })
                 .then(rawText => {
-                    console.log(`Raw response: ${rawText.substring(0, 150)}...`);
+                    console.log(`Raw response: ${rawText.substring(0, 500)}`);
                     try {
                         return JSON.parse(rawText);
                     } catch (e) {
@@ -1625,23 +1731,37 @@
                         
                         // Update profile image if it was uploaded and returned in the response
                         if (data.data && data.data.profile_photo) {
-                            const logoPreview = document.querySelector('.logo-preview');
-                            logoPreview.innerHTML = '';
-                            const img = document.createElement('img');
+                            // Check for multiple possible paths from the server
+                            let photoPath = data.data.profile_photo;
+                            let fullPhotoUrl = null;
                             
-                            // Check if the returned path is just a filename or a full path
-                            let fullPhotoUrl;
-                            if (data.data.profile_photo.includes('http')) {
-                                fullPhotoUrl = data.data.profile_photo;
-                            } else if (data.data.profile_photo.startsWith('/')) {
-                                fullPhotoUrl = data.data.profile_photo;
-                            } else {
-                                fullPhotoUrl = '../../../backend/' + data.data.profile_photo;
+                            console.log("Received profile photo data:", data.data);
+                            
+                            // Try the full URL first if available
+                            if (data.data.profile_photo_full) {
+                                fullPhotoUrl = data.data.profile_photo_full;
+                                console.log("Using full photo URL:", fullPhotoUrl);
+                            } 
+                            // Then try relative paths
+                            else if (data.data.profile_photo_backend) {
+                                fullPhotoUrl = `../../../${data.data.profile_photo_backend}`;
+                                console.log("Using backend relative path:", fullPhotoUrl);
+                            }
+                            else if (data.data.profile_photo_relative) {
+                                fullPhotoUrl = `../../../${data.data.profile_photo_relative}`;
+                                console.log("Using uploads relative path:", fullPhotoUrl);
+                            }
+                            // Fall back to default path construction
+                            else {
+                                fullPhotoUrl = `../../../backend/uploads/profile_photos/${photoPath}`;
+                                console.log("Using constructed path:", fullPhotoUrl);
                             }
                             
-                            img.src = fullPhotoUrl;
-                            logoPreview.appendChild(img);
-                            console.log('Updated profile image to:', fullPhotoUrl);
+                            // Save the path to localStorage
+                            localStorage.setItem(`profile_photo_${userId}`, fullPhotoUrl);
+                            
+                            // Use the unified function to update the preview
+                            updateLogoPreview(fullPhotoUrl);
                         }
                         
                         // Reset password fields if they were changed
