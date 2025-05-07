@@ -6,7 +6,18 @@
 
 // Include necessary files
 require_once __DIR__ . '/../config/env.php';
-require_once __DIR__ . '/../config/cors.php';
+
+// Set CORS headers - always allow all origins for Vercel frontend
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
+header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, Authorization");
+header("Access-Control-Max-Age: 3600");
+
+// Handle preflight requests
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit;
+}
 
 // Set content type to JSON
 header('Content-Type: application/json');
@@ -21,6 +32,7 @@ if ($method === 'GET') {
         'message' => 'ClothLoop API is running',
         'version' => '1.0.0',
         'environment' => IS_PRODUCTION ? 'production' : 'development',
+        'cors_status' => 'enabled',
         'api_documentation' => [
             'auth' => [
                 'login' => API_URL . '/users/login.php',
