@@ -1234,7 +1234,7 @@
     <!-- Product Template -->
     <template id="product-template">
         <div class="product-card">
-            <img class="product-image" src="" alt="Product Image" loading="lazy" 
+            <img class="product-image" src="../../assets/images/placeholder.png" alt="Product Image" loading="lazy" 
                  onerror="this.onerror=null; this.src='../../assets/images/placeholder.png';">
             <div class="product-details">
                 <h3 class="product-title">Product Title</h3>
@@ -1242,7 +1242,7 @@
                 <div class="product-seller">Seller Name</div>
                 <div class="product-actions">
                     <a href="#" class="view-details-btn">View Details</a>
-                    <a href="javascript:void(0);" class="wishlist-btn" title="Add to Wishlist" onclick="toggleWishlist(this, event); return false;"><i class="far fa-heart"></i></a>
+                    <a href="javascript:void(0);" class="wishlist-btn" title="Add to Wishlist"><i class="far fa-heart"></i></a>
                 </div>
             </div>
         </div>
@@ -1302,18 +1302,18 @@
                     heartIcon.className = 'fas fa-heart';
                     button.classList.add('active');
                     
-                    // Get product info
+                    // Get product info - safely check for element existence
                     const title = productCard.querySelector('.product-title');
                     const price = productCard.querySelector('.product-price');
                     const seller = productCard.querySelector('.product-seller');
                     const image = productCard.querySelector('.product-image');
                     
-                    // Construct product object
+                    // Construct product object with null checks
                     const productObj = {
                         id: productId,
-                        title: title ? title.textContent : 'Product',
-                        price: price ? price.textContent.replace('₹', '').replace('/day', '').trim() : '0',
-                        seller: seller ? seller.textContent : 'Seller'
+                        title: title && title.textContent ? title.textContent : 'Product',
+                        price: price && price.textContent ? price.textContent.replace('₹', '').replace('/day', '').trim() : '0',
+                        seller: seller && seller.textContent ? seller.textContent : 'Seller'
                     };
                     
                     // Always use the direct image API for reliable image access
@@ -1468,13 +1468,18 @@
                         heartIcon.className = 'fas fa-heart';
                         this.classList.add('active');
                         
-                        // Get product info
+                        // Get product info with null checks
+                        const titleElement = productCard.querySelector('.product-title');
+                        const priceElement = productCard.querySelector('.product-price');
+                        const sellerName = productCard.getAttribute('data-seller-name');
+                        const imageElement = productCard.querySelector('.product-image');
+                        
                         const productInfo = {
                             id: productId,
-                            title: productCard.querySelector('.product-title').textContent,
-                            price: productCard.querySelector('.product-price').textContent.replace('₹', '').replace('/day', '').trim(),
-                            seller: productCard.querySelector('.product-seller').textContent,
-                            image: productCard.querySelector('.product-image').src
+                            title: titleElement && titleElement.textContent ? titleElement.textContent : 'Product',
+                            price: priceElement && priceElement.textContent ? priceElement.textContent.replace('₹', '').replace('/day', '').trim() : '0',
+                            seller: sellerName || 'ClothLoop Seller',
+                            image: imageElement && imageElement.src ? imageElement.src : ''
                         };
                         
                         // Add to wishlist
@@ -2619,6 +2624,9 @@
                     
                     // Replace the original seller element with our new shop info container
                     seller.replaceWith(shopInfoContainer);
+                    
+                    // Also store the seller name as a data attribute for wishlist functionality
+                    productCard.setAttribute('data-seller-name', product.shop_name || product.seller_name || 'ClothLoop Seller');
                     
                     // Set link to details page
                     detailsLink.href = `details.html?id=${product.id}`;
