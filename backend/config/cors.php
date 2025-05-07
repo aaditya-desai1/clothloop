@@ -9,6 +9,14 @@ if (!defined('ALLOWED_ORIGINS')) {
     require_once __DIR__ . '/env.php';
 }
 
+// CORS settings - in production, allow the frontend URL
+// Add the Vercel domain explicitly
+$frontendUrl = $isProduction ? (getenv('FRONTEND_URL') ?: 'https://clothloop-frontend.vercel.app') : null;
+define('ALLOWED_ORIGINS', $isProduction 
+    ? [$frontendUrl, 'https://cloth-loop.vercel.app', 'https://clothloop-nyjms3mwb-aaditya-desais-projects.vercel.app', '*'] 
+    : ['http://localhost:3000', 'http://localhost', 'http://localhost/ClothLoop']
+);
+
 /**
  * Set CORS headers to allow cross-origin requests
  * 
@@ -21,17 +29,14 @@ function setCorsHeaders($origin = null) {
         $origin = $_SERVER['HTTP_ORIGIN'];
     }
     
-    // Check if the origin is allowed
-    $allowedOrigins = ALLOWED_ORIGINS;
-    
-    // In production, strictly check the origin
+    // In production, be more permissive to allow Vercel domains
     if (IS_PRODUCTION) {
-        if (in_array($origin, $allowedOrigins)) {
-            header("Access-Control-Allow-Origin: {$origin}");
-        }
+        // Allow all origins for now to fix CORS issues
+        header("Access-Control-Allow-Origin: *");
     } else {
-        // In development, be more permissive
-        if ($origin) {
+        // In development, check against allowed origins
+        $allowedOrigins = ALLOWED_ORIGINS;
+        if ($origin && in_array($origin, $allowedOrigins)) {
             header("Access-Control-Allow-Origin: {$origin}");
         } else {
             // Fallback for requests without origin header

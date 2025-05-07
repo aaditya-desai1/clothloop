@@ -1,4 +1,16 @@
 <?php
+// Allow CORS from any origin for Vercel frontend
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
+header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, Authorization");
+header("Access-Control-Max-Age: 3600");
+
+// Handle preflight requests
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit;
+}
+
 /**
  * Get Image API
  * Returns the primary image for a product by ID, as a direct image response

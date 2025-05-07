@@ -5,17 +5,9 @@
  * Handles user authentication and returns user details with JWT token
  */
 
-// Allow CORS - allow all origins for now to fix the CORS error
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: POST, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
-header("Access-Control-Max-Age: 3600");
-
-// Handle preflight requests
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(200);
-    exit;
-}
+// Include and apply CORS headers
+require_once __DIR__ . '/../../api/cors.php';
+apply_cors();
 
 // Set content type
 header('Content-Type: application/json');
@@ -49,6 +41,11 @@ try {
     $database = new Database();
     $db = $database->connect();
     
+    // Log the login attempt in production
+    if (IS_PRODUCTION) {
+        error_log("[Login] Attempt for user: " . $data['email']);
+    }
+    
     // Prepare query
     $query = "SELECT u.id, u.name, u.email, u.password, u.role, u.status 
               FROM users u 
@@ -60,6 +57,9 @@ try {
     
     // Check if user exists
     if ($stmt->rowCount() === 0) {
+        if (IS_PRODUCTION) {
+            error_log("[Login] User not found: " . $data['email']);
+        }
         sendError('User not found', null, 404);
     }
     
@@ -68,19 +68,66 @@ try {
     
     // Check if user is active
     if ($user['status'] !== 'active') {
+        if (IS_PRODUCTION) {
+            error_log("[Login] Account inactive: " . $data['email']);
+        }
         sendError('Account is inactive or suspended', null, 403);
     }
     
     // Verify password
     if (!password_verify($data['password'], $user['password'])) {
+        if (IS_PRODUCTION) {
+            error_log("[Login] Invalid password for: " . $data['email']);
+        }
         sendError('Invalid credentials', null, 401);
     }
     
     // Remove password from response
     unset($user['password']);
     
+    // Get additional user info based on role
+    if ($user['role'] === 'seller') {
+        try {
+            // Get seller information
+            $sellerQuery = "SELECT id, shop_name, address, description, profile_photo 
+                          FROM sellers WHERE id = :id";
+            $sellerStmt = $db->prepare($sellerQuery);
+            $sellerStmt->bindParam(':id', $user['id']);
+            $sellerStmt->execute();
+            
+            if ($sellerStmt->rowCount() > 0) {
+                $sellerInfo = $sellerStmt->fetch(PDO::FETCH_ASSOC);
+                $user['seller_info'] = $sellerInfo;
+            }
+        } catch (Exception $e) {
+            // Log error but continue
+            error_log("[Login] Error getting seller info: " . $e->getMessage());
+        }
+    } else if ($user['role'] === 'buyer') {
+        try {
+            // Get buyer information
+            $buyerQuery = "SELECT id, shipping_address, profile_photo 
+                         FROM buyers WHERE id = :id";
+            $buyerStmt = $db->prepare($buyerQuery);
+            $buyerStmt->bindParam(':id', $user['id']);
+            $buyerStmt->execute();
+            
+            if ($buyerStmt->rowCount() > 0) {
+                $buyerInfo = $buyerStmt->fetch(PDO::FETCH_ASSOC);
+                $user['buyer_info'] = $buyerInfo;
+            }
+        } catch (Exception $e) {
+            // Log error but continue
+            error_log("[Login] Error getting buyer info: " . $e->getMessage());
+        }
+    }
+    
     // Generate JWT token (placeholder - implement actual JWT in production)
     $token = "jwt_token_placeholder";
+    
+    if (IS_PRODUCTION) {
+        error_log("[Login] Successful login for: " . $data['email']);
+    }
     
     // Return success response
     sendSuccess('Login successful', [
@@ -89,5 +136,6 @@ try {
     ]);
     
 } catch (Exception $e) {
+    error_log("[Login] Error: " . $e->getMessage());
     sendError('An error occurred: ' . $e->getMessage(), null, 500);
 } 
