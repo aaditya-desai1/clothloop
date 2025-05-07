@@ -33,6 +33,33 @@ if (!isset($data['email']) || !isset($data['password'])) {
 $email = $data['email'];
 $password = $data['password'];
 
+// For demo purposes, allow login with predefined admin credentials
+if ($email === 'admin@clothloop.com' && $password === 'password') {
+    // Create a demo admin user
+    $user = [
+        'id' => 3,
+        'name' => 'Demo Admin',
+        'email' => 'admin@clothloop.com',
+        'role' => 'admin',
+        'phone_no' => '1234567890',
+        'status' => 'active'
+    ];
+    
+    // Start session
+    Auth::startSession($user);
+    
+    // Return success response
+    Response::success('Login successful', [
+        'user' => [
+            'id' => $user['id'],
+            'name' => $user['name'],
+            'email' => $user['email'],
+            'role' => $user['role']
+        ]
+    ]);
+    exit;
+}
+
 // For demo purposes, allow login with predefined credentials
 if ($email === 'buyer@clothloop.com' && $password === 'password') {
     // Create a demo buyer user

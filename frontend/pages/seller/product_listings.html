@@ -888,6 +888,103 @@
         flex-direction: column;
         width: 100%;
     }
+
+    /* Admin restriction badge */
+    .admin-restriction-badge {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background-color: var(--error-color);
+        color: white;
+        padding: 5px 10px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        border-radius: 3px;
+        z-index: 5;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    
+    .admin-restriction-badge i {
+        font-size: 1rem;
+    }
+    
+    /* Restriction notifications */
+    .restriction-notifications {
+        background-color: rgba(255, 59, 48, 0.1);
+        border-left: 4px solid var(--error-color);
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 4px;
+        animation: fadeIn 0.5s ease;
+    }
+    
+    .notification-heading {
+        font-size: 1.1rem;
+        color: var(--error-color);
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .notification-item {
+        background-color: rgba(255, 255, 255, 0.1);
+        padding: 12px;
+        margin-bottom: 10px;
+        border-radius: 4px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .notification-content {
+        flex: 1;
+    }
+    
+    .notification-time {
+        font-size: 0.8rem;
+        opacity: 0.7;
+        margin-top: 5px;
+    }
+    
+    .dismiss-notification {
+        background: none;
+        border: none;
+        color: var(--text-color);
+        cursor: pointer;
+        padding: 5px;
+        margin-left: 10px;
+        opacity: 0.6;
+        transition: opacity 0.3s;
+    }
+    
+    .dismiss-notification:hover {
+        opacity: 1;
+    }
+    
+    /* Product hidden state */
+    .product-hidden .product-image::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.6);
+        z-index: 1;
+    }
+    
+    .product-hidden .product-details {
+        opacity: 0.7;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
   </style>
 </head>
 <body>
@@ -1320,6 +1417,18 @@
                 
                 // Add data-id attribute for easier reference
                 productElement.setAttribute('data-id', product.id);
+                
+                // Mark hidden products
+                if (product.is_hidden === '1' || product.is_hidden === 1 || product.is_hidden === true) {
+                    productElement.classList.add('product-hidden');
+                    
+                    // Add admin restriction badge to product image container
+                    const imageContainer = productElement.querySelector('.product-image-container');
+                    const restrictionBadge = document.createElement('div');
+                    restrictionBadge.className = 'admin-restriction-badge';
+                    restrictionBadge.innerHTML = '<i class="fas fa-ban"></i> Hidden by Admin';
+                    imageContainer.appendChild(restrictionBadge);
+                }
                 
                 // Set product image
                 const imageElement = productElement.querySelector('.product-image');
@@ -1905,8 +2014,8 @@
             // Start trying paths
             tryCurrentPath();
         }
-    </script>
 
+        // Initialize the page
     <!-- Footer -->
     <footer class="footer">
         <div class="footer-bottom">
