@@ -417,25 +417,6 @@
     <div class="main-container">
         <h2 class="section-title">Your Wishlist</h2>
         
-        <!-- Debug controls (only visible in development) -->
-        <div class="debug-controls" style="text-align: right; margin-bottom: 20px;">
-            <button id="refresh-wishlist-btn" style="
-                background-color: transparent;
-                color: var(--accent-color);
-                border: 2px solid var(--accent-color);
-                padding: 8px 15px;
-                cursor: pointer;
-                font-size: 0.9rem;
-                font-weight: 600;
-                transition: all 0.2s linear;
-                font-family: 'Poppins', sans-serif;
-                display: inline-flex;
-                align-items: center;
-            ">
-                <i class="fas fa-sync-alt" style="margin-right: 8px;"></i> Refresh Wishlist
-            </button>
-        </div>
-
         <div id="wishlist-container">
             <div class="wishlist-grid" id="wishlist-grid">
                 <!-- Dynamic wishlist items will be loaded here -->
@@ -1106,20 +1087,6 @@
                 // Load wishlist items
                 await loadWishlistItems();
                 console.log('Wishlist initialization complete');
-                
-                // Add event listener for refresh button
-                const refreshButton = document.getElementById('refresh-wishlist-btn');
-                if (refreshButton) {
-                    refreshButton.addEventListener('click', async function() {
-                        console.log('Manual refresh requested');
-                        // Clear localStorage wishlist to force server fetch
-                        const userId = localStorage.getItem('user_id');
-                        if (userId) {
-                            localStorage.removeItem(`wishlist_${userId}`);
-                        }
-                        await loadWishlistItems();
-                    });
-                }
                 
             } catch (error) {
                 console.error('Error initializing wishlist:', error);
