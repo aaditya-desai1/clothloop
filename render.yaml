@@ -7,8 +7,8 @@ services:
     region: ohio
     plan: free
     buildCommand: ""
-    startCommand: apache2-foreground
-    healthCheckPath: /api/index.php
+    startCommand: "php setup_database.php && apache2-foreground"
+    healthCheckPath: /api/test/cors_test.php
     envVars:
       - key: RENDER
         value: true
