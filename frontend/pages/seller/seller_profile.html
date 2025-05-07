@@ -974,6 +974,22 @@
         <div class="alert alert-success" id="successAlert"></div>
         <div class="alert alert-error" id="errorAlert"></div>
 
+        <!-- Add detailed error display for server errors -->
+        <div id="serverErrorContainer" style="display: none; margin: 20px auto; max-width: 600px; background-color: var(--card-bg); border: 1px solid var(--error-color); padding: 20px; border-radius: 5px; box-shadow: var(--box-shadow); text-align: left;">
+            <h3 style="color: var(--error-color); margin-bottom: 15px;"><i class="fas fa-exclamation-triangle"></i> Server Error</h3>
+            <div id="serverErrorMessage" style="margin-bottom: 15px;"></div>
+            <div id="serverErrorDetails" style="margin-bottom: 15px; background-color: rgba(255,59,48,0.1); padding: 10px; border-left: 3px solid var(--error-color); overflow-x: auto; white-space: pre-wrap; font-family: monospace; font-size: 12px;"></div>
+            <div id="serverErrorSolution" style="margin-bottom: 15px;"></div>
+            <div style="display: flex; justify-content: space-between;">
+                <button id="fixErrorButton" class="btn" style="background-color: var(--primary-color); color: var(--accent-color); border: 1px solid var(--accent-color);">
+                    <i class="fas fa-wrench"></i> Repair
+                </button>
+                <button id="hideErrorButton" class="btn" style="background-color: transparent; color: var(--text-color); border: 1px solid var(--input-border);">
+                    <i class="fas fa-times"></i> Hide
+                </button>
+            </div>
+        </div>
+
         <div id="loginPrompt" style="display: none;">
             <p>You need to be logged in to view your profile.</p>
             
@@ -1283,10 +1299,25 @@
                 // Fetch seller profile data
                 fetch(`../../../backend/api/sellers/get_seller_profile.php?id=${sellerId}`)
                     .then(response => {
-                        if (!response.ok) {
-                            throw new Error(`HTTP error ${response.status}`);
-                        }
-                        return response.json();
+                        // Log the response status regardless of success/failure
+                        console.log(`Server response status: ${response.status} ${response.statusText}`);
+                        
+                        // First capture the raw response text for debugging
+                        return response.text().then(text => {
+                            if (!response.ok) {
+                                // Log the raw error response for debugging
+                                console.error('Error response text:', text);
+                                throw new Error(`HTTP error ${response.status}: ${text}`);
+                            }
+                            
+                            try {
+                                // Try to parse as JSON
+                                return JSON.parse(text);
+                            } catch (e) {
+                                console.error('Invalid JSON in response:', text);
+                                throw new Error('Invalid JSON response from server');
+                            }
+                        });
                     })
                     .then(data => {
                         // Hide loading spinner
@@ -1340,10 +1371,12 @@
                                         }
                                         
                                         // Set image source
-                                        const logoPreview = document.getElementById('logoPreview');
+                                        const logoPreview = document.querySelector('.logo-preview');
                                         if (logoPreview) {
-                                            logoPreview.src = fullPhotoUrl;
-                                            logoPreview.style.display = 'block';
+                                            logoPreview.innerHTML = '';
+                                            const img = document.createElement('img');
+                                            img.src = fullPhotoUrl;
+                                            logoPreview.appendChild(img);
                                         }
                                     }
                                 }
@@ -1362,7 +1395,108 @@
                         profileForm.style.display = 'block';
                         
                         console.error('Error fetching seller profile:', error);
-                        showAlert('Error fetching profile: ' + error.message, 'error');
+                        
+                        // Show detailed error message in the server error container
+                        const serverErrorContainer = document.getElementById('serverErrorContainer');
+                        const serverErrorMessage = document.getElementById('serverErrorMessage');
+                        const serverErrorDetails = document.getElementById('serverErrorDetails');
+                        const serverErrorSolution = document.getElementById('serverErrorSolution');
+                        const fixErrorButton = document.getElementById('fixErrorButton');
+                        
+                        // Show the error container
+                        serverErrorContainer.style.display = 'block';
+                        
+                        // Set error message and details
+                        let errorMsg = `Failed to fetch seller profile`;
+                        let errorDetails = error.message || 'Unknown error';
+                        let errorSolution = '';
+                        
+                        // Check for common error patterns
+                        if (errorDetails.includes('500')) {
+                            errorMsg = 'Server error when fetching profile';
+                            errorSolution = 'This might be due to a database connection issue or a problem with the seller tables. Try the repair button below.';
+                        } else if (errorDetails.includes('404')) {
+                            errorMsg = 'Profile API endpoint not found';
+                            errorSolution = 'The API endpoint for seller profiles could not be found. Please check your installation.';
+                        } else if (errorDetails.includes('403')) {
+                            errorMsg = 'Access forbidden';
+                            errorSolution = 'You do not have permission to access this profile. Please login with the correct credentials.';
+                        } else if (errorDetails.includes('401')) {
+                            errorMsg = 'Authentication required';
+                            errorSolution = 'Please login again to access your profile.';
+                        }
+                        
+                        serverErrorMessage.textContent = errorMsg;
+                        serverErrorDetails.textContent = errorDetails;
+                        serverErrorSolution.textContent = errorSolution;
+                        
+                        // Set up hide button
+                        document.getElementById('hideErrorButton').addEventListener('click', function() {
+                            serverErrorContainer.style.display = 'none';
+                        });
+                        
+                        // Set up fix button functionality
+                        fixErrorButton.addEventListener('click', function() {
+                            // Show that we're checking the issue
+                            fixErrorButton.disabled = true;
+                            fixErrorButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking...';
+                            
+                            // Make a request to a diagnostic endpoint
+                            fetch('../../../backend/api/system/diagnose.php')
+                                .then(response => response.json())
+                                .catch(() => {
+                                    // If diagnose endpoint doesn't exist, try a simpler check
+                                    return fetch('../../../backend/api/sellers/get_seller_profile.php?check=1')
+                                        .then(response => response.text())
+                                        .then(text => ({ status: 'basic_check', message: text }))
+                                        .catch(() => ({ status: 'error', message: 'Could not connect to the server' }));
+                                })
+                                .then(data => {
+                                    // Reset button
+                                    fixErrorButton.disabled = false;
+                                    fixErrorButton.innerHTML = '<i class="fas fa-wrench"></i> Repair';
+                                    
+                                    if (data && data.status === 'success') {
+                                        serverErrorSolution.textContent = 'Diagnostic passed. Try refreshing the page or clicking Retry.';
+                                    } else {
+                                        // Add a more specific solution based on the diagnostic
+                                        let solution = 'Could not automatically fix the issue. ';
+                                        
+                                        if (data && data.message) {
+                                            if (data.message.includes('database')) {
+                                                solution += 'There seems to be a database connection issue. Please check your XAMPP control panel and ensure MySQL is running.';
+                                            } else if (data.message.includes('table')) {
+                                                solution += 'There might be missing tables. Try reinstalling or running database setup.';
+                                            } else {
+                                                solution += data.message;
+                                            }
+                                        } else {
+                                            solution += 'Try restarting your XAMPP server or refreshing the page.';
+                                        }
+                                        
+                                        serverErrorSolution.textContent = solution;
+                                    }
+                                    
+                                    // Add retry button
+                                    const retryButton = document.createElement('button');
+                                    retryButton.innerHTML = '<i class="fas fa-sync-alt"></i> Retry';
+                                    retryButton.className = 'btn';
+                                    retryButton.style.marginLeft = '10px';
+                                    retryButton.style.backgroundColor = 'var(--primary-color)';
+                                    retryButton.style.color = 'var(--accent-color)';
+                                    retryButton.style.border = '1px solid var(--accent-color)';
+                                    
+                                    fixErrorButton.parentNode.appendChild(retryButton);
+                                    
+                                    retryButton.addEventListener('click', function() {
+                                        serverErrorContainer.style.display = 'none';
+                                        fetchSellerProfile();
+                                    });
+                                });
+                        });
+                        
+                        // Also show a simple alert for immediate visibility
+                        showAlert('Error fetching profile. See details below.', 'error');
                     });
             }
             

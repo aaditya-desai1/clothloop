@@ -33,20 +33,24 @@ class Seller {
      * @return array|bool Seller data or false if not found
      */
     public function getSingle() {
-        $query = "SELECT * FROM " . $this->table . " WHERE id = :id LIMIT 1";
-        
-        // Check which ID to use
-        $idToUse = $this->id ?? $this->seller_id;
-        
-        if (!$idToUse) {
-            return false;
+        // First, determine which ID to use and what column to query
+        if (isset($this->id)) {
+            $query = "SELECT * FROM " . $this->table . " WHERE id = :id LIMIT 1";
+            $idParam = $this->id;
+            $idName = ':id';
+        } else if (isset($this->seller_id)) {
+            $query = "SELECT * FROM " . $this->table . " WHERE id = :id LIMIT 1";
+            $idParam = $this->seller_id;
+            $idName = ':id';
+        } else {
+            return false; // No ID available
         }
         
         // Prepare statement
         $stmt = $this->conn->prepare($query);
         
         // Bind parameter
-        $stmt->bindParam(':id', $idToUse);
+        $stmt->bindParam($idName, $idParam);
         
         // Execute query
         $stmt->execute();

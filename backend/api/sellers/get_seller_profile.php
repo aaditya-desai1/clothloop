@@ -10,14 +10,14 @@ header("Access-Control-Allow-Methods: GET");
 header("Content-Type: application/json; charset=UTF-8");
 
 // Include database and model files
-include_once '../../config/Database.php';
+include_once '../../config/database.php';
 include_once '../../models/User.php';
 include_once '../../models/Seller.php';
 include_once '../../models/Review.php';
 include_once '../../models/Product.php';
 include_once '../../utils/Validator.php';
-include_once '../../utils/Response.php';
-include_once '../../utils/Auth.php';
+include_once '../../utils/response.php';
+include_once '../../utils/auth.php';
 
 // Initialize validator
 $validator = new Validator();
@@ -64,14 +64,40 @@ try {
     }
     
     // Get seller shop information
-    $seller->seller_id = $seller_id;
+    $seller->id = $seller_id;
     $shop_data = $seller->getSingle();
     
-    // Get seller rating summary
-    $rating_summary = $review->getSellerRatingSummary($seller_id);
+    // Get seller rating summary (with error handling for missing tables)
+    $rating_summary = [
+        'average_rating' => 0,
+        'total_reviews' => 0,
+        'rating_5' => 0,
+        'rating_4' => 0,
+        'rating_3' => 0,
+        'rating_2' => 0,
+        'rating_1' => 0
+    ];
+    try {
+        $rating_summary = $review->getSellerRatingSummary($seller_id);
+    } catch (Exception $e) {
+        // If table doesn't exist, we'll use the defaults
+        if (strpos($e->getMessage(), "doesn't exist") === false) {
+            // Re-throw if it's not a missing table error
+            throw $e;
+        }
+    }
     
-    // Get seller product count
-    $product_count = $product->countSellerProducts($seller_id);
+    // Get seller product count (with error handling for missing tables)
+    $product_count = 0;
+    try {
+        $product_count = $product->countSellerProducts($seller_id);
+    } catch (Exception $e) {
+        // If table doesn't exist, we'll use the default (0)
+        if (strpos($e->getMessage(), "doesn't exist") === false) {
+            // Re-throw if it's not a missing table error
+            throw $e;
+        }
+    }
     
     // Prepare response data
     $response_data = [
