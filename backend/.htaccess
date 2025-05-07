@@ -13,10 +13,13 @@ RewriteRule ^(.*)$ $1 [R=200,L]
     Header always set Access-Control-Allow-Credentials "true"
 </IfModule>
 
-# Send all API requests to the appropriate file
+# Send requests to index.php if file or directory doesn't exist
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^api/(.*)$ api/$1 [QSA,L]
+
+# Direct access to index.php for API health check
+RewriteRule ^$ api/index.php [L]
 
 # Protect sensitive files
 <FilesMatch "\.(htaccess|htpasswd|ini|log|sh|sql)$">

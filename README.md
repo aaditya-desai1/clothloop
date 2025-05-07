@@ -9,7 +9,7 @@ ClothLoop is a modern clothing rental platform that connects people who want to 
 - [Technologies Used](#technologies-used)
 - [Local Installation](#local-installation)
 - [Deployment](#deployment)
-  - [Backend (Render)](#backend-render)
+  - [Backend (Render with Docker)](#backend-render-with-docker)
   - [Frontend (Vercel)](#frontend-vercel)
 - [Project Structure](#project-structure)
 - [User Roles](#user-roles)
@@ -93,7 +93,7 @@ ClothLoop is a modern clothing rental platform that connects people who want to 
 
 ## 🚀 Deployment
 
-### Backend (Render)
+### Backend (Render with Docker)
 
 1. **Create a Render account**
    - Sign up at [render.com](https://render.com)
@@ -105,27 +105,31 @@ ClothLoop is a modern clothing rental platform that connects people who want to 
 
 3. **Configure the Web Service**
    - Name: `clothloop-backend`
-   - Environment: `PHP`
-   - Build Command: `composer install && mkdir -p /tmp/deploy/backend/uploads && chmod -R 777 /tmp/deploy/backend/uploads`
-   - Start Command: `php -S 0.0.0.0:$PORT -t backend`
+   - Environment: `Docker`
+   - Root Directory: (leave empty if Dockerfile is in the root, otherwise specify the directory containing Dockerfile)
+   - Build Command: (leave empty, Docker will handle this)
+   - Start Command: (leave empty, Docker will handle this)
 
 4. **Set Environment Variables**
    - RENDER=true
-   - DB_HOST (from your Render MySQL database)
-   - DB_NAME (from your Render MySQL database)
-   - DB_USER (from your Render MySQL database)
-   - DB_PASS (from your Render MySQL database)
+   - DB_HOST (from your database)
+   - DB_NAME (from your database)
+   - DB_USER (from your database)
+   - DB_PASS (from your database)
    - JWT_SECRET (generate a random string)
+   - FRONTEND_URL (your Vercel frontend URL after deployment)
 
-5. **Create a MySQL Database**
+5. **Create a Database**
+   - You can use Render's PostgreSQL service or any other MySQL/PostgreSQL provider
    - Go to the Render Dashboard
-   - Click "New" and select "PostgreSQL" (or use your preferred external MySQL provider)
-   - Note the connection details to use as environment variables
+   - Click "New" → "PostgreSQL"
+   - Set up your database with preferred settings
+   - Use the connection details in your environment variables
 
 6. **Deploy the Backend**
    - Click "Create Web Service"
    - Wait for the deployment to complete
-   - Note the URL of your deployed backend (e.g., `https://clothloop-backend.onrender.com`)
+   - Your backend will be available at `https://clothloop-backend.onrender.com`
 
 ### Frontend (Vercel)
 
